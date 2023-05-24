@@ -22,14 +22,14 @@ from pathlib import Path
 import shutil
 
 from utils.to_anki import add_to_anki
-from utils.misc import convert_paste
+from utils.misc import convert_paste, tokenize
 from utils.logger import red, whi, yel, log
+from utils.memory import curate_previous_prompts, memorized_prompts
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
 assert Path("API_KEY.txt").exists(), "No api key found"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
-enc = tiktoken.encoding_for_model("gpt-3.5-turbo")
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
@@ -42,8 +42,6 @@ TRANSCRIPT
 '''
 """
 
-with open("audio_prompts.json", "r") as f:
-    messages = json.load(f)
 
 # load anki profile using ankipandas just to get the media folder
 db_path = akp.find_db(user="Main")
@@ -231,22 +229,22 @@ def alfred(txt_audio, context):
     if not context:
         return "No context found.", None
 
-    global messages
-    messages = curate_previous_prompts(messages)
+    global memorized_prompts
+    memorized_prompts = curate_previous_prompts(memorized_prompts)
 
     formatted_messages = []
     tkns = 0
-    for m in messages:
+    for m in memorized_prompts:
         if m["disabled"] is True:
             continue
         formatted_messages.append(m.copy())
-        tkns += len(enc.encode(m["content"]))
+        tkns += len(tokenize(m["content"]))
         del formatted_messages[-1]["disabled"]
     formatted_messages.append(
             {"role": "user", "content": dedent(
                 transcript_template.replace("CONTEXT", context).replace("TRANSCRIPT", txt_audio)),
                 })
-    tkns += len(enc.encode(formatted_messages[-1]["content"]))
+    tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages in ChatGPT prompt: {len(formatted_messages)} (tokens: {tkns})")
 
     assert tkns <= 4000, f"Too many tokens! ({tkns})"
@@ -310,7 +308,7 @@ def auto_mode(*args, **kwargs):
 
 def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, output):
     whi("Recursively improving")
-    global messages
+    global memorized_prompts
     if not txt_audio:
         return "No audio transcripts found.\n\n" + output
     if not txt_chatgpt_cloz:
@@ -320,7 +318,7 @@ def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, out
         txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
 
     try:
-        assert len(messages) % 2 == 1, "invalid length of new prompts before even updating it"
+        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts before even updating it"
         to_add = [
                 {
                     "role": "user",
@@ -333,62 +331,21 @@ def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, out
                     "disabled": False,
                     }
                 ]
-        if to_add[0] in messages:
+        if to_add[0] in memorized_prompts:
             return f"Already present in previous outputs!\n\n{output}"
-        if to_add[1] in messages:
+        if to_add[1] in memorized_prompts:
             return f"Already present in previous outputs!\n\n{output}"
-        messages.extend(to_add)
+        memorized_prompts.extend(to_add)
 
-        messages = curate_previous_prompts(messages)
+        memorized_prompts = curate_previous_prompts(memorized_prompts)
 
-        assert len(messages) % 2 == 1, "invalid length of new prompts"
+        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts"
 
         with open("audio_prompts.json", "w") as f:
-            json.dump(messages, f, indent=4)
+            json.dump(memorized_prompts, f, indent=4)
     except Exception as err:
         return f"Error during recursive improvement: '{err}'\n\n{output}"
-    return f"Recursively improved: {len(messages)} total examples" + "\n\n" + output
-
-def curate_previous_prompts(messages):
-    "auto disable passed example if too many tokens"
-
-    # make sure they all have a disabled flag
-    for i, mess in enumerate(messages):
-        if "disabled" not in messages[i]:
-            messages[i]["disabled"] = False
-            yel(f"Edited entry {i} to add the 'disabled' flag")
-        assert mess["disabled"] in [True, False], "invalid value of disabled flag of a message"
-        assert mess["role"] in ["system", "user", "assistant"], "invalid value of role value of message"
-        assert "CONTEXT" not in mess["content"], "CONTEXT string found in message!"
-        assert "TRANSCRIPT" not in mess["content"], "TRANSCRIPT string found in message!"
-        messages[i]["content"] = dedent(messages[i]["content"]).strip()
-
-    while True:
-        tkns = 0
-        dis_tkns = 0
-        for m in messages:
-            if not m["disabled"]:
-                tkns += len(enc.encode(m["content"]))
-            else:
-                dis_tkns += len(enc.encode(m["content"]))
-        red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
-        if tkns > 3500:
-            red("Disabling oldest examples")
-            for i, m in enumerate(messages):
-                if m["role"] == "system":
-                    continue
-                if i % 2 != 1:
-                    continue
-                if not m["disabled"]:
-                    messages[i]["disabled"] = True
-                    assert messages[i]["role"] == "user", "unexpected role not user"
-                    messages[i + 1]["disabled"] = True
-                    assert messages[i + 1]["role"] == "assistant", "unexpected role not assitant"
-                    break
-
-        else:
-            break
-    return messages
+    return f"Recursively improved: {len(memorized_prompts)} total examples" + "\n\n" + output
 
 
 def main(
@@ -660,14 +617,5 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     ],
                 outputs=[output_elem],
                 )
-
-
-# check previous prompts just in case
-if not messages or not isinstance(messages, list):
-    print(messages)
-    raise SystemExit("Invalid messages")
-with open("audio_prompts.json", "w") as f:
-    json.dump(messages, f, indent=4)
-messages = curate_previous_prompts(messages)
 
 demo.queue()

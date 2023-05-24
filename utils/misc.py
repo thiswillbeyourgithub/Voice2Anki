@@ -1,3 +1,4 @@
+import tiktoken
 import ftfy
 
 # string at the end of the prompt
@@ -17,3 +18,7 @@ def convert_paste(paste):
     except:
         # is image
         return paste
+
+# used to count the number of tokens for chatgpt
+tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
+tokenize = tokenizer.encode
