@@ -1,8 +1,9 @@
 from textwrap import dedent
 import json
 
-from .logger import red, yel
-from .misc import tokenize
+from .logger import whi, red, yel
+from .misc import tokenize, transcript_template
+
 
 def curate_previous_prompts(memorized_prompts):
     "auto disable passed example if too many tokens"
@@ -45,6 +46,47 @@ def curate_previous_prompts(memorized_prompts):
             break
     return memorized_prompts
 
+
+def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, output):
+    whi("Recursively improving")
+    global memorized_prompts
+    if not txt_audio:
+        return "No audio transcripts found.\n\n" + output
+    if not txt_chatgpt_cloz:
+        return "No chatgpt cloze found.\n\n" + output
+    if "\n" in txt_chatgpt_cloz:
+        whi("Replaced newlines in txt_chatgpt_cloz")
+        txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
+
+    try:
+        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts before even updating it"
+        to_add = [
+                {
+                    "role": "user",
+                    "content": transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio),
+                    "disabled": False,
+                    },
+                {
+                    "role": "assistant",
+                    "content": txt_chatgpt_cloz.replace("\n", "<br/>"),
+                    "disabled": False,
+                    }
+                ]
+        if to_add[0] in memorized_prompts:
+            return f"Already present in previous outputs!\n\n{output}"
+        if to_add[1] in memorized_prompts:
+            return f"Already present in previous outputs!\n\n{output}"
+        memorized_prompts.extend(to_add)
+
+        memorized_prompts = curate_previous_prompts(memorized_prompts)
+
+        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts"
+
+        with open("audio_prompts.json", "w") as f:
+            json.dump(memorized_prompts, f, indent=4)
+    except Exception as err:
+        return f"Error during recursive improvement: '{err}'\n\n{output}"
+    return f"Recursively improved: {len(memorized_prompts)} total examples" + "\n\n" + output
 
 
 

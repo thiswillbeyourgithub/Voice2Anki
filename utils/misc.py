@@ -22,3 +22,13 @@ def convert_paste(paste):
 # used to count the number of tokens for chatgpt
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 tokenize = tokenizer.encode
+
+transcript_template = """
+Contexte: "CONTEXT"
+
+Transcript:
+'''
+TRANSCRIPT
+'''
+"""
+

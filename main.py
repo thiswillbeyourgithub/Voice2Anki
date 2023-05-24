@@ -24,7 +24,7 @@ import shutil
 from utils.to_anki import add_to_anki
 from utils.misc import convert_paste, tokenize
 from utils.logger import red, whi, yel, log
-from utils.memory import curate_previous_prompts, memorized_prompts
+from utils.memory import curate_previous_prompts, memorized_prompts, recur_improv
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -33,14 +33,6 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
-transcript_template = """
-Contexte: "CONTEXT"
-
-Transcript:
-'''
-TRANSCRIPT
-'''
-"""
 
 
 # load anki profile using ankipandas just to get the media folder
@@ -304,49 +296,6 @@ def audio_to_anki(audio_path):
 def auto_mode(*args, **kwargs):
     whi("Triggering auto mode")
     return main(*args, **kwargs, auto_mode=True)
-
-
-def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, output):
-    whi("Recursively improving")
-    global memorized_prompts
-    if not txt_audio:
-        return "No audio transcripts found.\n\n" + output
-    if not txt_chatgpt_cloz:
-        return "No chatgpt cloze found.\n\n" + output
-    if "\n" in txt_chatgpt_cloz:
-        whi("Replaced newlines in txt_chatgpt_cloz")
-        txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
-
-    try:
-        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts before even updating it"
-        to_add = [
-                {
-                    "role": "user",
-                    "content": transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio),
-                    "disabled": False,
-                    },
-                {
-                    "role": "assistant",
-                    "content": txt_chatgpt_cloz.replace("\n", "<br/>"),
-                    "disabled": False,
-                    }
-                ]
-        if to_add[0] in memorized_prompts:
-            return f"Already present in previous outputs!\n\n{output}"
-        if to_add[1] in memorized_prompts:
-            return f"Already present in previous outputs!\n\n{output}"
-        memorized_prompts.extend(to_add)
-
-        memorized_prompts = curate_previous_prompts(memorized_prompts)
-
-        assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts"
-
-        with open("audio_prompts.json", "w") as f:
-            json.dump(memorized_prompts, f, indent=4)
-    except Exception as err:
-        return f"Error during recursive improvement: '{err}'\n\n{output}"
-    return f"Recursively improved: {len(memorized_prompts)} total examples" + "\n\n" + output
-
 
 def main(
         audio_path,
