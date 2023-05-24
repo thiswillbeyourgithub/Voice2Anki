@@ -6,6 +6,13 @@ import json
 from .logger import whi, red, yel
 from .misc import tokenize, transcript_template
 
+default_system_prompt = {
+        "role": "system",
+        "content": "You are Alfred, my excellent assistant who always exceeds my expactation. Your task today is the to transform audio transcripts from french medical flashcards into anki flashcards.\n\n            Here are the rules:\n                * always end your answers by \"END\".\n                * If you create several flashcards for one transcript, separate them with \"#####\".\n                * You are allowed to use medical acronyms.\n                * the flashcards have to be as concise as possible.\n                * the flashcards have to be close to the format \"[category], [question] ?<br/>[answer]\". I'll show you examples of good formats.\n                * the transcript are from french medical textbooks, it is also your job to correct misrecognized words using the other words and the supplied context.\n                * don't reply anything other than the answer ot your task\n                * if you're absolutely sure that you must ask me something: begin your answer by 'Alfred:' and I'll come immediately.",
+        "disabled": False,
+    }
+
+
 
 def curate_previous_prompts(memorized_prompts):
     "auto disable passed example if too many tokens"
@@ -106,10 +113,19 @@ for ar in args:
         profile = ar.replace("--profile=", "")
 
 assert Path(f"user_data/{username}").exists(), "No user directory found"
-assert Path(f"user_data/{username}/{profile}.json").exists(), "No user profile found"
-with open(f"user_data/{username}/{profile}.json", "r") as f:
-    memorized_prompts = json.load(f)
-
+if Path(f"user_data/{username}/{profile}.json").exists():
+    with open(f"user_data/{username}/{profile}.json", "r") as f:
+        memorized_prompts = json.load(f)
+else:
+    ans = input("No user profile found, creating it? (y/n)\n")
+    if ans not in ["y", "n"]:
+        raise SystemExit("Invalid answer")
+    if ans == "n":
+        raise SystemExit()
+    if ans == "y":
+        memorized_prompts = default_system_prompt.copy()
+        with open(f"user_data/{username}/{profile}.json", "w") as f:
+            json.dump(memorized_prompts, f)
 
 # check previous prompts just in case
 if not memorized_prompts or not isinstance(memorized_prompts, list):
@@ -118,4 +134,3 @@ if not memorized_prompts or not isinstance(memorized_prompts, list):
 with open("audio_prompts.json", "w") as f:
     json.dump(memorized_prompts, f, indent=4)
 memorized_prompts = curate_previous_prompts(memorized_prompts)
-
