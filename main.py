@@ -11,8 +11,8 @@ from pathlib import Path
 
 from utils.to_anki import add_to_anki, audio_to_anki
 from utils.misc import tokenize, transcript_template, check_source
-from utils.logger import red, whi, yel, log
-from utils.memory import curate_previous_prompts, memorized_prompts, recur_improv
+from utils.logger import red, whi, yel
+from utils.memory import curate_previous_prompts, recur_improv, previous_values, memorized_prompts
 from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio
 
 # misc init values
@@ -22,55 +22,7 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
-
-
-# remember previous states
-def default_state():
-    return {
-            "txt_deck": "Default",
-            "txt_tags": "WhisperToAnki::untagged",
-            "txt_context": "CONTEXT",
-            "txt_whisp_prompt": "TRANSCRIPT",
-            }
-if Path("./inferences/whisperToAnki_state.toml").exists():
-    try:
-        with open("./inferences/whisperToAnki_state.toml", "r") as f:
-            last_state = rtoml.load(f)
-    except Exception as err:
-        red(f"Exception: '{err}'")
-        last_state = default_state()
-else:
-    last_state = default_state()
-
-red(f"Last state: {last_state}")
-
-# reset the last state if missing some values
-if sorted([k for k in last_state.keys()]) != sorted([k for k in default_state().keys()]):
-    red("Malformed last state, resetting.")
-    last_state = default_state()
-
-# rtoml saves None as null, replacing by None
-for k, v in last_state.items():
-    if v == "null":
-        last_state[k] = None
-
-# reload previous image and microphone
-if Path("./cache/voice_cards_last_image.pickle").exists():
-    with open("./cache/voice_cards_last_image.pickle", "rb") as f:
-        prev_image = pickle.load(f)
-else:
-    prev_image = None
-if Path("./cache/voice_cards_last_source.pickle").exists():
-    with open("./cache/voice_cards_last_source.pickle", "rb") as f:
-        prev_source = pickle.load(f)
-else:
-    prev_source = None
-if Path("./cache/voice_cards_last_audio.pickle").exists():
-    with open("./cache/voice_cards_last_audio.pickle", "rb") as f:
-        prev_audio = pickle.load(f)
-else:
-    prev_audio = None
-
+pv = previous_values()
 
 def transcribe(audio_path, txt_whisp_prompt):
     whi("Transcribing audio")
@@ -82,8 +34,7 @@ def transcribe(audio_path, txt_whisp_prompt):
     audio_path = enhance_audio(audio_path)
 
     # save audio for next startup
-    with open("./cache/voice_cards_last_audio.pickle", "wb") as f:
-        pickle.dump(audio_path, f)
+    pv["audio_path"] = audio_path
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
@@ -216,8 +167,7 @@ def main(
 
     # save image and audio for next startup
     if img_elem is not None:
-        with open("./cache/voice_cards_last_image.pickle", "wb") as f:
-            pickle.dump(img_elem, f)
+        pv["image"] = img_elem
 
     # get text from audio if not already parsed
     if (not txt_audio) or auto_mode:
@@ -299,15 +249,10 @@ def main(
     whi("Finished loop.\n\n")
 
     # save state for next start
-    with open("./inferences/whisperToAnki_state.toml", "w") as f:
-        rtoml.dump(
-                {
-                    "txt_deck": txt_deck,
-                    "txt_tags": txt_tags,
-                    "txt_context": txt_context,
-                    "txt_whisp_prompt": txt_whisp_prompt,
-                    }, f)
-
+    pv["txt_deck"] = txt_deck
+    pv["txt_tags"] = txt_tags
+    pv["txt_content"] = txt_context
+    pv["txt_whisp_prompt"] = txt_whisp_prompt
 
     to_return["output"] += "\n\nDONE"
 
@@ -332,22 +277,22 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Row():
                 img_btn = gr.Button(value="Load image from source or clipboard", variant="secondary")
-                img_elem = gr.Image(value=prev_image, label="Source image")
+                img_elem = gr.Image(value=pv["image"], label="Source image")
                 source_btn = gr.Button(value="Load source from image", variant="secondary")
-                txt_source = gr.Textbox(value=get_img_source(prev_image), label="Source field", lines=1)
+                txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
-                txt_deck = gr.Textbox(value=last_state["txt_deck"], label="Deck name", max_lines=1)
-                txt_tag = gr.Textbox(value=last_state["txt_tags"], label="Tags", lines=1)
-                txt_context = gr.Textbox(value=last_state["txt_context"], label="Contexte pour ChatGPT")
-                txt_whisp_prompt = gr.Textbox(value=last_state["txt_whisp_prompt"], label="Contexte pour Whisper")
+                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
+                txt_tag = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
+                txt_context = gr.Textbox(value=pv["txt_context"], label="Contexte pour ChatGPT")
+                txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
 
         with gr.Row():
             with gr.Column():
-                audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=prev_audio)
+                audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=pv["audio_path"])
                 rst_btn = gr.Button(value="Reset audio", variant="secondary")
             with gr.Column():
-                txt_audio = gr.Textbox(value=None, label="Audio transcript", lines=10, max_lines=10)
-                txt_chatgpt_cloz = gr.Textbox(value=None, label="ChatGPT output", lines=10, max_lines=10)
+                txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
+                txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
 
         with gr.Row():
             with gr.Column(scale=1):
