@@ -1,3 +1,5 @@
+from pathlib import Path
+import sys
 from textwrap import dedent
 import json
 
@@ -91,7 +93,21 @@ def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, out
 
 
 
-with open("user_data/g/memories.json", "r") as f:
+args = sys.argv[1:]
+collated = " ".join(args)
+if "--username=" not in collated:
+    raise Exception("No --username=USERNAME argument found")
+if "--profile=" not in collated:
+    raise Exception("No --profile=PROFILE argument found")
+for ar in args:
+    if "--username=" in ar:
+        username = ar.replace("--username=", "")
+    if "--profile=" in ar:
+        profile = ar.replace("--profile=", "")
+
+assert Path(f"user_data/{username}").exists(), "No user directory found"
+assert Path(f"user_data/{username}/{profile}.json").exists(), "No user profile found"
+with open(f"user_data/{username}/{profile}.json", "r") as f:
     memorized_prompts = json.load(f)
 
 

@@ -1,30 +1,19 @@
-from unsilence import Unsilence
-import torchaudio
-from speechbrain.pretrained import WaveformEnhancement
-import tiktoken
 import json
-from joblib import Memory
-from bs4 import BeautifulSoup
 import pickle
 from textwrap import dedent
 import rtoml
-import hashlib
 import time
-import ankipandas as akp
-import cv2
-import numpy as np
-import pyperclip3
 from datetime import datetime
 import gradio as gr
 import openai
 from openai.error import RateLimitError
 from pathlib import Path
-import shutil
 
-from utils.to_anki import add_to_anki
-from utils.misc import convert_paste, tokenize
+from utils.to_anki import add_to_anki, audio_to_anki
+from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel, log
 from utils.memory import curate_previous_prompts, memorized_prompts, recur_improv
+from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -34,27 +23,6 @@ d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 
-
-# load anki profile using ankipandas just to get the media folder
-db_path = akp.find_db(user="Main")
-red(f"WhisperToAnki will use anki collection found at {db_path}")
-
-# check that akp will not go in trash
-if "trash" in str(db_path).lower():
-    red("Ankipandas seems to have "
-        "found a collection that might be located in "
-        "the trash folder. If that is not your intention "
-        "cancel now. Waiting 10s for you to see this "
-        "message before proceeding.")
-    time.sleep(1)
-anki_media = Path(db_path).parent / "collection.media"
-assert anki_media.exists(), "Media folder not found!"
-
-# voice cleaning model
-voice_cleaner = WaveformEnhancement.from_hparams(
-    source="speechbrain/mtl-mimic-voicebank",
-    savedir="cache/pretrained_models/mtl-mimic-voicebank",
-)
 
 # remember previous states
 def default_state():
@@ -78,7 +46,7 @@ red(f"Last state: {last_state}")
 
 # reset the last state if missing some values
 if sorted([k for k in last_state.keys()]) != sorted([k for k in default_state().keys()]):
-    red(f"Malformed last state, resetting.")
+    red("Malformed last state, resetting.")
     last_state = default_state()
 
 # rtoml saves None as null, replacing by None
@@ -103,80 +71,6 @@ if Path("./cache/voice_cards_last_audio.pickle").exists():
 else:
     prev_audio = None
 
-
-def get_image(source):
-    whi("Getting image")
-    try:
-        if source:
-            soup = BeautifulSoup(source, 'html.parser')
-            path = soup.find_all('img')[0]['src']
-            decoded = cv2.imread(str(anki_media / path))
-            return decoded
-
-        yel("Getting image.")
-        pasted = pyperclip3.paste()
-        decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
-        return decoded
-    except Exception as err:
-        return red(f"Error: {err}")
-
-
-def get_img_source(decoded):
-    whi("Getting source from image")
-    try:
-        img_hash = hashlib.md5(decoded).hexdigest()
-        new = anki_media / f"{img_hash}.png"
-        if not new.exists():
-            cv2.imwrite(str(new), decoded)
-        source = f'<img src="{new.name}" '
-        source += 'type="made_by_WhisperToAnki">'
-        return source
-    except Exception as err:
-        return red(f"Error getting source: '{err}'")
-
-
-def reset_audio():
-    whi("Reset audio.")
-    return None
-
-
-def enhance_audio(audio_path):
-    whi("Cleaning voice")
-    try:
-        cleaned_sound = voice_cleaner.enhance_file(audio_path)
-
-        # overwrites previous sound
-        torchaudio.save(audio_path, cleaned_sound.unsqueeze(0).cpu(), 16000)
-
-        whi("Done cleaning audio")
-        return audio_path
-
-    except Exception as err:
-        red(f"Error when cleaning voice: '{err}'")
-        return audio_path
-
-
-def remove_silences(audio_path):
-    whi("Removing silences")
-    try:
-        u = Unsilence(audio_path)
-        u.detect_silence()
-
-        # do it only if its worth it as it might degrade audio quality?
-        estimated_time = u.estimate_time(audible_speed=1, silent_speed=2)  # Estimate time savings
-        before = estimated_time["before"]["all"][0]
-        after = estimated_time["after"]["all"][0]
-        if after / before  > 0.9 and before - after < 5:
-            whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-            return audio_path
-
-        yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
-        u.render_media(audio_path, audible_speed=1, silent_speed=2, audio_only=True)
-        whi("Done removing silences")
-        return audio_path
-    except Exception as err:
-        red(f"Error when removing silences: '{err}'")
-        return audio_path
 
 def transcribe(audio_path, txt_whisp_prompt):
     whi("Transcribing audio")
@@ -264,33 +158,6 @@ def alfred(txt_audio, context):
     except Exception as err:
         return None, red(f"Error with ChatGPT: '{err}'")
 
-
-def check_source(source):
-    "makes sure the source is only an img"
-    whi("Checking source")
-    if source:
-        soup = BeautifulSoup(source, 'html.parser')
-        imgs = soup.find_all("img")
-        source = "</br>".join([str(x) for x in imgs])
-        assert source, f"invalid source: {source}"
-        # save for next startup
-        with open("./cache/voice_cards_last_source.pickle", "wb") as f:
-            pickle.dump(source, f)
-    else:
-        source = ""
-    return source
-
-
-def audio_to_anki(audio_path):
-    whi("Sending audio to anki")
-    try:
-        with open(audio_path, "rb") as audio_file:
-            audio_hash = hashlib.md5(audio_file.read()).hexdigest()
-        shutil.copy(audio_path, anki_media / f"{audio_hash}.wav")
-        html = f"</br>[sound:{audio_hash}.wav]"
-        return html
-    except Exception as err:
-        return red(f"\n\nError when copying audio to anki media: '{err}'")
 
 
 def auto_mode(*args, **kwargs):

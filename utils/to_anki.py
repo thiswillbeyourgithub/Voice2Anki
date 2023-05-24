@@ -68,6 +68,17 @@ def _call_anki(action, **params):
         raise Exception(response['error'])
     return response['result']
 
+def audio_to_anki(audio_path):
+    whi("Sending audio to anki")
+    try:
+        with open(audio_path, "rb") as audio_file:
+            audio_hash = hashlib.md5(audio_file.read()).hexdigest()
+        shutil.copy(audio_path, anki_media / f"{audio_hash}.wav")
+        html = f"</br>[sound:{audio_hash}.wav]"
+        return html
+    except Exception as err:
+        return red(f"\n\nError when copying audio to anki media: '{err}'")
+
 
 if __name__ == "__main__":
     print(
