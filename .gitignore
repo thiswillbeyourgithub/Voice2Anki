@@ -2,5 +2,6 @@ API_KEY.txt
 *cache*
 *.pyc
 */*.pyc
+*/*/*.pyc
 logs.txt
 audio-0-100.wav
