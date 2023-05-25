@@ -277,7 +277,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Row():
                 img_btn = gr.Button(value="Load image from source or clipboard", variant="secondary")
-                img_elem = gr.Image(value=pv["image"], label="Source image")
+                img_elem = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[3], object_fit="contain", height="auto")
                 source_btn = gr.Button(value="Load source from image", variant="secondary")
                 txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
@@ -314,7 +314,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         source_btn.click(fn=get_img_source, inputs=[img_elem], outputs=[txt_source])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
-        img_btn.click(fn=get_image, inputs=[txt_source], outputs=[img_elem])
+        img_btn.click(fn=get_image, inputs=[txt_source, img_elem], outputs=[img_elem])
         source_btn.click(fn=get_img_source, inputs=[img_elem], outputs=[txt_source])
         rst_btn.click(fn=reset_audio, outputs=[audio_path])
         anki_btn.click(

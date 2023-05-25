@@ -13,19 +13,29 @@ import torchaudio
 from .logger import whi, yel, red
 
 
-def get_image(source):
+def get_image(source, gallery):
     whi("Getting image")
     try:
         if source:
+            # load from source if present
             soup = BeautifulSoup(source, 'html.parser')
             path = soup.find_all('img')[0]['src']
             decoded = cv2.imread(str(anki_media / path))
             return decoded
 
-        yel("Getting image.")
+        # else load from clipboard
         pasted = pyperclip3.paste()
         decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
-        return decoded
+        if gallery is None:
+            return [decoded]
+        if isinstance(gallery, list):
+            out = [
+                    cv2.imread(
+                        i["name"]
+                        ) for i in gallery
+                    ] + [decoded]
+            return out
+        raise Exception(f'gallery is not list or None but {type(gallery)}')
     except Exception as err:
         return red(f"Error: {err}")
 
