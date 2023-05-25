@@ -4,7 +4,7 @@
         "content": "You are Alfred, my excellent assistant who always exceeds my expactation. Your task today is the to transform audio transcripts from french medical flashcards into anki flashcards.\n\n            Here are the rules:\n                * always end your answers by \"END\".\n                * If you create several flashcards for one transcript, separate them with \"#####\".\n                * You are allowed to use medical acronyms.\n                * the flashcards have to be as concise as possible.\n                * the flashcards have to be close to the format \"[category], [question] ?<br/>[answer]\". I'll show you examples of good formats.\n                * the transcript are from french medical textbooks, it is also your job to correct misrecognized words using the other words and the supplied context.\n                * don't reply anything other than the answer ot your task\n                * if you're absolutely sure that you must ask me something: begin your answer by 'Alfred:' and I'll come immediately.",
         "disabled": false,
         "timestamp": 0,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 200
     },
     {
@@ -13,7 +13,7 @@
         "disabled": true,
         "answer": "valvulopathie, laquelle est devenue rare dans les pays industrialis\u00e9s ?</br>{{insuffisance mitrale, car }}{{c1::d'origine rhumatismale}}",
         "timestamp": 1,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 102
     },
     {
@@ -22,7 +22,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale, type possible ?<br/>{{c1::degenerative <br/>}}{{c1::endocardite infectieuse <br/>}}{{c1::post-rhumatismale <br/>}}{{c1::isch\u00e9mique}}",
         "timestamp": 2,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 122
     },
     {
@@ -31,7 +31,7 @@
         "disabled": true,
         "answer": "maladie de Monckberg, c'est quoi ?<br/>{{c1::retrecissement aortique degeneratif caus\u00e9 par }}{{c1::le vieillissement.}}",
         "timestamp": 3,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 99
     },
     {
@@ -40,7 +40,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale, signe fonctionnel ?<br/>{{c1::si insuffisance mitrale <b>aigu\u00eb<b/> : }}{{c1::dyspn\u00e9e aigue et douleur thoracique br\u00e8ve <br/>}}{{c1::si insuffisance mitrale <b>chronique<b/> : }}{{c1::dyspn\u00e9e tardive progressive}}",
         "timestamp": 4,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 156
     },
     {
@@ -49,7 +49,7 @@
         "disabled": true,
         "answer": "valvulopathie, type si auscultation en jet de vapeur ?<br/>{{c1::insuffisance mitrale}}",
         "timestamp": 5,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 81
     },
     {
@@ -58,7 +58,7 @@
         "disabled": true,
         "answer": "r\u00e9tr\u00e9cissement aortique, la dyspn\u00e9e et l'angor sont au repos ou a l'effort ?<br/>{{c1::en general a l'effort}}",
         "timestamp": 6,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -67,7 +67,7 @@
         "disabled": true,
         "answer": "valvulopathie, type si r\u00e9v\u00e9l\u00e9e par {{c2::grossesse ou une fibrillation atriale}} ? <br/>{{c1::r\u00e9tr\u00e9cissement mitral}}",
         "timestamp": 7,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -76,7 +76,7 @@
         "disabled": true,
         "answer": "valvulopathie, type si bruit auscultatoire bien entendu en position {{c2::assise}} ?<br/>{{c1::insuffisance aortique}}",
         "timestamp": 8,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 98
     },
     {
@@ -85,7 +85,7 @@
         "disabled": true,
         "answer": "retrecissement mitral, bruit auscultatoire si valve souple ?<br/>{{c1::\u00e9clat du B1}}\n            #####\n            retrecissement mitral, bruit auscultatoire si HTAP ?<br/>{{c1::d\u00e9doublement du B2}}",
         "timestamp": 9,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 144
     },
     {
@@ -94,7 +94,7 @@
         "disabled": true,
         "answer": "rythme en 3 temps de Durozier, c'est quoi ?<br/>{{c1::d\u00e9doublement du B2 lors }}{{c1::d'un retrecissement mitral avec }}{{c1::HTAP}}",
         "timestamp": 10,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 109
     },
     {
@@ -103,7 +103,7 @@
         "disabled": true,
         "answer": "valvulopathie chronique severe, l'ECG peut il etre normal ?<br/>{{c1::rarement}}",
         "timestamp": 11,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 74
     },
     {
@@ -112,7 +112,7 @@
         "disabled": true,
         "answer": "valvulopathie, type si hypertrophie ventriculaire gauche de type {{c2::diastolique}} ?<br/>{{c1::insuffisance mitrale <br/>}}{{c1::insuffisance aortique}}",
         "timestamp": 12,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 119
     },
     {
@@ -121,7 +121,7 @@
         "disabled": true,
         "answer": "valvulopathie, laquelle ne cause pas d'hypertrophie de l'oreillette gauche ?<br/>{{c1::aucune, elle causent toutes une hypertrophie de l'oreillette gauche}}",
         "timestamp": 13,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -130,7 +130,7 @@
         "disabled": true,
         "answer": "valvulopathie, type qui ne cause pas de cardiomegalie ?<br/>{{c1::retrecissement aortique}}",
         "timestamp": 14,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 83
     },
     {
@@ -139,7 +139,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale severe, criteres echographiques ?<br/>{{c1::regurgitation > }}{{c1::45 ml <br/>}}{{c1::surface de l'orifice > }}{{c1::30 mm2}}",
         "timestamp": 15,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 140
     },
     {
@@ -148,7 +148,7 @@
         "disabled": true,
         "answer": "valvulopathie, dans quelle situation l'epreuve d'effort est contre-indiqu\u00e9e ?<br/>{{c1::valvulopathie symptomatique}}",
         "timestamp": 16,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 93
     },
     {
@@ -157,7 +157,7 @@
         "disabled": true,
         "answer": "valvulopathie, la calcification fait ou non partie des critere diagnostique a l'\u00e9chographie cardiaque transthoracique des r\u00e9tr\u00e9cissement aortique et mitral ?<br/>{{c1::oui les calcifications en font partie}}",
         "timestamp": 17,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 134
     },
     {
@@ -166,7 +166,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, evolution rapide ou lente ?<br/>{{c1::lente}}",
         "timestamp": 18,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 71
     },
     {
@@ -175,7 +175,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, pronostic ?<br/>{{c1::si serr\u00e9 et asymptomatique : }}{{c1::bon <br/>}}{{c1::si symptomatique : }}{{c1::mauvais}}",
         "timestamp": 19,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 119
     },
     {
@@ -184,7 +184,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, complications ?<br/>{{c1::insuffisance cardiaque <br/>}}{{c1::troubles de la conduction <br/>}}{{c1::troubles du rythme (ex: fibrillation atriale) <br/>}}{{c1::mort subite <br/>}}{{c1::plus rarement : <br/>}}{{c1::endocardite infectieuse <br/>}}{{c1::an\u00e9mie}}",
         "timestamp": 20,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 186
     },
     {
@@ -193,7 +193,7 @@
         "disabled": true,
         "answer": "{{c2::syndrome de Heyde}}, c'est quoi ?<br/>{{c1::coagulopathie par retrecissement aortique associ\u00e9 a }}{{c1:: un syndrome de Willebrand acquis, entrainant }}{{c1::des saignements digestifs et donc }}{{c1:une anemie}}",
         "timestamp": 21,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 165
     },
     {
@@ -202,7 +202,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, peut causer des embols calcaires ou non ?<br/>{{c1::oui}}",
         "timestamp": 22,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 70
     },
     {
@@ -211,7 +211,7 @@
         "disabled": true,
         "answer": "insuffisance aortique aigue, evolution sans intervention ?<br/>{{c1::evolution rapide vers le choc cardiogenique et le deces}}",
         "timestamp": 23,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 102
     },
     {
@@ -220,7 +220,7 @@
         "disabled": true,
         "answer": "insuffisance aortique <b>chronique symptomatique</b>, mortalit\u00e9 ?<br/>{{c1::15% par an}}",
         "timestamp": 24,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 81
     },
     {
@@ -229,7 +229,7 @@
         "disabled": true,
         "answer": "insuffisance aortique chronique, complications ?<br/>{{c1::insuffisance cardiaque <br/>}}{{c1::troubles du rythme <br/>}}{{c1::endocardite <br/>}}{{c1::si associ\u00e9e a dilatation aortique : }}{{c1::dissection aortique}}",
         "timestamp": 25,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 161
     },
     {
@@ -238,7 +238,7 @@
         "disabled": true,
         "answer": "retrecissement mitral, complications ?<br/>{{c1::fibrillation atriale <br/>}}{{c1::insuffisance cardiaque <br/>}}{{c1::HTAP <br/>}}{{c1::accidents thromboemboliques <br/>}}{{c1::si grossesse : }}{{c1::decompensation cardiaque}}",
         "timestamp": 26,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 150
     },
     {
@@ -247,7 +247,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale, traitement ?<br/>{{c1::si < 65 ans : }}{{c1::plastie mitrale <br/>}}{{c1::si > 65 ans : }}{{c1::prothese mitrale}}",
         "timestamp": 27,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 119
     },
     {
@@ -256,7 +256,7 @@
         "disabled": true,
         "answer": "insuffisance aortique, traitement ?<br/>{{c1::remplacement de la valve aortique <br/>}}{{c1::ou remplacement de l'aorte par : }}{{c1::intervention de Benthal ou de Tirone David}}",
         "timestamp": 28,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 127
     },
     {
@@ -265,7 +265,7 @@
         "disabled": true,
         "answer": "intervention chirurgicale pour conserver la valve aortique lors d'une insuffisance aortique ?<br/>{{c1::intervention de Tirone David}}<br/>#####<br/>intervention de {{c2::Bentall}}, en quoi consiste-t-elle ?<br/>{{c1::remplacement de la valve et de l'aorte ascendante}}",
         "timestamp": 29,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 160
     },
     {
@@ -274,7 +274,7 @@
         "disabled": true,
         "answer": "retrecissement mitral, traitement chirurgical ?<br/>{{c1::commissurotomie chirurgicale <br/>}}{{c1::ou remplacement valvulaire}}",
         "timestamp": 30,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -283,7 +283,7 @@
         "disabled": true,
         "answer": "insuffisance aortique par endocardite, traitement chirurgical ?<br/>{{c1::remplacement de la valvule aortique}}",
         "timestamp": 31,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 89
     },
     {
@@ -292,7 +292,7 @@
         "disabled": true,
         "answer": "insuffisance aortique, traitement chirurgical percutan\u00e9 ?<br/>{{c1::non, il n'existe pas de traitement chirurgical percutan\u00e9 pour l'insuffisance aortique}}<br/>#####<br/>seule valvulopathie sans traitement chirurgical percutan\u00e9 possible ?<br/>{{c1::insuffisance aortique}}",
         "timestamp": 32,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 136
     },
     {
@@ -301,7 +301,7 @@
         "disabled": true,
         "answer": "traitement chirurgical percutan\u00e9 du retrecissement aortique (TAVI), la valve native est-elle laiss\u00e9e en place ?<br/>{{c1::oui}}",
         "timestamp": 33,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 102
     },
     {
@@ -310,7 +310,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale aigue, traitement urgent ou non ?<br/>{{c1::traitement urgent si mal tol\u00e9r\u00e9e}}",
         "timestamp": 34,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 78
     },
     {
@@ -319,7 +319,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale chronique <b>severe</b>, indication du traitement chirurgical ?<br/>{{c1::si patient symptomatique : }}{{c1::si FEVG > 30% <br/>}}{{c1::si patient asymptomatique : }}{{c1::si retentissement sur le ventricule gauche}}",
         "timestamp": 35,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 166
     },
     {
@@ -328,7 +328,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, indication du traitement chirurgical ?<br/>{{c1::si symptomatique <br/>}}{{c1::ou si epreuve d'effort positive <br/>}}{{c1::ou si asymptomatique avec }}{{c1::FEVG <50% et retentissement sur le ventricule gauche <br/>}}{{c1::ou si signe de gravit\u00e9 echographique}}",
         "timestamp": 36,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 194
     },
     {
@@ -337,7 +337,7 @@
         "disabled": true,
         "answer": "insuffisance aortique aigue, traitement chirurgical urgent ou non ?<br/>{{c1::urgence car mal tol\u00e9r\u00e9e}}",
         "timestamp": 37,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 87
     },
     {
@@ -346,7 +346,7 @@
         "disabled": true,
         "answer": "retrecissement mitral, indication du traitement chirurgical si commissurotomie percutan\u00e9 impossible ?<br/>{{c1::si retrecissement mitral tres severe <br/>}}{{c1::ou severe et symptomatique <br/>}}{{c1::ou mod\u00e9r\u00e9ment symptomatique avec HTAP}}",
         "timestamp": 38,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 164
     },
     {
@@ -355,7 +355,7 @@
         "disabled": true,
         "answer": "valvulopathies, traitement percutan\u00e9 habituellement pour quelles valvulopathies ?<br/>{{c1::r\u00e9tr\u00e9cissement aortique <br/>}}{{c1::insuffisance mitrale}}",
         "timestamp": 39,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 111
     },
     {
@@ -364,7 +364,7 @@
         "disabled": true,
         "answer": "traitement percutan\u00e9 de quelle valvulopathie necessite une reunion pluridisciplinaire ?<br/>{{c1::traitement du retrecissement aortique}}<br/>#####<br/>reunion pluridisciplinaire pour traitement percutan\u00e9 du retrecissement aortique, avec quels sp\u00e9cialistes ?<br/>{{c1::au moins un chirurgien cardiaque et un cardiologue interventionnel}}",
         "timestamp": 40,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 184
     },
     {
@@ -373,7 +373,7 @@
         "disabled": true,
         "answer": "retrecissement aortique, esperance de vie minimale pour etre op\u00e9r\u00e9 par traitement percutan\u00e9 TAVI ?<br/>{{c1::au moins 1 an}}",
         "timestamp": 41,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -382,7 +382,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale <b>organique</b>, indication du mitraclip ?<br/>{{c1::si patient contre indiqu\u00e9 a la chirurgie (ex FEVG <30%) ou a haut risque chirurgical}}",
         "timestamp": 42,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 127
     },
     {
@@ -391,7 +391,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale <b>fonctionnelle</b>, indication du mitraclip ?<br/>{{c1::si echec du traitement medical}}",
         "timestamp": 43,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 88
     },
     {
@@ -400,7 +400,7 @@
         "disabled": true,
         "answer": "insuffisance aortique, traitement non chirurgical ?<br/>{{c1::regles hygieno dietetique : }}{{c1::regime pauvre en sel <br/>}}{{c1::traitement pharmacologique : }}{{c1::IEC, ARA2 et/ou diur\u00e9tique <br/>}}{{c1::pr\u00e9vention d'endocardite infectieuse : }}{{c1::hygi\u00e8ne buccodentaire <br/>}}{{c1::si Marfan ou malformation cong\u00e9nitale : }}{{c1::depistage familial <br/>}}{{c1::surveillance clinique r\u00e9guli\u00e8re}}",
         "timestamp": 44,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 275
     },
     {
@@ -409,7 +409,7 @@
         "disabled": true,
         "answer": "insuffisance aortique, fr\u00e9quence de surveillance par ECG et ETT ?<br/>{{c1::6 mois \u00e0 1 an pour les formes mod\u00e9r\u00e9es \u00e0 s\u00e9v\u00e8res asymptomatiques}}<br/>{{c1::jusqu'\u00e0 tous les 2 ans pour les formes minimes}}",
         "timestamp": 45,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 158
     },
     {
@@ -418,7 +418,7 @@
         "disabled": true,
         "answer": "protheses valvulaires mecaniques, materiaux ?<br/>{{c1::titane et carbone}}",
         "timestamp": 46,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 79
     },
     {
@@ -427,7 +427,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, type de prothese avec la meilleure durabilit\u00e9 ?<br/>{{c1::protheses valvulaires mecaniques}}",
         "timestamp": 47,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 86
     },
     {
@@ -436,7 +436,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, type d'anticoagulants recommand\u00e9 ?<br/>{{c1::AVK}}",
         "timestamp": 48,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 79
     },
     {
@@ -445,7 +445,7 @@
         "disabled": true,
         "answer": "protheses valvulaires <b>mecaniques</b>, avantages et inconv\u00e9nients ?<br/>{{c1::avantages : }}{{c1::grande durabilit\u00e9 <br/>}}{{c1::inconv\u00e9nients : }}{{c1::anticoagulation curative au long cours pour \u00e9viter les thrombose}}",
         "timestamp": 49,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 149
     },
     {
@@ -454,7 +454,7 @@
         "disabled": true,
         "answer": "protheses valvulaires mecaniques, age recommand\u00e9 pour la position aortique et mitrale ?<br/>{{c1::aortique : < 60 ans <br/>}}{{c1::mitrale : < 65 ans}}",
         "timestamp": 50,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 120
     },
     {
@@ -463,7 +463,7 @@
         "disabled": true,
         "answer": "protheses valvulaires biologiques, materiaux ?<br/>{{c1::pericardes bovins <br/>}}{{c1::parfois x\u00e9nogreffes porcines <br/>}}{{c1::et meme homogreffes de donneurs humains}}",
         "timestamp": 51,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 138
     },
     {
@@ -472,7 +472,7 @@
         "disabled": true,
         "answer": "protheses valvulaires biologiques, dur\u00e9e de vie ?<br/>{{c1::10 \u00e0 15 ans}}",
         "timestamp": 52,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 76
     },
     {
@@ -481,7 +481,7 @@
         "disabled": true,
         "answer": "protheses valvulaires <b>biologiques</b>, age recommand\u00e9 pour la position aortique et mitrale ?<br/>{{c1::aortique : > 60 ans <br/>}}{{c1::mitrale : > 65 ans}}",
         "timestamp": 53,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 119
     },
     {
@@ -490,7 +490,7 @@
         "disabled": true,
         "answer": "protheses valvulaires <b>percutan\u00e9e</b>, indication ?<br/>{{c1::chez les patients \u00e0 risque op\u00e9ratoire }}{{c1::\u00e9lev\u00e9 ou interm\u00e9diaire}}",
         "timestamp": 54,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 113
     },
     {
@@ -499,7 +499,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, moment critique du risque de complications thromboemboliques ?<br/>{{c1::dans la premi\u00e8re ann\u00e9e suivant la pose de la prothese valvulaire}}",
         "timestamp": 55,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 94
     },
     {
@@ -508,7 +508,7 @@
         "disabled": true,
         "answer": "Pourquoi les proth\u00e8ses valvulaires mitrale ou tricuspidiennes sont-elles plus \u00e0 risque thromboemboliques que les aortiques ?<br/>{{c1::car il y a moins de pression}}",
         "timestamp": 56,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 128
     },
     {
@@ -517,7 +517,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, les complications thromboemboliques sont plutot des embolies ou thrombose ?<br/>{{c1::embolies syst\u00e9miques}}",
         "timestamp": 57,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 97
     },
     {
@@ -526,7 +526,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, signe clinique possible de <b>d\u00e9sinsertion</b> ?<br/>{{c1::anemie hemolytique}}",
         "timestamp": 58,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 88
     },
     {
@@ -535,7 +535,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, types possibles de d\u00e9g\u00e9n\u00e9rescence ?<br/>{{c1::d\u00e9g\u00e9n\u00e9rescences st\u00e9nosante <br/>}}{{c1::d\u00e9g\u00e9n\u00e9rescences fuyantes <br/>}}{{c1::type mixte possible}}",
         "timestamp": 59,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 130
     },
     {
@@ -544,7 +544,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, facteurs de risque principaux de d\u00e9g\u00e9n\u00e9rescence ?<br/>{{c1::sexe }}{{c1::masculin <br/>}}{{c1::insuffisance }}{{c1::renale <br/>}}{{c1::anomalies du m\u00e9tabolisme }}{{c1::calcique <br/>}}{{c1::dyslipid\u00e9mie <br/>}}{{c1::proth\u00e8ses en position }}{{c1::mitrale}}",
         "timestamp": 60,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 201
     },
     {
@@ -553,7 +553,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, incidence \u00e0 5 ans de l'endocardite infectieuse ?<br/>{{c1::environ 5% (sutout }}{{c1::dans la 1ere ann\u00e9e)}}",
         "timestamp": 61,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 121
     },
     {
@@ -562,7 +562,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, germes responsables d'endocardites infectieuses avant et apr\u00e8s 1 an ?<br/>{{c1::avant 1 an : }}{{c1::Staphylococcus epidermidis ou Staphylococcus aureus <br/>}}{{c1::apr\u00e8s 1 an : }}{{c1::Staphylocoque, enterococque ou streptococque}}",
         "timestamp": 62,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 201
     },
     {
@@ -571,7 +571,7 @@
         "disabled": true,
         "answer": "protheses valvulaires, fr\u00e9quence minimale de suivi clinique ?<br/>{{c1::1x tous les 4 mois}}",
         "timestamp": 63,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 76
     },
     {
@@ -580,7 +580,7 @@
         "disabled": true,
         "answer": "insuffisance mitrale, fr\u00e9quence de suivi biologique de l'INR ?<br/>{{c1::1x par mois}}",
         "timestamp": 64,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 71
     },
     {
@@ -589,7 +589,7 @@
         "disabled": true,
         "answer": "endocardite infectieuse chez un porteur de proth\u00e8ses valvulaires, que faire avant toute antibioth\u00e9rapie ?<br/>{{c1::une h\u00e9moculture}}<br/>#####<br/>endocardite infectieuse chez un porteur de proth\u00e8ses valvulaires, doit on faire une h\u00e9moculture avant l'antibiotherapie ?<br/>{{c1::oui, systematiquement}}",
         "timestamp": 65,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 166
     },
     {
@@ -598,7 +598,7 @@
         "disabled": true,
         "answer": "porteur de protheses valvulaires, antibioprophylaxie recommand\u00e9e 1h avant les soins dentaires ?<br/>{{c1::amoxicilline <br/>}}{{c1::ou si allergie : }}{{c1::clindamycine}}",
         "timestamp": 66,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 153
     },
     {
@@ -607,7 +607,7 @@
         "disabled": true,
         "answer": "porteur de protheses valvulaires, majoration de l'objectif d'INR si >=1 facteur de risque h\u00e9morragique ?<br/>{{c1::objectid d'INR major\u00e9 de 0,5}}",
         "timestamp": 67,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 124
     },
     {
@@ -616,7 +616,7 @@
         "disabled": true,
         "answer": "porteur de protheses valvulaires, objectif d'INR sans facteur de risque h\u00e9morragique et avec prothese de faible risque ?<br/>{{c1::2,5}}<br/>#####<br/>porteur de protheses valvulaires, objectif d'INR si >=1 facteur de risque h\u00e9morragique et prothese de risque \u00e9lev\u00e9 ?<br/>{{c1::4}}",
         "timestamp": 68,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 223
     },
     {
@@ -625,7 +625,7 @@
         "disabled": true,
         "answer": "porteur de protheses valvulaires, facteurs de risque h\u00e9morragique li\u00e9s aux patients ?<br/>{{c1::prothese m\u00e9canique en position }}{{c1::mitrale, tricuspidienne ou pulmonaire <br/>}}{{c1::ant\u00e9c\u00e9dents de maladies thromboemboliques <br/>}}{{c1::fibrillation atriale <br/>}}{{c1::oreillette gauche dilat\u00e9e > 50 mm <br/>}}{{c1::contraste dense spontan\u00e9 dans l'oreillette gauche <br/>}}{{c1::r\u00e9tr\u00e9cissement mitral associ\u00e9 <br/>}}{{c1::FEVG < 35% <br/>}}{{c1::\u00e9tat d'hypercoagulabilit\u00e9 comme les SAPL}}",
         "timestamp": 69,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 351
     },
     {
@@ -634,7 +634,7 @@
         "disabled": true,
         "answer": "BAV 2 Mobitz 1 vs BAV 2 Mobitz 2, diff\u00e9rence physiologique ?<br/>{{c1::BAV 2 Mobitz 1 : suprahissien <br/>}}{{c1::BAV 2 Mobitz 2 : hissien ou infrahissien}}",
         "timestamp": 70,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 155
     },
     {
@@ -643,7 +643,7 @@
         "disabled": true,
         "answer": "troubles de la conduction chez le sujet \u00e2g\u00e9, principale cause ?<br/>{{c1::d\u00e9g\u00e9n\u00e9rescence par fibrose avec plus ou moins calcification du syst\u00e8me de conduction (maladie }}{{c1:: de Lev et de Len\u00e8gre)}}",
         "timestamp": 71,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 135
     },
     {
@@ -652,7 +652,7 @@
         "disabled": true,
         "answer": "troubles de la conduction cardiaque pour cause infectieuse, qu'\u00e9voquer chez un patient originaire {{c2::d'Europe de l'Est}} ?<br/>{{c1::rhumatismes articulaires aigus}}",
         "timestamp": 72,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 129
     },
     {
@@ -661,7 +661,7 @@
         "disabled": true,
         "answer": "manoeuvres de r\u00e9animation \u00e0 pratiquer sur un patient en arr\u00eat cardio-respiratoire ?<br/>{{c1::coup de poing sternal <br/>}}{{c1::si inefficace, d\u00e9buter en massage cardiaque externe}}",
         "timestamp": 73,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 126
     },
     {
@@ -670,7 +670,7 @@
         "disabled": true,
         "answer": "isopr\u00e9naline, mecanisme tachycardisant ?<br/>{{c1::agoniste beta1 et beta2}}",
         "timestamp": 74,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 99
     },
     {
@@ -679,7 +679,7 @@
         "disabled": false,
         "answer": "contre-indications a {{c2lll'isoprenaline}} pour une bradycardie mal tol\u00e9r\u00e9e ?<br/>{{c1::intoxication aux digitalique <br/>}}{{c1::extra systoles ventriculaires <br/>}}{{c1::tachycardie > 120 BPM}}",
         "timestamp": 75,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 158
     },
     {
@@ -688,7 +688,7 @@
         "disabled": false,
         "answer": "ECG percritique vs ECG intercritique, diff\u00e9rence ?<br/>{{c1::ECG percritique : r\u00e9alis\u00e9 pendant une crise de palpitations <br/>}}{{c1::ECG intercritique : r\u00e9alis\u00e9 en dehors d'une crise de palpitations}}",
         "timestamp": 76,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 106
     },
     {
@@ -697,7 +697,7 @@
         "disabled": false,
         "answer": "En cas de palpitations, fait on systematiquement un ECG ?<br/>{{c1::oui}}<br/>#####<br/>En cas de palpitations, fait on systematiquement une echocardiographiie ?<br/>{{c1::oui}}",
         "timestamp": 77,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 101
     },
     {
@@ -706,7 +706,7 @@
         "disabled": false,
         "answer": "palpitations, examen si ECG percritique normal et >1 palpitation par semaine ?<br/>{{c1::holter ECG}}<br/>#####<br/>palpitations, examen si ECG percritique normal et <1 palpitation par semaine ?<br/>{{c1::ECG ambulatoire (dure plusieurs ssemaines)}}",
         "timestamp": 78,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 174
     },
     {
@@ -715,7 +715,7 @@
         "disabled": false,
         "answer": "extrasystoles ventriculaires <b>malignes</b>, criteres ?<br/>{{c1::fr\u00e9quentes <br/>}}{{c1::polymorphes <br/>}}{{c1::en salve <br/>}}{{c1::\u00e0 couplage court <br/>}}{{c1::d\u00e9clench\u00e9 \u00e0 l'effort <br/>}}{{c1::survenant sur un terrain cardiopathique}}",
         "timestamp": 79,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 186
     },
     {
@@ -724,7 +724,7 @@
         "disabled": false,
         "answer": "trouble thyroidien causant des extrasystoles ?<br/>{{c1::hyperthyroidie}}",
         "timestamp": 80,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 67
     },
     {
@@ -733,7 +733,7 @@
         "disabled": false,
         "answer": "Maladie de Bouveret, patient typique ?<br/>{{c1::atteint classiquement les sujets jeunes <br/>}}{{c1::avec un c\u0153ur sain}}",
         "timestamp": 81,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 83
     },
     {
@@ -742,7 +742,7 @@
         "disabled": false,
         "answer": "maladie de Bouveret, signe clnique a la p\u00e9riode postcritique ?<br/>{{c1::polyurie post critique}}",
         "timestamp": 82,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 80
     },
     {
@@ -751,7 +751,7 @@
         "disabled": false,
         "answer": "maladie de Bouveret, les palpitations sont elles arret\u00e9es par des manoeuvres vagales ?<br/>{{c1::oui}}<br/>#####<br/>maladie de Bouveret, les palpitations sont elles arret\u00e9es par l'adenosine ?<br/>{{c1::oui}}<br/>",
         "timestamp": 83,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 136
     },
     {
@@ -760,7 +760,7 @@
         "disabled": false,
         "answer": "n\u00e9vrose cardiaque, diagnostic ?<br/>{{c1::palpitation avec ECG percritique strictement normal (diagnostic d'elimination)}}",
         "timestamp": 84,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 83
     },
     {
@@ -769,7 +769,7 @@
         "disabled": false,
         "answer": "insuffisance cardiaque, d\u00e9finition universelle ?<br/>{{c1::syndrome clinique avec anomalies cardiaques structurelles ou fonctionnelles confirm\u00e9es par : <br/>{{c1::signes cliniques d'insuffisance cardiaque <br/>}}{{c1::taux \u00e9lev\u00e9 de peptides natriur\u00e9tiques <br/>}}{{c1::signes radiologiques \u00e9co-cardiographiques et h\u00e9modynamiques}}",
         "timestamp": 85,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 213
     },
     {
@@ -778,7 +778,7 @@
         "disabled": false,
         "answer": "crit\u00e8re de classification des insuffisances cardiaques ?<br/>{{c1::FEVG}}",
         "timestamp": 86,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 75
     },
     {
@@ -787,7 +787,7 @@
         "disabled": false,
         "answer": "choc cardiog\u00e9nique, d\u00e9finition ?<br/>{{c1::PAS < }}{{c1::90 mmHg <br/>}}{{c1::d\u00e9bit urinaire < }}{{c1::30 ml/h ou extr\u00e9mit\u00e9s froides <br/>}}{{c1::index cardiaque < }}{{c1::2,2 L/min/m2 <br/>}}{{c1::pression capillaire > }}{{c1::15 mmHg}}",
         "timestamp": 87,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 209
     },
     {
@@ -796,7 +796,7 @@
         "disabled": false,
         "answer": "valeurs normales des d\u00e9terminants du d\u00e9bit cardiaque ?<br/>{{c1::VTD : }}{{c1::160 mL <br/>}}{{c1::VTS : }}{{c1::60 mL <br/>}}{{c1::VES : }}{{c1::100 mL <br/>}}{{c1::d\u00e9bit cardiaque : }}{{c1::5 L/min}}",
         "timestamp": 88,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 161
     },
     {
@@ -805,7 +805,7 @@
         "disabled": false,
         "answer": "insuffisance cardiaque droite, signes a l'imagerie ?<br/>{{c1::dilatation de la veine cave inf\u00e9rieure <br/>}}{{c1::reflux de sang dans les veines sus hepatiques}}",
         "timestamp": 89,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 124
     },
     {
@@ -814,7 +814,7 @@
         "disabled": false,
         "answer": "types d'OAP ?<br/>{{c1::oed\u00e8me l\u00e9sionnel par alteration de la membrane alveolocapillaire <br/>}}{{c1::OAP cardiogenique par hyperpression capillaire pulmonaire}}",
         "timestamp": 90,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 137
     },
     {
@@ -823,7 +823,7 @@
         "disabled": false,
         "answer": "OAP cardiog\u00e9nique, quelles est la valeur de pression capillaire pulmonaire ?<br/>{{c1::pression capillaire pulmonaire > }}{{c1::25 mmHg car }}{c1::extravasation de liquide donc depasse la pression oncotique}}",
         "timestamp": 91,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 153
     },
     {
@@ -832,7 +832,7 @@
         "disabled": false,
         "answer": "dans quel type d'OAP la pression capillaire pulmonaire est basse ?<br/>{{c1::OAP lesionnelle par alt\u00e9ration de la membrane alv\u00e9olo-capillaire)}}",
         "timestamp": 92,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 108
     },
     {
@@ -841,7 +841,7 @@
         "disabled": false,
         "answer": "type d'OAP avec oedeme forte concentration en prot\u00e9ines ?<br/>{{c1::OAP lesionnelle par alteration de la membrane alveolo capillaire}}",
         "timestamp": 93,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 103
     },
     {
@@ -850,7 +850,7 @@
         "disabled": false,
         "answer": "fraction d'\u00e9jection, mesur\u00e9 par quel examen ?<br/>{{c1::echocardiographie}}",
         "timestamp": 94,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 64
     },
     {
@@ -859,7 +859,7 @@
         "disabled": false,
         "answer": "traitements de l'insuffisance cardiaque, ciblent surtout quel type d'insuffisance cardiaque ?<br/>{{c1::la majorit\u00e9 des traitements ne ciblent que l'insuffisance cardiaque \u00e0 FEVG diminu\u00e9e}}",
         "timestamp": 95,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 134
     },
     {
@@ -868,7 +868,7 @@
         "disabled": false,
         "answer": "Classification de l'insuffisance cardiaque par NYHA, stade {{c2::1}} ?<br/>{{c1::pas de sympt\u00f4mes, m\u00eame \u00e0 l'effort}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::2}} ?<br/>{{c1::sympt\u00f4mes qui apparaissent lors des efforts importants}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::3}} ?<br/>{{c1::sympt\u00f4mes aux efforts mod\u00e9r\u00e9s}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::4}} ?<br/>{{c1::limitation importante de l'activit\u00e9 physique}}",
         "timestamp": 96,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 332
     },
     {
@@ -877,7 +877,7 @@
         "disabled": false,
         "answer": "insuffisance cardiaque droite, peut-elle causer une h\u00e9patom\u00e9galie ?<br/>{{c1::oui}}<br/>#####<br/>insuffisance cardiaque droite, peut-elle causer une perturbation du bilan h\u00e9patique ?<br/>{{c1::oui}}",
         "timestamp": 97,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 135
     },
     {
@@ -886,7 +886,7 @@
         "disabled": false,
         "answer": "insuffisance cardiaque <b>droite</b>, peut-elle causer un \u00e9tat de choc cardiog\u00e9nique ?<br/>{{c1::oui}}",
         "timestamp": 98,
-        "priority": 0,
+        "priority": 4,
         "tkn_len": 87
     }
 ]
