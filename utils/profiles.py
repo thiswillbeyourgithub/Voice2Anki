@@ -66,7 +66,7 @@ def switch_profile(profile, output):
     return [
             pv["txt_deck"],
             pv["txt_tags"],
-            pv["txt_context"],
+            pv["txt_chatgpt_context"],
             pv["txt_whisp_prompt"],
             pv["audio_path"],
             pv["txt_audio"],

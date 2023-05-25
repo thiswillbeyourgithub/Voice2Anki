@@ -125,7 +125,7 @@ def main(
         txt_chatgpt_resp,
         txt_chatgpt_cloz,
 
-        txt_context,
+        txt_chatgpt_context,
         txt_deck,
         txt_tags,
 
@@ -142,8 +142,8 @@ def main(
         return red("No audio in either microphone data or audio file")
     if not txt_whisp_prompt:
         return red("No whisper prompt found.")
-    if not txt_context:
-        return red("No txt_context found.")
+    if not txt_chatgpt_context:
+        return red("No txt_chatgpt_context found.")
     if not txt_deck:
         return red("you should specify a deck")
     if not txt_tags:
@@ -181,7 +181,7 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or auto_mode:
-        txt_chatgpt_cloz, txt_chatgpt_resp = alfred(txt_audio, txt_context)
+        txt_chatgpt_cloz, txt_chatgpt_resp = alfred(txt_audio, txt_chatgpt_context)
     if isinstance(txt_chatgpt_resp, str):
         txt_chatgpt_resp = json.loads(txt_chatgpt_resp)
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
@@ -258,7 +258,7 @@ def main(
     # save state for next start
     pv["txt_deck"] = txt_deck
     pv["txt_tags"] = txt_tags
-    pv["txt_content"] = txt_context
+    pv["txt_content"] = txt_chatgpt_context
     pv["txt_whisp_prompt"] = txt_whisp_prompt
 
     to_return["output"] += "\n\nDONE"
@@ -294,7 +294,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile", max_lines=1)
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
-                txt_context = gr.Textbox(value=pv["txt_context"], label="Contexte pour ChatGPT")
+                txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Contexte pour ChatGPT")
                 txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
 
         with gr.Row():
@@ -322,9 +322,9 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
         # events
-        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
+        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
         source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
-        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
+        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
         img_btn.click(fn=get_image, inputs=[txt_source, gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
@@ -339,7 +339,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_chatgpt_resp,
                     txt_chatgpt_cloz,
 
-                    txt_context,
+                    txt_chatgpt_context,
                     txt_deck,
                     txt_tags,
 
@@ -364,7 +364,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_chatgpt_resp,
                     txt_chatgpt_cloz,
 
-                    txt_context,
+                    txt_chatgpt_context,
                     txt_deck,
                     txt_tags,
 
@@ -385,7 +385,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_audio,
                     txt_whisp_prompt,
                     txt_chatgpt_cloz,
-                    txt_context,
+                    txt_chatgpt_context,
                     output_elem,
                     ],
                 outputs=[output_elem],
