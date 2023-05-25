@@ -6,3 +6,4 @@ API_KEY.txt
 logs.txt
 audio-0-100.wav
 utils/ssl/key.pem
+profiles/*/*pickle

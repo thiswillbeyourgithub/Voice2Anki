@@ -12,8 +12,9 @@ from pathlib import Path
 from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel
-from utils.memory import curate_previous_prompts, recur_improv, previous_values, memorized_prompts
+from utils.memory import curate_previous_prompts, recur_improv, load_memorized_prompts
 from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio, reset_image
+from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -23,6 +24,7 @@ d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 pv = previous_values()
+
 
 def transcribe(audio_path, txt_whisp_prompt):
     whi("Transcribing audio")
@@ -271,7 +273,6 @@ def main(
             to_return["txt_chatgpt_cloz"],
             ]
 
-
 #with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=gr.themes.Soft()) as demo:
 with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         gr.Markdown("WhisperToAnki")
@@ -286,11 +287,13 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear", variant="primary")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary")
+                    with gr.Row():
                         source_btn = gr.Button(value="Load source from gallery", variant="secondary")
-                    txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
+                        txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
+                choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile", max_lines=1)
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
-                txt_tag = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
                 txt_context = gr.Textbox(value=pv["txt_context"], label="Contexte pour ChatGPT")
                 txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
 
@@ -319,6 +322,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
         # events
+        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
         source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
@@ -337,7 +341,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
                     txt_context,
                     txt_deck,
-                    txt_tag,
+                    txt_tags,
 
                     gallery,
                     txt_source,
@@ -362,7 +366,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
                     txt_context,
                     txt_deck,
-                    txt_tag,
+                    txt_tags,
 
                     gallery,
                     txt_source,

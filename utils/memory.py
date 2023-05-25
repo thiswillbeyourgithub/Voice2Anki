@@ -94,7 +94,7 @@ def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, out
 
         assert len(memorized_prompts) % 2 == 1, "invalid length of new prompts"
 
-        with open(f"user_data/{username}/{profile}/memories.json", "w") as f:
+        with open(f"profiles/{profile}/memories.json", "w") as f:
             json.dump(memorized_prompts, f, indent=4)
     except Exception as err:
         return f"Error during recursive improvement: '{err}'\n\n{output}"
@@ -102,72 +102,26 @@ def recur_improv(txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, out
 
 
 
+def load_memorized_prompts(profile):
+    assert Path(f"profiles/").exists(), "profile directory not found"
+    if Path(f"profiles/{profile}/memories.json").exists():
+        with open(f"profiles/{profile}/memories.json", "r") as f:
+            memorized_prompts = json.load(f)
+    else:
+        ans = input("No profile found, creating it? (y/n)\n")
+        if ans not in ["y", "n"]:
+            raise SystemExit("Invalid answer")
+        if ans == "n":
+            raise SystemExit()
+        if ans == "y":
+            memorized_prompts = default_system_prompt.copy()
+            with open(f"profiles/{profile}/memories.json", "w") as f:
+                json.dump(memorized_prompts, f)
 
-args = sys.argv[1:]
-collated = " ".join(args)
-if "--username=" not in collated:
-    raise Exception("No --username=USERNAME argument found")
-if "--profile=" not in collated:
-    raise Exception("No --profile=PROFILE argument found")
-for ar in args:
-    if "--username=" in ar:
-        username = ar.replace("--username=", "")
-    if "--profile=" in ar:
-        profile = ar.replace("--profile=", "")
-
-assert Path(f"user_data/{username}").exists(), "No user directory found"
-assert Path(f"user_data/{username}/{profile}").exists(), "User profile directory not found"
-if Path(f"user_data/{username}/{profile}/memories.json").exists():
-    with open(f"user_data/{username}/{profile}/memories.json", "r") as f:
-        memorized_prompts = json.load(f)
-else:
-    ans = input("No user profile found, creating it? (y/n)\n")
-    if ans not in ["y", "n"]:
-        raise SystemExit("Invalid answer")
-    if ans == "n":
-        raise SystemExit()
-    if ans == "y":
-        memorized_prompts = default_system_prompt.copy()
-        with open(f"user_data/{username}/{profile}/memories.json", "w") as f:
-            json.dump(memorized_prompts, f)
-
-# check previous prompts just in case
-if not memorized_prompts or not isinstance(memorized_prompts, list):
-    print(memorized_prompts)
-    raise SystemExit("Invalid memorized_prompts")
-with open(f"user_data/{username}/{profile}/memories.json", "w") as f:
-    json.dump(memorized_prompts, f, indent=4)
-memorized_prompts = curate_previous_prompts(memorized_prompts)
-
-
-class previous_values:
-    def __init__(self):
-        self.user_path = Path(f"user_data/{username}/{profile}")
-        assert self.user_path.exists(), "profile of user not found!"
-
-    def __getitem__(self, key):
-        if (self.user_path / key).exists():
-            try:
-                with open(str(self.user_path / key + ".pickle"), "r") as f:
-                    return pickle.load(f)
-            except Exception as err:
-                try:
-                    with open(str(self.user_path / key + ".pickle"), "rb") as f:
-                        return pickle.load(f)
-                except Exception as err:
-                    raise Exception(f"Error when getting {key} from user: '{err}'")
-        else:
-            whi(f"No {key} in store for user")
-            return None
-
-    def __setitem__(self, key, item):
-        try:
-            with open(str(self.user_path / (key + ".pickle")), "w") as f:
-                return pickle.dump(item, f)
-        except Exception as err:
-            try:
-                # try as binary
-                with open(str(self.user_path / (key + ".pickle")), "wb") as f:
-                    return pickle.dump(item, f)
-            except Exception as err:
-                raise Exception(f"Error when setting {key} from user: '{err}'")
+    # check previous prompts just in case
+    if not memorized_prompts or not isinstance(memorized_prompts, list):
+        print(memorized_prompts)
+        raise SystemExit("Invalid memorized_prompts")
+    with open(f"profiles/{profile}/memories.json", "w") as f:
+        json.dump(memorized_prompts, f, indent=4)
+    memorized_prompts = curate_previous_prompts(memorized_prompts)
