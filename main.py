@@ -274,7 +274,7 @@ def main(
 
 #with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=gr.themes.Soft()) as demo:
 with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
-        gr.Markdown("Valide tes partiels")
+        gr.Markdown("WhisperToAnki")
 
         # hidden, to store the request answer from chatgpt
         txt_chatgpt_resp = gr.Textbox(value=None, visible=False)
