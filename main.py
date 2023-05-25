@@ -32,6 +32,9 @@ def transcribe(audio_path, txt_whisp_prompt):
     if audio_path is None:
         return red(f"Error: None audio_path")
 
+    if txt_whisp_prompt is None:
+        return red(f"Error: None whisper prompt")
+
     # try to remove silences
     audio_path = remove_silences(audio_path)
 
@@ -156,15 +159,40 @@ def main(
     to_return["output"] = ""
 
     if not (audio_path or txt_audio):
-        return red("No audio in either microphone data or audio file")
+        return [
+                red("No audio in either microphone data or audio file"),
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
+                ]
     if not txt_whisp_prompt:
-        return red("No whisper prompt found.")
+        return [
+                red("No whisper prompt found."),
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
+                ]
     if not txt_chatgpt_context:
-        return red("No txt_chatgpt_context found.")
+        return [
+                red("No txt_chatgpt_context found."),
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
+                ]
     if not txt_deck:
-        return red("you should specify a deck")
+        return [
+                red("you should specify a deck"),
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
+                ]
     if not txt_tags:
-        return red("you should specify tags")
+        return [
+                red("you should specify tags"),
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
+                ]
 
     if not ((gallery is not None) or txt_source):
         to_return["output"] += red("you should probably specify either image+source or source")
