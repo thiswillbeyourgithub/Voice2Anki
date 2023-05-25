@@ -68,11 +68,11 @@ def transcribe(audio_path, txt_whisp_prompt):
         return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, context, profile, max_token):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
     if not txt_audio:
-        return "No transcribed audio found.", None
-    if not context:
-        return "No context found.", None
+        return "No transcribed audio found.", None, f"No transcribed audio found\n\n{output}"
+    if not txt_chatgpt_context:
+        return "No txt_chatgpt_context found.", None, f"No txt_chatgpt_context found\n\n{output}"
 
     prev_prompts = load_prev_prompts(profile)
     prev_prompts = prompt_filter(prev_prompts, max_token)
@@ -99,7 +99,7 @@ def alfred(txt_audio, context, profile, max_token):
                 del formatted_messages[i][col]
     formatted_messages.append(
             {"role": "user", "content": dedent(
-                transcript_template.replace("CONTEXT", context).replace("TRANSCRIPT", txt_audio)),
+                transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio)),
                 })
     tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages in ChatGPT prompt: {len(formatted_messages)} (tokens: {tkns})")
@@ -120,14 +120,14 @@ def alfred(txt_audio, context, profile, max_token):
                 break
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red("ChatGPT: too many retries.")
+                    return red("ChatGPT: too many retries."), None, f"ChatGPT: too many retries.\n\n{output}"
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
         cloz = response["choices"][0]["message"]["content"]
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
-        return cloz, response
+        return cloz, response, f"New cloze created: {cloz}\n\n{output}"
     except Exception as err:
-        return None, red(f"Error with ChatGPT: '{err}'")
+        return None, red(f"Error with ChatGPT: '{err}'"), f"Error with ChatGPT: '{err}'\n\n{output}"
 
 
 
@@ -375,7 +375,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         # events
         choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
-        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
+        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp, output_elem])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
