@@ -1,7 +1,7 @@
 from utils.logger import whi, yel
 import sys
 from main import demo
-from utils.user_db import authentification
+from utils.users import authentification
 
 if __name__ == "__main__":
     args = sys.argv[1:]

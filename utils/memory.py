@@ -171,4 +171,3 @@ class previous_values:
                     return pickle.dump(item, f)
             except Exception as err:
                 raise Exception(f"Error when setting {key} from user: '{err}'")
-
