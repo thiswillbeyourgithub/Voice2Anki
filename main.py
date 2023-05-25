@@ -155,7 +155,9 @@ def main(
         auto_mode=False,
         ):
     to_return = {}
-    whi("Entering 'ain")
+    global pv
+    pv = previous_values(profile)
+    whi("Entering main")
     to_return["output"] = ""
 
     if not (audio_path or txt_audio):
