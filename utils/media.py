@@ -1,3 +1,5 @@
+import pickle
+from bs4 import BeautifulSoup
 from pathlib import Path
 from speechbrain.pretrained import WaveformEnhancement
 import cv2
@@ -11,8 +13,8 @@ from .logger import whi, yel, red
 from .anki import anki_media
 
 
-def get_image(source, gallery, txt_output):
-    whi("Getting image")
+def get_image(gallery, txt_output):
+    whi("Getting image from clipboard")
     try:
         # load from clipboard
         pasted = pyperclip3.paste()
@@ -26,10 +28,27 @@ def get_image(source, gallery, txt_output):
                         ) for i in gallery
                     ] + [decoded]
             return out, "Loaded image.\n" + txt_output
+        print(gallery)
         raise Exception(f'gallery is not list or None but {type(gallery)}')
     except Exception as err:
         return None, None, red(f"Error: {err}\n\n") + txt_output
 
+
+
+def check_source(source):
+    "makes sure the source is only an img"
+    whi("Checking source")
+    if source:
+        soup = BeautifulSoup(source, 'html.parser')
+        imgs = soup.find_all("img")
+        source = "</br>".join([str(x) for x in imgs])
+        assert source, f"invalid source: {source}"
+        # save for next startup
+        with open("./cache/voice_cards_last_source.pickle", "wb") as f:
+            pickle.dump(source, f)
+    else:
+        source = ""
+    return source
 
 def get_img_source(gallery):
     whi("Getting source from image")
@@ -51,6 +70,7 @@ def get_img_source(gallery):
             if newsource not in source:
                 source += newsource
 
+        source = check_source(source)
         return source
     except Exception as err:
         return red(f"Error getting source: '{err}'")
@@ -62,7 +82,7 @@ def reset_audio():
 
 def reset_image():
     whi("Reset images and source.")
-    return None, None
+    return None
 
 
 def enhance_audio(audio_path):

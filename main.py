@@ -10,7 +10,7 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from utils.anki import add_to_anki, audio_to_anki, sync_anki
-from utils.misc import tokenize, transcript_template, check_source
+from utils.misc import tokenize, transcript_template
 from utils.logger import red, whi, yel
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
 from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio, reset_image
@@ -148,7 +148,6 @@ def main(
         txt_tags,
 
         gallery,
-        txt_source,
         profile,
         sld_max_tkn,
         old_output,
@@ -196,12 +195,11 @@ def main(
                 txt_chatgpt_cloz,
                 ]
 
-    if not ((gallery is not None) or txt_source):
-        to_return["output"] += red("you should probably specify either image+source or source")
-    if (gallery is not None and len(gallery) != 0) and not txt_source:
-        return red("Image but no source: please load the source")
-
-    txt_source = check_source(txt_source)
+    if gallery is None or len(gallery) == 0:
+        to_return["output"] += red("you should probably specify an image in source")
+        txt_source = "<br>"
+    else:
+        txt_source = get_img_source(gallery)
 
     # save state for next start
     pv["txt_deck"] = txt_deck
@@ -274,7 +272,7 @@ def main(
 
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
-    if "img" not in txt_source:
+    if "<img" not in txt_source:
         # if no image in source: add a tag to find them easily later on
         new_tags += ["WhisperToAnki::no_img_in_source"]
 
@@ -333,18 +331,16 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Row():
                 with gr.Column():
-                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[1], object_fit="none", height="auto", container=True)
+                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=1, rows=1, object_fit="scale-down", height="auto", container=True)
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
-                        source_btn = gr.Button(value="Load source from gallery", variant="secondary").style(full_width=False, size="sm")
-                        txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
-            with gr.Column():
-                choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile")
-                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
-                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
-                txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Contexte pour ChatGPT")
-                txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
+                with gr.Column():
+                    choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile")
+                    txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
+                    txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
+                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Contexte pour ChatGPT")
+                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
 
         with gr.Row():
             with gr.Column():
@@ -357,7 +353,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         with gr.Row():
             with gr.Column(scale=1):
-                auto_btn = gr.Button(value="Auto", variant="secondary").style(full_width=False, size="sm")
+                auto_btn = gr.Button(value="Auto", variant="secondary") #.style(full_width=False, size="sm")
 
 
             with gr.Column(scale=9):
@@ -379,12 +375,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         # events
         choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
-        source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
-        img_btn.click(fn=get_image, inputs=[txt_source, gallery, output_elem], outputs=[gallery, output_elem])
+        img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
-        rst_img_btn.click(fn=reset_image, outputs=[gallery, txt_source])
+        rst_img_btn.click(fn=reset_image, outputs=[gallery])
 
         anki_btn.click(
                 fn=main,
@@ -401,7 +396,6 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_tags,
 
                     gallery,
-                    txt_source,
                     choice_profile,
                     sld_max_tkn,
                     output_elem,
@@ -428,7 +422,6 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_tags,
 
                     gallery,
-                    txt_source,
                     choice_profile,
                     sld_max_tkn,
                     output_elem,
