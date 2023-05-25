@@ -58,6 +58,7 @@ def transcribe(audio_path, txt_whisp_prompt, output):
                             language="fr",
                             )
                     txt_audio = transcript["text"]
+                    yel(f"\nWhisper transcript: {txt_audio}")
                     return txt_audio, f"Whisper transcription: {txt_audio}\n\n{output}"
             except Exception as err:
                 if cnt >= 5:
@@ -125,6 +126,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
                 time.sleep(2 * cnt)
         cloz = response["choices"][0]["message"]["content"]
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+        yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
         return cloz, response, f"New cloze created: {cloz}\n\n{output}"
     except Exception as err:
         return None, red(f"Error with ChatGPT: '{err}'"), f"Error with ChatGPT: '{err}'\n\n{output}"
@@ -153,12 +155,7 @@ def main(
         old_output,
         auto_mode=False,
         ):
-    to_return = {}
-    global pv
-    pv = previous_values(profile)
     whi("Entering main")
-    to_return["output"] = ""
-
     if not (audio_path or txt_audio):
         return [
                 red("No audio in either microphone data or audio file"),
@@ -195,8 +192,17 @@ def main(
                 txt_chatgpt_cloz,
                 ]
 
+    # to_return allows to keep track of what to output to which widget
+    to_return = {}
+    to_return["output"] = old_output
+    to_return["txt_audio"] = txt_audio
+    to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
+
+    global pv
+    pv = previous_values(profile)
+
     if gallery is None or len(gallery) == 0:
-        to_return["output"] += red("you should probably specify an image in source")
+        to_return["output"] = red("you should probably specify an image in source\n") + to_return["output"]
         txt_source = "<br>"
     else:
         txt_source = get_img_source(gallery)
@@ -213,10 +219,11 @@ def main(
     audio_html = audio_to_anki(audio_path)
     if "Error" in audio_html:  # then out is an error message and not the source
         to_return["output"] = audio_html + to_return["output"]
-        return [to_return["output"],
-                txt_audio,
-                txt_chatgpt_resp,
-                txt_chatgpt_cloz,
+        return [
+                to_return["output"],
+                to_return["txt_audio"],
+                to_return["txt_chatgpt_resp"],
+                to_return["txt_chatgpt_cloz"],
                 ]
     txt_source += audio_html
 
@@ -226,23 +233,31 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or auto_mode:
-        txt_audio = transcribe(audio_path, txt_whisp_prompt)
-    to_return["txt_audio"] = txt_audio
-
-    to_return["output"] += f"\n>>>> Whisper:\n{txt_audio}"
-    yel(f"\n###\nTranscript:\n{txt_audio}\n###\n")
+        txt_audio, to_return["output"] = transcribe(audio_path, txt_whisp_prompt, to_return["output"])
+        to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or auto_mode:
-        txt_chatgpt_cloz, txt_chatgpt_resp = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn)
-    if isinstance(txt_chatgpt_resp, str) and "Error" not in txt_chatgpt_resp:
-        txt_chatgpt_resp = json.loads(txt_chatgpt_resp)
+        txt_chatgpt_cloz, txt_chatgpt_resp, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
+    if "Error" in txt_chatgpt_resp:
+        to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
+        return [
+                to_return["output"],
+                to_return["txt_audio"],
+                to_return["txt_chatgpt_resp"],
+                to_return["txt_chatgpt_cloz"],
+                ]
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
     to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
 
-    tkn_cost = txt_chatgpt_resp["usage"]["total_tokens"]
-    tkn_cost_dol = tkn_cost / 1000 * 0.002
-    yel(f"\n###\nChatGPT answer:\n{txt_chatgpt_cloz}\n###\n")
+    try:
+        tkn_cost = txt_chatgpt_resp["usage"]["total_tokens"]
+        tkn_cost_dol = tkn_cost / 1000 * 0.002
+    except Exception as err:
+        red(f"Error: '{err}'")
+        tkn_cost = 0
+        tkn_cost_dol = 0
+
 
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
