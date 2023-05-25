@@ -7,23 +7,23 @@ if __name__ == "__main__":
     args = sys.argv[1:]
 
     to_share = False
-    auth = False
-    op_br = False
+    auth = None
+    op_br = True
     debug = False
     auth_message = None
 
     if args:
         whi(f"Startup arguments: {args}")
 
-        if "share" in args:
+        if "--share" in args:
             to_share = True
             yel("Sharing enabled")
 
-        if "auth" in args:
+        if "--auth" in args:
             auth = authentification
             yel("Authentification enabled")
             # TODO: auth_message
-        if "open" in args:
+        if "--open" in args:
             of_br = True
             yel("Opening browser")
         if "debug" in args:
@@ -45,13 +45,13 @@ if __name__ == "__main__":
     demo.launch(
             share=to_share,
             auth=auth,
-            auth_message=auth_message,
-            inbrowser=op_br
+            auth_message="Please login",
+            inbrowser=op_br,
             debug=debug,
-            show_err=True,
-            #server_name="0.0.0.0",  # TODO, this make it sharable by hand?!
+            show_error=True,
+            server_name="0.0.0.0",  # TODO, this make it sharable by hand?!
             server_port=7860,
-            show_tips=True
+            show_tips=True,
             # ssl_keyfile=,
             # ssl_certfile=,
             # ssl_keyfile_password=,
