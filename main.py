@@ -9,7 +9,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from utils.to_anki import add_to_anki, audio_to_anki
+from utils.anki import add_to_anki, audio_to_anki
 from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel
 from utils.memory import curate_previous_prompts, recur_improv, previous_values, memorized_prompts

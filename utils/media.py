@@ -9,7 +9,7 @@ from unsilence import Unsilence
 import torchaudio
 
 from .logger import whi, yel, red
-from .to_anki import anki_media
+from .anki import anki_media
 
 
 def get_image(source, gallery, txt_output):
