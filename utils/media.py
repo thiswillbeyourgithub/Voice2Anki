@@ -76,13 +76,13 @@ def get_img_source(gallery):
         return red(f"Error getting source: '{err}'")
 
 
-def reset_audio():
+def reset_audio(output):
     whi("Reset audio.")
-    return None
+    return None, f"Reset audio.\n\n{output}"
 
-def reset_image():
-    whi("Reset images and source.")
-    return None
+def reset_image(output):
+    whi("Reset images.")
+    return None, f"Reset images.\n\n{output}"
 
 
 def enhance_audio(audio_path):

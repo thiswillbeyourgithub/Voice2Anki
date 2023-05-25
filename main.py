@@ -378,8 +378,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp, output_elem])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
-        rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
-        rst_img_btn.click(fn=reset_image, outputs=[gallery])
+        rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_path, output_elem])
+        rst_img_btn.click(fn=reset_image, inputs=[output_elem], outputs=[gallery, output_elem])
 
         anki_btn.click(
                 fn=main,
