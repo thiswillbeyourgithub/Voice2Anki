@@ -1,7 +1,5 @@
 from speechbrain.pretrained import WaveformEnhancement
 import time
-from pathlib import Path
-import ankipandas as akp
 from bs4 import BeautifulSoup
 import cv2
 import numpy as np
@@ -11,6 +9,7 @@ from unsilence import Unsilence
 import torchaudio
 
 from .logger import whi, yel, red
+from .to_anki import anki_media
 
 
 def get_image(source, gallery, txt_output):
@@ -38,9 +37,9 @@ def get_img_source(gallery):
     try:
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
         if gallery is None:
-            return red(f"No image in gallery.")
+            return red("No image in gallery.")
         if len(gallery) == 0:
-            return red(f"0 image found in gallery.")
+            return red("0 image found in gallery.")
         source = ""
         for img in gallery:
             decoded = cv2.imread(img["name"])
@@ -104,21 +103,6 @@ def remove_silences(audio_path):
     except Exception as err:
         red(f"Error when removing silences: '{err}'")
         return audio_path
-
-# load anki profile using ankipandas just to get the media folder
-db_path = akp.find_db(user="Main")
-red(f"WhisperToAnki will use anki collection found at {db_path}")
-
-# check that akp will not go in trash
-if "trash" in str(db_path).lower():
-    red("Ankipandas seems to have "
-        "found a collection that might be located in "
-        "the trash folder. If that is not your intention "
-        "cancel now. Waiting 10s for you to see this "
-        "message before proceeding.")
-    time.sleep(1)
-anki_media = Path(db_path).parent / "collection.media"
-assert anki_media.exists(), "Media folder not found!"
 
 # load voice cleaning model
 voice_cleaner = WaveformEnhancement.from_hparams(

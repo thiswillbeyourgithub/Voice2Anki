@@ -1,6 +1,10 @@
+from pathlib import Path
+import ankipandas as akp
+import shutil
+import time
 import urllib.request
 import json
-from .logger import red
+from .logger import red, whi
 
 
 def add_to_anki(
@@ -78,6 +82,30 @@ def audio_to_anki(audio_path):
         return html
     except Exception as err:
         return red(f"\n\nError when copying audio to anki media: '{err}'")
+
+def sync_anki():
+    "trigger anki synchronization"
+    sync_output = _call_anki(action="sync")
+    assert sync_output is None or sync_output == "None", (
+        f"Error during sync?: '{sync_output}'")
+    time.sleep(1)  # wait for sync to finish, just in case
+    whi("Done syncing!")
+
+# load anki profile using ankipandas just to get the media folder
+db_path = akp.find_db(user="Main")
+red(f"WhisperToAnki will use anki collection found at {db_path}")
+
+# check that akp will not go in trash
+if "trash" in str(db_path).lower():
+    red("Ankipandas seems to have "
+        "found a collection that might be located in "
+        "the trash folder. If that is not your intention "
+        "cancel now. Waiting 10s for you to see this "
+        "message before proceeding.")
+    time.sleep(1)
+anki_media = Path(db_path).parent / "collection.media"
+assert anki_media.exists(), "Media folder not found!"
+
 
 
 if __name__ == "__main__":
