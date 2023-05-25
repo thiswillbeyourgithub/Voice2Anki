@@ -315,7 +315,6 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
         img_btn.click(fn=get_image, inputs=[txt_source, gallery], outputs=[gallery])
-        source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         rst_btn.click(fn=reset_audio, outputs=[audio_path])
         anki_btn.click(
                 fn=main,
