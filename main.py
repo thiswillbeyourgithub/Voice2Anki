@@ -26,14 +26,14 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 pv = previous_values()
 
 
-def transcribe(audio_path, txt_whisp_prompt):
+def transcribe(audio_path, txt_whisp_prompt, output):
     whi("Transcribing audio")
 
     if audio_path is None:
-        return red(f"Error: None audio_path")
+        return red(f"Error: None audio_path"), f"Error: None audio_path\n\n{output}"
 
     if txt_whisp_prompt is None:
-        return red(f"Error: None whisper prompt")
+        return red(f"Error: None whisper prompt"), f"Error: None whisper prompt\n\n{output}"
 
     # try to remove silences
     audio_path = remove_silences(audio_path)
@@ -58,14 +58,14 @@ def transcribe(audio_path, txt_whisp_prompt):
                             language="fr",
                             )
                     txt_audio = transcript["text"]
-                    return txt_audio
+                    return txt_audio, f"Whisper transcription: {txt_audio}\n\n{output}"
             except Exception as err:
                 if cnt >= 5:
-                    return red("Whisper: too many retries.")
+                    return red("Whisper: too many retries."), f"Whisper: too many retries.\n\n{output}"
                 red(f"Error from whisper: '{err}'")
                 time.sleep(2 * cnt)
     except Exception as err:
-        return red(f"Error when transcribing audio: '{err}'")
+        return red(f"Error when transcribing audio: '{err}'"), f"Error when transcribing audio: '{err}'\n\n{output}"
 
 
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
@@ -376,7 +376,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         # events
         choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp, output_elem])
-        transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
+        transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
         rst_img_btn.click(fn=reset_image, outputs=[gallery])
