@@ -13,7 +13,7 @@ import torchaudio
 from .logger import whi, yel, red
 
 
-def get_image(source, gallery):
+def get_image(source, gallery, txt_output):
     whi("Getting image")
     try:
         # load from clipboard
@@ -27,21 +27,32 @@ def get_image(source, gallery):
                         i["name"]
                         ) for i in gallery
                     ] + [decoded]
-            return out
+            return out, "Loaded image.\n" + txt_output
         raise Exception(f'gallery is not list or None but {type(gallery)}')
     except Exception as err:
-        return red(f"Error: {err}")
+        return None, None, red(f"Error: {err}\n\n") + txt_output
 
 
-def get_img_source(decoded):
+def get_img_source(gallery):
     whi("Getting source from image")
     try:
-        img_hash = hashlib.md5(decoded).hexdigest()
-        new = anki_media / f"{img_hash}.png"
-        if not new.exists():
-            cv2.imwrite(str(new), decoded)
-        source = f'<img src="{new.name}" '
-        source += 'type="made_by_WhisperToAnki">'
+        assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
+        if gallery is None:
+            return red(f"No image in gallery.")
+        if len(gallery) == 0:
+            return red(f"0 image found in gallery.")
+        source = ""
+        for img in gallery:
+            decoded = cv2.imread(img["name"])
+            img_hash = hashlib.md5(decoded).hexdigest()
+            new = anki_media / f"{img_hash}.png"
+            if not new.exists():
+                cv2.imwrite(str(new), decoded)
+            newsource = f'<img src="{new.name}" type="made_by_WhisperToAnki">'
+            # only add if not duplicate, somehow
+            if newsource not in source:
+                source += newsource
+
         return source
     except Exception as err:
         return red(f"Error getting source: '{err}'")
@@ -50,6 +61,10 @@ def get_img_source(decoded):
 def reset_audio():
     whi("Reset audio.")
     return None
+
+def reset_image():
+    whi("Reset images and source.")
+    return None, None
 
 
 def enhance_audio(audio_path):

@@ -13,7 +13,7 @@ from utils.to_anki import add_to_anki, audio_to_anki
 from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel
 from utils.memory import curate_previous_prompts, recur_improv, previous_values, memorized_prompts
-from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio
+from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio, reset_image
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -276,10 +276,13 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         with gr.Row():
             with gr.Row():
-                img_btn = gr.Button(value="Load image from source or clipboard", variant="secondary")
-                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[3], object_fit="contain", height="auto")
-                source_btn = gr.Button(value="Load source from image", variant="secondary")
-                txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
+                with gr.Column():
+                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[1], object_fit="fill", height="auto", container=True)
+                    with gr.Row():
+                        rst_img_btn = gr.Button(value="Clear", variant="primary")
+                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary")
+                        source_btn = gr.Button(value="Load source from gallery", variant="secondary")
+                    txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tag = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
@@ -289,7 +292,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Column():
                 audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=pv["audio_path"])
-                rst_btn = gr.Button(value="Reset audio", variant="secondary")
+                rst_audio_btn = gr.Button(value="Reset audio", variant="secondary")
             with gr.Column():
                 txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
                 txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
@@ -314,8 +317,9 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
-        img_btn.click(fn=get_image, inputs=[txt_source, gallery], outputs=[gallery])
-        rst_btn.click(fn=reset_audio, outputs=[audio_path])
+        img_btn.click(fn=get_image, inputs=[txt_source, gallery, output_elem], outputs=[gallery, output_elem])
+        rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
+        rst_img_btn.click(fn=reset_image, outputs=[gallery, txt_source])
         anki_btn.click(
                 fn=main,
                 inputs=[
