@@ -82,15 +82,16 @@ def prompt_filter(prev_prompts, max_token):
     assert len(syspr) == 1, "Number of system prompts != 1"
 
     # add by decreasing priority and timestamp
-    imp_vals = sorted(set([x["priority"] for x in prev_prompts]), reverse=True)
+    prio_vals = sorted(set([x["priority"] for x in prev_prompts]), reverse=True)
     tkns = syspr[0]["tkn_len"]
     dis_tkns = 0
     output_pr = [syspr[0]]
-    for imp in imp_vals:
+    for prio in prio_vals:
+        red(f"priority: {prio}")  # debug
         for pr in timesorted_pr:
             if pr in output_pr:
                 continue
-            if pr["priority"] == imp:
+            if pr["priority"] == prio:
                 if not tkns + pr["tkn_len"] > max_token:
                     tkns += pr["tkn_len"]
                     output_pr.append(pr)
