@@ -277,7 +277,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Row():
                 with gr.Column():
-                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[1], object_fit="fill", height="auto", container=True)
+                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[1], object_fit="none", height="auto", container=True)
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear", variant="primary")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary")
