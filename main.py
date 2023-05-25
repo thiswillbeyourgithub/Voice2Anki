@@ -9,7 +9,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from utils.anki import add_to_anki, audio_to_anki, sync
+from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel
 from utils.memory import curate_previous_prompts, recur_improv, previous_values, memorized_prompts
@@ -239,7 +239,7 @@ def main(
     results = [str(r) for r in results if str(r).isdigit()]
 
     # trigger anki sync
-    sync()
+    sync_anki()
     to_return["output"] += f"Synchronized anki\n"
 
     if not len(results) == len(clozes):
