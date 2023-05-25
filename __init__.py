@@ -52,7 +52,8 @@ if __name__ == "__main__":
             server_name="0.0.0.0",  # TODO, this make it sharable by hand?!
             server_port=7860,
             show_tips=True,
-            # ssl_keyfile=,
-            # ssl_certfile=,
-            # ssl_keyfile_password=,
+            ssl_keyfile="./utils/ssl/key.pem",
+            ssl_certfile="./utils/ssl/cert.pem",
+            ssl_keyfile_password="fd5d63390f1a45427acfe20dd0e24a95",  # random md5
+            ssl_verify=False,  # allow self signed
             )
