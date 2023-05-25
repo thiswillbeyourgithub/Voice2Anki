@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 import ankipandas as akp
 import shutil
@@ -72,6 +73,7 @@ def _call_anki(action, **params):
         raise Exception(response['error'])
     return response['result']
 
+
 def audio_to_anki(audio_path):
     whi("Sending audio to anki")
     try:
@@ -82,6 +84,7 @@ def audio_to_anki(audio_path):
         return html
     except Exception as err:
         return red(f"\n\nError when copying audio to anki media: '{err}'")
+
 
 def sync_anki():
     "trigger anki synchronization"

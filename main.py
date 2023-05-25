@@ -12,7 +12,7 @@ from pathlib import Path
 from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template, check_source
 from utils.logger import red, whi, yel
-from utils.memory import curate_previous_prompts, recur_improv, load_memorized_prompts
+from utils.memory import prompt_filter, recur_improv, load_prev_prompts
 from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio, reset_image
 from utils.profiles import get_profiles, switch_profile, previous_values
 
@@ -29,11 +29,14 @@ pv = previous_values()
 def transcribe(audio_path, txt_whisp_prompt):
     whi("Transcribing audio")
 
+    if audio_path is None:
+        return red(f"Error: None audio_path")
+
     # try to remove silences
     audio_path = remove_silences(audio_path)
 
     # try to enhance quality
-    audio_path = enhance_audio(audio_path)
+    #audio_path = enhance_audio(audio_path)  # TODO, fix that
 
     # save audio for next startup
     pv["audio_path"] = audio_path
@@ -62,23 +65,35 @@ def transcribe(audio_path, txt_whisp_prompt):
         return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, context):
+def alfred(txt_audio, context, profile, max_token):
     if not txt_audio:
         return "No transcribed audio found.", None
     if not context:
         return "No context found.", None
 
-    global memorized_prompts
-    memorized_prompts = curate_previous_prompts(memorized_prompts)
+    prev_prompts = load_prev_prompts(profile)
+    prev_prompts = prompt_filter(prev_prompts, max_token)
 
+    # check the number of token is fine and format the previous
+    # prompts in chatgpt format
     formatted_messages = []
     tkns = 0
-    for m in memorized_prompts:
-        if m["disabled"] is True:
-            continue
+    for m in prev_prompts:
         formatted_messages.append(m.copy())
-        tkns += len(tokenize(m["content"]))
-        del formatted_messages[-1]["disabled"]
+        tkns += m["tkn_len"]
+        if "answer" in m:
+            assert m["role"] == "user", "expected user"
+            formatted_messages.append(
+                    {
+                        "role": "assistant",
+                        "content": m["answer"],
+                        }
+                    )
+
+    for i, fm in enumerate(formatted_messages):
+        for col in ["timestamp", "priority", "tkn_len", "answer", "disabled"]:
+            if col in fm:
+                del formatted_messages[i][col]
     formatted_messages.append(
             {"role": "user", "content": dedent(
                 transcript_template.replace("CONTEXT", context).replace("TRANSCRIPT", txt_audio)),
@@ -131,11 +146,13 @@ def main(
 
         gallery,
         txt_source,
+        profile,
+        sld_max_tkn,
         old_output,
         auto_mode=False,
         ):
     to_return = {}
-    whi("Entering main")
+    whi("Entering 'ain")
     to_return["output"] = ""
 
     if not (audio_path or txt_audio):
@@ -151,19 +168,27 @@ def main(
 
     if not ((gallery is not None) or txt_source):
         to_return["output"] += red("you should probably specify either image+source or source")
-    if (gallery is not None) and not txt_source:
+    if (gallery is not None and len(gallery) != 0) and not txt_source:
         return red("Image but no source: please load the source")
 
     txt_source = check_source(txt_source)
 
+    # save state for next start
+    pv["txt_deck"] = txt_deck
+    pv["txt_tags"] = txt_tags
+    pv["sld_max_tkn"] = sld_max_tkn
+    pv["profile"] = profile
+    pv["txt_chatgpt_context"] = txt_chatgpt_context
+    pv["txt_whisp_prompt"] = txt_whisp_prompt
+
     # manage sound path
     audio_html = audio_to_anki(audio_path)
     if "Error" in audio_html:  # then out is an error message and not the source
-        to_return["output"] = audio_html + to_return["audio_html"]
+        to_return["output"] = audio_html + to_return["output"]
         return [to_return["output"],
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_resp"],
-                to_return["txt_chatgpt_cloz"],
+                txt_audio,
+                txt_chatgpt_resp,
+                txt_chatgpt_cloz,
                 ]
     txt_source += audio_html
 
@@ -181,8 +206,8 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or auto_mode:
-        txt_chatgpt_cloz, txt_chatgpt_resp = alfred(txt_audio, txt_chatgpt_context)
-    if isinstance(txt_chatgpt_resp, str):
+        txt_chatgpt_cloz, txt_chatgpt_resp = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn)
+    if isinstance(txt_chatgpt_resp, str) and "Error" not in txt_chatgpt_resp:
         txt_chatgpt_resp = json.loads(txt_chatgpt_resp)
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
     to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
@@ -218,7 +243,7 @@ def main(
     to_return["output"] += "\n>>>> To anki:\n"
 
     # anki tags
-    new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"],
+    new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
     if "img" not in txt_source:
         # if no image in source: add a tag to find them easily later on
         new_tags += ["WhisperToAnki::no_img_in_source"]
@@ -255,11 +280,6 @@ def main(
 
     whi("Finished loop.\n\n")
 
-    # save state for next start
-    pv["txt_deck"] = txt_deck
-    pv["txt_tags"] = txt_tags
-    pv["txt_content"] = txt_chatgpt_context
-    pv["txt_whisp_prompt"] = txt_whisp_prompt
 
     to_return["output"] += "\n\nDONE"
 
@@ -285,13 +305,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 with gr.Column():
                     gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[1], object_fit="none", height="auto", container=True)
                     with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear", variant="primary")
-                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary")
-                    with gr.Row():
-                        source_btn = gr.Button(value="Load source from gallery", variant="secondary")
+                        rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
+                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
+                        source_btn = gr.Button(value="Load source from gallery", variant="secondary").style(full_width=False, size="sm")
                         txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
-                choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile", max_lines=1)
+                choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile")
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
                 txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Contexte pour ChatGPT")
@@ -299,15 +318,17 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         with gr.Row():
             with gr.Column():
-                audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=pv["audio_path"])
-                rst_audio_btn = gr.Button(value="Reset audio", variant="secondary")
+                with gr.Row():
+                    rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
+                    audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=pv["audio_path"])
             with gr.Column():
                 txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
                 txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
 
         with gr.Row():
             with gr.Column(scale=1):
-                auto_btn = gr.Button(value="Auto", variant="secondary")
+                auto_btn = gr.Button(value="Auto", variant="secondary").style(full_width=False, size="sm")
+
 
             with gr.Column(scale=9):
                 with gr.Row():
@@ -315,7 +336,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     chatgpt_btn = gr.Button(value="To ChatGPT", variant="stop")
                     anki_btn = gr.Button(value="To Anki", variant="stop")
 
-                    improve_btn = gr.Button(value="Improve", variant="secondary")
+                    sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
+
+        with gr.Row():
+            improve_btn = gr.Button(value="Improve", variant="secondary")
+            sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
+
 
 
         # output
@@ -324,11 +350,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         # events
         choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
         source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
-        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
+        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
         img_btn.click(fn=get_image, inputs=[txt_source, gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, outputs=[audio_path])
         rst_img_btn.click(fn=reset_image, outputs=[gallery, txt_source])
+
         anki_btn.click(
                 fn=main,
                 inputs=[
@@ -345,6 +372,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
                     gallery,
                     txt_source,
+                    choice_profile,
+                    sld_max_tkn,
                     output_elem,
                     ],
                 outputs=[
@@ -370,6 +399,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
                     gallery,
                     txt_source,
+                    choice_profile,
+                    sld_max_tkn,
                     output_elem,
                     ],
                 outputs=[
@@ -382,10 +413,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         improve_btn.click(
                 fn=recur_improv,
                 inputs=[
+                    choice_profile,
                     txt_audio,
                     txt_whisp_prompt,
                     txt_chatgpt_cloz,
                     txt_chatgpt_context,
+                    sld_improve,
                     output_elem,
                     ],
                 outputs=[output_elem],

@@ -1,3 +1,4 @@
+from pathlib import Path
 from speechbrain.pretrained import WaveformEnhancement
 import cv2
 import numpy as np
@@ -70,6 +71,7 @@ def enhance_audio(audio_path):
         cleaned_sound = voice_cleaner.enhance_file(audio_path)
 
         # overwrites previous sound
+        Path(audio_path).unlink()
         torchaudio.save(audio_path, cleaned_sound.unsqueeze(0).cpu(), 16000)
 
         whi("Done cleaning audio")
