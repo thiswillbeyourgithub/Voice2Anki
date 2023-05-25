@@ -127,7 +127,7 @@ def main(
         txt_deck,
         txt_tags,
 
-        img_elem,
+        gallery,
         txt_source,
         old_output,
         auto_mode=False,
@@ -147,9 +147,9 @@ def main(
     if not txt_tags:
         return red("you should specify tags")
 
-    if not ((img_elem is not None) or txt_source):
+    if not ((gallery is not None) or txt_source):
         to_return["output"] += red("you should probably specify either image+source or source")
-    if (img_elem is not None) and not txt_source:
+    if (gallery is not None) and not txt_source:
         return red("Image but no source: please load the source")
 
     txt_source = check_source(txt_source)
@@ -166,8 +166,8 @@ def main(
     txt_source += audio_html
 
     # save image and audio for next startup
-    if img_elem is not None:
-        pv["image"] = img_elem
+    if gallery is not None:
+        pv["gallery"] = gallery
 
     # get text from audio if not already parsed
     if (not txt_audio) or auto_mode:
@@ -277,7 +277,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Row():
             with gr.Row():
                 img_btn = gr.Button(value="Load image from source or clipboard", variant="secondary")
-                img_elem = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[3], object_fit="contain", height="auto")
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[1], rows=[3], object_fit="contain", height="auto")
                 source_btn = gr.Button(value="Load source from image", variant="secondary")
                 txt_source = gr.Textbox(value=pv["txt_source"], label="Source field", lines=1)
             with gr.Column():
@@ -311,11 +311,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
         # events
-        source_btn.click(fn=get_img_source, inputs=[img_elem], outputs=[txt_source])
+        source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_context], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp])
         transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt], outputs=[txt_audio])
-        img_btn.click(fn=get_image, inputs=[txt_source, img_elem], outputs=[img_elem])
-        source_btn.click(fn=get_img_source, inputs=[img_elem], outputs=[txt_source])
+        img_btn.click(fn=get_image, inputs=[txt_source, gallery], outputs=[gallery])
+        source_btn.click(fn=get_img_source, inputs=[gallery], outputs=[txt_source])
         rst_btn.click(fn=reset_audio, outputs=[audio_path])
         anki_btn.click(
                 fn=main,
@@ -331,7 +331,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_deck,
                     txt_tag,
 
-                    img_elem,
+                    gallery,
                     txt_source,
                     output_elem,
                     ],
@@ -356,7 +356,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_deck,
                     txt_tag,
 
-                    img_elem,
+                    gallery,
                     txt_source,
                     output_elem,
                     ],
