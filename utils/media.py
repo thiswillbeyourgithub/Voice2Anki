@@ -1,6 +1,4 @@
 from speechbrain.pretrained import WaveformEnhancement
-import time
-from bs4 import BeautifulSoup
 import cv2
 import numpy as np
 import pyperclip3

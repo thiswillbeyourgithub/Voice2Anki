@@ -1,5 +1,6 @@
 import hashlib
 import json
+from pathlib import Path
 
 from .logger import red, whi
 
@@ -50,10 +51,13 @@ def create_account(username, password):
         user_db = json.load(f)
     if username in user_db:
         raise Exception("Username already taken")
+    assert not Path(f"../user_data/{username}").exists(), "username folder already exists"
     hashed_pass = password_hasher(password)
     user_db[username] = hashed_pass
     with open("users.json", "w") as f:
         json.dump(user_db, f)
+    Path(f"../user_data/{username}").mkdir(exist_ok=False)
+    assert Path(f"../user_data/{username}").exists(), "username folder creation failed"
     whi("Done creating account")
 
 def change_password(username, oldpass, newpass):
