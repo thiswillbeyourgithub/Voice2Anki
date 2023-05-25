@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     demo.launch(
             share=to_share,
-            auth=("test", "test"),
+            auth=("g", "g"),
             auth_message="Please login",
             inbrowser=op_br,
             debug=debug,
