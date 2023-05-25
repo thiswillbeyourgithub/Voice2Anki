@@ -114,7 +114,6 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
 
     prev_prompts = load_prev_prompts(choice_profile)
     try:
-        assert len(prev_prompts) % 2 == 1, "invalid length of new prompts before even updating it"
         to_add = [
                 {
                     "role": "user",
