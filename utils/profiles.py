@@ -8,24 +8,27 @@ from .logger import red, whi
 
 class previous_values:
     def __init__(self, profile="default"):
-        self.p = Path(f"profiles/{profile}")
+        assert Path("./profiles").exists(), "profile folder not found"
+        self.p = Path(f"./profiles/{profile}")
         if profile == "default":
+            whi(f"Assuming profile 'default'")
             self.p.mkdir(exist_ok=True)
-        assert self.p.exists(), "profile not found!"
+        assert self.p.exists(), f"{self.p} not found!"
 
     def __getitem__(self, key):
-        if (self.p / key).exists():
+        kp = key + ".pickle"
+        if (self.p / kp).exists():
             try:
-                with open(str(self.p / key + ".pickle"), "r") as f:
+                with open(str(self.p / kp), "r") as f:
                     return pickle.load(f)
             except Exception as err:
                 try:
-                    with open(str(self.p / key + ".pickle"), "rb") as f:
+                    with open(str(self.p / kp), "rb") as f:
                         return pickle.load(f)
                 except Exception as err:
-                    raise Exception(f"Error when getting {key} from profile: '{err}'")
+                    raise Exception(f"Error when getting {kp} from {self.p}: '{err}'")
         else:
-            whi(f"No {key} in store for profile")
+            whi(f"No {kp} in store for {self.p}")
             if key == "max_tkn":
                 return 3500
             return None
@@ -40,7 +43,7 @@ class previous_values:
                 with open(str(self.p / (key + ".pickle")), "wb") as f:
                     return pickle.dump(item, f)
             except Exception as err:
-                raise Exception(f"Error when setting {key} from profile: '{err}'")
+                raise Exception(f"Error when setting {key} from {self.p}: '{err}'")
 
 
 def get_profiles():
