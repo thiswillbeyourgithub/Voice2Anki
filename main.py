@@ -206,9 +206,11 @@ def main(
     to_return = {}
     to_return["output"] = old_output
     to_return["txt_audio"] = txt_audio
+    to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     global pv
+    pv["profile"] = profile  # save the profile in the default folder if unspecified
     pv = previous_values(profile)
 
     if gallery is None or len(gallery) == 0:
@@ -364,8 +366,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile")
                     txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                     txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
-                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Contexte pour ChatGPT")
-                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Contexte pour Whisper")
+                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
+                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
 
         with gr.Row():
             with gr.Column():
