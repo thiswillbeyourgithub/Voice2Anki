@@ -17,7 +17,7 @@ if __name__ == "__main__":
             yel("Sharing enabled")
 
         if "--browser" in args:
-            of_br = True
+            op_br = True
             yel("Opening browser")
         if "debug" in args:
             debug = True
