@@ -1,3 +1,7 @@
+import io
+import torch
+import tempfile
+from scipy.io.wavfile import write, read
 import pickle
 from bs4 import BeautifulSoup
 from pathlib import Path
@@ -85,27 +89,33 @@ def reset_image(output):
     return None, f"Reset images.\n\n{output}"
 
 
-def enhance_audio(audio_path):
+def enhance_audio(audio_numpy):
+    raise NotImplemented("Enhancing the audio automatically is not supported for now")
     whi("Cleaning voice")
     try:
-        cleaned_sound = voice_cleaner.enhance_file(audio_path)
-
-        # overwrites previous sound
-        Path(audio_path).unlink()
-        torchaudio.save(audio_path, cleaned_sound.unsqueeze(0).cpu(), 16000)
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+        write(tmp.name, audio_numpy[0], audio_numpy[1])
+        cleaned = voice_cleaner.enhance_file(tmp.name)
+        torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy[0])
+        enhanced_audio_numpy = read(tmp.name)
 
         whi("Done cleaning audio")
-        return audio_path
+        return enhanced_audio_numpy
 
     except Exception as err:
         red(f"Error when cleaning voice: '{err}'")
-        return audio_path
+        raise
+        return audio_numpy
 
 
-def remove_silences(audio_path):
+def remove_silences(audio_numpy):
     whi("Removing silences")
     try:
-        u = Unsilence(audio_path)
+        # first saving numpy audio to file
+        # note: audio_numpy is a 2-tuple (samplerate, array)
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+        write(tmp.name, audio_numpy[0], audio_numpy[1])
+        u = Unsilence(tmp.name)
         u.detect_silence()
 
         # do it only if its worth it as it might degrade audio quality?
@@ -114,15 +124,16 @@ def remove_silences(audio_path):
         after = estimated_time["after"]["all"][0]
         if after / before  > 0.9 and before - after < 5:
             whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-            return audio_path
+            return audio_numpy  # return untouched
 
         yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
-        u.render_media(audio_path, audible_speed=1, silent_speed=2, audio_only=True)
+        u.render_media(tmp.name, audible_speed=1, silent_speed=2, audio_only=True)
+        unsilenced_audio_numpy = read(tmp.name)
         whi("Done removing silences")
-        return audio_path
+        return unsilenced_audio_numpy
     except Exception as err:
         red(f"Error when removing silences: '{err}'")
-        return audio_path
+        return audio_numpy
 
 # load voice cleaning model
 voice_cleaner = WaveformEnhancement.from_hparams(

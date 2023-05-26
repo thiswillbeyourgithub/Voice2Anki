@@ -1,3 +1,5 @@
+import tempfile
+from scipy.io.wavfile import write, read
 import json
 import pickle
 from textwrap import dedent
@@ -26,23 +28,31 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 pv = previous_values()
 
 
-def transcribe(audio_path, txt_whisp_prompt, output):
+def transcribe(audio_numpy, txt_whisp_prompt, output):
     whi("Transcribing audio")
 
-    if audio_path is None:
-        return red(f"Error: None audio_path"), f"Error: None audio_path\n\n{output}"
+    if audio_numpy is None:
+        return red(f"Error: None audio_numpy"), f"Error: None audio_numpy\n\n{output}"
 
     if txt_whisp_prompt is None:
         return red(f"Error: None whisper prompt"), f"Error: None whisper prompt\n\n{output}"
 
     # try to remove silences
-    audio_path = remove_silences(audio_path)
+    audio_numpy = remove_silences(audio_numpy)
 
+    # DISABLED: it seems to completely screw up the audio :(
     # try to enhance quality
-    #audio_path = enhance_audio(audio_path)  # TODO, fix that
+    # audio_numpy = enhance_audio(audio_numpy)
 
     # save audio for next startup
-    pv["audio_path"] = audio_path
+    pv["audio_numpy"] = audio_numpy
+
+    # save audio to temp file
+    whi(f"Saving audio as wav file")
+    tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+    write(tmp.name, audio_numpy[0], audio_numpy[1])
+    tempwavpath = tmp.name
+
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
@@ -50,7 +60,7 @@ def transcribe(audio_path, txt_whisp_prompt, output):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(audio_path, "rb") as audio_file:
+                with open(tempwavpath, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
                             model="whisper-1",
                             file=audio_file,
@@ -138,7 +148,7 @@ def auto_mode(*args, **kwargs):
     return main(*args, **kwargs, auto_mode=True)
 
 def main(
-        audio_path,
+        audio_numpy,
         txt_audio,
         txt_whisp_prompt,
 
@@ -156,7 +166,7 @@ def main(
         auto_mode=False,
         ):
     whi("Entering main")
-    if not (audio_path or txt_audio):
+    if not (audio_numpy or txt_audio):
         return [
                 red("No audio in either microphone data or audio file"),
                 txt_audio,
@@ -216,7 +226,7 @@ def main(
     pv["txt_whisp_prompt"] = txt_whisp_prompt
 
     # manage sound path
-    audio_html = audio_to_anki(audio_path)
+    audio_html = audio_to_anki(audio_numpy)
     if "Error" in audio_html:  # then out is an error message and not the source
         to_return["output"] = audio_html + to_return["output"]
         return [
@@ -233,7 +243,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or auto_mode:
-        txt_audio, to_return["output"] = transcribe(audio_path, txt_whisp_prompt, to_return["output"])
+        txt_audio, to_return["output"] = transcribe(audio_numpy, txt_whisp_prompt, to_return["output"])
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
@@ -361,17 +371,17 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
             with gr.Column():
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
-                    audio_path = gr.Audio(source="microphone", type="filepath", label="Audio", format="wav", value=pv["audio_path"])
+                    audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=pv["audio_numpy"])
             with gr.Column():
                 txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
                 txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
 
         with gr.Row():
-            with gr.Column(scale=1):
-                auto_btn = gr.Button(value="Autopilot", variant="secondary") #.style(full_width=False, size="sm")
+            with gr.Column():
+                auto_btn = gr.Button(value="Autopilot", variant="secondary") #.style(full_width=False)  #, size="sm")
 
 
-            with gr.Column(scale=9):
+            with gr.Column():
                 with gr.Row():
                     transcript_btn = gr.Button(value="Speech to text", variant="stop")
                     chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
@@ -389,17 +399,17 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
         # events
-        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_path, txt_audio, txt_chatgpt_cloz, output_elem])
+        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp, output_elem])
-        transcript_btn.click(fn=transcribe, inputs=[audio_path, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
+        transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
-        rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_path, output_elem])
+        rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
         rst_img_btn.click(fn=reset_image, inputs=[output_elem], outputs=[gallery, output_elem])
 
         anki_btn.click(
                 fn=main,
                 inputs=[
-                    audio_path,
+                    audio_numpy,
                     txt_audio,
                     txt_whisp_prompt,
 
@@ -425,7 +435,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         auto_btn.click(
                 fn=auto_mode,
                 inputs=[
-                    audio_path,
+                    audio_numpy,
                     txt_audio,
                     txt_whisp_prompt,
 
