@@ -18,26 +18,55 @@ def add_to_anki(
         ):
     """create a new cloze directly in anki"""
     assert isinstance(tags, list), "tags have to be a list"
-    return _call_anki(
-            action="addNote",
-            note={
-                "deckName": deck_name,
-                "modelName": "Clozolkor",
-                "fields": {
-                    "body": body,
-                    "header": "",
-                    "hint": "",
-                    "more": "",
-                    "source": source,
-                    "source_extra": "",
-                    "teacher": "",
-                    "Nearest_neighbors": "",
-                    "GPToAnkiMetadata": note_metadata,
-                    },
-                "tags": tags,
-                "options": {"allowDuplicate": True},
-               },
-            )
+    model_name = False
+    other_fields = {}
+    if "Clozolkor" in _call_anki(action="modelNames"):
+        model_name = "Clozolkor"
+        other_fields = {
+                "header": "",
+                "hint": "",
+                "more": "",
+                "source_extra": "",
+                "teacher": "",
+                "Nearest_neighbors": "",
+                }
+    else:
+        if "WhisperToAnki" in _call_anki(action="modelNames"):
+            model_name = "WhisperToAnki"
+    if model_name:
+        res = _call_anki(
+                action="addNote",
+                note={
+                    "deckName": deck_name,
+                    "modelName": model_name,
+                    "fields": {
+                        "body": body,
+                        "source": source,
+                        "GPToAnkiMetadata": note_metadata,
+                        **other_fields,
+                        },
+                    "tags": tags,
+                    "options": {"allowDuplicate": True},
+                   },
+                )
+        return res
+    else:
+        # create note type model that has the right fields
+        red("No notetype WhisperToAnki nor Clozolkor found, creating WhisperToAnki")
+        res = _call_anki(
+                action="createModel",
+                modelName="WhisperToAnki",
+                inOrderFields=["body", "source", "GPToAnkiMetadata"],
+                isCloze=True,
+                cardTemplates=[
+                    {
+                        "Front": "{{cloze:body}}",
+                        "Back": "{{cloze:body}}<br><br>{{source}}",
+                        },
+                    ],
+                )
+        red("Done creating notetype")
+        return add_to_anki(body, source, note_metadata, tags, deck_name)
 
 
 def _call_anki(action, **params):
