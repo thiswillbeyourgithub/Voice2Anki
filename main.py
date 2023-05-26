@@ -1,3 +1,4 @@
+import cv2
 import tempfile
 from scipy.io.wavfile import write
 from textwrap import dedent
@@ -244,7 +245,12 @@ def main(
 
     # save image and audio for next startup
     if gallery is not None:
-        pv["gallery"] = gallery
+        saved_gallery = [
+                    cv2.imread(
+                        i["name"]
+                        ) for i in gallery
+                    ]
+        pv["gallery"] = saved_gallery
 
     # get text from audio if not already parsed
     if (not txt_audio) or auto_mode:
