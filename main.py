@@ -368,14 +368,14 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         with gr.Row():
             with gr.Column(scale=1):
-                auto_btn = gr.Button(value="Auto", variant="secondary") #.style(full_width=False, size="sm")
+                auto_btn = gr.Button(value="Autopilot", variant="secondary") #.style(full_width=False, size="sm")
 
 
             with gr.Column(scale=9):
                 with gr.Row():
-                    transcript_btn = gr.Button(value="To Whisper", variant="stop")
-                    chatgpt_btn = gr.Button(value="To ChatGPT", variant="stop")
-                    anki_btn = gr.Button(value="To Anki", variant="stop")
+                    transcript_btn = gr.Button(value="Speech to text", variant="stop")
+                    chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
+                    anki_btn = gr.Button(value="Cloze to Anki", variant="stop")
 
                     sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
