@@ -1,3 +1,4 @@
+from scipy.io.wavfile import write, read
 import hashlib
 from pathlib import Path
 import ankipandas as akp
@@ -74,12 +75,13 @@ def _call_anki(action, **params):
     return response['result']
 
 
-def audio_to_anki(audio_path):
+def audio_to_anki(audio_numpy):
     whi("Sending audio to anki")
     try:
-        with open(audio_path, "rb") as audio_file:
-            audio_hash = hashlib.md5(audio_file.read()).hexdigest()
-        shutil.copy(audio_path, anki_media / f"{audio_hash}.wav")
+        audio_hash = hashlib.md5(audio_numpy[1]).hexdigest()
+        assert not (anki_media / f"{audio_hash}.wav").exists(), (
+            f"Audio hash already exists! {audio_hash}.wav")
+        write(f"{audio_hash}.wav", audio_numpy[0], audio_numpy[1])
         html = f"</br>[sound:{audio_hash}.wav]"
         return html
     except Exception as err:
