@@ -132,14 +132,19 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
                     return red("ChatGPT: too many retries."), None, f"ChatGPT: too many retries.\n\n{output}"
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
+
         cloz = response["choices"][0]["message"]["content"]
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
-        return cloz, response, f"New cloze created: {cloz}\n\n{output}"
+
+        reason = response["choices"][0]["finish_reason"]
+        assert reason == "stop", "ChatGPT's reason to strop was not stop"
+
+        tkn_cost = response["usage"]["total_tokens"]
+
+        return cloz, tkn_cost, f"New cloze created: {cloz}\n\n{output}"
     except Exception as err:
-        return None, red(f"Error with ChatGPT: '{err}'"), f"Error with ChatGPT: '{err}'\n\n{output}"
-
-
+        return None, 0, f"Error with ChatGPT: '{err}'\n\n{output}"
 
 def auto_mode(*args, **kwargs):
     whi("Triggering auto mode")
@@ -150,7 +155,7 @@ def main(
         txt_audio,
         txt_whisp_prompt,
 
-        txt_chatgpt_resp,
+        txt_chatgpt_tkncost,
         txt_chatgpt_cloz,
 
         txt_chatgpt_context,
@@ -168,35 +173,35 @@ def main(
         return [
                 red("No audio in either microphone data or audio file"),
                 txt_audio,
-                txt_chatgpt_resp,
+                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ]
     if not txt_whisp_prompt:
         return [
                 red("No whisper prompt found."),
                 txt_audio,
-                txt_chatgpt_resp,
+                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ]
     if not txt_chatgpt_context:
         return [
                 red("No txt_chatgpt_context found."),
                 txt_audio,
-                txt_chatgpt_resp,
+                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ]
     if not txt_deck:
         return [
                 red("you should specify a deck"),
                 txt_audio,
-                txt_chatgpt_resp,
+                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ]
     if not txt_tags:
         return [
                 red("you should specify tags"),
                 txt_audio,
-                txt_chatgpt_resp,
+                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ]
 
@@ -204,7 +209,7 @@ def main(
     to_return = {}
     to_return["output"] = old_output
     to_return["txt_audio"] = txt_audio
-    to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
+    to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     global pv
@@ -232,7 +237,7 @@ def main(
         return [
                 to_return["output"],
                 to_return["txt_audio"],
-                to_return["txt_chatgpt_resp"],
+                to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
                 ]
     txt_source += audio_html
@@ -248,25 +253,18 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or auto_mode:
-        txt_chatgpt_cloz, txt_chatgpt_resp, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
-    if "Error" in txt_chatgpt_resp:
-        to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
+        txt_chatgpt_cloz, txt_chatgpt_tkncost, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
+    if to_return["output"].startswith("Error with ChatGPT"):
         return [
                 to_return["output"],
                 to_return["txt_audio"],
-                to_return["txt_chatgpt_resp"],
+                txt_chatgpt_tkncost,
                 to_return["txt_chatgpt_cloz"],
                 ]
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
-    to_return["txt_chatgpt_resp"] = txt_chatgpt_resp
+    to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
 
-    try:
-        tkn_cost = txt_chatgpt_resp["usage"]["total_tokens"]
-        tkn_cost_dol = tkn_cost / 1000 * 0.002
-    except Exception as err:
-        red(f"Error: '{err}'")
-        tkn_cost = 0
-        tkn_cost_dol = 0
+    tkn_cost_dol = int(txt_chatgpt_tkncost) / 1000 * 0.002
 
 
     # checks clozes validity
@@ -278,18 +276,18 @@ def main(
         return [
                 red(f"{to_return['output']}\nCOMMUNICATION REQUESTED:\n{txt_chatgpt_cloz}"),
                 to_return["txt_audio"],
-                to_return["txt_chatgpt_resp"],
+                to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
                 ]
 
     # show output
-    to_return["output"] += f"\n>>>> ChatGpt {tkn_cost} (${tkn_cost_dol:.3f}):\n{txt_chatgpt_cloz}"
+    to_return["output"] += f"\n>>>> ChatGPT {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}):\n{txt_chatgpt_cloz}"
 
     # send to anki
     metadata = {
             "author": "WhisperToAnki",
             "transcripted_text": txt_audio,
-            "chatgpt_tkn_cost": tkn_cost,
+            "chatgpt_tkn_cost": txt_chatgpt_tkncost,
             "chatgpt_dollars_cost": tkn_cost_dol,
             }
     results = []
@@ -326,7 +324,7 @@ def main(
         return [
                 red(f"{to_return['output']}\n\n-> Some cards were not added!"),
                 to_return["txt_audio"],
-                to_return["txt_chatgpt_resp"],
+                to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
                 ]
 
@@ -342,7 +340,7 @@ def main(
     return [
             to_return["output"],
             to_return["txt_audio"],
-            to_return["txt_chatgpt_resp"],
+            to_return["txt_chatgpt_tkncost"],
             to_return["txt_chatgpt_cloz"],
             ]
 
@@ -351,7 +349,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         gr.Markdown("WhisperToAnki")
 
         # hidden, to store the request answer from chatgpt
-        txt_chatgpt_resp = gr.Textbox(value=None, visible=False)
+        txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False)
 
         with gr.Row():
             with gr.Row():
@@ -400,7 +398,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         # events
         choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
-        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_resp, output_elem])
+        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
         transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
         rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
@@ -413,7 +411,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_audio,
                     txt_whisp_prompt,
 
-                    txt_chatgpt_resp,
+                    txt_chatgpt_tkncost,
                     txt_chatgpt_cloz,
 
                     txt_chatgpt_context,
@@ -428,7 +426,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 outputs=[
                     output_elem,
                     txt_audio,
-                    txt_chatgpt_resp,
+                    txt_chatgpt_tkncost,
                     txt_chatgpt_cloz,
                     ],
                 )
@@ -439,7 +437,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     txt_audio,
                     txt_whisp_prompt,
 
-                    txt_chatgpt_resp,
+                    txt_chatgpt_tkncost,
                     txt_chatgpt_cloz,
 
                     txt_chatgpt_context,
@@ -454,7 +452,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 outputs=[
                     output_elem,
                     txt_audio,
-                    txt_chatgpt_resp,
+                    txt_chatgpt_tkncost,
                     txt_chatgpt_cloz,
                     ],
                 )
