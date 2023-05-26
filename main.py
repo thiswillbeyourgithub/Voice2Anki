@@ -378,7 +378,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
             with gr.Column():
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
-                    audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=pv["audio_numpy"])
+                    audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None)
             with gr.Column():
                 txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
                 txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
