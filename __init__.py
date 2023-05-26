@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     demo.launch(
             share=to_share,
-            auth=("g", "g"),
-            auth_message="Please login",
+            #auth=("g", "g"),
+            #auth_message="Please login",
             inbrowser=op_br,
             debug=debug,
             show_error=True,
