@@ -26,6 +26,8 @@ class previous_values:
                     raise Exception(f"Error when getting {key} from profile: '{err}'")
         else:
             whi(f"No {key} in store for profile")
+            if key == "max_tkn":
+                return 3500
             return None
 
     def __setitem__(self, key, item):
