@@ -214,7 +214,7 @@ def main(
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     global pv
-    pv["profile"] = profile  # save the profile in the default folder if unspecified
+    pv["profile"] = profile
     pv = previous_values(profile)
 
     if gallery is None or len(gallery) == 0:
@@ -368,7 +368,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                         rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
                 with gr.Column():
-                    choice_profile = gr.Dropdown(value=pv["profile"], choices=get_profiles(), type="value", multiselect=False, label="Profile")
+                    choice_profile = gr.Dropdown(value="default", choices=get_profiles(), type="value", multiselect=False, label="Profile")
                     txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                     txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
                     txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
