@@ -260,6 +260,9 @@ def main(
     # ask chatgpt
     if (not txt_chatgpt_cloz) or auto_mode:
         txt_chatgpt_cloz, txt_chatgpt_tkncost, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
+    if not txt_chatgpt_tkncost:
+        red("No token cost found, setting to 0")
+        txt_chatgpt_tkncost = 0
     if to_return["output"].startswith("Error with ChatGPT"):
         return [
                 to_return["output"],
@@ -403,7 +406,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
         # events
-        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
+        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
         chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
         transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
         img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
