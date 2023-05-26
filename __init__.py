@@ -6,7 +6,7 @@ if __name__ == "__main__":
     args = sys.argv[1:]
 
     to_share = False
-    op_br = True
+    op_br = False
     debug = False
 
     if args:
