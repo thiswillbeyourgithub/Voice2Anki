@@ -1,7 +1,5 @@
 import tempfile
-from scipy.io.wavfile import write, read
-import json
-import pickle
+from scipy.io.wavfile import write
 from textwrap import dedent
 import rtoml
 import time
@@ -15,7 +13,7 @@ from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template
 from utils.logger import red, whi, yel
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
-from utils.media import remove_silences, enhance_audio, get_image, get_img_source, reset_audio, reset_image
+from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image
 from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
@@ -70,7 +68,7 @@ def transcribe(audio_numpy, txt_whisp_prompt, output):
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
                     return txt_audio, f"Whisper transcription: {txt_audio}\n\n{output}"
-            except Exception as err:
+            except RateLimitError as err:
                 if cnt >= 5:
                     return red("Whisper: too many retries."), f"Whisper: too many retries.\n\n{output}"
                 red(f"Error from whisper: '{err}'")
@@ -120,7 +118,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
         cnt = 0
         while True:
             try:
-                red("Asking chatgpt")
+                red("Asking ChatGPT")
                 cnt += 1
                 response = openai.ChatCompletion.create(
                         model="gpt-3.5-turbo",
