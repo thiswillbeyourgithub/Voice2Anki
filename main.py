@@ -213,13 +213,6 @@ def main(
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     global pv
-    # checks that there is no , in profile, which would be the default value
-    if "," in profile:
-        spl = [s for s in profile.strip().split(",") if s.strip()]
-        if not len(spl) == 1:
-            raise Exception(f"profile with invalid value: '{profile}'")
-        else:
-            profile = spl[0]
     pv["profile"] = profile
     pv = previous_values(profile)
 
@@ -465,6 +458,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ],
+            # batch=True,  # TODO: enable batching when you figure out how to convert all to iterables
+            # max_batch_size=10,
             )
     improve_btn.click(
             fn=recur_improv,
