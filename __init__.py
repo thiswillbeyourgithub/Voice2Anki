@@ -5,9 +5,12 @@ from main import demo
 if __name__ == "__main__":
     args = sys.argv[1:]
 
+    # default argument
     to_share = False
     op_br = False
     debug = False
+    auth_args = {"auth": ("g", "g"), "auth_message": "Please login using g/g"}
+    server = None
 
     if args:
         whi(f"Startup arguments: {args}")
@@ -19,9 +22,15 @@ if __name__ == "__main__":
         if "--browser" in args:
             op_br = True
             yel("Opening browser")
-        if "debug" in args:
+        if "--debug" in args:
             debug = True
             yel("Debug mode enabled")
+        if "--noauth" in args:
+            auth_args = {}
+            yel("Disabling authentication")
+        if "--localnetwork" in args:
+            server="0.0.0.0"
+            yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
 
     if not to_share:
         whi("Sharing disabled")
@@ -32,12 +41,11 @@ if __name__ == "__main__":
 
     demo.launch(
             share=to_share,
-            #auth=("g", "g"),
-            #auth_message="Please login",
+            **auth_args,
             inbrowser=op_br,
             debug=debug,
             show_error=True,
-            server_name="0.0.0.0",
+            server_name=server,
             server_port=7860,
             show_tips=True,
             ssl_keyfile="./utils/ssl/key.pem",
