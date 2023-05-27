@@ -13,3 +13,6 @@
         * `--debug` to increase verbosity.
         * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use WhisperToAnki on mobile but can have privacy and security implications.
 
+## Notes
+    * The ssl used is self signed, you'll likely have to tick a few checkbox on your browser to access the site.
+
