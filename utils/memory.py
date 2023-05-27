@@ -84,7 +84,6 @@ def prompt_filter(prev_prompts, max_token):
     dis_tkns = 0
     output_pr = [syspr[0]]
     for prio in prio_vals:
-        red(f"priority: {prio}")  # debug
         for pr in timesorted_pr:
             if pr in output_pr:
                 continue
@@ -94,6 +93,7 @@ def prompt_filter(prev_prompts, max_token):
                     output_pr.append(pr)
                 else:
                     dis_tkns += pr["tkn_len"]
+        whi(f"Keeping {len(output_pr)} with priority >= {prio}")
     red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
     yel(f"Number of prompts: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
