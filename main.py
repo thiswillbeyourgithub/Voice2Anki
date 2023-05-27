@@ -371,12 +371,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
     with gr.Row():
         with gr.Row():
-            with gr.Column():
-                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(grid=3, columns=1, rows=1, object_fit="scale-down", height="auto", container=True)
+            with gr.Column(scale=1):
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=3, rows=1, object_fit="scale-down", height="auto", container=True)
                 with gr.Row():
                     rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
-            with gr.Column():
+            with gr.Column(scale=2):
                 txt_profile = gr.Textbox(placeholder=",".join(get_profiles()), label="Profile")
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
@@ -384,30 +384,31 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
 
     with gr.Row():
-        with gr.Column():
+        with gr.Column(scale=1):
             with gr.Row():
                 rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
                 audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None)
-        with gr.Column():
-            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
-            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
+        with gr.Column(scale=3):
+            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=5, max_lines=10)
+            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=5, max_lines=10)
 
     with gr.Row():
-        with gr.Column():
+        with gr.Column(scale=1):
             auto_btn = gr.Button(value="Autopilot", variant="secondary")  # .style(full_width=False)  #, size="sm")
 
-        with gr.Column():
+        with gr.Column(scale=9):
             with gr.Row():
                 semiauto_btn = gr.Button(value="Speech to Cloze", variant="stop")  # .style(full_width=False)  #, size="sm")
                 transcript_btn = gr.Button(value="Speech to text", variant="stop")
                 chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
                 anki_btn = gr.Button(value="Cloze to Anki", variant="stop")
 
-                sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
-
     with gr.Row():
-        improve_btn = gr.Button(value="Improve", variant="secondary")
-        sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
+        with gr.Column(scale=9):
+            improve_btn = gr.Button(value="Improve", variant="secondary")
+            sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
+        with gr.Column(scale=1):
+            sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
     # output
     output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
