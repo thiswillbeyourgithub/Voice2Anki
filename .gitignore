@@ -8,3 +8,4 @@ audio-0-100.wav
 utils/ssl/key.pem
 utils/__pycache__/*
 profiles/*/*pickle
+*.wav
