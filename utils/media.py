@@ -16,6 +16,8 @@ from .anki import anki_media
 
 def get_image(gallery, txt_output):
     whi("Getting image from clipboard")
+    if txt_output is None:
+        txt_output = ""
     try:
         # load from clipboard
         pasted = pyperclip3.paste()
