@@ -24,9 +24,9 @@ if __name__ == "__main__":
             yel("Debug mode enabled")
 
     if not to_share:
-        whi("SHaring disabled")
+        whi("Sharing disabled")
     if not op_br:
-        whi("Not openning browser.")
+        whi("Not opening browser.")
 
     demo.queue(concurrency_count=3)
 
