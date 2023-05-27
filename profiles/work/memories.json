@@ -888,5 +888,29 @@
         "timestamp": 98,
         "priority": 4,
         "tkn_len": 87
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour le sociologue Pierre Bourdieu, le corps exerce au moins trois fonctions celles de m\u00e9moire, celles d'apprentissage des habitudes de classe et celles de marqueur de position sociale.\nAlfred: fait une cloze a liste\n'''",
+        "timestamp": 1685195732,
+        "priority": 6,
+        "answer": "Fonction du corps selon Pierre Bourdieu ?<br/>{{c1::memoire <br/>}}{{c1::apprentissage des habitudes de classe <br/>}}{{c1::marqueur de position sociale}}",
+        "tkn_len": 128
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nEn France, constitue une discrimination le fait de discriminer sur le patronyme, sur la capacit\u00e9 \u00e0 s'exprimer en fran\u00e7ais, sur l'apparence physique, sur le lieu de r\u00e9sidence, sur la situation de perte d'autonomie et sur le fait d'\u00eatre b\u00e9n\u00e9ficiaire de compl\u00e9mentaires sant\u00e9 ou d'aide m\u00e9dicale d'\u00e9tat. Note \u00e0 Alfred, j'aimerais que tu cr\u00e9es une carte unique par discrimination.\n'''",
+        "timestamp": 1685196840,
+        "priority": 10,
+        "answer": "discrimination en France, est il interdit de discrminer sur le patronyme ?<br/>{{c1::oui}}<br/>#####<br/>discrimination en France, est il interdit de discrminer sur sa maitrise du francais ?<br/>{{c1::oui}}<br/>#####<br/>discrimination en France, est il interdit de discrminer sur l'apparence physique ?<br/>{{c1::oui}}<br/>#####<br/>discrimination en France, est il interdit de discrminer sur le lieu de residence ?<br/>{{c1::oui}}<br/>#####<br/>discrimination en France, est il interdit de discrminer sur la presence de handicap ?<br/>{{c1::oui}}<br/>#####<br/>discrimination en France, est il interdit de discrminer sur le fait d'etre beneficiaire d'aide financiere ?<br/>{{c1::oui}}",
+        "tkn_len": 337
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nEn France, il existe une jurisprudence comme quoi il est interdit de discriminer quelqu'un sur le motif de sa couverture de sant\u00e9, comme quoi ce serait trop co\u00fbteux en termes de difficult\u00e9s administratives.\n'''",
+        "timestamp": 1685197007,
+        "priority": 6,
+        "answer": "En France, y a t il une jurisprudence interdisant de refuser un patient sur le motif de sa couverture de sant\u00e9 ?<br/>{{c1::oui}}",
+        "tkn_len": 109
     }
 ]
