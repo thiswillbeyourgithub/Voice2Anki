@@ -51,6 +51,20 @@ def get_profiles():
 
 
 def switch_profile(profile, output):
+    if profile is None or profile.strip() == "" or "/" in profile or not profile.isalpha():
+        return [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                f"Invalid profile name, must be alphanumeric" + output
+                ]
+
     if profile not in get_profiles():
         Path(f"profiles/{profile}").mkdir(exist_ok=False)
         return [
@@ -61,6 +75,8 @@ def switch_profile(profile, output):
                 None,
                 None,
                 None,
+                None,
+                profile,
                 f"created {profile}.\n\n" + output
                 ]
 
@@ -76,5 +92,6 @@ def switch_profile(profile, output):
             pv["audio_numpy"],
             pv["txt_audio"],
             pv["txt_chatgpt_cloz"],
+            profile,
             f"Switch profile to '{profile}'",
             ]

@@ -364,7 +364,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                     rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
             with gr.Column():
-                choice_profile = gr.Dropdown(value="default", choices=get_profiles(), type="value", multiselect=False, label="Profile")
+                txt_profile = gr.Textbox(placeholder=",".join(get_profiles()), label="Profile")
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
                 txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
@@ -399,8 +399,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
     output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
     # events
-    choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
-    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
+    txt_profile.submit(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
+    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
     transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
     img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
     rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
@@ -421,7 +421,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 txt_tags,
 
                 gallery,
-                choice_profile,
+                txt_profile,
                 sld_max_tkn,
                 output_elem,
                 ],
@@ -447,7 +447,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 txt_tags,
 
                 gallery,
-                choice_profile,
+                txt_profile,
                 sld_max_tkn,
                 output_elem,
                 ],
@@ -461,7 +461,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
     improve_btn.click(
             fn=recur_improv,
             inputs=[
-                choice_profile,
+                txt_profile,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_chatgpt_cloz,
