@@ -126,7 +126,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
                         model="gpt-3.5-turbo",
                         messages=formatted_messages,
                         stop="END",
-                        temperature=0.0,
+                        temperature=0.5,
                         )
                 break
             except RateLimitError as err:
