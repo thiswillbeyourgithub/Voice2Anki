@@ -31,10 +31,10 @@ def transcribe(audio_numpy, txt_whisp_prompt, output):
     whi("Transcribing audio")
 
     if audio_numpy is None:
-        return red(f"Error: None audio_numpy"), f"Error: None audio_numpy\n\n{output}"
+        return red("Error: None audio_numpy"), f"Error: None audio_numpy\n\n{output}"
 
     if txt_whisp_prompt is None:
-        return red(f"Error: None whisper prompt"), f"Error: None whisper prompt\n\n{output}"
+        return red("Error: None whisper prompt"), f"Error: None whisper prompt\n\n{output}"
 
     # try to remove silences
     audio_numpy = remove_silences(audio_numpy)
@@ -47,7 +47,7 @@ def transcribe(audio_numpy, txt_whisp_prompt, output):
     pv["audio_numpy"] = audio_numpy
 
     # save audio to temp file
-    whi(f"Saving audio as wav file")
+    whi("Saving audio as wav file")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav")
     write(tmp.name, audio_numpy[0], audio_numpy[1])
     tempwavpath = tmp.name
@@ -61,11 +61,10 @@ def transcribe(audio_numpy, txt_whisp_prompt, output):
                 cnt += 1
                 with open(tempwavpath, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
-                            model="whisper-1",
-                            file=audio_file,
-                            prompt=txt_whisp_prompt,
-                            language="fr",
-                            )
+                        model="whisper-1",
+                        file=audio_file,
+                        prompt=txt_whisp_prompt,
+                        language="fr")
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
                     return txt_audio, f"Whisper transcription: {txt_audio}\n\n{output}"
@@ -96,21 +95,19 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
         tkns += m["tkn_len"]
         if "answer" in m:
             assert m["role"] == "user", "expected user"
-            formatted_messages.append(
-                    {
-                        "role": "assistant",
-                        "content": m["answer"],
-                        }
-                    )
+            formatted_messages.append({
+                "role": "assistant",
+                "content": m["answer"]})
 
     for i, fm in enumerate(formatted_messages):
         for col in ["timestamp", "priority", "tkn_len", "answer", "disabled"]:
             if col in fm:
                 del formatted_messages[i][col]
     formatted_messages.append(
-            {"role": "user", "content": dedent(
-                transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio)),
-                })
+            {
+                "role": "user",
+                "content": dedent(
+                    transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio))})
     tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages in ChatGPT prompt: {len(formatted_messages)} (tokens: {tkns})")
 
@@ -147,9 +144,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
     except Exception as err:
         return None, 0, f"Error with ChatGPT: '{err}'\n\n{output}"
 
+
 def auto_mode(*args, **kwargs):
     whi("Triggering auto mode")
     return main(*args, **kwargs, auto_mode=True)
+
 
 def main(
         audio_numpy,
@@ -275,7 +274,6 @@ def main(
 
     tkn_cost_dol = int(txt_chatgpt_tkncost) / 1000 * 0.002
 
-
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
@@ -327,7 +325,7 @@ def main(
 
     # trigger anki sync
     sync_anki()
-    to_return["output"] += f"Synchronized anki\n"
+    to_return["output"] += "Synchronized anki\n"
 
     if not len(results) == len(clozes):
         return [
@@ -337,9 +335,7 @@ def main(
                 to_return["txt_chatgpt_cloz"],
                 ]
 
-
     whi("Finished loop.\n\n")
-
 
     to_return["output"] += "\n\nDONE"
 
@@ -353,130 +349,127 @@ def main(
             to_return["txt_chatgpt_cloz"],
             ]
 
-#with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=gr.themes.Soft()) as demo:
+
 with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
-        gr.Markdown("WhisperToAnki")
+    gr.Markdown("WhisperToAnki")
 
-        # hidden, to store the request answer from chatgpt
-        txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False)
+    # hidden, to store the request answer from chatgpt
+    txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False)
 
+    with gr.Row():
         with gr.Row():
+            with gr.Column():
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=1, rows=1, object_fit="scale-down", height="auto", container=True)
+                with gr.Row():
+                    rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
+                    img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
+            with gr.Column():
+                choice_profile = gr.Dropdown(value="default", choices=get_profiles(), type="value", multiselect=False, label="Profile")
+                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
+                txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
+                txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
+
+    with gr.Row():
+        with gr.Column():
             with gr.Row():
-                with gr.Column():
-                    gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=1, rows=1, object_fit="scale-down", height="auto", container=True)
-                    with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear", variant="primary").style(full_width=False, size="sm")
-                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary").style(full_width=False, size="sm")
-                with gr.Column():
-                    choice_profile = gr.Dropdown(value="default", choices=get_profiles(), type="value", multiselect=False, label="Profile")
-                    txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
-                    txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
-                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
-                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
+                rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
+                audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None)
+        with gr.Column():
+            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
+            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
 
-        with gr.Row():
-            with gr.Column():
-                with gr.Row():
-                    rst_audio_btn = gr.Button(value="Reset audio", variant="primary").style(full_width=False, size="sm")
-                    audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None)
-            with gr.Column():
-                txt_audio = gr.Textbox(value=pv["txt_audio"], label="Audio transcript", lines=10, max_lines=10)
-                txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="ChatGPT output", lines=10, max_lines=10)
+    with gr.Row():
+        with gr.Column():
+            auto_btn = gr.Button(value="Autopilot", variant="secondary")  # .style(full_width=False)  #, size="sm")
 
-        with gr.Row():
-            with gr.Column():
-                auto_btn = gr.Button(value="Autopilot", variant="secondary") #.style(full_width=False)  #, size="sm")
+        with gr.Column():
+            with gr.Row():
+                transcript_btn = gr.Button(value="Speech to text", variant="stop")
+                chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
+                anki_btn = gr.Button(value="Cloze to Anki", variant="stop")
 
+                sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
-            with gr.Column():
-                with gr.Row():
-                    transcript_btn = gr.Button(value="Speech to text", variant="stop")
-                    chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
-                    anki_btn = gr.Button(value="Cloze to Anki", variant="stop")
+    with gr.Row():
+        improve_btn = gr.Button(value="Improve", variant="secondary")
+        sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
 
-                    sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
+    # output
+    output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
-        with gr.Row():
-            improve_btn = gr.Button(value="Improve", variant="secondary")
-            sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
+    # events
+    choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
+    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
+    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
+    img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
+    rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
+    rst_img_btn.click(fn=reset_image, inputs=[output_elem], outputs=[gallery, output_elem])
 
+    anki_btn.click(
+            fn=main,
+            inputs=[
+                audio_numpy,
+                txt_audio,
+                txt_whisp_prompt,
 
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
 
-        # output
-        output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
+                txt_chatgpt_context,
+                txt_deck,
+                txt_tags,
 
-        # events
-        choice_profile.change(fn=switch_profile, inputs=[choice_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, output_elem])
-        chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, choice_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
-        transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
-        img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
-        rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
-        rst_img_btn.click(fn=reset_image, inputs=[output_elem], outputs=[gallery, output_elem])
+                gallery,
+                choice_profile,
+                sld_max_tkn,
+                output_elem,
+                ],
+            outputs=[
+                output_elem,
+                txt_audio,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+                ],
+            )
+    auto_btn.click(
+            fn=auto_mode,
+            inputs=[
+                audio_numpy,
+                txt_audio,
+                txt_whisp_prompt,
 
-        anki_btn.click(
-                fn=main,
-                inputs=[
-                    audio_numpy,
-                    txt_audio,
-                    txt_whisp_prompt,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
 
-                    txt_chatgpt_tkncost,
-                    txt_chatgpt_cloz,
+                txt_chatgpt_context,
+                txt_deck,
+                txt_tags,
 
-                    txt_chatgpt_context,
-                    txt_deck,
-                    txt_tags,
-
-                    gallery,
-                    choice_profile,
-                    sld_max_tkn,
-                    output_elem,
-                    ],
-                outputs=[
-                    output_elem,
-                    txt_audio,
-                    txt_chatgpt_tkncost,
-                    txt_chatgpt_cloz,
-                    ],
-                )
-        auto_btn.click(
-                fn=auto_mode,
-                inputs=[
-                    audio_numpy,
-                    txt_audio,
-                    txt_whisp_prompt,
-
-                    txt_chatgpt_tkncost,
-                    txt_chatgpt_cloz,
-
-                    txt_chatgpt_context,
-                    txt_deck,
-                    txt_tags,
-
-                    gallery,
-                    choice_profile,
-                    sld_max_tkn,
-                    output_elem,
-                    ],
-                outputs=[
-                    output_elem,
-                    txt_audio,
-                    txt_chatgpt_tkncost,
-                    txt_chatgpt_cloz,
-                    ],
-                )
-        improve_btn.click(
-                fn=recur_improv,
-                inputs=[
-                    choice_profile,
-                    txt_audio,
-                    txt_whisp_prompt,
-                    txt_chatgpt_cloz,
-                    txt_chatgpt_context,
-                    sld_improve,
-                    output_elem,
-                    ],
-                outputs=[output_elem],
-                )
+                gallery,
+                choice_profile,
+                sld_max_tkn,
+                output_elem,
+                ],
+            outputs=[
+                output_elem,
+                txt_audio,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+                ],
+            )
+    improve_btn.click(
+            fn=recur_improv,
+            inputs=[
+                choice_profile,
+                txt_audio,
+                txt_whisp_prompt,
+                txt_chatgpt_cloz,
+                txt_chatgpt_context,
+                sld_improve,
+                output_elem,
+                ],
+            outputs=[output_elem],
+            )
 
 demo.queue()

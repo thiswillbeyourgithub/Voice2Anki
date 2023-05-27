@@ -37,7 +37,7 @@ def coloured_log(color_asked):
             if isinstance(string, dict):
                 try:
                     string = rtoml.dumps(string)
-                except:
+                except Exception:
                     string = json.dumps(string)
             if isinstance(string, list):
                 string = ",".join(string)
@@ -50,7 +50,7 @@ def coloured_log(color_asked):
             if isinstance(string, dict):
                 try:
                     string = rtoml.dumps(string)
-                except:
+                except Exception:
                     string = json.dumps(string)
             if isinstance(string, list):
                 string = ",".join(string)
@@ -63,7 +63,7 @@ def coloured_log(color_asked):
             if isinstance(string, dict):
                 try:
                     string = rtoml.dumps(string)
-                except:
+                except Exception:
                     string = json.dumps(string)
             if isinstance(string, list):
                 string = ",".join(string)

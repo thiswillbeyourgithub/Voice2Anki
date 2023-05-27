@@ -29,7 +29,7 @@ if __name__ == "__main__":
             auth_args = {}
             yel("Disabling authentication")
         if "--localnetwork" in args:
-            server="0.0.0.0"
+            server = "0.0.0.0"
             yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
 
     if not to_share:

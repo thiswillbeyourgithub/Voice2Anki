@@ -1,10 +1,7 @@
-import io
-import torch
 import tempfile
 from scipy.io.wavfile import write, read
 import pickle
 from bs4 import BeautifulSoup
-from pathlib import Path
 from speechbrain.pretrained import WaveformEnhancement
 import cv2
 import numpy as np
@@ -38,7 +35,6 @@ def get_image(gallery, txt_output):
         return None, None, red(f"Error: {err}\n\n") + txt_output
 
 
-
 def check_source(source):
     "makes sure the source is only an img"
     whi("Checking source")
@@ -53,6 +49,7 @@ def check_source(source):
     else:
         source = ""
     return source
+
 
 def get_img_source(gallery):
     whi("Getting source from image")
@@ -84,13 +81,15 @@ def reset_audio(output):
     whi("Reset audio.")
     return None, f"Reset audio.\n\n{output}"
 
+
 def reset_image(output):
     whi("Reset images.")
     return None, f"Reset images.\n\n{output}"
 
 
 def enhance_audio(audio_numpy):
-    raise NotImplemented("Enhancing the audio automatically is not supported for now")
+    raise NotImplementedError(
+        "Enhancing the audio automatically is not supported for now")
     whi("Cleaning voice")
     try:
         tmp = tempfile.NamedTemporaryFile(suffix=".wav")
@@ -122,7 +121,7 @@ def remove_silences(audio_numpy):
         estimated_time = u.estimate_time(audible_speed=1, silent_speed=2)  # Estimate time savings
         before = estimated_time["before"]["all"][0]
         after = estimated_time["after"]["all"][0]
-        if after / before  > 0.9 and before - after < 5:
+        if after / before > 0.9 and before - after < 5:
             whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
             return audio_numpy  # return untouched
 
@@ -134,6 +133,7 @@ def remove_silences(audio_numpy):
     except Exception as err:
         red(f"Error when removing silences: '{err}'")
         return audio_numpy
+
 
 # load voice cleaning model
 voice_cleaner = WaveformEnhancement.from_hparams(

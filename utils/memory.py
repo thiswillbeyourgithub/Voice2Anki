@@ -1,7 +1,5 @@
 import time
-import pickle
 from pathlib import Path
-import sys
 from textwrap import dedent
 import json
 
@@ -16,7 +14,6 @@ default_system_prompt = [
             "content": "You are Alfred, my excellent assistant who always exceeds my expactation. Your task today is the to transform audio transcripts from french medical flashcards into anki flashcards.\n\n            Here are the rules:\n                * always end your answers by \"END\".\n                * If you create several flashcards for one transcript, separate them with \"#####\".\n                * You are allowed to use medical acronyms.\n                * the flashcards have to be as concise as possible.\n                * the flashcards have to be close to the format \"[category], [question] ?<br/>[answer]\". I'll show you examples of good formats.\n                * the transcript are from french medical textbooks, it is also your job to correct misrecognized words using the other words and the supplied context.\n                * don't reply anything other than the answer ot your task\n                * if you're absolutely sure that you must ask me something: begin your answer by 'Alfred:' and I'll come immediately.",
             "timestamp": int(time.time()),
             "priority": 10,
-            # tkn len is added 
             }
         ]
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "answer"]
@@ -24,7 +21,7 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "an
 
 def check_prompts(prev_prompts):
     "checks validity of the previous prompts"
-    whi(f"Checking prompt validity")
+    whi("Checking prompt validity")
     for i, mess in enumerate(prev_prompts):
 
         assert mess["role"] in ["system", "user"], "invalid value of role value of message"
@@ -138,7 +135,7 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
 
 
 def load_prev_prompts(profile):
-    assert Path(f"profiles/").exists(), "profile directory not found"
+    assert Path("profiles/").exists(), "profile directory not found"
     if Path(f"profiles/{profile}/memories.json").exists():
         with open(f"profiles/{profile}/memories.json", "r") as f:
             prev_prompts = json.load(f)

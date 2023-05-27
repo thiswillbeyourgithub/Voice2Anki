@@ -1,8 +1,7 @@
-from scipy.io.wavfile import write, read
+from scipy.io.wavfile import write
 import hashlib
 from pathlib import Path
 import ankipandas as akp
-import shutil
 import time
 import urllib.request
 import json
@@ -46,9 +45,7 @@ def add_to_anki(
                         **other_fields,
                         },
                     "tags": tags,
-                    "options": {"allowDuplicate": True},
-                   },
-                )
+                    "options": {"allowDuplicate": True}})
         return res
     else:
         # create note type model that has the right fields
@@ -125,6 +122,7 @@ def sync_anki():
     time.sleep(1)  # wait for sync to finish, just in case
     whi("Done syncing!")
 
+
 # load anki profile using ankipandas just to get the media folder
 db_path = akp.find_db(user="Main")
 red(f"WhisperToAnki will use anki collection found at {db_path}")
@@ -139,7 +137,6 @@ if "trash" in str(db_path).lower():
     time.sleep(1)
 anki_media = Path(db_path).parent / "collection.media"
 assert anki_media.exists(), "Media folder not found!"
-
 
 
 if __name__ == "__main__":

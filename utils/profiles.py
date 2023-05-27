@@ -1,9 +1,7 @@
 import pickle
-import hashlib
-import json
 from pathlib import Path
 
-from .logger import red, whi
+from .logger import whi
 
 
 class previous_values:
@@ -11,7 +9,7 @@ class previous_values:
         assert Path("./profiles").exists(), "profile folder not found"
         self.p = Path(f"./profiles/{profile}")
         if profile == "default":
-            whi(f"Assuming profile 'default'")
+            whi("Assuming profile 'default'")
             self.p.mkdir(exist_ok=True)
         assert self.p.exists(), f"{self.p} not found!"
 
@@ -21,7 +19,7 @@ class previous_values:
             try:
                 with open(str(self.p / kp), "r") as f:
                     return pickle.load(f)
-            except Exception as err:
+            except Exception:
                 try:
                     with open(str(self.p / kp), "rb") as f:
                         return pickle.load(f)
@@ -37,7 +35,7 @@ class previous_values:
         try:
             with open(str(self.p / (key + ".pickle")), "w") as f:
                 return pickle.dump(item, f)
-        except Exception as err:
+        except Exception:
             try:
                 # try as binary
                 with open(str(self.p / (key + ".pickle")), "wb") as f:
@@ -47,9 +45,10 @@ class previous_values:
 
 
 def get_profiles():
-    profiles = [str(p.name) for p in Path(f"profiles").iterdir()]
-    assert profiles, f"Empty list of profiles"
+    profiles = [str(p.name) for p in Path("profiles").iterdir()]
+    assert profiles, "Empty list of profiles"
     return profiles
+
 
 def switch_profile(profile, output):
     if profile not in get_profiles():
