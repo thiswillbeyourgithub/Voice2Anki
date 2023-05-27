@@ -7,6 +7,8 @@ from .logger import whi
 class previous_values:
     def __init__(self, profile="default"):
         assert Path("./profiles").exists(), "profile folder not found"
+        assert isinstance(profile, str), f"profile is not a string: '{profile}'"
+        assert profile.isalpha(), f"profile is not alphanumeric: '{profile}'"
         self.p = Path(f"./profiles/{profile}")
         if profile == "default":
             whi("Assuming profile 'default'")
