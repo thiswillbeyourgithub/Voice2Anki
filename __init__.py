@@ -32,6 +32,10 @@ if __name__ == "__main__":
             server = "0.0.0.0"
             yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
 
+    for ar in args:
+        if ar not in ["--share", "--browser", "--debug", "--noauth", "--localnetwork"]:
+            raise SystemExit(f"Invalid argument: '{ar}'")
+
     if not to_share:
         whi("Sharing disabled")
     if not op_br:
