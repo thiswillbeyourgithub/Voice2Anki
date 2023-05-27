@@ -1,0 +1,16 @@
+gradio==3.32.0
+openai==0.27.5
+tiktoken==0.3.3
+numpy==1.21.5
+scipy==1.8.0
+# speechbrain==0.5.14
+opencv-python==4.7.0.72
+
+torchaudio==2.0.2
+unsilence==1.0.9
+
+tqdm==4.57.0
+ankipandas==0.3.13
+beautifulsoup4==4.10.0
+pyperclip3==0.4.1
+rtoml==0.9.0
