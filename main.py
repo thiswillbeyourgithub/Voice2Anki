@@ -407,7 +407,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
         with gr.Column(scale=9):
             with gr.Row():
                 improve_btn = gr.Button(value="Improve", variant="secondary")
-                sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Enhancement priority")
+                sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="New example priority")
         with gr.Column(scale=1):
             sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
