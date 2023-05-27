@@ -26,6 +26,10 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 pv = previous_values()
 
+def save_audio(profile, audio_numpy):
+    whi("Saving audio to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy"] = audio_numpy
 
 def transcribe(audio_numpy, txt_whisp_prompt, output):
     whi("Transcribing audio")
@@ -415,6 +419,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
     output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
 
     # events
+    audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
     txt_profile.submit(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
     txt_profile.blur(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
     chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
