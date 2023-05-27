@@ -400,6 +400,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
     # events
     txt_profile.submit(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
+    txt_profile.blur(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
     chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
     transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
     img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
