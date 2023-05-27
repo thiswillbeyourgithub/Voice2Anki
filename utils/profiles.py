@@ -66,6 +66,15 @@ def switch_profile(profile, output):
                 ]
 
     profile = profile.lower()
+
+    # checks that there is no , in profile, which would be the default value
+    if "," in profile:
+        spl = [s for s in profile.strip().split(",") if s.strip()]
+        if not len(spl) == 1:
+            raise Exception(f"profile with invalid value: '{profile}'")
+        else:
+            profile = spl[0]
+
     if profile not in get_profiles():
         Path(f"profiles/{profile}").mkdir(exist_ok=False)
         return [

@@ -101,6 +101,14 @@ def prompt_filter(prev_prompts, max_token):
 
 
 def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, priority, output):
+    # checks that there is no , in profile, which would be the default value
+    if "," in choice_profile:
+        spl = [s for s in choice_profile.strip().split(",") if s.strip()]
+        if not len(spl) == 1:
+            raise Exception(f"profile with invalid value: '{choice_profile}'")
+        else:
+            choice_profile = spl[0]
+
     whi("Recursively improving")
     if not txt_audio:
         return "No audio transcripts found.\n\n" + output
