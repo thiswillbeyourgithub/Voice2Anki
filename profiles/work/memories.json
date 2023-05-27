@@ -711,7 +711,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les palpitation cardiaques\"\n\nTranscript:\n'''\nPour parler d'extracystoles ventriculaires malignes, il faut qu'elles soient fr\u00e9quentes, polymorphes, en salve, \u00e0 couplage court ou d\u00e9clench\u00e9 \u00e0 l'effort, ou survenant sur un terrain cardiopathique.\nalfred: fais une liste stp\n'''",
+        "content": "Contexte: \"Cours sur les palpitation cardiaques\"\n\nTranscript:\n'''\nPour parler d'extracystoles ventriculaires malignes, il faut qu'elles soient fr\u00e9quentes, polymorphes, en salve, \u00e0 couplage court ou d\u00e9clench\u00e9 \u00e0 l'effort, ou survenant sur un terrain cardiopathique.\nalfred: fais une liste\n'''",
         "disabled": false,
         "answer": "extrasystoles ventriculaires <b>malignes</b>, criteres ?<br/>{{c1::fr\u00e9quentes <br/>}}{{c1::polymorphes <br/>}}{{c1::en salve <br/>}}{{c1::\u00e0 couplage court <br/>}}{{c1::d\u00e9clench\u00e9 \u00e0 l'effort <br/>}}{{c1::survenant sur un terrain cardiopathique}}",
         "timestamp": 79,
@@ -747,7 +747,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les palpitation cardiaques\"\n\nTranscript:\n'''\nles palpitations de la maladie de Bouvray sont arr\u00eat\u00e9es en cas de man\u0153uvre vagale ou injection d'ad\u00e9nosine.\nalfred: fait 2 clozes\n'''",
+        "content": "Contexte: \"Cours sur les palpitation cardiaques\"\n\nTranscript:\n'''\nles palpitations de la maladie de Bouvray sont arr\u00eat\u00e9es en cas de man\u0153uvre vagale ou injection d'ad\u00e9nosine.\nalfred: fait 2 cartes\n'''",
         "disabled": false,
         "answer": "maladie de Bouveret, les palpitations sont elles arret\u00e9es par des manoeuvres vagales ?<br/>{{c1::oui}}<br/>#####<br/>maladie de Bouveret, les palpitations sont elles arret\u00e9es par l'adenosine ?<br/>{{c1::oui}}<br/>",
         "timestamp": 83,
@@ -891,7 +891,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour le sociologue Pierre Bourdieu, le corps exerce au moins trois fonctions celles de m\u00e9moire, celles d'apprentissage des habitudes de classe et celles de marqueur de position sociale.\nAlfred: fait une cloze a liste\n'''",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour le sociologue Pierre Bourdieu, le corps exerce au moins trois fonctions celles de m\u00e9moire, celles d'apprentissage des habitudes de classe et celles de marqueur de position sociale.\nAlfred: fait une liste\n'''",
         "timestamp": 1685195732,
         "priority": 6,
         "answer": "Fonction du corps selon Pierre Bourdieu ?<br/>{{c1::memoire <br/>}}{{c1::apprentissage des habitudes de classe <br/>}}{{c1::marqueur de position sociale}}",
@@ -1032,5 +1032,173 @@
         "priority": 5,
         "answer": "Que faut-il toujours examiner sur une plaie pour caract\u00e9riser les causes ?<br/>{{c1::les berges}}",
         "tkn_len": 78
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nEn France, les donn\u00e9es statistiques sur les violences faites aux femmes sont issues du rapport VIRAGE r\u00e9alis\u00e9 par T\u00e9l\u00e9phone en 2015 aupr\u00e8s de 27 000 Fran\u00e7ais.\n'''",
+        "timestamp": 1685206359,
+        "priority": 5,
+        "answer": "rapport fournissant les statistiques sur les violences faites aux femmes ?<br/>{{c1::rapport VIRAGE r\u00e9alis\u00e9 par }}{{c1::t\u00e9l\u00e9phone en }}{{c1::2015 aupr\u00e8s de ]]{{c1::27 000 Fran\u00e7ais}}",
+        "tkn_len": 124
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLa proportion de femmes porte-emplante pour des violences au sein d'un couple est inf\u00e9rieure \u00e0 18% et pour les violences sexuelles inf\u00e9rieures \u00e0 11%\n'''",
+        "timestamp": 1685206695,
+        "priority": 5,
+        "answer": "Proportion de femmes victimes portant plainte pour des violences au sein de leur couple ?<br/>{{c1::< 18%}}<br/>#####<br/>Proportion de femmes victimes portant plainte pour des violences sexuelles dans leur couple ?<br/>{{c1::< 11%}}",
+        "tkn_len": 130
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLe but d'un signalement judiciaire par un m\u00e9decin est de prot\u00e9ger une victime ou d'emp\u00eacher la commission d'un meurtre ou d'un suicide.\n'''",
+        "timestamp": 1685206880,
+        "priority": 5,
+        "answer": "but d'un signalement judiciaire par un m\u00e9decin ?<br/>{{c1::prot\u00e9ger une victime OU }}{{c1::emp\u00eacher un meurtre OU }}{{c1::un suicide}}",
+        "tkn_len": 111
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nUn signalement judiciaire est \u00e0 adresser au procureur de la R\u00e9publique par t\u00e9l\u00e9phone puis par mail en urgence avec une copie \u00e0 la cellule de recueil des informations pr\u00e9occupantes si c'est g\u00e9n\u00e9ralis\u00e9.\n'''",
+        "timestamp": 1685207179,
+        "priority": 6,
+        "answer": "Demarche d'un {{c2::signalement judiciaire}} ?<br/>{{c1::par t\u00e9l\u00e9phone au procureur de la R\u00e9publique puis par mail en urgence <br/>}}{{c1::si patient mineur : }}{{c1::rajouter  une copie \u00e0 la cellule de recueil des informations pr\u00e9occupantes (CRIP)}}",
+        "tkn_len": 148
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour faire un signalement judiciaire par un m\u00e9decin dans le cadre de violences conjugales on doit toujours essayer d'avoir l'accord de la victime majeure et en l'absence de son accord on doit lui informer du signalement\n'''",
+        "timestamp": 1685207428,
+        "priority": 5,
+        "answer": "Dans le cadre de violences conjugales, est-il obligatoire d'avoir l'accord de la victime majeure pour faire un signalement judiciaire ?<br/>{{c1::non, mais on doit au moins l'informer}}<br/>#####<br/>Que faire en l'absence d'accord de la victime de violence conjuguale pour un signalement judiciaire ?<br/>{{c1::lui informer qu'on va faire un signalement judiciaire}}",
+        "tkn_len": 188
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour faire la diff\u00e9rence entre le danger imm\u00e9diat et l'emprise dans le cadre de signalement judiciaire par le m\u00e9decin de violence conjugale, il faut se r\u00e9f\u00e9rer \u00e0 un VEDE MEKOUM r\u00e9alis\u00e9 par le Conseil de l'Ordre.\n'''",
+        "timestamp": 1685207569,
+        "priority": 5,
+        "answer": "Comment faire la diff\u00e9rence entre le danger imm\u00e9diat et l'emprise dans le cadre de signalement judiciaire par le m\u00e9decin de violence conjugale ?<br/>{{c1::se r\u00e9f\u00e9rer au vade-mecum du Conseil de l'Ordre}}",
+        "tkn_len": 143
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLa question \u00ab la victime se sent-elle d\u00e9prim\u00e9e ou \u00e0 bout et sans solution? \u00bb est une question qui \u00e9tablit l'emprise et non pas le danger dans un cas de violence conjugale. Note \u00e0 Alfred fait une carte qui me donne le choix entre emprise et danger imm\u00e9diat.\n'''",
+        "timestamp": 1685207677,
+        "priority": 5,
+        "answer": "Dans le cadre de la violence conjugale, la question \"la victime se sent-elle d\u00e9prim\u00e9e ou \u00e0 bout et sans solution?\" \u00e9tablit-elle l'emprise ou le danger imm\u00e9diat ?<br/>{{c1::emprise}}",
+        "tkn_len": 142
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLe diagnostic de la mort repose sur la constatation simultan\u00e9e de signe n\u00e9gatif et positif de mort. Note \u00e0 Alfred, fais une seule carte qui doit me faire hesiter entre signe n\u00e9gatif et positif.\n'''",
+        "timestamp": 1685208039,
+        "priority": 7,
+        "answer": "Le diagnostic de la mort repose sur la constatation simultan\u00e9e de signe positif ou negatif de mort ?<br/>{{c1::les deux}}",
+        "tkn_len": 110
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLa d\u00e9finition d'une mort suspecte est un d\u00e9c\u00e8s pour lequel il n'est pas possible d'exclure l'intervention mentaire.\n'''",
+        "timestamp": 1685208101,
+        "priority": 5,
+        "answer": "Definition d'une mort suspecte ?<br/>{{c1::d\u00e9c\u00e8s pour lequel il n'est pas possible d'exclure l'intervention d'un tiers}}",
+        "tkn_len": 88
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLa d\u00e9finition d'une mort inhabituelle est un d\u00e9c\u00e8s Avec un \u00e9l\u00e9ment inhabituel parmi les circonstances, le mode de d\u00e9couverte du corps et l'\u00e2ge de la victime\n'''",
+        "timestamp": 1685208167,
+        "priority": 5,
+        "answer": "Definition d'une mort inhabituelle ?<br/>{{c1::d\u00e9c\u00e8s avec un \u00e9l\u00e9ment inhabituel parmi : <br/>}}{{c1::les circonstances <br/>}}{{c1::le mode de d\u00e9couverte du corps <br/>}}{{c1::l'age de la victime}}",
+        "tkn_len": 132
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nPour s'assurer d'un d\u00e9c\u00e8s, il faut au minimum \u00e0 l'ECG v\u00e9rifier qu'on a un D2 long plat.\n'''",
+        "timestamp": 1685208364,
+        "priority": 3,
+        "answer": "test minimal a l'ECG s'assurer d'un d\u00e9c\u00e8s ?<br/>{{c1::v\u00e9rifier qu'on a un D2 long plat}}",
+        "tkn_len": 87
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLes signes positifs de mort pr\u00e9coces sont la d\u00e9croissance thermique, la lividit\u00e9 et la rigidit\u00e9\nAlfred: fait une liste\n'''",
+        "timestamp": 1685208443,
+        "priority": 5,
+        "answer": "Signes positifs de mort pr\u00e9coces ?<br/>{{c1::d\u00e9croissance thermique <br/>}}{{c1::lividit\u00e9 <br/>}}{{c1::rigidit\u00e9}}",
+        "tkn_len": 100
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nLe rigor mortis d\u00e9bute classiquement \u00e0 partir de 3 heures apr\u00e8s le d\u00e9c\u00e8s. Le rigor mortis d\u00e9bute au niveau des articulations temporo-vendibulaires, puis s'\u00e9tend vers le bas du corps. Le rigor mortis dispara\u00eet au bout d'environ 3 jours. Le rigor mortis a une \u00e9volution temporelle tr\u00e8s variable selon les personnes. R!!\n'''",
+        "timestamp": 1685208798,
+        "priority": 6,
+        "answer": "Quand d\u00e9bute classiquement le rigor mortis ?<br/>{{c1::\u00e0 partir de 3 heures apr\u00e8s le d\u00e9c\u00e8s}}<br/>#####<br/>O\u00f9 d\u00e9bute le rigor mortis ?<br/>{{c1::au niveau des articulations temporo-mandibulaires}}<br/>#####<br/>Comment \u00e9volue le rigor mortis ?<br/>{{c1::il s'\u00e9tend vers le bas du corps}}<br/>#####<br/>Au bout de combien de temps le rigor mortis dispara\u00eet-il ?<br/>{{c1::environ 3 jours}}<br/>#####<br/>Le rigor mortis est il d'evolution stable ou veriable selon les personnes ?<br/>{{c1::tres variable}}",
+        "tkn_len": 278
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nL'apparition de la tache verte abdominale commence en fosse iliaque droite car c'est en face du s\u00e9cum. Elle appara\u00eet classiquement en 48 heures et est caus\u00e9e par la pulvulation microbienne dans le s\u00e9cum. Note \u00e0 Alfred, fais plusieurs quarts!\n'''",
+        "timestamp": 1685208922,
+        "priority": 5,
+        "answer": "En combien de temps appara\u00eet classiquement la tache verte abdominale ?<br/>{{c1::48 heures}}<br/>#####<br/>O\u00f9 se situe la tache verte abdominale ?<br/>{{c1::en fosse iliaque droite car c'est en face du caecum}}<br/>#####<br/>Quelle est le mecanisme de la tache verte abdominale ?<br/>{{c1::pulvulation microbienne dans le caecum}}",
+        "tkn_len": 206
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nLa colonisation du corps par diff\u00e9rents insectes ne survient pas avant trois jours visiblement.\n'''",
+        "timestamp": 1685209056,
+        "priority": 2,
+        "answer": "Combien de temps faut-il pour que le corps soit colonis\u00e9 par des insectes ?<br/>{{c1::3 jours apparement}}",
+        "tkn_len": 74
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nLe certificat de d\u00e9c\u00e8s existe \u00e0 la fois en version papier et en version informatis\u00e9e. Il existe deux mod\u00e8les, un mod\u00e8le pour le d\u00e9c\u00e8s avant le 27e jour de vie, c'est le mod\u00e8le New Natal, et un pour le d\u00e9c\u00e8s apr\u00e8s le 28e jour de vie.\n'''",
+        "timestamp": 1685209287,
+        "priority": 5,
+        "answer": "Combien de mod\u00e8les de certificat de d\u00e9c\u00e8s existe-t-il ?<br/>{{c1::deux}}<br/>#####<br/>Quels sont les deux mod\u00e8les de certificat de d\u00e9c\u00e8s ?<br/>{{c1::le mod\u00e8le neo natal avant 27 jour de vie ou apres 28 jour de vie}}<br/>#####<br/>Le certificat de d\u00e9c\u00e8s est il papier ou informatis\u00e9 ?<br/>{{c1::les deux formats existent}}",
+        "tkn_len": 199
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nPour faire un certificat de d\u00e9c\u00e8s, il est obligatoire de faire un examen complet du corps. Quand on remplit un certificat de d\u00e9c\u00e8s, le m\u00e9decin doit remplir \u00e0 la fois le volet administratif et le volet m\u00e9dical.\n'''",
+        "timestamp": 1685209372,
+        "priority": 5,
+        "answer": "Est-il obligatoire de faire un examen complet du corps pour faire un certificat de d\u00e9c\u00e8s ?<br/>{{c1::oui}}<br/>#####<br/>Quel volet doit remplir le m\u00e9decin lorsqu'il remplit un certificat de d\u00e9c\u00e8s ?<br/>{{c1::\u00e0 la fois le volet administratif et le volet m\u00e9dical}}",
+        "tkn_len": 166
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nEn remplissant un certificat de d\u00e9c\u00e8s, les situations o\u00f9 le m\u00e9decin doit cocher la case obstacle m\u00e9dico-l\u00e9gale \u00e0 l'inimation, et devant toute main en suspecte ou inhabituelle ou violente ou pouvant poser des probl\u00e8mes de responsabilit\u00e9, ou devant tout corps non identifi\u00e9.\n'''",
+        "timestamp": 1685209530,
+        "priority": 5,
+        "answer": "Dans quelles situations le m\u00e9decin doit-il cocher la case obstacle m\u00e9dico-l\u00e9gale \u00e0 l'inhumation sur un certificat de d\u00e9c\u00e8s ?<br/>{{c1::mort suspecte <br/>}}{{c1::mort inhabituelle <br/>}}{{c1::mort violente <br/>}}{{c1::probl\u00e8mes de responsabilit\u00e9 <br/>}}{{c1::corps non identifi\u00e9}}",
+        "tkn_len": 182
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nApr\u00e8s un d\u00e9c\u00e8s, les op\u00e9rations fun\u00e9raires ne sont possibles qu'en absence de obstacles m\u00e9dicaux l\u00e9gaux \u00e0 l'immigration, l'absence d'obligation des envers et le respect du d\u00e9lai l\u00e9gal de r\u00e9alisation.\n'''",
+        "timestamp": 1685209623,
+        "priority": 3,
+        "answer": "Quelles sont les conditions pour que les op\u00e9rations fun\u00e9raires soient possibles apr\u00e8s un d\u00e9c\u00e8s ?<br/>{{c1::absence d'obstacles m\u00e9dico-l\u00e9gal \u00e0 l'inhumation <br/>}}{{c1::absence d'obligations de la mise en biere <br/>}}{{c1::respect du d\u00e9lai l\u00e9gal de r\u00e9alisation}}",
+        "tkn_len": 168
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nDans la r\u00e9alisation d'un certificat d'essai en format papier, le papier doit \u00eatre envoy\u00e9 par le m\u00e9decin \u00e0 la mairie, qui contactera ensuite l'INSEE et l'ARS. Alors que pour un certificat \u00e9lectronique, remarque non, le certificat \u00e9lectronique arrive aussi directement \u00e0 la mairie. Le certificat \u00e9lectronique est disponible imm\u00e9diatement, alors que le certificat papier n'est disponible qu'au bout de 3 semaines \u00e0 4 mois.\n'''",
+        "timestamp": 1685209762,
+        "priority": 4,
+        "answer": "Circuit de l'envoi d'un certificat de d\u00e9c\u00e8s en format papier et en format \u00e9lectronique ?<br/>{{c1::pour le format papier, le m\u00e9decin doit envoyer le papier \u00e0 la mairie, qui contactera ensuite l'INSEE et l'ARS, alors que pour le format \u00e9lectronique, le certificat est envoy\u00e9 directement \u00e0 la mairie}}<br/>#####<br/>Quel est le d\u00e9lai de disponibilit\u00e9 des donn\u00e9es d'un certificat de d\u00e9c\u00e8s en format papier ?<br/>{{c1::3 semaines \u00e0 4 mois}}",
+        "tkn_len": 281
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours sur les certificats m\u00e9dicaux de d\u00e9ces :\"\n\nTranscript:\n'''\nLes diff\u00e9rents types d'autopsies sont l'autopsie m\u00e9dico-l\u00e9gale et l'autopsie m\u00e9dicale. Le type d'autopsie demand\u00e9, non je veux dire la personne qui doit demander l'autopsie est un magistrat dans le cadre de l'autopsie m\u00e9dico-l\u00e9gale et un m\u00e9decin dans le cadre de l'autopsie m\u00e9dicale. Le but de l'autopsie m\u00e9dicale est de rechercher la cause de la mort pour chercher l'intervention enti\u00e8re. Le but de l'autopsie m\u00e9dicale est de comprendre la cause du d\u00e9c\u00e8s. L'autopsie m\u00e9dico-l\u00e9gale est r\u00e9gie par le Code de proc\u00e9dures p\u00e9nales. L'autopsie m\u00e9dicale est r\u00e9gie par le Code de la sant\u00e9 publique. La famille ne peut s'opposer uniquement \u00e0 l'autopsie m\u00e9dicale et pas \u00e0 l'autopsie m\u00e9dico-l\u00e9gale. Pour s'opposer \u00e0 l'autopsie m\u00e9dicale, il faut soit que la famille s'y oppose, soit que le vivant se soit inscrit au registre national des refus. L'autopsie m\u00e9dicale est r\u00e9gie par le Code de proc\u00e9dures p\u00e9nales.\n'''",
+        "timestamp": 1685210239,
+        "priority": 3,
+        "answer": "Quels sont les deux types d'autopsies ?<br/>{{c1::autopsie m\u00e9dico-l\u00e9gale et autopsie m\u00e9dicale}}<br/>#####<br/>Qui doit demander l'autopsie dans le cadre de l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::un magistrat}}<br/>#####<br/>Qui doit demander l'autopsie dans le cadre de l'autopsie m\u00e9dicale ?<br/>{{c1::un m\u00e9decin}}<br/>#####<br/>Quel est le but de l'autopsie m\u00e9dicale ?<br/>{{c1::comprendre la cause du d\u00e9c\u00e8s}}<br/>#####<br/>Quel est le but de l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::rechercher la cause de la mort pour chercher l'intervention d'un tiers}}<br/>#####<br/>Quel est le Code qui r\u00e9git l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::le Code de proc\u00e9dures p\u00e9nales}}<br/>#####<br/>Quel est le Code qui r\u00e9git l'autopsie m\u00e9dicale ?<br/>{{c1::le Code de la sant\u00e9 publique}}<br/>#####<br/>La famille peut-elle s'opposer \u00e0 l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::non}}<br/>#####<br/>Pour s'opposer \u00e0 l'autopsie m\u00e9dicale, que doit-il se passer ?<br/>{{c1::soit la famille s'y oppose, soit le vivant s'est inscrit au registre national des refus}}",
+        "tkn_len": 668
     }
 ]
