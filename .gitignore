@@ -1,11 +1,11 @@
-API_KEY.txt
 *cache*
 *.pyc
 */*.pyc
 */*/*.pyc
-logs.txt
-audio-0-100.wav
-utils/ssl/key.pem
 utils/__pycache__/*
-profiles/*/*pickle
 *.wav
+
+
+API_KEY.txt
+utils/ssl/key.pem
+logs.txt
