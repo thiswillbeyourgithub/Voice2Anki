@@ -65,6 +65,7 @@ def switch_profile(profile, output):
                 f"Invalid profile name, must be alphanumeric" + output
                 ]
 
+    profile = profile.lower()
     if profile not in get_profiles():
         Path(f"profiles/{profile}").mkdir(exist_ok=False)
         return [
