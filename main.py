@@ -145,9 +145,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
         return None, 0, f"Error with ChatGPT: '{err}'\n\n{output}"
 
 
+def semiauto_mode(*args, **kwargs):
+    whi("Triggering semiauto mode: doing everything but stop just before uploading to anki")
+    return main(*args, **kwargs, mode="semiauto")
+
 def auto_mode(*args, **kwargs):
     whi("Triggering auto mode")
-    return main(*args, **kwargs, auto_mode=True)
+    return main(*args, **kwargs, mode="auto")
 
 
 def main(
@@ -166,7 +170,7 @@ def main(
         profile,
         sld_max_tkn,
         old_output,
-        auto_mode=False,
+        mode="one",
         ):
     whi("Entering main")
     if not (audio_numpy or txt_audio):
@@ -252,12 +256,12 @@ def main(
         pv["gallery"] = saved_gallery
 
     # get text from audio if not already parsed
-    if (not txt_audio) or auto_mode:
+    if (not txt_audio) or mode in ["auto", "semiauto"]:
         txt_audio, to_return["output"] = transcribe(audio_numpy, txt_whisp_prompt, to_return["output"])
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
-    if (not txt_chatgpt_cloz) or auto_mode:
+    if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
         txt_chatgpt_cloz, txt_chatgpt_tkncost, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
     if not txt_chatgpt_tkncost:
         red("No token cost found, setting to 0")
@@ -299,6 +303,15 @@ def main(
             }
     results = []
     to_return["output"] += "\n>>>> To anki:\n"
+
+    if mode == "semiauto":
+        yel("Semiauto mode: stopping just before uploading to anki")
+        return [
+                to_return["output"],
+                to_return["txt_audio"],
+                to_return["txt_chatgpt_tkncost"],
+                to_return["txt_chatgpt_cloz"],
+                ]
 
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
@@ -385,6 +398,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
 
         with gr.Column():
             with gr.Row():
+                semiauto_btn = gr.Button(value="Speech to Cloze", variant="stop")  # .style(full_width=False)  #, size="sm")
                 transcript_btn = gr.Button(value="Speech to text", variant="stop")
                 chatgpt_btn = gr.Button(value="Text to cloze(s)", variant="stop")
                 anki_btn = gr.Button(value="Cloze to Anki", variant="stop")
@@ -460,6 +474,32 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 ],
             # batch=True,  # TODO: enable batching when you figure out how to convert all to iterables
             # max_batch_size=10,
+            )
+    semiauto_btn.click(
+            fn=semiauto_mode,
+            inputs=[
+                audio_numpy,
+                txt_audio,
+                txt_whisp_prompt,
+
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+
+                txt_chatgpt_context,
+                txt_deck,
+                txt_tags,
+
+                gallery,
+                txt_profile,
+                sld_max_tkn,
+                output_elem,
+                ],
+            outputs=[
+                output_elem,
+                txt_audio,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+                ],
             )
     improve_btn.click(
             fn=recur_improv,
