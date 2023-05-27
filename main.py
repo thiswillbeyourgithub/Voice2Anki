@@ -19,7 +19,7 @@ from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
-assert Path("API_KEY.txt").exists(), "No api key found"
+assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
