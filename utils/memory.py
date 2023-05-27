@@ -97,6 +97,10 @@ def prompt_filter(prev_prompts, max_token):
     red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
     yel(f"Number of prompts: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
+    # make it so that highest priority prompts are last in the discussion
+    prev_prompts.reverse()
+    prev_prompts.insert(0, prev_prompts.pop(-1))  # keep the system prompt first
+    assert prev_prompts[0]["role"] == "system", "invalid sorting of prev_prompts"
     return output_pr
 
 
