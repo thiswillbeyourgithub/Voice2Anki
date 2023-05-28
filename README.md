@@ -15,4 +15,5 @@
 
 ## Notes
     * The ssl used is self signed, you'll likely have to tick a few checkbox on your browser to access the site.
+    * It's apparently way less CPU intensive to use Chromium than to use firefox according to my limited testing with a heavily modified firefox.
 
