@@ -14,10 +14,8 @@ from .logger import whi, yel, red
 from .anki import anki_media
 
 
-def get_image(gallery, txt_output):
+def get_image(gallery):
     whi("Getting image from clipboard")
-    if txt_output is None:
-        txt_output = ""
     try:
         # load from clipboard
         pasted = pyperclip3.paste()
@@ -30,11 +28,14 @@ def get_image(gallery, txt_output):
                         i["name"]
                         ) for i in gallery
                     ] + [decoded]
-            return out, "Loaded image.\n" + txt_output
-        print(gallery)
-        raise Exception(f'gallery is not list or None but {type(gallery)}')
+            whi("Loaded image from clipboard.")
+            return out
+        else:
+            red(f'gallery is not list or None but {type(gallery)}')
+            return None
     except Exception as err:
-        return None, None, red(f"Error: {err}\n\n") + txt_output
+        red(f"Error: {err}")
+        return None
 
 
 def check_source(source):
@@ -79,14 +80,14 @@ def get_img_source(gallery):
         return red(f"Error getting source: '{err}'")
 
 
-def reset_audio(output):
+def reset_audio():
     whi("Reset audio.")
-    return None, f"Reset audio.\n\n{output}"
+    return None
 
 
-def reset_image(output):
+def reset_image():
     whi("Reset images.")
-    return None, f"Reset images.\n\n{output}"
+    return None
 
 
 def enhance_audio(audio_numpy):

@@ -3,6 +3,7 @@ import sys
 from main import demo
 
 if __name__ == "__main__":
+    whi(f"Starting WhisperToAnki\n")
     args = sys.argv[1:]
 
     # default argument

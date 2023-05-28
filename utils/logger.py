@@ -3,16 +3,17 @@
 Logger file for GPToAnki.py
 
 """
-import time
+import re
 from pathlib import Path
 from tqdm import tqdm
 import logging
+from logging import handlers
 import rtoml
 import json
 
 Path("logs.txt").touch(exist_ok=True)
-log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
-file_handler = logging.handlers.RotatingFileHandler(
+log_formatter = logging.Formatter('%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s')
+file_handler = handlers.RotatingFileHandler(
         "logs.txt",
         mode='a',
         maxBytes=100000,
@@ -26,6 +27,7 @@ file_handler.setFormatter(log_formatter)
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 log.addHandler(file_handler)
+log_regex = re.compile(" ##.*?## ")
 
 
 def coloured_log(color_asked):
@@ -77,6 +79,21 @@ def coloured_log(color_asked):
             tqdm.write(col_red + string + col_rst, **args)
             return string
     return printer
+
+def get_log():
+    "frequently called: read the most recent log entries and display it in the output field"
+    logcontent = []
+    with open("logs.txt", "r") as f:
+        for line in f.readlines()[-100:]:
+            line = line.strip()
+            if not line:
+                continue
+            line = re.sub(log_regex, " >           ", line)
+            logcontent.append(line)
+    if not logcontent:
+        return "Empty log"
+    logcontent.reverse()
+    return "\n".join(logcontent)
 
 
 whi = coloured_log("white")

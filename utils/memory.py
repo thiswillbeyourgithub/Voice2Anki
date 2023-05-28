@@ -104,12 +104,14 @@ def prompt_filter(prev_prompts, max_token):
     return output_pr
 
 
-def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, priority, output):
+def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, priority):
     whi("Recursively improving")
     if not txt_audio:
-        return "No audio transcripts found.\n\n" + output
+        red("No audio transcripts found.")
+        return
     if not txt_chatgpt_cloz:
-        return "No chatgpt cloze found.\n\n" + output
+        red("No chatgpt cloze found.")
+        return
     if "\n" in txt_chatgpt_cloz:
         whi("Replaced newlines in txt_chatgpt_cloz")
         txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
@@ -126,7 +128,8 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
                     }
                 ]
         if to_add[0] in prev_prompts:
-            return f"Already present in previous outputs!\n\n{output}"
+            red("Already present in previous outputs!")
+            return
         prev_prompts.extend(to_add)
 
         prev_prompts = check_prompts(prev_prompts)
@@ -134,8 +137,9 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
         with open(f"profiles/{choice_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4)
     except Exception as err:
-        return f"Error during recursive improvement: '{err}'\n\n{output}"
-    return f"Recursively improved: {len(prev_prompts)} total examples" + "\n\n" + output
+        red(f"Error during recursive improvement: '{err}'")
+        return
+    whi(f"Recursively improved: {len(prev_prompts)} total examples")
 
 
 def load_prev_prompts(profile):

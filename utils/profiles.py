@@ -52,8 +52,9 @@ def get_profiles():
     return profiles
 
 
-def switch_profile(profile, output):
+def switch_profile(profile):
     if profile is None or profile.strip() == "" or "/" in profile or not profile.isalpha():
+        red(f"Invalid profile name, must be alphanumeric")
         return [
                 None,
                 None,
@@ -64,13 +65,13 @@ def switch_profile(profile, output):
                 None,
                 None,
                 None,
-                f"Invalid profile name, must be alphanumeric" + output
                 ]
 
     profile = profile.lower()
 
     if profile not in get_profiles():
         Path(f"profiles/{profile}").mkdir(exist_ok=False)
+        red(f"created {profile}.")
         return [
                 None,
                 None,
@@ -81,12 +82,12 @@ def switch_profile(profile, output):
                 None,
                 None,
                 profile,
-                f"created {profile}.\n\n" + output
                 ]
 
     pv = previous_values(profile)
 
     # reset the fields to the previous values of profile
+    whi(f"Switch profile to '{profile}'")
     return [
             pv["txt_deck"],
             pv["txt_tags"],
@@ -97,5 +98,4 @@ def switch_profile(profile, output):
             pv["txt_audio"],
             pv["txt_chatgpt_cloz"],
             profile,
-            f"Switch profile to '{profile}'",
             ]

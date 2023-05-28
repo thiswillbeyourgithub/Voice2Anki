@@ -12,7 +12,7 @@ from pathlib import Path
 
 from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template
-from utils.logger import red, whi, yel
+from utils.logger import red, whi, yel, get_log
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
 from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image
 from utils.profiles import get_profiles, switch_profile, previous_values
@@ -31,14 +31,14 @@ def save_audio(profile, audio_numpy):
     pv = previous_values(profile)
     pv["audio_numpy"] = audio_numpy
 
-def transcribe(audio_numpy, txt_whisp_prompt, output):
+def transcribe(audio_numpy, txt_whisp_prompt):
     whi("Transcribing audio")
 
     if audio_numpy is None:
-        return red("Error: None audio_numpy"), f"Error: None audio_numpy\n\n{output}"
+        return red("Error: None audio_numpy")
 
     if txt_whisp_prompt is None:
-        return red("Error: None whisper prompt"), f"Error: None whisper prompt\n\n{output}"
+        return red("Error: None whisper prompt")
 
     # try to remove silences
     audio_numpy = remove_silences(audio_numpy)
@@ -71,21 +71,21 @@ def transcribe(audio_numpy, txt_whisp_prompt, output):
                         language="fr")
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
-                    return txt_audio, f"Whisper transcription: {txt_audio}\n\n{output}"
+                    return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red("Whisper: too many retries."), f"Whisper: too many retries.\n\n{output}"
+                    return red("Whisper: too many retries.")
                 red(f"Error from whisper: '{err}'")
                 time.sleep(2 * cnt)
     except Exception as err:
-        return red(f"Error when transcribing audio: '{err}'"), f"Error when transcribing audio: '{err}'\n\n{output}"
+        return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token):
     if not txt_audio:
-        return "No transcribed audio found.", None, f"No transcribed audio found\n\n{output}"
+        return "No transcribed audio found.", None
     if not txt_chatgpt_context:
-        return "No txt_chatgpt_context found.", None, f"No txt_chatgpt_context found\n\n{output}"
+        return "No txt_chatgpt_context found.", None
 
     prev_prompts = load_prev_prompts(profile)
     prev_prompts = prompt_filter(prev_prompts, max_token)
@@ -131,7 +131,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
                 break
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red("ChatGPT: too many retries."), None, f"ChatGPT: too many retries.\n\n{output}"
+                    return red("ChatGPT: too many retries."), None
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
 
@@ -144,9 +144,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, output):
 
         tkn_cost = response["usage"]["total_tokens"]
 
-        return cloz, tkn_cost, f"New cloze created: {cloz}\n\n{output}"
+        return cloz, tkn_cost
     except Exception as err:
-        return None, 0, f"Error with ChatGPT: '{err}'\n\n{output}"
+        return red(f"Error with ChatGPT: '{err}'"), 0
 
 
 def semiauto_mode(*args, **kwargs):
@@ -173,7 +173,6 @@ def main(
         gallery,
         profile,
         sld_max_tkn,
-        old_output,
         mode="one",
         ):
     whi("Entering main")
@@ -215,7 +214,6 @@ def main(
 
     # to_return allows to keep track of what to output to which widget
     to_return = {}
-    to_return["output"] = old_output
     to_return["txt_audio"] = txt_audio
     to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
@@ -225,7 +223,7 @@ def main(
     pv = previous_values(profile)
 
     if gallery is None or len(gallery) == 0:
-        to_return["output"] = red("you should probably specify an image in source\n") + to_return["output"]
+        red("you should probably specify an image in source")
         txt_source = "<br>"
     else:
         txt_source = get_img_source(gallery)
@@ -241,9 +239,7 @@ def main(
     # manage sound path
     audio_html = audio_to_anki(audio_numpy)
     if "Error" in audio_html:  # then out is an error message and not the source
-        to_return["output"] = audio_html + to_return["output"]
         return [
-                to_return["output"],
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
@@ -261,18 +257,17 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio, to_return["output"] = transcribe(audio_numpy, txt_whisp_prompt, to_return["output"])
+        txt_audio = transcribe(audio_numpy, txt_whisp_prompt)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost, to_return["output"] = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, to_return["output"])
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn)
     if not txt_chatgpt_tkncost:
         red("No token cost found, setting to 0")
         txt_chatgpt_tkncost = 0
-    if to_return["output"].startswith("Error with ChatGPT"):
+    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or txt_chatgpt_tkncost == 0:
         return [
-                to_return["output"],
                 to_return["txt_audio"],
                 txt_chatgpt_tkncost,
                 to_return["txt_chatgpt_cloz"],
@@ -285,18 +280,23 @@ def main(
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
-        return red(f"{to_return['output']}\n\nInvalid cloze: '{txt_chatgpt_cloz}'")
-
-    if "alfred:" in txt_chatgpt_cloz.lower():
+        red(f"Invalid cloze: '{txt_chatgpt_cloz}'")
         return [
-                red(f"{to_return['output']}\nCOMMUNICATION REQUESTED:\n{txt_chatgpt_cloz}"),
+                to_return["txt_audio"],
+                txt_chatgpt_tkncost,
+                to_return["txt_chatgpt_cloz"],
+                ]
+
+    if "alfred" in txt_chatgpt_cloz.lower():
+        red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
+        return [
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
                 ]
 
-    # show output
-    to_return["output"] += f"\n>>>> ChatGPT {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}):\n{txt_chatgpt_cloz}"
+    # add cloze to output
+    red(f">>>> ChatGPT {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}):\n{txt_chatgpt_cloz}")
 
     # send to anki
     metadata = {
@@ -306,12 +306,11 @@ def main(
             "chatgpt_dollars_cost": tkn_cost_dol,
             }
     results = []
-    to_return["output"] += "\n>>>> To anki:\n"
+    red(">>>> To anki:\n")
 
     if mode == "semiauto":
         yel("Semiauto mode: stopping just before uploading to anki")
         return [
-                to_return["output"],
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
@@ -337,16 +336,16 @@ def main(
                     deck_name=txt_deck,
                 )
                 )
-        to_return["output"] += f"* {cl}\n"
+        whi(f"* {cl}")
     results = [str(r) for r in results if str(r).isdigit()]
 
     # trigger anki sync
     sync_anki()
-    to_return["output"] += "Synchronized anki\n"
+    whi("Synchronized anki\n")
 
     if not len(results) == len(clozes):
+        red(f"Some flashcards were not added!"),
         return [
-                red(f"{to_return['output']}\n\n-> Some cards were not added!"),
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
                 to_return["txt_chatgpt_cloz"],
@@ -354,13 +353,11 @@ def main(
 
     whi("Finished loop.\n\n")
 
-    to_return["output"] += "\n\nDONE"
+    whi("\n\nDONE")
 
-    to_return["output"] += "\n\n ------------------------------------- \n\n" + old_output.strip()
+    whi("\n\n ------------------------------------- \n\n")
 
-    # the order matters because it's used to reset some fields
     return [
-            to_return["output"],
             to_return["txt_audio"],
             to_return["txt_chatgpt_tkncost"],
             to_return["txt_chatgpt_cloz"],
@@ -416,17 +413,17 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
             sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
     # output
-    output_elem = gr.Textbox(value="Welcome.", label="Logging", lines=20, max_lines=100)
+    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False)
 
     # events
     audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
-    txt_profile.submit(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
-    txt_profile.blur(fn=switch_profile, inputs=[txt_profile, output_elem], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile, output_elem])
-    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, output_elem], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost, output_elem])
-    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, output_elem], outputs=[txt_audio, output_elem])
-    img_btn.click(fn=get_image, inputs=[gallery, output_elem], outputs=[gallery, output_elem])
-    rst_audio_btn.click(fn=reset_audio, inputs=[output_elem], outputs=[audio_numpy, output_elem])
-    rst_img_btn.click(fn=reset_image, inputs=[output_elem], outputs=[gallery, output_elem])
+    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
+    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
+    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt], outputs=[txt_audio])
+    img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
+    rst_audio_btn.click(fn=reset_audio, outputs=[audio_numpy])
+    rst_img_btn.click(fn=reset_image, outputs=[gallery])
 
     anki_btn.click(
             fn=main,
@@ -445,10 +442,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 gallery,
                 txt_profile,
                 sld_max_tkn,
-                output_elem,
                 ],
             outputs=[
-                output_elem,
                 txt_audio,
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -471,10 +466,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 gallery,
                 txt_profile,
                 sld_max_tkn,
-                output_elem,
                 ],
             outputs=[
-                output_elem,
                 txt_audio,
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -499,10 +492,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 gallery,
                 txt_profile,
                 sld_max_tkn,
-                output_elem,
                 ],
             outputs=[
-                output_elem,
                 txt_audio,
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -517,9 +508,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
                 sld_improve,
-                output_elem,
                 ],
-            outputs=[output_elem],
             )
 
 demo.queue()
