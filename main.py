@@ -54,7 +54,6 @@ def transcribe(audio_numpy, txt_whisp_prompt):
     whi("Saving audio as wav file")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav")
     write(tmp.name, audio_numpy[0], audio_numpy[1])
-    tempwavpath = tmp.name
 
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
@@ -63,7 +62,7 @@ def transcribe(audio_numpy, txt_whisp_prompt):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(tempwavpath, "rb") as audio_file:
+                with open(tmp.name, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
                         model="whisper-1",
                         file=audio_file,
@@ -71,13 +70,16 @@ def transcribe(audio_numpy, txt_whisp_prompt):
                         language="fr")
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
+                    Path(tmp.name).unlink(missing_ok=False)
                     return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
+                    Path(tmp.name).unlink(missing_ok=False)
                     return red("Whisper: too many retries.")
                 red(f"Error from whisper: '{err}'")
                 time.sleep(2 * cnt)
     except Exception as err:
+        Path(tmp.name).unlink(missing_ok=False)
         return red(f"Error when transcribing audio: '{err}'")
 
 

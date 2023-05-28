@@ -1,3 +1,4 @@
+from pathlib import Path
 import tempfile
 from scipy.io.wavfile import write, read
 import pickle
@@ -103,13 +104,14 @@ def enhance_audio(audio_numpy):
         cleaned = voice_cleaner.enhance_file(tmp.name)
         torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy[0])
         enhanced_audio_numpy = read(tmp.name)
+        Path(tmp.name).unlink(missing_ok=False)
 
         whi("Done cleaning audio")
         return enhanced_audio_numpy
 
     except Exception as err:
         red(f"Error when cleaning voice: '{err}'")
-        raise
+        Path(tmp.name).unlink(missing_ok=True)
         return audio_numpy
 
 
@@ -129,15 +131,18 @@ def remove_silences(audio_numpy):
         after = estimated_time["after"]["all"][0]
         if after / before > 0.9 and before - after < 5:
             whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+            Path(tmp.name).unlink(missing_ok=False)
             return audio_numpy  # return untouched
 
         yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
         u.render_media(tmp.name, audible_speed=1, silent_speed=2, audio_only=True)
         unsilenced_audio_numpy = read(tmp.name)
         whi("Done removing silences")
+        Path(tmp.name).unlink(missing_ok=False)
         return unsilenced_audio_numpy
     except Exception as err:
         red(f"Error when removing silences: '{err}'")
+        Path(tmp.name).unlink(missing_ok=True)
         return audio_numpy
 
 
