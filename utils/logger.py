@@ -1,9 +1,5 @@
-"""
-
-Logger file for GPToAnki.py
-
-"""
 import re
+import os
 from pathlib import Path
 from tqdm import tqdm
 import logging
@@ -82,7 +78,22 @@ def coloured_log(color_asked):
 
 def get_log():
     "frequently called: read the most recent log entries and display it in the output field"
+    global last_log_content, latest_tail
     logcontent = []
+    # updates only if the last line has changed
+    with open("logs.txt", "rb") as f:
+        # source: https://stackoverflow.com/questions/46258499/how-to-read-the-last-line-of-a-file-in-python
+        try:  # catch OSError in case of a one line file
+            f.seek(-2, os.SEEK_END)
+            while f.read(1) != b'\n':
+                f.seek(-2, os.SEEK_CUR)
+        except OSError:
+            f.seek(0)
+        lastline = f.readline().decode()
+        if last_log_content and lastline == latest_tail:
+            return last_log_content
+
+    latest_tail = lastline
     with open("logs.txt", "r") as f:
         for line in f.readlines()[-100:]:
             line = line.strip()
@@ -93,7 +104,11 @@ def get_log():
     if not logcontent:
         return "Empty log"
     logcontent.reverse()
-    return "\n".join(logcontent)
+    last_log_content = "\n".join(logcontent)
+    return last_log_content
+
+latest_tail = None
+last_log_content = None
 
 
 whi = coloured_log("white")

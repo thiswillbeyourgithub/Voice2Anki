@@ -413,7 +413,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki") as demo:
             sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False)
+    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=0.3, interactive=False)
 
     # events
     audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
