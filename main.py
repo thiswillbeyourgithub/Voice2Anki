@@ -83,7 +83,7 @@ def transcribe(audio_numpy, txt_whisp_prompt):
         return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
     if not txt_audio:
         return "No transcribed audio found.", None
     if not txt_chatgpt_context:
@@ -128,7 +128,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token):
                         model="gpt-3.5-turbo",
                         messages=formatted_messages,
                         stop="END",
-                        temperature=0.5,
+                        temperature=temperature,
                         )
                 break
             except RateLimitError as err:
@@ -175,6 +175,7 @@ def main(
         gallery,
         profile,
         sld_max_tkn,
+        sld_temp,
         mode="one",
         ):
     whi("Entering main")
@@ -234,6 +235,7 @@ def main(
     pv["txt_deck"] = txt_deck
     pv["txt_tags"] = txt_tags
     pv["sld_max_tkn"] = sld_max_tkn
+    pv["temperature"] = sld_temp
     pv["profile"] = profile
     pv["txt_chatgpt_context"] = txt_chatgpt_context
     pv["txt_whisp_prompt"] = txt_whisp_prompt
@@ -264,7 +266,7 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn)
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp)
     if not txt_chatgpt_tkncost:
         red("No token cost found, setting to 0")
         txt_chatgpt_tkncost = 0
@@ -433,7 +435,9 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 improve_btn = gr.Button(value="Improve", variant="primary")
                 sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="New example priority")
         with gr.Column(scale=1):
-            sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
+            with gr.Row():
+                sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["max_tkn"], step=500, label="ChatGPT history token size")
+                sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="ChatGPT temperature")
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=0.3, interactive=False)
@@ -443,7 +447,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
     txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
     txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
-    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
+    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
     transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt], outputs=[txt_audio])
     img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
     rst_audio_btn.click(fn=reset_audio, outputs=[audio_numpy])
@@ -466,6 +470,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 gallery,
                 txt_profile,
                 sld_max_tkn,
+                sld_temp,
                 ],
             outputs=[
                 txt_audio,
@@ -490,6 +495,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 gallery,
                 txt_profile,
                 sld_max_tkn,
+                sld_temp,
                 ],
             outputs=[
                 txt_audio,
@@ -516,6 +522,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 gallery,
                 txt_profile,
                 sld_max_tkn,
+                sld_temp,
                 ],
             outputs=[
                 txt_audio,

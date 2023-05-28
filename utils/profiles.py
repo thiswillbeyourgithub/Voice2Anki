@@ -31,6 +31,8 @@ class previous_values:
             whi(f"No {kp} in store for {self.p}")
             if key == "max_tkn":
                 return 3500
+            if key == "temperature":
+                return 0.5
             return None
 
     def __setitem__(self, key, item):
