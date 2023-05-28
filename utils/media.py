@@ -20,6 +20,9 @@ def get_image(gallery):
         # load from clipboard
         pasted = pyperclip3.paste()
         decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
+        if decoded is None:
+            whi("Decoded image was Nonetype")
+            return gallery
         if gallery is None:
             return [decoded]
         if isinstance(gallery, list):
