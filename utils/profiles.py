@@ -33,6 +33,8 @@ class previous_values:
                 return 3500
             if key == "temperature":
                 return 0.5
+            if key == "txt_whisp_lang":
+                return "fr"
             return None
 
     def __setitem__(self, key, item):
@@ -56,8 +58,9 @@ def get_profiles():
 
 def switch_profile(profile):
     if profile is None or profile.strip() == "" or "/" in profile or not profile.isalpha():
-        red(f"Invalid profile name, must be alphanumeric")
+        red("Invalid profile name, must be alphanumeric")
         return [
+                None,
                 None,
                 None,
                 None,
@@ -83,6 +86,7 @@ def switch_profile(profile):
                 None,
                 None,
                 None,
+                None,
                 profile,
                 ]
 
@@ -95,6 +99,7 @@ def switch_profile(profile):
             pv["txt_tags"],
             pv["txt_chatgpt_context"],
             pv["txt_whisp_prompt"],
+            pv["txt_whisp_lang"],
             pv["gallery"],
             pv["audio_numpy"],
             pv["txt_audio"],

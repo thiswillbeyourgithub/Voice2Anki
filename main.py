@@ -31,7 +31,7 @@ def save_audio(profile, audio_numpy):
     pv = previous_values(profile)
     pv["audio_numpy"] = audio_numpy
 
-def transcribe(audio_numpy, txt_whisp_prompt):
+def transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang):
     whi("Transcribing audio")
 
     if audio_numpy is None:
@@ -39,6 +39,9 @@ def transcribe(audio_numpy, txt_whisp_prompt):
 
     if txt_whisp_prompt is None:
         return red("Error: None whisper prompt")
+
+    if txt_whisp_lang is None:
+        return red("Error: None whisper language")
 
     # try to remove silences
     audio_numpy = remove_silences(audio_numpy)
@@ -67,7 +70,7 @@ def transcribe(audio_numpy, txt_whisp_prompt):
                         model="whisper-1",
                         file=audio_file,
                         prompt=txt_whisp_prompt,
-                        language="fr")
+                        language=txt_whisp_lang)
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
                     Path(tmp.name).unlink(missing_ok=False)
@@ -164,6 +167,7 @@ def main(
         audio_numpy,
         txt_audio,
         txt_whisp_prompt,
+        txt_whisp_lang,
 
         txt_chatgpt_tkncost,
         txt_chatgpt_cloz,
@@ -189,6 +193,13 @@ def main(
     if not txt_whisp_prompt:
         return [
                 red("No whisper prompt found."),
+                txt_audio,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+                ]
+    if not txt_whisp_lang:
+        return [
+                red("No whisper language found."),
                 txt_audio,
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -239,6 +250,7 @@ def main(
     pv["profile"] = profile
     pv["txt_chatgpt_context"] = txt_chatgpt_context
     pv["txt_whisp_prompt"] = txt_whisp_prompt
+    pv["txt_whisp_lang"] = txt_whisp_lang
 
     # manage sound path
     audio_html = audio_to_anki(audio_numpy)
@@ -261,7 +273,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_numpy, txt_whisp_prompt)
+        txt_audio = transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
@@ -407,7 +419,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
                 txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="Context for Chat model")
-                txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
+                with gr.Row():
+                    with gr.Column(scale=1):
+                        txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="Language of SpeechToText")
+                    with gr.Column(scale=9):
+                        txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="Context for SpeechToText")
 
     with gr.Row():
         with gr.Column(scale=1):
@@ -445,10 +461,10 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     # events
     dark_mode_btn.click(fn=None, _js=darkmode_js)
     audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
-    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
     chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
-    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt], outputs=[txt_audio])
+    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
     img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
     rst_audio_btn.click(fn=reset_audio, outputs=[audio_numpy])
     rst_img_btn.click(fn=reset_image, outputs=[gallery])
@@ -459,6 +475,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 audio_numpy,
                 txt_audio,
                 txt_whisp_prompt,
+                txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -484,6 +501,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 audio_numpy,
                 txt_audio,
                 txt_whisp_prompt,
+                txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -511,6 +529,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 audio_numpy,
                 txt_audio,
                 txt_whisp_prompt,
+                txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
@@ -536,6 +555,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_profile,
                 txt_audio,
                 txt_whisp_prompt,
+                txt_whisp_lang,
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
                 sld_improve,
