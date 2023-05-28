@@ -10,17 +10,22 @@ import logging
 import rtoml
 import json
 
-# adds logger, restrict it to X lines
 Path("logs.txt").touch(exist_ok=True)
-Path("logs.txt").write_text(
-    "\n".join(
-        Path("logs.txt").read_text().split("\n")[-100_000:]))
-logging.basicConfig(filename="logs.txt",
-                    filemode='a',
-                    force=True,
-                    format=f"{time.ctime()}: %(message)s")
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+file_handler = logging.handlers.RotatingFileHandler(
+        "logs.txt",
+        mode='a',
+        maxBytes=100000,
+        backupCount=1,
+        encoding=None,
+        delay=0,
+        )
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(log_formatter)
+
 log = logging.getLogger()
 log.setLevel(logging.INFO)
+log.addHandler(file_handler)
 
 
 def coloured_log(color_asked):
