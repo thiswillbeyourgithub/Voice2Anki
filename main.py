@@ -370,8 +370,15 @@ def main(
         try:
             with open(f'./profiles/{profile}/sent_to_anki.csv', 'a', newline='') as csvfile:
                 file = csv.writer(csvfile, delimiter=",")
-                to_add = [cl, txt_source, metadata, new_tags, txt_deck]
-                to_add = [t.replace("\n", "\\n") for t in to_add]  # remove newlines
+                to_add = []
+                # remove newlines
+                for new in [cl, txt_source, metadata, new_tags, txt_deck]:
+                    try:
+                        new = ";".join(new)
+                    except Exception:
+                        pass
+                    new = new.replace(",", r"\,").replace("\n", "\\n")
+                    to_add.append(new)
                 file.writerow(to_add)
         except Exception as err:
             red(f"Error when appending cloze csv file: '{err}'")
