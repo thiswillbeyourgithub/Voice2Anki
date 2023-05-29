@@ -14,7 +14,7 @@ from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template
 from utils.logger import red, whi, yel, get_log
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
-from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image
+from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image, save_audio, load_next_audio
 from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
@@ -25,11 +25,6 @@ d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 pv = previous_values()
-
-def save_audio(profile, audio_numpy):
-    whi("Saving audio to profile")
-    pv = previous_values(profile)
-    pv["audio_numpy"] = audio_numpy
 
 def transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang):
     whi("Transcribing audio")
@@ -428,8 +423,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
 
     with gr.Row():
         with gr.Column(scale=1):
-            rst_audio_btn = gr.Button(value="Clear", variant="secondary").style(size="sm")
+            rst_audio_btn = gr.Button(value="Clear", variant="secondary")
             audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_2 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            load_audio_btn = gr.Button(value="Next", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10)
             txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="LLM cloze(s)", lines=5, max_lines=10)
@@ -466,8 +464,9 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
     transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
     img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
-    rst_audio_btn.click(fn=reset_audio, outputs=[audio_numpy])
+    rst_audio_btn.click(fn=reset_audio, inputs=[audio_numpy, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy, audio_numpy_2, audio_numpy_3])
     rst_img_btn.click(fn=reset_image, outputs=[gallery]).then(fn=get_image, inputs=[gallery], outputs=[gallery])
+    load_audio_btn.click(fn=load_next_audio, inputs=[audio_numpy, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy, audio_numpy_2, audio_numpy_3])
 
     anki_btn.click(
             fn=main,

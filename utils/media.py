@@ -13,6 +13,7 @@ import torchaudio
 
 from .logger import whi, yel, red
 from .anki import anki_media
+from .profiles import previous_values
 
 
 def get_image(gallery):
@@ -84,14 +85,28 @@ def get_img_source(gallery):
         return red(f"Error getting source: '{err}'")
 
 
-def reset_audio():
-    whi("Reset audio.")
-    return None
-
-
 def reset_image():
     whi("Reset images.")
     return None
+
+
+def reset_audio(audio1, audio2, audio3):
+    whi("Resetting all audio")
+    return None, None, None
+
+
+def load_next_audio(audio1, audio2, audio3):
+    whi("Rolling over audio samples")
+    if audio1 is None:
+        whi("Cannot load next audio if audio #1 is None")
+        return audio1, audio2, audio3
+    return audio2, audio3, None
+
+
+def save_audio(profile, audio_numpy):
+    whi("Saving audio from #1 to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy"] = audio_numpy
 
 
 def enhance_audio(audio_numpy):
