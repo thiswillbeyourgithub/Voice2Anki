@@ -39,7 +39,7 @@ def check_prompts(prev_prompts):
             mess["priority"] = 0
             if "importance" in mess:  # backward compatibility
                 mess["priority"] = mess["importance"]
-        assert isinstance(mess["priority"], int), "priority is not int!"
+        assert isinstance(mess["priority"], (float, int)), f"priority is not number! '{mess['priority']}'"
         assert mess["priority"] <= 10, "priority above 10 !"
         assert mess["priority"] >= 0, "priority under 0 !"
 

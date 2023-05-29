@@ -554,7 +554,6 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_profile,
                 txt_audio,
                 txt_whisp_prompt,
-                txt_whisp_lang,
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
                 sld_improve,
