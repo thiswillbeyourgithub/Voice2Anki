@@ -363,9 +363,7 @@ def main(
                 to_return["txt_chatgpt_cloz"],
                 ]
 
-    whi("Finished loop.\n\n")
-
-    whi("\n\nDONE")
+    whi("Finished adding card.\n\n")
 
     whi("\n\n ------------------------------------- \n\n")
 
