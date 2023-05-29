@@ -1496,5 +1496,37 @@
         "priority": 1,
         "answer": "Quel est le niveau de cat\u00e9gorisation de la HAS pour le dossier m\u00e9dical partag\u00e9 ?<br/>{{c1::niveau A}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour un moniteur de glucose ?<br/>{{c1::niveau D}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour un d\u00e9fibrillateur cardiaque ?<br/>{{c1::niveau D}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour une application d'audio description pour les non-voyants ?<br/>{{c1::niveau C}}",
         "tkn_len": 257
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nLa d\u00e9finition de pseudonymisation est de modifier les donn\u00e9es de face \u00e0 face de mani\u00e8re \u00e0 ce qu'il ne soit pas possible de rattacher directement un ensemble de donn\u00e9es \u00e0 une personne physique. C'est une carte bidirectionnelle.\n'''",
+        "timestamp": 1685388640,
+        "priority": 5,
+        "answer": "Quelle est la d\u00e9finition de la {{c2::pseudonymisation}} ?<br/>{{c1::modifier les donn\u00e9es de face \u00e0 face de mani\u00e8re \u00e0 ce qu'il ne soit pas possible de rattacher directement un ensemble de donn\u00e9es \u00e0 une personne physique}}",
+        "tkn_len": 124
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nLes professionnels de sant\u00e9 sont les m\u00e9decins, les pharmaciens, les professions de la physique m\u00e9dicale, les auxiliaires m\u00e9dicaux, les aides-soignants, les auxiliaires de couture et agriculture et les ambulanciers. Alfred, fait une carte pour chaque m\u00e9tier\n'''",
+        "timestamp": 1685389025,
+        "priority": 5,
+        "answer": "Le pharmacien est-il un professionnel de sant\u00e9 ?<br/>{{c1::oui}}<br/>#####<br/>La profession de physique m\u00e9dicale est-elle une profession de sant\u00e9 ?<br/>{{c1::oui}}<br/>#####<br/>Les auxiliaires m\u00e9dicaux sont-ils des professionnels de sant\u00e9 ?<br/>{{c1::oui}}<br/>#####<br/>Les aides-soignants sont-ils des professionnels de sant\u00e9 ?<br/>{{c1::oui}}<br/>#####<br/>Les auxiliaires de couture et d'agriculture sont-ils des professionnels de sant\u00e9 ?<br/>{{c1::non}}<br/>#####<br/>Les ambulanciers sont-ils des professionnels de sant\u00e9 ?<br/>{{c1::oui}}",
+        "tkn_len": 265
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nLe sigle PMSI signifie Programme de m\u00e9dicalisation de syst\u00e8me d'information Il y a aussi une carte pour dire qu'il s'agit d'une base de donn\u00e9es m\u00e9dico-administrative qui d\u00e9crit l'ensemble des s\u00e9jours hospitaliers et aussi pour dire que c'est le PMSI qui sert \u00e0 mettre en place la T2ISA\n'''",
+        "timestamp": 1685389185,
+        "priority": 5,
+        "answer": "Que signifie le sigle PMSI ?<br/>{{c1::Programme de m\u00e9dicalisation des syst\u00e8mes d'information}}<br/>#####<br/>Qu'est ce que {{c2::le PMSI}} ?<br/>{{c1::une base de donn\u00e9es m\u00e9dico-administrative qui d\u00e9crit l'ensemble des sejours hospitaliers}}<br/>#####<br/>Quel est la base de donn\u00e9e utilis\u00e9e pour mettre en place la T2A ?<br/>{{c1::le PMSI}}",
+        "tkn_len": 212
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nL'infod\u00e9miologie est le nouveau champ de recherche qui s'occupe de l'analyse des infod\u00e9mies. Une infod\u00e9mie est une propagation rapide et large d'un m\u00e9lange d'informations \u00e0 la fois effectues et inexactes. Une infod\u00e9mie ne traite pas forc\u00e9ment de maladie. Une infod\u00e9mie est une propagation rapide et large d'informations \u00e0 la fois effectues et inexactes.\n'''",
+        "timestamp": 1685389403,
+        "priority": 5,
+        "answer": "Qu'est-ce que l'infod\u00e9miologie ?<br/>{{c1::le nouveau champ de recherche qui s'occupe de l'analyse des infod\u00e9mies}}<br/>#####<br/>Qu'est-ce qu'une infod\u00e9mie ?<br/>{{c1::une propagation rapide et large d'un m\u00e9lange d'informations \u00e0 la fois exactes et inexactes}}<br/>#####<br/>Une infod\u00e9mie traite-t-elle forc\u00e9ment de maladie ?<br/>{{c1::non}}",
+        "tkn_len": 241
     }
 ]
