@@ -175,8 +175,11 @@ def remove_silences(audio_numpy_1):
         u = Unsilence(tmp.name)
         u.detect_silence()
 
+        # by how much to speed up silence
+        silence_speed = 2
+
         # do it only if its worth it as it might degrade audio quality?
-        estimated_time = u.estimate_time(audible_speed=1, silent_speed=2)  # Estimate time savings
+        estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
         before = estimated_time["before"]["all"][0]
         after = estimated_time["after"]["all"][0]
         if after / before > 0.9 and before - after < 5:
@@ -184,8 +187,19 @@ def remove_silences(audio_numpy_1):
             Path(tmp.name).unlink(missing_ok=False)
             return audio_numpy_1  # return untouched
 
+        if after > 30:
+            silence_speed += 2
+            if after > 60:
+                silence_speed += 3
+                whi(f"Removing silence: longer than 60s detected so speeding up even more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+            else:
+                whi(f"Removing silence: longer than 30s detected so speeding up a bit more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+            estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
+            before = estimated_time["before"]["all"][0]
+            after = estimated_time["after"]["all"][0]
+
         yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
-        u.render_media(tmp.name, audible_speed=1, silent_speed=2, audio_only=True)
+        u.render_media(tmp.name, audible_speed=1, silent_speed=silence_speed, audio_only=True)
         unsilenced_audio_numpy_1 = read(tmp.name)
         whi("Done removing silences")
         Path(tmp.name).unlink(missing_ok=False)
