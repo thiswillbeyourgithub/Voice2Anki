@@ -63,7 +63,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nLa valvulopathie pouvant \u00eatre r\u00e9v\u00e9l\u00e9e par une grossesse ou un passage en fibrillation atriale et le retracissement mitral.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nLa valvulopathie pouvant \u00eatre r\u00e9v\u00e9l\u00e9e par une grossesse ou un passage en fibrillation atriale et le retracissement mitral. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "valvulopathie, type si r\u00e9v\u00e9l\u00e9e par {{c2::grossesse ou une fibrillation atriale}} ? <br/>{{c1::r\u00e9tr\u00e9cissement mitral}}",
         "timestamp": 7,
@@ -72,7 +72,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nNouvelle carte. Le bruit auscultatoire de l'insuffisance aortique est bien entendu quand le patient est en position assise.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nNouvelle carte. Le bruit auscultatoire de l'insuffisance aortique est bien entendu quand le patient est en position assise. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "valvulopathie, type si bruit auscultatoire bien entendu en position {{c2::assise}} ?<br/>{{c1::insuffisance aortique}}",
         "timestamp": 8,
@@ -108,7 +108,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nnouvelle carte valvulopathique qui cause une hypertrophie ventriculaire gauche de type diastolique et insuffisance mitrale et insuffisance aortique\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les valvulopathies.\"\n\nTranscript:\n'''\nnouvelle carte valvulopathique qui cause une hypertrophie ventriculaire gauche de type diastolique et insuffisance mitrale et insuffisance aortique. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "valvulopathie, type si hypertrophie ventriculaire gauche de type {{c2::diastolique}} ?<br/>{{c1::insuffisance mitrale <br/>}}{{c1::insuffisance aortique}}",
         "timestamp": 12,
@@ -189,7 +189,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les valvulopathies.\"\n\nTranscript:\n'''\nLe syndrome de Heide, H E Y D E, est une coadulopathie induite par le r\u00e9tr\u00e9cissement aortique dans le cas d'un syndrome de Wilbrand-Hackey qui entra\u00eene des saignements digestifs par enjeux dysplasies. Cela cause donc des an\u00e9mies.\n'''",
+        "content": "Contexte: \"Cours sur les valvulopathies.\"\n\nTranscript:\n'''\nLe syndrome de Heide, H E Y D E, est une coadulopathie induite par le r\u00e9tr\u00e9cissement aortique dans le cas d'un syndrome de Wilbrand-Hackey qui entra\u00eene des saignements digestifs par enjeux dysplasies. Cela cause donc des an\u00e9mies. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "{{c2::syndrome de Heyde}}, c'est quoi ?<br/>{{c1::coagulopathie par retrecissement aortique associ\u00e9 a }}{{c1:: un syndrome de Willebrand acquis, entrainant }}{{c1::des saignements digestifs et donc }}{{c1:une anemie}}",
         "timestamp": 21,
@@ -261,7 +261,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les valvulopathies.\"\n\nTranscript:\n'''\nL'intervention chirurgicale qui permet de conserver la valve aortique lors d'une insuffisance aortique et l'intervention de Tyrone David par l'intervention de Ben Tal consiste \u00e0 remplacer la valve et la horte ascendante.\n'''",
+        "content": "Contexte: \"Cours sur les valvulopathies.\"\n\nTranscript:\n'''\nL'intervention chirurgicale qui permet de conserver la valve aortique lors d'une insuffisance aortique et l'intervention de Tyrone David par l'intervention de Ben Tal consiste \u00e0 remplacer la valve et la horte ascendante. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "intervention chirurgicale pour conserver la valve aortique lors d'une insuffisance aortique ?<br/>{{c1::intervention de Tirone David}}<br/>#####<br/>intervention de {{c2::Bentall}}, en quoi consiste-t-elle ?<br/>{{c1::remplacement de la valve et de l'aorte ascendante}}",
         "timestamp": 29,
@@ -648,7 +648,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les troubles de la conduction cardiaque\"\n\nTranscript:\n'''\nPour un patient atteint de troubles de conduction cardiaque pour cause infectieuse, il faut savoir \u00e9voquer les rhumatismes articulaires aigus si le patient est d'origine d'Europe de l'Est.\n'''",
+        "content": "Contexte: \"Cours sur les troubles de la conduction cardiaque\"\n\nTranscript:\n'''\nPour un patient atteint de troubles de conduction cardiaque pour cause infectieuse, il faut savoir \u00e9voquer les rhumatismes articulaires aigus si le patient est d'origine d'Europe de l'Est. Fait une carte bidirectionnelle.\n'''",
         "disabled": true,
         "answer": "troubles de la conduction cardiaque pour cause infectieuse, qu'\u00e9voquer chez un patient originaire {{c2::d'Europe de l'Est}} ?<br/>{{c1::rhumatismes articulaires aigus}}",
         "timestamp": 72,
@@ -675,7 +675,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les troubles de la conduction cardiaque\"\n\nTranscript:\n'''\nLes contre-indications \u00e0 l'isopr\u00e9naline comme traitement tachycardisant d'une radicardie mal tol\u00e9r\u00e9e sont l'intoxication dig\u00e9t\u00e9nique et les extracistoles ventriculaires et la tachycardie sup\u00e9rieure \u00e0 120 BPM.\n'''",
+        "content": "Contexte: \"Cours sur les troubles de la conduction cardiaque\"\n\nTranscript:\n'''\nLes contre-indications \u00e0 l'isopr\u00e9naline comme traitement tachycardisant d'une radicardie mal tol\u00e9r\u00e9e sont l'intoxication dig\u00e9t\u00e9nique et les extracistoles ventriculaires et la tachycardie sup\u00e9rieure \u00e0 120 BPM. Fait une carte bidirectionnelle.\n'''",
         "disabled": false,
         "answer": "contre-indications a {{c2lll'isoprenaline}} pour une bradycardie mal tol\u00e9r\u00e9e ?<br/>{{c1::intoxication aux digitalique <br/>}}{{c1::extra systoles ventriculaires <br/>}}{{c1::tachycardie > 120 BPM}}",
         "timestamp": 75,
@@ -864,7 +864,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours sur les insuffisances cardiaques\"\n\nTranscript:\n'''\nLa classification de l'insuffisance cardiaque par NYKHA est la suivante. Au stade 1, pas de sympt\u00f4mes, m\u00eame \u00e0 l'effort. Au stade 2, des sympt\u00f4mes qui apparaissent lors des efforts importants. Au stade 3, des sympt\u00f4mes aux efforts mod\u00e9r\u00e9s. Et au stade 4, une limitation importante de l'activit\u00e9 physique. Note \u00e0 Alfred, mon assistant, que je veux que tu fasses 4 cartes, une pour chaque stade.\n'''",
+        "content": "Contexte: \"Cours sur les insuffisances cardiaques\"\n\nTranscript:\n'''\nLa classification de l'insuffisance cardiaque par NYKHA est la suivante. Au stade 1, pas de sympt\u00f4mes, m\u00eame \u00e0 l'effort. Au stade 2, des sympt\u00f4mes qui apparaissent lors des efforts importants. Au stade 3, des sympt\u00f4mes aux efforts mod\u00e9r\u00e9s. Et au stade 4, une limitation importante de l'activit\u00e9 physique. Note \u00e0 Alfred, mon assistant, que je veux que tu fasses 4 cartes bidirectionnelles, une pour chaque stade.\n'''",
         "disabled": false,
         "answer": "Classification de l'insuffisance cardiaque par NYHA, stade {{c2::1}} ?<br/>{{c1::pas de sympt\u00f4mes, m\u00eame \u00e0 l'effort}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::2}} ?<br/>{{c1::sympt\u00f4mes qui apparaissent lors des efforts importants}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::3}} ?<br/>{{c1::sympt\u00f4mes aux efforts mod\u00e9r\u00e9s}}<br/>#####<br/>Classification de l'insuffisance cardiaque par NYHA, stade {{c2::4}} ?<br/>{{c1::limitation importante de l'activit\u00e9 physique}}",
         "timestamp": 96,
@@ -1011,7 +1011,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nUne excoriation d\u00e9signe une l\u00e9sion cutan\u00e9e provoqu\u00e9e par le fait de se caratter ou de s'arracher la peau.\n'''",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nUne excoriation d\u00e9signe une l\u00e9sion cutan\u00e9e provoqu\u00e9e par le fait de se caratter ou de s'arracher la peau. Fait une carte bidirectionnelle.\n'''",
         "timestamp": 1685204651,
         "priority": 5,
         "answer": "Qu'est-ce qu'une {{c2::excoriation}} ?<br/>{{c1::lesion cutan\u00e9e provoqu\u00e9e par le fait de se gratter ou de s'arracher la peau}}",
@@ -1059,7 +1059,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nUn signalement judiciaire est \u00e0 adresser au procureur de la R\u00e9publique par t\u00e9l\u00e9phone puis par mail en urgence avec une copie \u00e0 la cellule de recueil des informations pr\u00e9occupantes si c'est g\u00e9n\u00e9ralis\u00e9.\n'''",
+        "content": "Contexte: \"Cours d'ethique et d'administration medicale\"\n\nTranscript:\n'''\nUn signalement judiciaire est \u00e0 adresser au procureur de la R\u00e9publique par t\u00e9l\u00e9phone puis par mail en urgence avec une copie \u00e0 la cellule de recueil des informations pr\u00e9occupantes si c'est g\u00e9n\u00e9ralis\u00e9. Fait une carte bidirectionnelle.\n'''",
         "timestamp": 1685207179,
         "priority": 6,
         "answer": "Demarche d'un {{c2::signalement judiciaire}} ?<br/>{{c1::par t\u00e9l\u00e9phone au procureur de la R\u00e9publique puis par mail en urgence <br/>}}{{c1::si patient mineur : }}{{c1::rajouter  une copie \u00e0 la cellule de recueil des informations pr\u00e9occupantes (CRIP)}}",
@@ -1227,7 +1227,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nDans un couple, la violence situationnelle correspond \u00e0 des \u00e9pisodes de violence r\u00e9ciproque au sein d'un couple sans tentative de contr\u00f4le. Nouvelle carte, la violence r\u00e9actionnelle correspond \u00e0 la violence en r\u00e9action \u00e0 une agression de la part du partenaire. La violence coercitive correspond \u00e0 une dynamique cyclique o\u00f9 l'auteur a recours \u00e0 une panoplie de strat\u00e9gies.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nDans un couple, la violence situationnelle correspond \u00e0 des \u00e9pisodes de violence r\u00e9ciproque au sein d'un couple sans tentative de contr\u00f4le. Nouvelle carte, la violence r\u00e9actionnelle correspond \u00e0 la violence en r\u00e9action \u00e0 une agression de la part du partenaire. La violence coercitive correspond \u00e0 une dynamique cyclique o\u00f9 l'auteur a recours \u00e0 une panoplie de strat\u00e9gies. Fait plusieurs cartes bidirectionnelles.\n'''",
         "timestamp": 1685357330,
         "priority": 5,
         "answer": "Qu'est-ce que la violence {{c2::situationnelle}} dans un couple ?<br/>{{c1::\u00e9pisodes de violence r\u00e9ciproque sans tentative de contr\u00f4le}}<br/>#####<br/>Qu'est-ce que la violence {{c2::r\u00e9actionnelle}} dans un couple ?<br/>{{c1::violence en r\u00e9action \u00e0 une agression de la part du partenaire}}<br/>#####<br/>Qu'est-ce que la violence {{c2::coercitive}} dans un couple ?<br/>{{c1::dynamique cyclique o\u00f9 l'auteur a recours \u00e0 une panoplie de strat\u00e9gies}}",
@@ -1235,7 +1235,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur la t\u00e9l\u00e9m\u00e9decine\"\n\nTranscript:\n'''\nLa t\u00e9l\u00e9m\u00e9decine et le t\u00e9l\u00e9soin sont regroup\u00e9s dans la t\u00e9l\u00e9santh\u00e9.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la t\u00e9l\u00e9m\u00e9decine\"\n\nTranscript:\n'''\nLa t\u00e9l\u00e9m\u00e9decine et le t\u00e9l\u00e9soin sont regroup\u00e9s dans la t\u00e9l\u00e9santh\u00e9. Fait des cartes bidirectionnelles.\n'''",
         "timestamp": 1685360416,
         "priority": 3,
         "answer": "Qu'est-ce que {{c2::la t\u00e9l\u00e9sant\u00e9}} ?<br/>{{c1::regroupement de la t\u00e9l\u00e9m\u00e9decine et du t\u00e9l\u00e9soin}}",
@@ -1323,7 +1323,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLes mutilations sexuelles f\u00e9minines de type 1 sont la clitoridectomie De type 2 sont l'ablation, clitoris et ses petites l\u00e8vres et \u00e9ventuellement grandes l\u00e8vres De type 3 c'est l'infibulation et de type 4 c'est toute autre technique telle que le percement, l'escalification, la c\u00f4t\u00e9lisation\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLes mutilations sexuelles f\u00e9minines de type 1 sont la clitoridectomie De type 2 sont l'ablation, clitoris et ses petites l\u00e8vres et \u00e9ventuellement grandes l\u00e8vres De type 3 c'est l'infibulation et de type 4 c'est toute autre technique telle que le percement, l'escalification, la c\u00f4t\u00e9lisation. Fait des cartes bidirectionnelles.\n'''",
         "timestamp": 1685366698,
         "priority": 5,
         "answer": "Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 1}} ?<br/>{{c1::la clitoridectomie}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 2}} ?<br/>{{c1::clitoridectomie et atteinte des  petites l\u00e8vres et parfois grandes l\u00e8vres}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 3}} ?<br/>{{c1::l'infibulation}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 4}} ?<br/>{{c1::toute autre technique telle que le percement, la scarification, la cauterisation}}",
@@ -1363,7 +1363,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLa d\u00e9finition d'une faute disciplinaire est un manquement au r\u00e8gle de d\u00e9ontologie m\u00e9dicale.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLa d\u00e9finition d'une faute disciplinaire est un manquement au r\u00e8gle de d\u00e9ontologie m\u00e9dicale. Fait des cartes bidirectionnelles.\n'''",
         "timestamp": 1685369113,
         "priority": 1,
         "answer": "Quelle est la d\u00e9finition {{c2::d'une faute disciplinaire}} ?<br/>{{c1::un manquement aux r\u00e8gles de d\u00e9ontologie m\u00e9dicale}}",
@@ -1467,7 +1467,7 @@
     },
     {
         "role": "user",
-        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLes personnes \u00e9tant en contact fr\u00e9quent avec des murs infest\u00e9s par des rongeurs sont oblig\u00e9es de se vacciner contre la rectospirose. C'est une carte bidirectionnelle.\n'''",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLes personnes \u00e9tant en contact fr\u00e9quent avec des murs infest\u00e9s par des rongeurs sont oblig\u00e9es de se vacciner contre la rectospirose. Fait une carte bidirectionnelle.\n'''",
         "timestamp": 1685380631,
         "priority": 3,
         "answer": "Quelle est l'obligation vaccinale pour les personnes en contact fr\u00e9quent avec des murs infest\u00e9s par {{c2::des rongeurs}} ?<br/>{{c1::vaccination contre la leptospirose}}",
