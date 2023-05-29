@@ -23,7 +23,7 @@ file_handler.setFormatter(log_formatter)
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 log.addHandler(file_handler)
-log_regex = re.compile(" ##.*?## ")
+log_regex = re.compile(" ##.*?##")
 
 
 def coloured_log(color_asked):
