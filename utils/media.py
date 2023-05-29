@@ -103,40 +103,52 @@ def load_next_audio(audio1, audio2, audio3):
     return audio2, audio3, None
 
 
-def save_audio(profile, audio_numpy):
+def save_audio(profile, audio_numpy_1):
     whi("Saving audio from #1 to profile")
     pv = previous_values(profile)
-    pv["audio_numpy"] = audio_numpy
+    pv["audio_numpy_1"] = audio_numpy_1
 
 
-def enhance_audio(audio_numpy):
+def save_audio2(profile, audio_numpy_2):
+    whi("Saving audio from #2 to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy_2"] = audio_numpy_2
+
+
+def save_audio3(profile, audio_numpy_3):
+    whi("Saving audio from #3 to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy_3"] = audio_numpy_3
+
+
+def enhance_audio(audio_numpy_1):
     raise NotImplementedError(
         "Enhancing the audio automatically is not supported for now")
     whi("Cleaning voice")
     try:
         tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="enhance")
-        write(tmp.name, audio_numpy[0], audio_numpy[1])
+        write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
         cleaned = voice_cleaner.enhance_file(tmp.name)
-        torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy[0])
-        enhanced_audio_numpy = read(tmp.name)
+        torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy_1[0])
+        enhanced_audio_numpy_1 = read(tmp.name)
         Path(tmp.name).unlink(missing_ok=False)
 
         whi("Done cleaning audio")
-        return enhanced_audio_numpy
+        return enhanced_audio_numpy_1
 
     except Exception as err:
         red(f"Error when cleaning voice: '{err}'")
         Path(tmp.name).unlink(missing_ok=True)
-        return audio_numpy
+        return audio_numpy_1
 
 
-def remove_silences(audio_numpy):
+def remove_silences(audio_numpy_1):
     whi("Removing silences")
     try:
         # first saving numpy audio to file
-        # note: audio_numpy is a 2-tuple (samplerate, array)
+        # note: audio_numpy_1 is a 2-tuple (samplerate, array)
         tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="unsilence")
-        write(tmp.name, audio_numpy[0], audio_numpy[1])
+        write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
         u = Unsilence(tmp.name)
         u.detect_silence()
 
@@ -147,18 +159,18 @@ def remove_silences(audio_numpy):
         if after / before > 0.9 and before - after < 5:
             whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
             Path(tmp.name).unlink(missing_ok=False)
-            return audio_numpy  # return untouched
+            return audio_numpy_1  # return untouched
 
         yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
         u.render_media(tmp.name, audible_speed=1, silent_speed=2, audio_only=True)
-        unsilenced_audio_numpy = read(tmp.name)
+        unsilenced_audio_numpy_1 = read(tmp.name)
         whi("Done removing silences")
         Path(tmp.name).unlink(missing_ok=False)
-        return unsilenced_audio_numpy
+        return unsilenced_audio_numpy_1
     except Exception as err:
         red(f"Error when removing silences: '{err}'")
         Path(tmp.name).unlink(missing_ok=True)
-        return audio_numpy
+        return audio_numpy_1
 
 
 # load voice cleaning model

@@ -70,6 +70,8 @@ def switch_profile(profile):
                 None,
                 None,
                 None,
+                None,
+                None,
                 ]
 
     profile = profile.lower()
@@ -78,6 +80,8 @@ def switch_profile(profile):
         Path(f"profiles/{profile}").mkdir(exist_ok=False)
         red(f"created {profile}.")
         return [
+                None,
+                None,
                 None,
                 None,
                 None,
@@ -101,7 +105,9 @@ def switch_profile(profile):
             pv["txt_whisp_prompt"],
             pv["txt_whisp_lang"],
             pv["gallery"],
-            pv["audio_numpy"],
+            pv["audio_numpy_1"],
+            pv["audio_numpy_2"],
+            pv["audio_numpy_3"],
             pv["txt_audio"],
             pv["txt_chatgpt_cloz"],
             profile,

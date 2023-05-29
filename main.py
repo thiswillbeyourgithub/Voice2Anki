@@ -14,7 +14,7 @@ from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template
 from utils.logger import red, whi, yel, get_log
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
-from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image, save_audio, load_next_audio
+from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image, save_audio, save_audio2, save_audio3, load_next_audio
 from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
@@ -26,11 +26,11 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 pv = previous_values()
 
-def transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang):
+def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang):
     whi("Transcribing audio")
 
-    if audio_numpy is None:
-        return red("Error: None audio_numpy")
+    if audio_numpy_1 is None:
+        return red("Error: None audio_numpy_1")
 
     if txt_whisp_prompt is None:
         return red("Error: None whisper prompt")
@@ -39,19 +39,19 @@ def transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang):
         return red("Error: None whisper language")
 
     # try to remove silences
-    audio_numpy = remove_silences(audio_numpy)
+    audio_numpy_1 = remove_silences(audio_numpy_1)
 
     # DISABLED: it seems to completely screw up the audio :(
     # try to enhance quality
-    # audio_numpy = enhance_audio(audio_numpy)
+    # audio_numpy_1 = enhance_audio(audio_numpy_1)
 
     # save audio for next startup
-    pv["audio_numpy"] = audio_numpy
+    pv["audio_numpy_1"] = audio_numpy_1
 
     # save audio to temp file
     whi("Saving audio as wav file")
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="transcribe")
-    write(tmp.name, audio_numpy[0], audio_numpy[1])
+    write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
 
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
@@ -159,7 +159,7 @@ def auto_mode(*args, **kwargs):
 
 
 def main(
-        audio_numpy,
+        audio_numpy_1,
         txt_audio,
         txt_whisp_prompt,
         txt_whisp_lang,
@@ -178,7 +178,7 @@ def main(
         mode="one",
         ):
     whi("Entering main")
-    if not (audio_numpy or txt_audio):
+    if not (audio_numpy_1 or txt_audio):
         return [
                 red("No audio in either microphone data or audio file"),
                 txt_audio,
@@ -248,7 +248,7 @@ def main(
     pv["txt_whisp_lang"] = txt_whisp_lang
 
     # manage sound path
-    audio_html = audio_to_anki(audio_numpy)
+    audio_html = audio_to_anki(audio_numpy_1)
     if "Error" in audio_html:  # then out is an error message and not the source
         return [
                 to_return["txt_audio"],
@@ -268,7 +268,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang)
+        txt_audio = transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
@@ -424,7 +424,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     with gr.Row():
         with gr.Column(scale=1):
             rst_audio_btn = gr.Button(value="Clear", variant="secondary")
-            audio_numpy = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_1 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_2 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Next", variant="secondary")
@@ -456,20 +456,22 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
 
     # events
     dark_mode_btn.click(fn=None, _js=darkmode_js)
-    audio_numpy.change(fn=save_audio, inputs=[txt_profile, audio_numpy])
-    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy, txt_audio, txt_chatgpt_cloz, txt_profile])
+    audio_numpy_1.change(fn=save_audio, inputs=[txt_profile, audio_numpy_1])
+    audio_numpy_2.change(fn=save_audio2, inputs=[txt_profile, audio_numpy_3])
+    audio_numpy_3.change(fn=save_audio3, inputs=[txt_profile, audio_numpy_3])
+    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
     chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
-    transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
+    transcript_btn.click(fn=transcribe, inputs=[audio_numpy_1, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
     img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
-    rst_audio_btn.click(fn=reset_audio, inputs=[audio_numpy, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy, audio_numpy_2, audio_numpy_3])
+    rst_audio_btn.click(fn=reset_audio, inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
     rst_img_btn.click(fn=reset_image, outputs=[gallery]).then(fn=get_image, inputs=[gallery], outputs=[gallery])
-    load_audio_btn.click(fn=load_next_audio, inputs=[audio_numpy, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy, audio_numpy_2, audio_numpy_3])
+    load_audio_btn.click(fn=load_next_audio, inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
 
     anki_btn.click(
             fn=main,
             inputs=[
-                audio_numpy,
+                audio_numpy_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
@@ -495,7 +497,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     auto_btn.click(
             fn=auto_mode,
             inputs=[
-                audio_numpy,
+                audio_numpy_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
@@ -523,7 +525,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     semiauto_btn.click(
             fn=semiauto_mode,
             inputs=[
-                audio_numpy,
+                audio_numpy_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
