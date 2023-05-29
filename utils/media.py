@@ -90,9 +90,9 @@ def reset_image():
     return None
 
 
-def reset_audio(audio1, audio2, audio3):
+def reset_audio(audio1, audio2, audio3, audio4, audio5):
     whi("Resetting all audio")
-    return None, None, None
+    return None, None, None, None, None
 
 
 def load_next_audio(audio1, audio2, audio3, audio4, audio5):

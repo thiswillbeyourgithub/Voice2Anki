@@ -518,8 +518,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     # audio
     rst_audio_btn.click(
             fn=reset_audio,
-            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3],
-            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
+            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
+            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5])
     audio_numpy_1.change(fn=save_audio, inputs=[txt_profile, audio_numpy_1])
     load_audio_btn.click(
             fn=load_next_audio,
