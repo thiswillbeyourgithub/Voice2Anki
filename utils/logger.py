@@ -13,7 +13,7 @@ file_handler = handlers.RotatingFileHandler(
         "logs.txt",
         mode='a',
         maxBytes=100000,
-        backupCount=1,
+        backupCount=4,
         encoding=None,
         delay=0,
         )
