@@ -99,8 +99,8 @@ def prompt_filter(prev_prompts, max_token):
                     dis_tkns += pr["tkn_len"]
         whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}'")  # debug
         category_count = len(output_pr)
-    red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
-    yel(f"Number of prompts: '{len(prev_prompts)}'")
+    red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
+    yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
     # make it so that highest priority prompts are last in the discussion
     prev_prompts.reverse()
