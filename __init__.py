@@ -1,6 +1,8 @@
-from utils.logger import whi, yel
 import sys
+from pathlib import Path
+
 from main import demo
+from utils.logger import whi, yel
 
 if __name__ == "__main__":
     whi(f"Starting WhisperToAnki\n")
@@ -12,6 +14,13 @@ if __name__ == "__main__":
     debug = False
     auth_args = {"auth": ("g", "g"), "auth_message": "Please login using g/g"}
     server = None
+
+    wavfiles = [p for p in Path(".").iterdir() if str(p).endswith(".wav")]
+    if wavfiles:
+        ans = input(whi(f"Found {len(wavfiles)} .wav files in root folder. Can I delete them? (y/n)\n>"))
+        if ans == "y":
+            whi("Deleting wav files")
+            [p.unlink() for p in wavfiles]
 
     if args:
         whi(f"Startup arguments: {args}")
