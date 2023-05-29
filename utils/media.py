@@ -174,7 +174,7 @@ def remove_silences(audio_numpy_1):
             return audio_numpy_1  # return untouched
 
         if after > 30:
-            silence_speed += 2
+            silence_speed += 1
             if after > 60:
                 silence_speed += 3
                 whi(f"Removing silence: longer than 60s detected so speeding up even more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
