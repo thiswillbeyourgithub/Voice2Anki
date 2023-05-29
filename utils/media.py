@@ -97,21 +97,7 @@ def reset_audio(audio1, audio2, audio3):
 
 def load_next_audio(audio1, audio2, audio3, audio4, audio5):
     whi("Rolling over audio samples")
-    if audio1 is None:
-        whi("Cannot load next audio if audio #1 is None")
-        return audio1, audio2, audio3, audio4, audio5
-    audio1 = audio2
-    audio2 = audio3
-    audio3 = audio4
-    audio4 = audio5
-    audio5 = None
-    while audio1 is None and not (audio2 is None and audio3 is None and audio4 is None and audio5 is None):
-        audio1 = audio2
-        audio2 = audio3
-        audio3 = audio4
-        audio4 = audio5
-        audio5 = None
-    return audio1, audio2, audio3, audio4, audio5
+    return audio2, audio3, audio4, audio5, None
 
 
 def save_audio(profile, audio_numpy_1):
