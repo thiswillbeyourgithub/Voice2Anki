@@ -466,7 +466,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     transcript_btn.click(fn=transcribe, inputs=[audio_numpy, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
     img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
     rst_audio_btn.click(fn=reset_audio, outputs=[audio_numpy])
-    rst_img_btn.click(fn=reset_image, outputs=[gallery])
+    rst_img_btn.click(fn=reset_image, outputs=[gallery]).then(fn=get_image, inputs=[gallery], outputs=[gallery])
 
     anki_btn.click(
             fn=main,
