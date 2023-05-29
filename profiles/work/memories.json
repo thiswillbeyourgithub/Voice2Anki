@@ -1464,5 +1464,37 @@
         "priority": 3,
         "answer": "Particularit\u00e9 d'administration du vaccin contre le rotavirus ?<br/>{{c1::vaccin oral}}<br/>#####<br/>Chez qui est-il recommand\u00e9 de proposer le vaccin contre le rotavirus ?<br/>{{c1::enfants pr\u00e9matur\u00e9s}}<br/>#####<br/>Quel est le risque potentiel du vaccin contre le rotavirus ?<br/>{{c1::risque d'invagination intestinale aigu\u00eb}}",
         "tkn_len": 202
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLes personnes \u00e9tant en contact fr\u00e9quent avec des murs infest\u00e9s par des rongeurs sont oblig\u00e9es de se vacciner contre la rectospirose. C'est une carte bidirectionnelle.\n'''",
+        "timestamp": 1685380631,
+        "priority": 3,
+        "answer": "Quelle est l'obligation vaccinale pour les personnes en contact fr\u00e9quent avec des murs infest\u00e9s par {{c2::des rongeurs}} ?<br/>{{c1::vaccination contre la leptospirose}}",
+        "tkn_len": 117
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nEst-ce que le carnet de vaccination \u00e9lectronique est int\u00e9gr\u00e9 dans les dossiers m\u00e9dical personnel \u00e9lectronique? La r\u00e9ponse est pas encore laiss\u00e9e pr\u00e9vue.\n'''",
+        "timestamp": 1685380858,
+        "priority": 1,
+        "answer": "Le carnet de vaccination \u00e9lectronique est-il int\u00e9gr\u00e9 dans les dossiers m\u00e9dicaux personnels \u00e9lectroniques ?<br/>{{c1::pas encore mais c'est pr\u00e9vu}}",
+        "tkn_len": 98
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nLes applications num\u00e9riques utilis\u00e9es en sant\u00e9 sont classifi\u00e9es par la Haute Autorit\u00e9 de Sant\u00e9. La carte est cat\u00e9goris\u00e9e en niveaux A, B, C et D.\n'''",
+        "timestamp": 1685381172,
+        "priority": 1,
+        "answer": "Par qui sont classifi\u00e9es les applications num\u00e9riques utilis\u00e9es en sant\u00e9 ?<br/>{{c1::par la Haute Autorit\u00e9 de Sant\u00e9}}<br/>#####<br/>Comment sont cat\u00e9goris\u00e9s  les applications num\u00e9riques en sant\u00e9 ?<br/>{{c1::en niveaux A, B, C et D}}",
+        "tkn_len": 134
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le num\u00e9rique\"\n\nTranscript:\n'''\nLa cat\u00e9gorisation de la HAS des applications num\u00e9riques en sant\u00e9 Consid\u00e8re que le dossier m\u00e9dical partag\u00e9 fait partie du niveau A Qu'un moniteur de glucose fait partie du niveau D Qu'un d\u00e9fibrillateur cardiaque fait partie du niveau D Qu'une application du haut description pour les non-voyants fait partie du niveau C Fais une carte par exemple s'il te pla\u00eet\n'''",
+        "timestamp": 1685381210,
+        "priority": 1,
+        "answer": "Quel est le niveau de cat\u00e9gorisation de la HAS pour le dossier m\u00e9dical partag\u00e9 ?<br/>{{c1::niveau A}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour un moniteur de glucose ?<br/>{{c1::niveau D}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour un d\u00e9fibrillateur cardiaque ?<br/>{{c1::niveau D}}<br/>#####<br/>Quel est le niveau de cat\u00e9gorisation de la HAS pour une application d'audio description pour les non-voyants ?<br/>{{c1::niveau C}}",
+        "tkn_len": 257
     }
 ]
