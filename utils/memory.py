@@ -72,6 +72,7 @@ def prompt_filter(prev_prompts, max_token):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
+    whi("Filtering prompts")
 
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 3500, "max_token should be under 3500"
@@ -85,6 +86,7 @@ def prompt_filter(prev_prompts, max_token):
     tkns = syspr[0]["tkn_len"]
     dis_tkns = 0
     output_pr = [syspr[0]]
+    category_count = 0
     for prio in prio_vals:
         for pr in timesorted_pr:
             if pr in output_pr:
@@ -95,7 +97,8 @@ def prompt_filter(prev_prompts, max_token):
                     output_pr.append(pr)
                 else:
                     dis_tkns += pr["tkn_len"]
-        # whi(f"Keeping {len(output_pr)} with priority >= {prio}")  # debug
+        whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}'")  # debug
+        category_count = len(output_pr)
     red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
     yel(f"Number of prompts: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
