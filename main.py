@@ -402,8 +402,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=1):
-                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=3, rows=1, object_fit="scale-down", height="auto", container=True)
-                rst_img_btn = gr.Button(value="Clear", variant="secondary").style(size="sm")
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[2], rows=[1], object_fit="scale-down", height="auto", container=True)
+                rst_img_btn = gr.Button(value="Clear then add", variant="secondary").style(size="sm")
                 img_btn = gr.Button(value="Add image from clipboard", variant="primary").style(size="sm")
             with gr.Column(scale=2):
                 with gr.Row():
@@ -455,19 +455,62 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=0.3, interactive=False)
 
     # events
+    # darkmode
     dark_mode_btn.click(fn=None, _js=darkmode_js)
+
+    # change profile and load previous data
+    txt_profile.submit(
+            fn=switch_profile,
+            inputs=[txt_profile],
+            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_profile.blur(
+            fn=switch_profile,
+            inputs=[txt_profile],
+            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
+
+    # image
+    img_btn.click(
+            fn=get_image,
+            inputs=[gallery],
+            outputs=[gallery])
+    rst_img_btn.click(
+            fn=reset_image,
+            outputs=[gallery]
+            ).then(
+                    fn=get_image,
+                    inputs=[gallery],
+                    outputs=[gallery])
+
+    # audio
+    rst_audio_btn.click(
+            fn=reset_audio,
+            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3],
+            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
     audio_numpy_1.change(fn=save_audio, inputs=[txt_profile, audio_numpy_1])
     audio_numpy_2.change(fn=save_audio2, inputs=[txt_profile, audio_numpy_3])
     audio_numpy_3.change(fn=save_audio3, inputs=[txt_profile, audio_numpy_3])
-    txt_profile.submit(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_profile.blur(fn=switch_profile, inputs=[txt_profile], outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, audio_numpy_2, audio_numpy_3, txt_audio, txt_chatgpt_cloz, txt_profile])
-    chatgpt_btn.click(fn=alfred, inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp], outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
-    transcript_btn.click(fn=transcribe, inputs=[audio_numpy_1, txt_whisp_prompt, txt_whisp_lang], outputs=[txt_audio])
-    img_btn.click(fn=get_image, inputs=[gallery], outputs=[gallery])
-    rst_audio_btn.click(fn=reset_audio, inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
-    rst_img_btn.click(fn=reset_image, outputs=[gallery]).then(fn=get_image, inputs=[gallery], outputs=[gallery])
-    load_audio_btn.click(fn=load_next_audio, inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3], outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3])
+    load_audio_btn.click(
+            fn=load_next_audio,
+            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3],
+            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3]
+            ).then(
+                    fn=semiauto_btn,
+                    inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
 
+    # send to whisper
+    transcript_btn.click(
+            fn=transcribe,
+            inputs=[audio_numpy_1, txt_whisp_prompt, txt_whisp_lang],
+            outputs=[txt_audio])
+
+    # send to chatgpt
+    chatgpt_btn.click(
+            fn=alfred,
+            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+            outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
+
+    # send to anki
     anki_btn.click(
             fn=main,
             inputs=[
@@ -494,34 +537,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_chatgpt_cloz,
                 ],
             )
-    auto_btn.click(
-            fn=auto_mode,
-            inputs=[
-                audio_numpy_1,
-                txt_audio,
-                txt_whisp_prompt,
-                txt_whisp_lang,
 
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-
-                txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
-
-                gallery,
-                txt_profile,
-                sld_max_tkn,
-                sld_temp,
-                ],
-            outputs=[
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ],
-            # batch=True,  # TODO: enable batching when you figure out how to convert all to iterables
-            # max_batch_size=10,
-            )
+    # 1+2
     semiauto_btn.click(
             fn=semiauto_mode,
             inputs=[
@@ -548,6 +565,35 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_chatgpt_cloz,
                 ],
             )
+
+    # 1+2+3
+    auto_btn.click(
+            fn=auto_mode,
+            inputs=[
+                audio_numpy_1,
+                txt_audio,
+                txt_whisp_prompt,
+                txt_whisp_lang,
+
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+
+                txt_chatgpt_context,
+                txt_deck,
+                txt_tags,
+
+                gallery,
+                txt_profile,
+                sld_max_tkn,
+                sld_temp,
+                ],
+            outputs=[
+                txt_audio,
+                txt_chatgpt_tkncost,
+                txt_chatgpt_cloz,
+                ],
+            )
+
     improve_btn.click(
             fn=recur_improv,
             inputs=[
