@@ -16,4 +16,5 @@
 ## Notes
     * The ssl used is self signed, you'll likely have to tick a few checkbox on your browser to access the site.
     * It's apparently way less CPU intensive to use Chromium than to use firefox according to my limited testing with a heavily modified firefox.
+    * tips: if you want to quickly have high quality card, add the end of the recording mention notes to alfred like "Note à Alfred: fait 3 cartes sur cette notion" or "Note à Alfred: fait une carte de liste". Then simply manually delete from the transcript that you guided Alfred and save the prompt as a good example of Alfred doing what you wanted.
 
