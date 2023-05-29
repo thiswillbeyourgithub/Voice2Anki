@@ -89,7 +89,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         return "No txt_chatgpt_context found.", None
 
     prev_prompts = load_prev_prompts(profile)
-    prev_prompts = prompt_filter(prev_prompts, max_token)
+    prev_prompts = prompt_filter(prev_prompts, max_token, temperature)
 
     # check the number of token is fine and format the previous
     # prompts in chatgpt format

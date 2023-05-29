@@ -1,3 +1,4 @@
+import random
 import time
 from pathlib import Path
 from textwrap import dedent
@@ -68,11 +69,23 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def prompt_filter(prev_prompts, max_token):
+def prompt_filter(prev_prompts, max_token, temperature):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
     whi("Filtering prompts")
+
+    if temperature != 0:
+        whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
+
+    def stocha():
+        if temperature == 0:
+            return True
+        if random.random() >= min(temperature / 3, 0.33):
+            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
+            # no worse if temperature is higher than 1
+            return True
+        return False
 
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 3500, "max_token should be under 3500"
@@ -92,7 +105,7 @@ def prompt_filter(prev_prompts, max_token):
             if pr in output_pr:
                 continue
             if pr["priority"] == prio:
-                if not tkns + pr["tkn_len"] > max_token:
+                if not tkns + pr["tkn_len"] > max_token and stocha():
                     tkns += pr["tkn_len"]
                     output_pr.append(pr)
                 else:
