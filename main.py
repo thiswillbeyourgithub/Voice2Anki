@@ -143,10 +143,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         tkn_cost = response["usage"]["total_tokens"]
 
         reason = response["choices"][0]["finish_reason"]
-        if reason != "stop":
-            red(f"ChatGPT's reason to strop was not 'stop', retrying with {max_token-500} tokens")
-            return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature)
-
+        if reason.lower() != "stop":
+            red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         return cloz, tkn_cost
     except Exception as err:
