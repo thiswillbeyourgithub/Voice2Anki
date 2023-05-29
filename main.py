@@ -118,7 +118,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                 "content": dedent(
                     transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio))})
     tkns += len(tokenize(formatted_messages[-1]["content"]))
-    yel(f"Number of messages in ChatGPT prompt: {len(formatted_messages)} (tokens: {tkns})")
+    yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
     assert tkns <= 4000, f"Too many tokens! ({tkns})"
     try:
