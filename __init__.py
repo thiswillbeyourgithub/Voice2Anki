@@ -17,7 +17,8 @@ if __name__ == "__main__":
 
     wavfiles = [p for p in Path(".").iterdir() if str(p).endswith(".wav")]
     if wavfiles:
-        ans = input(whi(f"Found {len(wavfiles)} .wav files in root folder. Can I delete them? (y/n)\n>"))
+        whi(f"Found {len(wavfiles)} .wav files in root folder. Can I delete them? (y/n)")
+        ans = input(">")
         if ans == "y":
             whi("Deleting wav files")
             [p.unlink() for p in wavfiles]
