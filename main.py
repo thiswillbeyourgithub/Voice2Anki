@@ -373,10 +373,9 @@ def main(
                 to_add = []
                 # remove newlines
                 for new in [cl, txt_source, metadata, new_tags, txt_deck]:
-                    try:
+                    if isinstance(new, (list, set)):
                         new = ";".join(new)
-                    except Exception:
-                        pass
+                    new = str(new)
                     new = new.replace(",", r"\,").replace("\n", "\\n")
                     to_add.append(new)
                 file.writerow(to_add)
