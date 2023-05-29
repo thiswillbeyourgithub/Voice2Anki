@@ -312,7 +312,8 @@ def main(
                 ]
 
     # add cloze to output
-    red(f">>>> ChatGPT {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}):\n{txt_chatgpt_cloz}")
+    red(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f})")
+    red(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
 
     # send to anki
     metadata = {
