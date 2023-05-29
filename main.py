@@ -323,7 +323,6 @@ def main(
             "chatgpt_dollars_cost": tkn_cost_dol,
             }
     results = []
-    red(">>>> To anki:\n")
 
     if mode == "semiauto":
         yel("Semiauto mode: stopping just before uploading to anki")
@@ -333,6 +332,7 @@ def main(
                 to_return["txt_chatgpt_cloz"],
                 ]
 
+    red("Sending to anki:")
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
     if "<img" not in txt_source:
