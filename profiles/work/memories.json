@@ -1448,5 +1448,21 @@
         "priority": 1,
         "answer": "La s\u00e9roth\u00e9rapie est-elle consid\u00e9r\u00e9e comme un type de vaccination ?<br/>{{c1::non}}",
         "tkn_len": 68
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLes vaccins recommand\u00e9s \u00e0 partir de l'\u00e2ge de 65 ans sont la grippe, le zona ou le pneumococci. Si on est en contact avec des nourrissons, la coqueluche fait une liste.\n'''",
+        "timestamp": 1685379435,
+        "priority": 5,
+        "answer": "Quels sont les vaccins recommand\u00e9s \u00e0 partir de l'\u00e2ge de 65 ans ?<br/>{{c1::grippe <br/>}}{{c1::zona <br/>}}{{c1::pneumocoque <br/>}}{{c1::si contact avec nourrissons : }}{{c1::coqueluche}}<br/>#####<br/>Quel vaccin est recommand\u00e9 apres 65 ans si on est en contact avec des nourrissons ?<br/>{{c1::la coqueluche}}",
+        "tkn_len": 185
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLe vaccin contre le rotavirus a comme particularit\u00e9 d'\u00eatre sous forme orale et il est recommand\u00e9 et il est propos\u00e9 uniquement chez les enfants pr\u00e9matur\u00e9s mais porte peut-\u00eatre un risque d'invagination intestinale aigu\u00eb. C'est un vaccin qui fait 3 cartes si je ne me trompe pas.\n'''",
+        "timestamp": 1685379968,
+        "priority": 3,
+        "answer": "Particularit\u00e9 d'administration du vaccin contre le rotavirus ?<br/>{{c1::vaccin oral}}<br/>#####<br/>Chez qui est-il recommand\u00e9 de proposer le vaccin contre le rotavirus ?<br/>{{c1::enfants pr\u00e9matur\u00e9s}}<br/>#####<br/>Quel est le risque potentiel du vaccin contre le rotavirus ?<br/>{{c1::risque d'invagination intestinale aigu\u00eb}}",
+        "tkn_len": 202
     }
 ]
