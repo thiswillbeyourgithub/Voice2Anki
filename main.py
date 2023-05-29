@@ -494,7 +494,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3],
             outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3]
             ).then(
-                    fn=semiauto_btn,
+                    fn=semiauto_mode,
                     inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
 
