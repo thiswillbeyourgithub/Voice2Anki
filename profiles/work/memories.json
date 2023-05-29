@@ -1200,5 +1200,53 @@
         "priority": 3,
         "answer": "Quels sont les deux types d'autopsies ?<br/>{{c1::autopsie m\u00e9dico-l\u00e9gale et autopsie m\u00e9dicale}}<br/>#####<br/>Qui doit demander l'autopsie dans le cadre de l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::un magistrat}}<br/>#####<br/>Qui doit demander l'autopsie dans le cadre de l'autopsie m\u00e9dicale ?<br/>{{c1::un m\u00e9decin}}<br/>#####<br/>Quel est le but de l'autopsie m\u00e9dicale ?<br/>{{c1::comprendre la cause du d\u00e9c\u00e8s}}<br/>#####<br/>Quel est le but de l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::rechercher la cause de la mort pour chercher l'intervention d'un tiers}}<br/>#####<br/>Quel est le Code qui r\u00e9git l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::le Code de proc\u00e9dures p\u00e9nales}}<br/>#####<br/>Quel est le Code qui r\u00e9git l'autopsie m\u00e9dicale ?<br/>{{c1::le Code de la sant\u00e9 publique}}<br/>#####<br/>La famille peut-elle s'opposer \u00e0 l'autopsie m\u00e9dico-l\u00e9gale ?<br/>{{c1::non}}<br/>#####<br/>Pour s'opposer \u00e0 l'autopsie m\u00e9dicale, que doit-il se passer ?<br/>{{c1::soit la famille s'y oppose, soit le vivant s'est inscrit au registre national des refus}}",
         "tkn_len": 668
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nLes derni\u00e8res donn\u00e9es \u00e9pid\u00e9miologiques mondiales sur la pr\u00e9valence des violences est issue d'un rapport de l'OMS datant de 2002.\n'''",
+        "timestamp": 1685356550,
+        "priority": 7,
+        "answer": "Source des derni\u00e8res donn\u00e9es \u00e9pid\u00e9miologiques sur la pr\u00e9valence des violences ?<br/>{{c1::rapport de l'OMS datant de }}{{c1::2002}}",
+        "tkn_len": 104
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nLe plus souvent, les victimes et les coupables de violences scolaires sont des gar\u00e7ons.\n'''",
+        "timestamp": 1685356650,
+        "priority": 3,
+        "answer": "Les victimes et les coupables de violences scolaires sont-ils majoritairement des gar\u00e7ons ?<br/>{{c1::oui, le plus souvent}}",
+        "tkn_len": 81
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nLa proportion des enfants \u00e0 se d\u00e9clarer victimes de violences physiques de mani\u00e8re durable dans l'enfance ou l'adolescence, selon l'Observatoire National de Protection de l'Enfance, est de 1 sur 10. La proportion victimes de violences sexuelles est de 1 sur 100. Seulement 10 % auraient \u00e9t\u00e9 pris en charge par les services de protection de l'enfance.\n'''",
+        "timestamp": 1685357053,
+        "priority": 5,
+        "answer": "Proportion des enfants victimes de violences physiques de mani\u00e8re durable dans l'enfance ou l'adolescence selon l'Observatoire National de Protection de l'Enfance ?<br/>{{c1::1 sur 10}}<br/>#####<br/>Proportion des enfants victimes de violences sexuelles selon l'Observatoire National de Protection de l'Enfance ?<br/>{{c1::1 sur 100}}<br/>#####<br/>Quel est le pourcentage d'enfants victimes de violences ayant \u00e9t\u00e9 pris en charge par les services de protection de l'enfance ?<br/>{{c1::10 %}}",
+        "tkn_len": 260
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la violence en sant\u00e9\"\n\nTranscript:\n'''\nDans un couple, la violence situationnelle correspond \u00e0 des \u00e9pisodes de violence r\u00e9ciproque au sein d'un couple sans tentative de contr\u00f4le. Nouvelle carte, la violence r\u00e9actionnelle correspond \u00e0 la violence en r\u00e9action \u00e0 une agression de la part du partenaire. La violence coercitive correspond \u00e0 une dynamique cyclique o\u00f9 l'auteur a recours \u00e0 une panoplie de strat\u00e9gies.\n'''",
+        "timestamp": 1685357330,
+        "priority": 5,
+        "answer": "Qu'est-ce que la violence {{c2::situationnelle}} dans un couple ?<br/>{{c1::\u00e9pisodes de violence r\u00e9ciproque sans tentative de contr\u00f4le}}<br/>#####<br/>Qu'est-ce que la violence {{c2::r\u00e9actionnelle}} dans un couple ?<br/>{{c1::violence en r\u00e9action \u00e0 une agression de la part du partenaire}}<br/>#####<br/>Qu'est-ce que la violence {{c2::coercitive}} dans un couple ?<br/>{{c1::dynamique cyclique o\u00f9 l'auteur a recours \u00e0 une panoplie de strat\u00e9gies}}",
+        "tkn_len": 248
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la t\u00e9l\u00e9m\u00e9decine\"\n\nTranscript:\n'''\nLa t\u00e9l\u00e9m\u00e9decine et le t\u00e9l\u00e9soin sont regroup\u00e9s dans la t\u00e9l\u00e9santh\u00e9.\n'''",
+        "timestamp": 1685360416,
+        "priority": 3,
+        "answer": "Qu'est-ce que {{c2::la t\u00e9l\u00e9sant\u00e9}} ?<br/>{{c1::regroupement de la t\u00e9l\u00e9m\u00e9decine et du t\u00e9l\u00e9soin}}",
+        "tkn_len": 88
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la t\u00e9l\u00e9m\u00e9decine\"\n\nTranscript:\n'''\nconcernant la t\u00e9l\u00e9m\u00e9decine, la t\u00e9l\u00e9consultation assist\u00e9e est consid\u00e9r\u00e9e comme un type de t\u00e9l\u00e9consultation.\n'''",
+        "timestamp": 1685360726,
+        "priority": 3,
+        "answer": "La t\u00e9l\u00e9consultation <b>assist\u00e9e</b> est-elle consid\u00e9r\u00e9e comme un type de t\u00e9l\u00e9consultation en t\u00e9l\u00e9m\u00e9decine ?<br/>{{c1::oui}}",
+        "tkn_len": 95
     }
 ]
