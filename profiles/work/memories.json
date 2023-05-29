@@ -1248,5 +1248,13 @@
         "priority": 3,
         "answer": "La t\u00e9l\u00e9consultation <b>assist\u00e9e</b> est-elle consid\u00e9r\u00e9e comme un type de t\u00e9l\u00e9consultation en t\u00e9l\u00e9m\u00e9decine ?<br/>{{c1::oui}}",
         "tkn_len": 95
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la t\u00e9l\u00e9m\u00e9decine\"\n\nTranscript:\n'''\nLe syst\u00e8me MS sant\u00e9, pour messagerie s\u00e9curis\u00e9e de sant\u00e9, permet d'\u00e9changer \u00e0 la fois des messages et des documents entre professionnels de sant\u00e9, professionnels m\u00e9dico-social et social. Et cela en toute s\u00e9curit\u00e9.\n'''",
+        "timestamp": 1685362907,
+        "priority": 5,
+        "answer": "Que peut on echanger via le syst\u00e8me MS sant\u00e9 ?<br/>{{c1::MSSant\u00e9 permet l'\u00e9change de messages et de documents}}<br/>#####<br/>Qui peut utiliser le syst\u00e8me MS sant\u00e9 ?<br/>{{c1::les professionnels de sant\u00e9, professionnels m\u00e9dico-social et social}}<br/>#####<br/>Le syst\u00e8me MS sant\u00e9 permet-il un \u00e9change de donn\u00e9es s\u00e9curis\u00e9 ?<br/>{{c1::oui}}",
+        "tkn_len": 169
     }
 ]

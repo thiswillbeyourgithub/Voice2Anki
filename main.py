@@ -178,9 +178,9 @@ def main(
         mode="one",
         ):
     whi("Entering main")
-    if not (audio_numpy_1 or txt_audio):
+    if not (audio_numpy_1):
         return [
-                red("No audio in either microphone data or audio file"),
+                red("None audio in microphone #1"),
                 txt_audio,
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
