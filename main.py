@@ -1,3 +1,4 @@
+import csv
 import cv2
 import tempfile
 from scipy.io.wavfile import write
@@ -311,12 +312,13 @@ def main(
     red(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
 
     # send to anki
-    metadata = {
+    metadata = rtoml.dumps(
+            {
             "author": "WhisperToAnki",
             "transcripted_text": txt_audio,
             "chatgpt_tkn_cost": txt_chatgpt_tkncost,
             "chatgpt_dollars_cost": tkn_cost_dol,
-            }
+            }, pretty=True)
     results = []
 
     if mode == "semiauto":
@@ -328,6 +330,20 @@ def main(
                 ]
 
     red("Sending to anki:")
+
+    # if not found or empty: create csv file in profile containing the header
+    try:
+        if (not Path(f'./profiles/{profile}/sent_to_anki.csv').exists()
+                ) or not (
+                        Path(f'./profiles/{profile}/sent_to_anki.csv').read_text().strip()
+                        ):
+            yel(f"Creating sent_to_anki.csv file in profiles/{profile}")
+            with open(f'./profiles/{profile}/sent_to_anki.csv', 'w', newline='') as csvfile:
+                file = csv.writer(csvfile, delimiter=",")
+                file.writerow("body,source,GPToAnkiMetadata,tags,deck".split(","))
+    except Exception as err:
+        red(f"Error when creating csv file: '{err}'")
+
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
     if "<img" not in txt_source:
@@ -343,12 +359,21 @@ def main(
                 add_to_anki(
                     body=cl,
                     source=txt_source,
-                    note_metadata=rtoml.dumps(metadata, pretty=True),
+                    note_metadata=metadata,
                     tags=new_tags,
                     deck_name=txt_deck,
                 )
                 )
         whi(f"* {cl}")
+
+        # add to csv file
+        try:
+            with open(f'./profiles/{profile}/sent_to_anki.csv', 'a', newline='') as csvfile:
+                file = csv.writer(csvfile, delimiter=",")
+                file.writerow([cl, txt_source, metadata, new_tags, txt_deck])
+        except Exception as err:
+            red(f"Error when appending cloze csv file: '{err}'")
+
     results = [str(r) for r in results if str(r).isdigit()]
 
     # trigger anki sync
