@@ -140,12 +140,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
 
+        tkn_cost = response["usage"]["total_tokens"]
+
         reason = response["choices"][0]["finish_reason"]
-        if reason == "stop":
+        if reason != "stop":
             red(f"ChatGPT's reason to strop was not 'stop', retrying with {max_token-500} tokens")
             return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature)
 
-        tkn_cost = response["usage"]["total_tokens"]
 
         return cloz, tkn_cost
     except Exception as err:
