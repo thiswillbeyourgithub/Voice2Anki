@@ -461,7 +461,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_4 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_5 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
-            load_audio_btn = gr.Button(value="Next", variant="secondary")
+            load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10)
             txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="LLM cloze(s)", lines=5, max_lines=10)
