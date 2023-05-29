@@ -100,7 +100,18 @@ def load_next_audio(audio1, audio2, audio3, audio4, audio5):
     if audio1 is None:
         whi("Cannot load next audio if audio #1 is None")
         return audio1, audio2, audio3, audio4, audio5
-    return audio2, audio3, audio4, audio5, None
+    audio1 = audio2
+    audio2 = audio3
+    audio3 = audio4
+    audio4 = audio5
+    audio5 = None
+    while audio1 is None:
+        audio1 = audio2
+        audio2 = audio3
+        audio3 = audio4
+        audio4 = audio5
+        audio5 = None
+    return audio1, audio2, audio3, audio4, audio5
 
 
 def save_audio(profile, audio_numpy_1):
