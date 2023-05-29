@@ -32,7 +32,7 @@ class previous_values:
             if key == "max_tkn":
                 return 3500
             if key == "temperature":
-                return 0.5
+                return 0
             if key == "txt_whisp_lang":
                 return "fr"
             return None
