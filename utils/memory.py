@@ -39,7 +39,9 @@ def check_prompts(prev_prompts):
             mess["priority"] = 0
             if "importance" in mess:  # backward compatibility
                 mess["priority"] = mess["importance"]
-        assert isinstance(mess["priority"], (float, int)), f"priority is not number! '{mess['priority']}'"
+        if isinstance(mess["priority"], float):
+            mess["priority"] = int(mess["priority"])
+        assert isinstance(mess["priority"], int), f"priority is not int! '{mess['priority']}'"
         assert mess["priority"] <= 10, "priority above 10 !"
         assert mess["priority"] >= 0, "priority under 0 !"
 
@@ -93,7 +95,7 @@ def prompt_filter(prev_prompts, max_token):
                     output_pr.append(pr)
                 else:
                     dis_tkns += pr["tkn_len"]
-        whi(f"Keeping {len(output_pr)} with priority >= {prio}")
+        # whi(f"Keeping {len(output_pr)} with priority >= {prio}")  # debug
     red(f"Nondisabled token count : {tkns} (total: {tkns + dis_tkns})")
     yel(f"Number of prompts: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
