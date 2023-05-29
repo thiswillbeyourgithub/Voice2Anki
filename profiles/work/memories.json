@@ -1256,5 +1256,197 @@
         "priority": 5,
         "answer": "Que peut on echanger via le syst\u00e8me MS sant\u00e9 ?<br/>{{c1::MSSant\u00e9 permet l'\u00e9change de messages et de documents}}<br/>#####<br/>Qui peut utiliser le syst\u00e8me MS sant\u00e9 ?<br/>{{c1::les professionnels de sant\u00e9, professionnels m\u00e9dico-social et social}}<br/>#####<br/>Le syst\u00e8me MS sant\u00e9 permet-il un \u00e9change de donn\u00e9es s\u00e9curis\u00e9 ?<br/>{{c1::oui}}",
         "tkn_len": 169
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLes crit\u00e8res pour l'encontre sont l'accord explicite, libre, \u00e9clair\u00e9 et mutuel.\n'''",
+        "timestamp": 1685363141,
+        "priority": 3,
+        "answer": "Crit\u00e8res pour l'encontre ?<br/>{{c1::accord explicite <br/>}}{{c1::libre <br/>}}{{c1::\u00e9clair\u00e9 <br/>}}{{c1::mutuel}}",
+        "tkn_len": 92
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nun commentaire peut \u00eatre consid\u00e9r\u00e9 comme une violence sexuelle.\n'''",
+        "timestamp": 1685363348,
+        "priority": 3,
+        "answer": "Est-ce qu'un commentaire peut \u00eatre consid\u00e9r\u00e9 comme une forme de violence sexuelle ?<br/> {{c1::oui}}",
+        "tkn_len": 60
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLa majeure partie des agressions sexuelles ne sont pas commises par la famille des proches, mais dans les espaces publics.\n'''",
+        "timestamp": 1685363994,
+        "priority": 3,
+        "answer": "Dans quelles circonstances sont principalement commises les agressions sexuelles ?<br/>{{c1::dans les espaces publics}}<br/>#####<br/>Les agressions sexuelles sont-elles principalement commises par la famille ou les proches ?<br/>{{c1::non}}",
+        "tkn_len": 123
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLe d\u00e9lai de prescription des contraventions est de 1 an, des d\u00e9lits est de 6 ans, des crimes est de 20 \u00e0 30 ans selon le crime.\n'''",
+        "timestamp": 1685364657,
+        "priority": 4,
+        "answer": "Quel est le d\u00e9lai de prescription des contraventions ?<br/>{{c1::1 an}}<br/>#####<br/>Quel est le d\u00e9lai de prescription des d\u00e9lits ?<br/>{{c1::6 ans}}<br/>#####<br/>Quel est le d\u00e9lai de prescription des crimes ?<br/>{{c1::20 \u00e0 30 ans selon le crime}}",
+        "tkn_len": 152
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nConcernant les violences sexuelles, est-ce que le fait que l'auteur soit le conjoint est une condition aggravante? La r\u00e9ponse est oui. Pareil pour \u00eatre une personne en \u00e9tat d'ivresse et pareil pour une personne, si les victimes sont une personne se livrant \u00e0 la prostitution.\n'''",
+        "timestamp": 1685364701,
+        "priority": 5,
+        "answer": "Est-ce que le fait que l'auteur des violences sexuelles soit le conjoint est une condition aggravante ?<br/>{{c1::oui}}<br/>#####<br/>Est-ce que le fait que l'auteur des violences sexuelles soit en \u00e9tat d'ivresse est une condition aggravante ?<br/>{{c1::oui}}<br/>#####<br/>Est-ce que le fait que les victimes des violences sexuelles soient des personnes se livrant \u00e0 la prostitution est une condition aggravante ?<br/>{{c1::oui}}",
+        "tkn_len": 211
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nConcernant la gestion d'une agression sexuelle par un m\u00e9decin, on doit syst\u00e9matiquement r\u00e9aliser un certificat m\u00e9dical et on doit le rendre victime, sauf si l'examen fait l'objet d'une r\u00e9quisition.\n'''",
+        "timestamp": 1685365724,
+        "priority": 5,
+        "answer": "Doit on syst\u00e9matiquement faire un certificat m\u00e9dical en cas d'agression sexuelle ?<br/>{{c1::oui}}<br/>#####<br/>Doit-on rendre le certificat m\u00e9dical \u00e0 la victime en cas d'agression sexuelle ?<br/>{{c1::oui sauf si l'examen fait l'objet d'une requisition}}<br/>#####<br/>Dans quel cas ne doit-on pas rendre le certificat m\u00e9dical \u00e0 la victime en cas d'agression sexuelle ?<br/>{{c1::si l'examen fait l'objet d'une r\u00e9quisition}}",
+        "tkn_len": 214
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nD\u00e9c\u00e9dant de l'examen clinique apr\u00e8s un viol, est-ce qu'on peut utiliser un sp\u00e9culum? La r\u00e9ponse est oui. Et est-ce qu'on peut utiliser le toucher vaginal? La r\u00e9ponse est oui aussi. Et pareil pour un toucher rectal.\n'''",
+        "timestamp": 1685366221,
+        "priority": 5,
+        "answer": "Peut-on utiliser un sp\u00e9culum lors de l'examen clinique apr\u00e8s un viol ?<br/>{{c1::oui}}<br/>#####<br/>Peut-on utiliser le toucher vaginal lors de l'examen clinique apr\u00e8s un viol ?<br/>{{c1::oui}}<br/>#####<br/>Peut-on utiliser le toucher rectal lors de l'examen clinique apr\u00e8s un viol ?<br/>{{c1::oui}}",
+        "tkn_len": 181
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nConcernant l'examen clinique apr\u00e8s un viol, les pr\u00e9l\u00e8vements \u00e0 effectuer sont les pr\u00e9l\u00e8vements \u00e0 DNA sur les zones de contact et d\u00e9jaculation, les pr\u00e9l\u00e8vements de sang si c'\u00e9tait il y a moins de 72 heures, les pr\u00e9l\u00e8vements d'urine si c'\u00e9tait il y a moins de 120 heures et les pr\u00e9l\u00e8vements de cheveux si c'\u00e9tait dans le mois.\n'''",
+        "timestamp": 1685366306,
+        "priority": 5,
+        "answer": "Quels sont les pr\u00e9l\u00e8vements \u00e0 effectuer lors de l'examen clinique apr\u00e8s un viol ?<br/>{{c1::pr\u00e9l\u00e8vements \u00e0 DNA sur les zones de contact et d'\u00e9jaculation <br/>}}{{c1::pr\u00e9l\u00e8vements de sang si c'\u00e9tait il y a moins de }}{{c1::72 heures <br/>}}{{c1::pr\u00e9l\u00e8vements d'urine si c'\u00e9tait il y a moins de }}{{c1::120 heures <br/>}}{{c1::pr\u00e9l\u00e8vements de cheveux si c'\u00e9tait dans }}{{c1::le mois}}",
+        "tkn_len": 248
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nLes mutilations sexuelles f\u00e9minines de type 1 sont la clitoridectomie De type 2 sont l'ablation, clitoris et ses petites l\u00e8vres et \u00e9ventuellement grandes l\u00e8vres De type 3 c'est l'infibulation et de type 4 c'est toute autre technique telle que le percement, l'escalification, la c\u00f4t\u00e9lisation\n'''",
+        "timestamp": 1685366698,
+        "priority": 5,
+        "answer": "Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 1}} ?<br/>{{c1::la clitoridectomie}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 2}} ?<br/>{{c1::clitoridectomie et atteinte des  petites l\u00e8vres et parfois grandes l\u00e8vres}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 3}} ?<br/>{{c1::l'infibulation}}<br/>#####<br/>Qu'est-ce que les mutilations sexuelles f\u00e9minines de {{c2::type 4}} ?<br/>{{c1::toute autre technique telle que le percement, la scarification, la cauterisation}}",
+        "tkn_len": 304
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les violences sexuelles\"\n\nTranscript:\n'''\nApr\u00e8s un viol, il y a une indication pour une s\u00e9ro-vaccination au VHV.\n'''",
+        "timestamp": 1685366980,
+        "priority": 5,
+        "answer": "Indication pour une s\u00e9ro-vaccination au VHB apr\u00e8s un viol ?<br/>{{c1::oui}}<br/>#####<br/>Quelle est la vaccination recommand\u00e9e apr\u00e8s un viol ?<br/>{{c1::s\u00e9ro-vaccination au VHB}}",
+        "tkn_len": 102
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le handicap\"\n\nTranscript:\n'''\nEn France, la pr\u00e9valence de la maladie chronique est de un tiers de la population.\n'''",
+        "timestamp": 1685367129,
+        "priority": 3,
+        "answer": "Quelle est la pr\u00e9valence de la maladie chronique en France ?<br/>{{c1::1/3 de la population (20 millions de francais)}}",
+        "tkn_len": 77
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur le handicap\"\n\nTranscript:\n'''\nEn France, la proportion de handicap invisible est de 80%.\n'''",
+        "timestamp": 1685367182,
+        "priority": 1,
+        "answer": "Quelle est la proportion de handicap <b>invisible</b> en France ?<br/>{{c1::80%}}",
+        "tkn_len": 60
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\n\u00e0 la question quelle est la relation juridique entre le m\u00e9decin du service public hospitalier et son patient la r\u00e9ponse est qu'il n'y a aucune relation juridique.\n'''",
+        "timestamp": 1685368574,
+        "priority": 1,
+        "answer": "Quelle est la relation juridique entre le m\u00e9decin du service public hospitalier et son patient ?<br/>{{c1::aucune relation juridique}}",
+        "tkn_len": 94
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLa d\u00e9finition d'une faute disciplinaire est un manquement au r\u00e8gle de d\u00e9ontologie m\u00e9dicale.\n'''",
+        "timestamp": 1685369113,
+        "priority": 1,
+        "answer": "Quelle est la d\u00e9finition {{c2::d'une faute disciplinaire}} ?<br/>{{c1::un manquement aux r\u00e8gles de d\u00e9ontologie m\u00e9dicale}}",
+        "tkn_len": 85
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLes sanctions disciplinaires du conseil de l'Ontario des m\u00e9decins sont l'avertissement, le bl\u00e2me, l'interdiction temporaire d'exercer les fonctions d'administration par le tableau de collectivit\u00e9 publique, l'interdiction temporaire d'exercice pour une dur\u00e9e de 3 ans et la radiation du tableau de l'ordre.\n'''",
+        "timestamp": 1685371140,
+        "priority": 3,
+        "answer": "Quelles sont les sanctions disciplinaires possibles du CNOM ?<br/>{{c1::avertissement <br/>}}{{c1::bl\u00e2me <br/>}}{{c1::interdiction temporaire d'exercer les fonctions d'administration par le tableau de collectivit\u00e9 publique <br/>}}{{c1::interdiction temporaire d'exercice pour une dur\u00e9e de }}{{c1::3 ans <br/>}}{{c1::radiation du tableau de l'ordre}}",
+        "tkn_len": 223
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nconcernant la responsabilit\u00e9 disciplinaire du m\u00e9decin, la juridiction comp\u00e9tente et la chambre disciplinaire du Conseil R\u00e9gional de l'Ordre, et la chambre disciplinaire du Conseil National de l'Ordre en appel. Un pouvoir en cassation peut \u00eatre form\u00e9 devant le Conseil d'\u00c9tat.\n'''",
+        "timestamp": 1685371680,
+        "priority": 5,
+        "answer": "Quelle est la juridiction comp\u00e9tente pour la responsabilit\u00e9 disciplinaire du m\u00e9decin ?<br/>{{c1::la chambre disciplinaire du Conseil <b>R\u00e9gional</b> de l'Ordre <br/>}}{{c1::puis la chambre disciplinaire du Conseil <b>National</b> de l'Ordre <br/>}}{{c1::puis en appel : }}{{c1::devant le Conseil d'\u00c9tat}}",
+        "tkn_len": 193
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLes m\u00e9decins lib\u00e9raux peuvent \u00eatre jug\u00e9s par la Chambre disciplinaire du Conseil r\u00e9gional de l'Ordre, alors que les m\u00e9decins hospitaliers doivent \u00eatre jug\u00e9s par le Conseil d\u00e9partemental de l'Ordre.\n'''",
+        "timestamp": 1685371859,
+        "priority": 5,
+        "answer": "Quelle est la chambre comp\u00e9tente pour juger les m\u00e9decins lib\u00e9raux ?<br/>{{c1::la Chambre disciplinaire du Conseil <b>r\u00e9gional</b> de l'Ordre}}<br/>#####<br/>Quelle est la chambre comp\u00e9tente pour juger les m\u00e9decins hospitaliers ?<br/>{{c1::la chambre disciplinaire du Conseil <b>d\u00e9partemental</b> de l'Ordre}}",
+        "tkn_len": 174
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nDans un contexte de sanctions disciplinaires, le patient peut \u00eatre accompagn\u00e9 d'un avocat, et le m\u00e9decin d'un avocat ou d'un confr\u00e8re. Fait une carte ouverte\n'''",
+        "timestamp": 1685372434,
+        "priority": 6,
+        "answer": "Qui peut accompagner un patient lors d'une saudience de sanction disciplinaire du CNOM ?<br/>{{c1::un avocat}}<br/>#####<br/>Qui peut accompagner le m\u00e9decin lors d'une saudience de sanction disciplinaire du CNOM ?<br/>{{c1::un avocat ou un confr\u00e8re}}",
+        "tkn_len": 146
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur la responsabilit\u00e9\"\n\nTranscript:\n'''\nLa checklist chirurgicale et la prescription informatis\u00e9e font partie des barri\u00e8res de pr\u00e9vention dans les mod\u00e8les de s\u00e9curit\u00e9. Fait deux cartes en demandant le type de barriere.\n'''",
+        "timestamp": 1685373478,
+        "priority": 5,
+        "answer": "De quel type de barri\u00e8re s'agit-il pour la checklist chirurgicale ?<br/>{{c1::barri\u00e8re de pr\u00e9vention}}<br/>#####<br/>De quel type de barri\u00e8re s'agit-il pour la prescription informatis\u00e9e ?<br/>{{c1::barri\u00e8re de pr\u00e9vention}}",
+        "tkn_len": 130
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les droits du patient\"\n\nTranscript:\n'''\nLe secret m\u00e9dical est encadr\u00e9 par le Code de sant\u00e9 publique et de d\u00e9ontologie et par le Code p\u00e9nal.\n'''",
+        "timestamp": 1685373976,
+        "priority": 2,
+        "answer": "Quels sont les codes encadrant le secret m\u00e9dical ?<br/>{{c1::Code de sant\u00e9 publique <br/>}}{{c1::Code de d\u00e9ontologie <br/>}}{{c1::Code p\u00e9nal}}",
+        "tkn_len": 100
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les droits du patient\"\n\nTranscript:\n'''\nLa violation du secret m\u00e9dical expose \u00e0 une sanction disciplinaire et \u00e0 une sanction p\u00e9nale.\n'''",
+        "timestamp": 1685374051,
+        "priority": 2,
+        "answer": "Une violation du secret m\u00e9dical encoure a une paine disciplinaire ou p\u00e9nale ?<br/>{{c1::sanction disciplinaire et sanction p\u00e9nale}}",
+        "tkn_len": 77
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les droits du patient\"\n\nTranscript:\n'''\nles modalit\u00e9s techniques pour qu'un patient puisse acc\u00e9der \u00e0 son dossier m\u00e9dical sans que les frais de reproduction et d'exp\u00e9dition sont \u00e0 la charge du patient sans que le m\u00e9decin se fasse de marge.\n'''",
+        "timestamp": 1685374550,
+        "priority": 2,
+        "answer": "Qui doit prendre en charge les frais de reproduction et d'exp\u00e9dition du dossier m\u00e9dical du patient ?<br/>{{c1::le patient}}<br/>#####<br/>Le patient doit-il payer pour acc\u00e9der \u00e0 son dossier m\u00e9dical ?<br/>{{c1::non, sauf frais de reproduction et envoi}}",
+        "tkn_len": 143
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les droits du patient\"\n\nTranscript:\n'''\nLes situations o\u00f9 il est obligatoire d'obtenir un consentement \u00e9crit du patient sont Pour l'interruption volontaire des proc\u00e8s, pour la st\u00e9rilisation \u00e0 vis\u00e9e contraceptive, pour les activit\u00e9s de recherche impliquant la personne humaine, pour le pr\u00e9l\u00e8vement d'organes sur d'odeurs vivants, pour l'\u00e9tude des caract\u00e9ristiques g\u00e9n\u00e9tiques \u00e0 des fins de votre groupe m\u00e9dical, et pour le don et l'utilisation de gam\u00e8tes.\n'''",
+        "timestamp": 1685375110,
+        "priority": 3,
+        "answer": "Dans quelles situations est-il obligatoire d'obtenir un consentement \u00e9crit du patient ?<br/>{{c1::interruption volontaire de grossesse <br/>}}{{c1::st\u00e9rilisation \u00e0 vis\u00e9e contraceptive <br/>}}{{c1::activit\u00e9s de recherche impliquant la personne humaine <br/>}}{{c1::pr\u00e9l\u00e8vement d'organes sur donneurs vivants <br/>}}{{c1::\u00e9tude des caract\u00e9ristiques g\u00e9n\u00e9tiques \u00e0 des fins }}{{c1::m\u00e9dical <br/>}}{{c1::don et utilisation de gam\u00e8tes}}",
+        "tkn_len": 266
+    },
+    {
+        "role": "user",
+        "content": "Contexte: \"Cours de m\u00e9decine sur les vaccins\"\n\nTranscript:\n'''\nLa c\u00e9r\u00e9broth\u00e9rapie n'est pas consid\u00e9r\u00e9e comme un type de vaccination.\n'''",
+        "timestamp": 1685376106,
+        "priority": 1,
+        "answer": "La s\u00e9roth\u00e9rapie est-elle consid\u00e9r\u00e9e comme un type de vaccination ?<br/>{{c1::non}}",
+        "tkn_len": 68
     }
 ]
