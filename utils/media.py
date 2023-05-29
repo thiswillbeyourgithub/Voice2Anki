@@ -95,12 +95,12 @@ def reset_audio(audio1, audio2, audio3):
     return None, None, None
 
 
-def load_next_audio(audio1, audio2, audio3):
+def load_next_audio(audio1, audio2, audio3, audio4, audio5):
     whi("Rolling over audio samples")
     if audio1 is None:
         whi("Cannot load next audio if audio #1 is None")
-        return audio1, audio2, audio3
-    return audio2, audio3, None
+        return audio1, audio2, audio3, audio4, audio5
+    return audio2, audio3, audio4, audio5, None
 
 
 def save_audio(profile, audio_numpy_1):
@@ -119,6 +119,18 @@ def save_audio3(profile, audio_numpy_3):
     whi("Saving audio from #3 to profile")
     pv = previous_values(profile)
     pv["audio_numpy_3"] = audio_numpy_3
+
+
+def save_audio4(profile, audio_numpy_4):
+    whi("Saving audio from #4 to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy_4"] = audio_numpy_4
+
+
+def save_audio5(profile, audio_numpy_5):
+    whi("Saving audio from #5 to profile")
+    pv = previous_values(profile)
+    pv["audio_numpy_5"] = audio_numpy_5
 
 
 def enhance_audio(audio_numpy_1):

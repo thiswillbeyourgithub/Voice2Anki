@@ -14,7 +14,7 @@ from utils.anki import add_to_anki, audio_to_anki, sync_anki
 from utils.misc import tokenize, transcript_template
 from utils.logger import red, whi, yel, get_log
 from utils.memory import prompt_filter, recur_improv, load_prev_prompts
-from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image, save_audio, save_audio2, save_audio3, load_next_audio
+from utils.media import remove_silences, get_image, get_img_source, reset_audio, reset_image, save_audio, save_audio2, save_audio3, save_audio4, save_audio5, load_next_audio
 from utils.profiles import get_profiles, switch_profile, previous_values
 
 # misc init values
@@ -427,6 +427,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             audio_numpy_1 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_2 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_4 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_5 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Next", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10)
@@ -489,10 +491,12 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     audio_numpy_1.change(fn=save_audio, inputs=[txt_profile, audio_numpy_1])
     audio_numpy_2.change(fn=save_audio2, inputs=[txt_profile, audio_numpy_3])
     audio_numpy_3.change(fn=save_audio3, inputs=[txt_profile, audio_numpy_3])
+    audio_numpy_4.change(fn=save_audio4, inputs=[txt_profile, audio_numpy_4])
+    audio_numpy_5.change(fn=save_audio5, inputs=[txt_profile, audio_numpy_5])
     load_audio_btn.click(
             fn=load_next_audio,
-            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3],
-            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3]
+            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
+            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5]
             ).then(
                     fn=semiauto_mode,
                     inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
