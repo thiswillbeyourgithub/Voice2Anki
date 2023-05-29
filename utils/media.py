@@ -99,7 +99,7 @@ def enhance_audio(audio_numpy):
         "Enhancing the audio automatically is not supported for now")
     whi("Cleaning voice")
     try:
-        tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         write(tmp.name, audio_numpy[0], audio_numpy[1])
         cleaned = voice_cleaner.enhance_file(tmp.name)
         torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy[0])
@@ -120,7 +120,7 @@ def remove_silences(audio_numpy):
     try:
         # first saving numpy audio to file
         # note: audio_numpy is a 2-tuple (samplerate, array)
-        tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         write(tmp.name, audio_numpy[0], audio_numpy[1])
         u = Unsilence(tmp.name)
         u.detect_silence()

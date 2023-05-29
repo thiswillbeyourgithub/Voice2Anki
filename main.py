@@ -55,7 +55,7 @@ def transcribe(audio_numpy, txt_whisp_prompt, txt_whisp_lang):
 
     # save audio to temp file
     whi("Saving audio as wav file")
-    tmp = tempfile.NamedTemporaryFile(suffix=".wav")
+    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
     write(tmp.name, audio_numpy[0], audio_numpy[1])
 
     try:
