@@ -3,7 +3,7 @@ import gradio as gr
 from .profiles import get_profiles, switch_profile, previous_values
 from .main import transcribe, alfred, main, auto_mode, semiauto_mode
 
-from .logger import get_log
+from .logger import get_log, whi
 from .memory import recur_improv
 from .media import get_image, reset_audio, reset_image, save_audio, load_next_audio, sound_preprocessing
 
@@ -29,6 +29,7 @@ document.querySelector('body').classList.add('dark');
 pv = previous_values()
 # if last profile was not 'default', switch directly to the last used
 if pv["profile"] != "default":
+    whi(f"Loading profile '{pv['profile']}'")
     pv = previous_values(pv["profile"])
 
 with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as demo:
