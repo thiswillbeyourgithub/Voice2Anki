@@ -89,7 +89,7 @@ def reset_image():
     return None
 
 
-def reset_audio(audio1, audio2, audio3, audio4, audio5):
+def reset_audio(audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5):
     whi("Resetting all audio")
     return None, None, None, None, None
 
@@ -106,45 +106,43 @@ def load_next_audio(txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, au
     return audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5, None
 
 
-def save_audio1(txt_profile, string, audio_numpy_1):
-    whi("Saving audio from #1 to profile")
-    print(string)
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_1"] = audio_numpy_1
+class audio_saver:
+    def save_audio(self, txt_profile, audio_numpy_n, n):
+        whi(f"Saving audio from #{n} to profile")
+        if audio_numpy_n is None:
+            whi("Not saving because sound is None")
+            return
+        pv = previous_values(txt_profile)
+        pv[f"audio_numpy_{n}"] = audio_numpy_n
+
+    def n1(self, txt_profile, audio_numpy):
+        return self.save_audio(txt_profile, audio_numpy, n=1)
+
+    def n2(self, txt_profile, audio_numpy):
+        return self.save_audio(txt_profile, audio_numpy, n=2)
+
+    def n3(self, txt_profile, audio_numpy):
+        return self.save_audio(txt_profile, audio_numpy, n=3)
+
+    def n4(self, txt_profile, audio_numpy):
+        return self.save_audio(txt_profile, audio_numpy, n=4)
+
+    def n5(self, txt_profile, audio_numpy):
+        return self.save_audio(txt_profile, audio_numpy, n=5)
 
 
-def save_audio2(txt_profile, audio_numpy_2):
-    whi("Saving audio from #2 to profile")
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_2"] = audio_numpy_2
-
-
-def save_audio3(txt_profile, audio_numpy_3):
-    whi("Saving audio from #3 to profile")
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_3"] = audio_numpy_3
-
-
-def save_audio4(txt_profile, audio_numpy_4):
-    whi("Saving audio from #4 to profile")
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_4"] = audio_numpy_4
-
-
-def save_audio5(txt_profile, audio_numpy_5):
-    whi("Saving audio from #5 to profile")
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_5"] = audio_numpy_5
-
-
-def sound_preprocessing(audio_numpy_1):
+def sound_preprocessing(audio_numpy_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
+    whi("Cleaning sound with torchaudio")
+
+    if audio_numpy_n is None:
+        whi("Not cleaning sound because received None")
+        return None
 
     # save as wav file
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="preprocessing")
-    write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
+    write(tmp.name, audio_numpy_n[0], audio_numpy_n[1])
 
-    whi("Cleaning sound with torchaudio")
     tens = load(tmp.name)
     cleaned = vad(
             waveform=tens[0],
@@ -168,8 +166,8 @@ def sound_preprocessing(audio_numpy_1):
             )
 
     Path(tmp.name).unlink(missing_ok=True)
-    audio_numpy_1 = tuple((audio_numpy_1[0], cleaned.numpy().T))
+    audio_numpy_n = tuple((audio_numpy_n[0], cleaned.numpy().T))
 
 
     whi("Done preprocessing audio")
-    return audio_numpy_1
+    return audio_numpy_n
