@@ -142,6 +142,13 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                     inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
 
+    # load previous values
+    audio_numpy_1.value = pv["audio_numpy_1"]
+    audio_numpy_2.value = pv["audio_numpy_3"]
+    audio_numpy_3.value = pv["audio_numpy_3"]
+    audio_numpy_5.value = pv["audio_numpy_4"]
+    audio_numpy_5.value = pv["audio_numpy_5"]
+
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
