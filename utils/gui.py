@@ -47,7 +47,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             with gr.Column(scale=2):
                 with gr.Row():
                     with gr.Column(scale=10):
-                        txt_profile = gr.Textbox(placeholder=",".join(get_profiles()), label="Profile")
+                        txt_profile = gr.Textbox(value=pv["profile"], placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary").style(full_width=True)
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
