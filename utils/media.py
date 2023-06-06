@@ -1,17 +1,18 @@
 from pathlib import Path
 import tempfile
-from scipy.io.wavfile import write, read
+from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
-from speechbrain.pretrained import WaveformEnhancement
+# from speechbrain.pretrained import WaveformEnhancement
 import cv2
 import numpy as np
 import pyperclip3
 import hashlib
-from unsilence import Unsilence
-import torchaudio
+# from unsilence import Unsilence
+from torchaudio import load
+from torchaudio.functional import vad
 
-from .logger import whi, yel, red
+from .logger import whi, red
 from .anki import anki_media
 from .profiles import previous_values
 
@@ -133,56 +134,69 @@ def save_audio5(profile, audio_numpy_5):
 def sound_preprocessing(audio_numpy_1):
     "removing silence, maybe try to enhance audio, apply filters etc"
 
-    whi("Removing silences")
-    # first saving numpy audio to file
-    # note: audio_numpy_1 is a 2-tuple (samplerate, array)
+    # save as wav file
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="unsilence")
     write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
-    u = Unsilence(tmp.name)
-    u.detect_silence()
 
-    # by how much to speed up silence
-    silence_speed = 2
+    # whi("Removing silences")
+    # first saving numpy audio to file
+    # note: audio_numpy_1 is a 2-tuple (samplerate, array)
+    # u = Unsilence(tmp.name)
+    # u.detect_silence()
 
-    # do it only if its worth it as it might degrade audio quality?
-    estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
-    before = estimated_time["before"]["all"][0]
-    after = estimated_time["after"]["all"][0]
-    if after / before < 0.9 or before - after > 5:
-        if after > 30:
-            silence_speed += 1
-            if after > 60:
-                silence_speed += 3
-                whi(f"Removing silence: longer than 60s detected so speeding up even more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-            else:
-                whi(f"Removing silence: longer than 30s detected so speeding up a bit more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-            estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
-            before = estimated_time["before"]["all"][0]
-            after = estimated_time["after"]["all"][0]
+    # # by how much to speed up silence
+    # silence_speed = 2
 
-        yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
-        u.render_media(tmp.name, audible_speed=1, silent_speed=silence_speed, audio_only=True)
-        # the new unsilenced sound is stored in the wav at tmp.name
-        whi("Done removing silences")
-    else:
-        whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+    # # do it only if its worth it as it might degrade audio quality?
+    # estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
+    # before = estimated_time["before"]["all"][0]
+    # after = estimated_time["after"]["all"][0]
+    # if after / before < 0.9 or before - after > 5:
+    #     if after > 30:
+    #         silence_speed += 1
+    #         if after > 60:
+    #             silence_speed += 3
+    #             whi(f"Removing silence: longer than 60s detected so speeding up even more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+    #         else:
+    #             whi(f"Removing silence: longer than 30s detected so speeding up a bit more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+    #         estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
+    #         before = estimated_time["before"]["all"][0]
+    #         after = estimated_time["after"]["all"][0]
 
-    # temporarily disabled as it appears this can reduce non english
-    # sound quality
-    # whi("Cleaning voice")
-    # cleaned = voice_cleaner.enhance_file(tmp.name)
-    # torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy_1[0])
+    #     yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
+    #     u.render_media(tmp.name, audible_speed=1, silent_speed=silence_speed, audio_only=True)
+    #     # the new unsilenced sound is stored in the wav at tmp.name
+    #     whi("Done removing silences")
+    # else:
+    #     whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
 
-    audio_numpy_1 = read(tmp.name)
+    whi("Cleaning sound with torchaudio")
+    # using built in torchaudio features
+    tens = load(tmp.name)
+    cleaned = vad(
+            waveform=tens[0],
+            sample_rate=tens[1],
+            trigger_level=7.0,
+            trigger_time=0.25,
+            search_time=1.0,
+            allowed_gap=0.25,
+            pre_trigger_time=0.0,
+            boot_time=0.35,
+            noise_up_time=0.1,
+            noise_down_time=0.01,
+            noise_reduction_amount=1.35,
+            measure_freq=20.0,
+            measure_duration=None,
+            measure_smooth_time=0.4,
+            hp_filter_freq=50.0,
+            lp_filter_freq=6000.0,
+            hp_lifter_freq=150.0,
+            lp_lifter_freq=2000.0,
+            )
     Path(tmp.name).unlink(missing_ok=True)
+
+    audio_numpy_1 = tuple((audio_numpy_1[0], cleaned.numpy().T))
 
     whi("Done preprocessing audio")
 
     return audio_numpy_1
-
-
-# load voice cleaning model
-voice_cleaner = WaveformEnhancement.from_hparams(
-    source="speechbrain/mtl-mimic-voicebank",
-    savedir="cache/pretrained_models/mtl-mimic-voicebank",
-)
