@@ -5,7 +5,7 @@ from .main import transcribe, alfred, main, auto_mode, semiauto_mode
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, save_audio, load_next_audio, sound_preprocessing
+from .media import get_image, reset_audio, reset_image, save_audio1, save_audio2, save_audio3, save_audio4, save_audio5, load_next_audio, sound_preprocessing
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -128,11 +128,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             fn=reset_audio,
             inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
             outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5])
-    audio_numpy_1.change(fn=sound_preprocessing, inputs=[audio_numpy_1], outputs=[audio_numpy_1]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_1])
-    audio_numpy_2.change(fn=sound_preprocessing, inputs=[audio_numpy_2], outputs=[audio_numpy_2]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_2])
-    audio_numpy_3.change(fn=sound_preprocessing, inputs=[audio_numpy_3], outputs=[audio_numpy_3]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_3])
-    audio_numpy_4.change(fn=sound_preprocessing, inputs=[audio_numpy_4], outputs=[audio_numpy_4]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_4])
-    audio_numpy_5.change(fn=sound_preprocessing, inputs=[audio_numpy_5], outputs=[audio_numpy_5]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_5])
+    audio_numpy_1.change(fn=sound_preprocessing, inputs=[audio_numpy_1], outputs=[audio_numpy_1]).then(fn=save_audio1, inputs=[txt_profile, audio_numpy_1])
+    audio_numpy_2.change(fn=sound_preprocessing, inputs=[audio_numpy_2], outputs=[audio_numpy_2]).then(fn=save_audio2, inputs=[txt_profile, audio_numpy_2])
+    audio_numpy_3.change(fn=sound_preprocessing, inputs=[audio_numpy_3], outputs=[audio_numpy_3]).then(fn=save_audio3, inputs=[txt_profile, audio_numpy_3])
+    audio_numpy_4.change(fn=sound_preprocessing, inputs=[audio_numpy_4], outputs=[audio_numpy_4]).then(fn=save_audio4, inputs=[txt_profile, audio_numpy_4])
+    audio_numpy_5.change(fn=sound_preprocessing, inputs=[audio_numpy_5], outputs=[audio_numpy_5]).then(fn=save_audio5, inputs=[txt_profile, audio_numpy_5])
     load_audio_btn.click(
             fn=load_next_audio,
             inputs=[txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],

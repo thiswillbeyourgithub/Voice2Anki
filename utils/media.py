@@ -106,33 +106,34 @@ def load_next_audio(txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, au
     return audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5, None
 
 
-def save_audio(profile, audio_numpy_1):
+def save_audio1(txt_profile, string, audio_numpy_1):
     whi("Saving audio from #1 to profile")
-    pv = previous_values(profile)
+    print(string)
+    pv = previous_values(txt_profile)
     pv["audio_numpy_1"] = audio_numpy_1
 
 
-def save_audio2(profile, audio_numpy_2):
+def save_audio2(txt_profile, audio_numpy_2):
     whi("Saving audio from #2 to profile")
-    pv = previous_values(profile)
+    pv = previous_values(txt_profile)
     pv["audio_numpy_2"] = audio_numpy_2
 
 
-def save_audio3(profile, audio_numpy_3):
+def save_audio3(txt_profile, audio_numpy_3):
     whi("Saving audio from #3 to profile")
-    pv = previous_values(profile)
+    pv = previous_values(txt_profile)
     pv["audio_numpy_3"] = audio_numpy_3
 
 
-def save_audio4(profile, audio_numpy_4):
+def save_audio4(txt_profile, audio_numpy_4):
     whi("Saving audio from #4 to profile")
-    pv = previous_values(profile)
+    pv = previous_values(txt_profile)
     pv["audio_numpy_4"] = audio_numpy_4
 
 
-def save_audio5(profile, audio_numpy_5):
+def save_audio5(txt_profile, audio_numpy_5):
     whi("Saving audio from #5 to profile")
-    pv = previous_values(profile)
+    pv = previous_values(txt_profile)
     pv["audio_numpy_5"] = audio_numpy_5
 
 
