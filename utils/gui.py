@@ -135,7 +135,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     audio_numpy_5.change(fn=sound_preprocessing, inputs=[audio_numpy_5], outputs=[audio_numpy_5]).then(fn=save_audio, inputs=[txt_profile, audio_numpy_5])
     load_audio_btn.click(
             fn=load_next_audio,
-            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
+            inputs=[txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
             outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5]
             ).then(
                     fn=semiauto_mode,
