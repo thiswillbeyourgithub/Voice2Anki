@@ -14,7 +14,7 @@ from .anki import add_to_anki, audio_to_anki, sync_anki
 from .misc import tokenize, transcript_template
 from .logger import red, whi, yel
 from .memory import prompt_filter, load_prev_prompts
-from .media import remove_silences, get_img_source
+from .media import sound_preprocessing, get_img_source
 from .profiles import previous_values
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
@@ -35,11 +35,10 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red("Error: None whisper language")
 
     # try to remove silences
-    audio_numpy_1 = remove_silences(audio_numpy_1)
-
-    # DISABLED: it seems to completely screw up the audio :(
-    # try to enhance quality
-    # audio_numpy_1 = enhance_audio(audio_numpy_1)
+    try:
+        audio_numpy_1 = sound_preprocessing(audio_numpy_1)
+    except Exception as err:
+        red(f"Error when preprocessing sound: '{err}'")
 
     # save audio for next startup
     pv = previous_values(txt_profile)

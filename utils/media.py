@@ -130,49 +130,25 @@ def save_audio5(profile, audio_numpy_5):
     pv["audio_numpy_5"] = audio_numpy_5
 
 
-def enhance_audio(audio_numpy_1):
-    raise NotImplementedError(
-        "Enhancing the audio automatically is not supported for now")
-    whi("Cleaning voice")
-    try:
-        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="enhance")
-        write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
-        cleaned = voice_cleaner.enhance_file(tmp.name)
-        torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy_1[0])
-        enhanced_audio_numpy_1 = read(tmp.name)
-        Path(tmp.name).unlink(missing_ok=False)
+def sound_preprocessing(audio_numpy_1):
+    "removing silence, maybe try to enhance audio, apply filters etc"
 
-        whi("Done cleaning audio")
-        return enhanced_audio_numpy_1
-
-    except Exception as err:
-        red(f"Error when cleaning voice: '{err}'")
-        Path(tmp.name).unlink(missing_ok=True)
-        return audio_numpy_1
-
-
-def remove_silences(audio_numpy_1):
     whi("Removing silences")
-    try:
-        # first saving numpy audio to file
-        # note: audio_numpy_1 is a 2-tuple (samplerate, array)
-        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="unsilence")
-        write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
-        u = Unsilence(tmp.name)
-        u.detect_silence()
+    # first saving numpy audio to file
+    # note: audio_numpy_1 is a 2-tuple (samplerate, array)
+    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="unsilence")
+    write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
+    u = Unsilence(tmp.name)
+    u.detect_silence()
 
-        # by how much to speed up silence
-        silence_speed = 2
+    # by how much to speed up silence
+    silence_speed = 2
 
-        # do it only if its worth it as it might degrade audio quality?
-        estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
-        before = estimated_time["before"]["all"][0]
-        after = estimated_time["after"]["all"][0]
-        if after / before > 0.9 and before - after < 5:
-            whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-            Path(tmp.name).unlink(missing_ok=False)
-            return audio_numpy_1  # return untouched
-
+    # do it only if its worth it as it might degrade audio quality?
+    estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
+    before = estimated_time["before"]["all"][0]
+    after = estimated_time["after"]["all"][0]
+    if after / before < 0.9 or before - after > 5:
         if after > 30:
             silence_speed += 1
             if after > 60:
@@ -186,14 +162,23 @@ def remove_silences(audio_numpy_1):
 
         yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
         u.render_media(tmp.name, audible_speed=1, silent_speed=silence_speed, audio_only=True)
-        unsilenced_audio_numpy_1 = read(tmp.name)
+        # the new unsilenced sound is stored in the wav at tmp.name
         whi("Done removing silences")
-        Path(tmp.name).unlink(missing_ok=False)
-        return unsilenced_audio_numpy_1
-    except Exception as err:
-        red(f"Error when removing silences: '{err}'")
-        Path(tmp.name).unlink(missing_ok=True)
-        return audio_numpy_1
+    else:
+        whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
+
+    # temporarily disabled as it appears this can reduce non english
+    # sound quality
+    # whi("Cleaning voice")
+    # cleaned = voice_cleaner.enhance_file(tmp.name)
+    # torchaudio.save(tmp.name, cleaned.unsqueeze(0).cpu(), audio_numpy_1[0])
+
+    audio_numpy_1 = read(tmp.name)
+    Path(tmp.name).unlink(missing_ok=True)
+
+    whi("Done preprocessing audio")
+
+    return audio_numpy_1
 
 
 # load voice cleaning model
