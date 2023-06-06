@@ -93,7 +93,7 @@ def get_log():
             f.seek(0)
         lastline = f.readline().decode().strip()
         lastline = re.sub(log_regex, " >           ", lastline)
-        if last_log_content and lastline[23:] == latest_tail[23:]:
+        if last_log_content and (lastline[23:] == latest_tail[23:] or "HTTP Request: POST" in latest_tail):
             return last_log_content
 
     latest_tail = lastline
