@@ -63,7 +63,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     with gr.Row():
         with gr.Column(scale=1):
             rst_audio_btn = gr.Button(value="Clear audio", variant="secondary")
-            audio_numpy_1 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_numpy_1 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=pv["audio_numpy_1"]).style(size="sm")
             audio_numpy_2 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             audio_numpy_4 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
