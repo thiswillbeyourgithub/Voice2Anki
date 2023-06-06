@@ -3,12 +3,10 @@ import tempfile
 from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
-# from speechbrain.pretrained import WaveformEnhancement
 import cv2
 import numpy as np
 import pyperclip3
 import hashlib
-# from unsilence import Unsilence
 from torchaudio import load
 from torchaudio.functional import vad
 
@@ -135,43 +133,10 @@ def sound_preprocessing(audio_numpy_1):
     "removing silence, maybe try to enhance audio, apply filters etc"
 
     # save as wav file
-    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="unsilence")
+    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="preprocessing")
     write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
 
-    # whi("Removing silences")
-    # first saving numpy audio to file
-    # note: audio_numpy_1 is a 2-tuple (samplerate, array)
-    # u = Unsilence(tmp.name)
-    # u.detect_silence()
-
-    # # by how much to speed up silence
-    # silence_speed = 2
-
-    # # do it only if its worth it as it might degrade audio quality?
-    # estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
-    # before = estimated_time["before"]["all"][0]
-    # after = estimated_time["after"]["all"][0]
-    # if after / before < 0.9 or before - after > 5:
-    #     if after > 30:
-    #         silence_speed += 1
-    #         if after > 60:
-    #             silence_speed += 3
-    #             whi(f"Removing silence: longer than 60s detected so speeding up even more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-    #         else:
-    #             whi(f"Removing silence: longer than 30s detected so speeding up a bit more (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-    #         estimated_time = u.estimate_time(audible_speed=1, silent_speed=silence_speed)  # Estimate time savings
-    #         before = estimated_time["before"]["all"][0]
-    #         after = estimated_time["after"]["all"][0]
-
-    #     yel(f"Removing silence: {before:.1f}s -> {after:.1f}s")
-    #     u.render_media(tmp.name, audible_speed=1, silent_speed=silence_speed, audio_only=True)
-    #     # the new unsilenced sound is stored in the wav at tmp.name
-    #     whi("Done removing silences")
-    # else:
-    #     whi(f"Not removing silence (orig: {before:.1f}s vs unsilenced: {after:.1f}s)")
-
     whi("Cleaning sound with torchaudio")
-    # using built in torchaudio features
     tens = load(tmp.name)
     cleaned = vad(
             waveform=tens[0],
@@ -193,10 +158,10 @@ def sound_preprocessing(audio_numpy_1):
             hp_lifter_freq=150.0,
             lp_lifter_freq=2000.0,
             )
-    Path(tmp.name).unlink(missing_ok=True)
 
+    Path(tmp.name).unlink(missing_ok=True)
     audio_numpy_1 = tuple((audio_numpy_1[0], cleaned.numpy().T))
 
-    whi("Done preprocessing audio")
 
+    whi("Done preprocessing audio")
     return audio_numpy_1
