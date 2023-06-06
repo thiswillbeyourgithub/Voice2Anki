@@ -93,7 +93,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=0.3, interactive=False)
+    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False)
 
     # events
     # darkmode
