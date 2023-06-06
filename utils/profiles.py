@@ -1,5 +1,6 @@
 import pickle
 from pathlib import Path
+import numpy as np
 
 from .logger import whi, red
 
@@ -11,7 +12,6 @@ class previous_values:
         assert profile.isalpha(), f"profile is not alphanumeric: '{profile}'"
         self.p = Path(f"./profiles/{profile}")
         if profile == "default":
-            whi("Assuming profile 'default'")
             self.p.mkdir(exist_ok=True)
         assert self.p.exists(), f"{self.p} not found!"
 
@@ -20,13 +20,18 @@ class previous_values:
         if (self.p / kp).exists():
             try:
                 with open(str(self.p / kp), "r") as f:
-                    return pickle.load(f)
+                    new = pickle.load(f)
             except Exception:
                 try:
                     with open(str(self.p / kp), "rb") as f:
-                        return pickle.load(f)
+                        new = pickle.load(f)
                 except Exception as err:
                     raise Exception(f"Error when getting {kp} from {self.p}: '{err}'")
+            if "key".startswith("audio_numpy_"):
+                if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
+                    red(f"Error when loading {kp} from {self.p}: unexpected value for loaded value")
+                    return None
+            return new
         else:
             whi(f"No {kp} in store for {self.p}")
             if key == "max_tkn":
@@ -36,6 +41,7 @@ class previous_values:
             if key == "txt_whisp_lang":
                 return "fr"
             return None
+        return new
 
     def __setitem__(self, key, item):
         try:
