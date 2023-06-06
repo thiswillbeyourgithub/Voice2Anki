@@ -277,7 +277,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang)
+        txt_audio = transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, profile)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
