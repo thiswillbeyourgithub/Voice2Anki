@@ -1,11 +1,14 @@
 import sys
 from pathlib import Path
 
-from main import demo
+from utils.gui import demo
 from utils.logger import whi, yel
 
+# misc init values
+Path("./cache").mkdir(exist_ok=True)
+
 if __name__ == "__main__":
-    whi(f"Starting WhisperToAnki\n")
+    whi("Starting WhisperToAnki\n")
     args = sys.argv[1:]
 
     # default argument
