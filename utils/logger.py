@@ -8,7 +8,9 @@ import rtoml
 import json
 
 Path("logs.txt").touch(exist_ok=True)
-log_formatter = logging.Formatter('%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s')
+log_formatter = logging.Formatter(
+        fmt='%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s',
+        datefmt='%d/%m/%Y %H:%M:%S')
 file_handler = handlers.RotatingFileHandler(
         "logs.txt",
         mode='a',
@@ -89,8 +91,9 @@ def get_log():
                 f.seek(-2, os.SEEK_CUR)
         except OSError:
             f.seek(0)
-        lastline = f.readline().decode()
-        if last_log_content and lastline == latest_tail:
+        lastline = f.readline().decode().strip()
+        lastline = re.sub(log_regex, " >           ", lastline)
+        if last_log_content and lastline[23:] == latest_tail[23:]:
             return last_log_content
 
     latest_tail = lastline
