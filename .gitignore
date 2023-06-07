@@ -8,5 +8,5 @@ utils/__pycache__/*
 
 API_KEY.txt
 utils/ssl/key.pem
-logs.txt*
+utils/logs
 profiles/

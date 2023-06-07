@@ -7,12 +7,12 @@ from logging import handlers
 import rtoml
 import json
 
-Path("logs.txt").touch(exist_ok=True)
+Path("utils/logs/logs.txt").touch(exist_ok=True)
 log_formatter = logging.Formatter(
         fmt='%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s',
         datefmt='%d/%m/%Y %H:%M:%S')
 file_handler = handlers.RotatingFileHandler(
-        "logs.txt",
+        "utils/logs/logs.txt",
         mode='a',
         maxBytes=1000000,
         backupCount=4,
