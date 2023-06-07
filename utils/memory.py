@@ -116,10 +116,18 @@ def prompt_filter(prev_prompts, max_token, temperature):
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
-    # make it so that highest priority prompts are last in the discussion
-    prev_prompts.reverse()
-    prev_prompts.insert(0, prev_prompts.pop(-1))  # keep the system prompt first
-    assert prev_prompts[0]["role"] == "system", "invalid sorting of prev_prompts"
+
+    # make it so that highest priority prompts are last in the discussion:
+    # prev_prompts.reverse()
+    # or sort by timestamp:
+    prev_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"])
+    # make sure the system prompt is first
+    for i, p in enumerate(prev_prompts):
+        if p["role"] == "system":
+            break
+    prev_prompts.insert(0, prev_prompts.pop(i))
+
+    assert prev_prompts[0]["role"] == "system", "the first prompt is not system"
     return output_pr
 
 
