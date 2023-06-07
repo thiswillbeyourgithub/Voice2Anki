@@ -14,7 +14,7 @@ log_formatter = logging.Formatter(
 file_handler = handlers.RotatingFileHandler(
         "logs.txt",
         mode='a',
-        maxBytes=100000,
+        maxBytes=1000000,
         backupCount=4,
         encoding=None,
         delay=0,
