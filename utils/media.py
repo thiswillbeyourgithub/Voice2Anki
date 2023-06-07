@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import tempfile
 from scipy.io.wavfile import write
@@ -12,6 +13,7 @@ from torchaudio.functional import vad
 
 from .logger import whi, red
 from .anki import anki_media
+from .ocr import get_text
 from .profiles import previous_values
 
 
@@ -73,7 +75,17 @@ def get_img_source(gallery):
             new = anki_media / f"{img_hash}.png"
             if not new.exists():
                 cv2.imwrite(str(new), decoded)
-            newsource = f'<img src="{new.name}" type="made_by_WhisperToAnki">'
+
+            ocr = ""
+            try:
+                ocr = get_text(str(new))
+            except Exception as err:
+                red(f"Error when OCRing image: '{err}'")
+            if ocr:
+                ocr = f"title=\"{json.dumps(ocr)}\" "
+
+            newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
+
             # only add if not duplicate, somehow
             if newsource not in source:
                 source += newsource
