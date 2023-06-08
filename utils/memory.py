@@ -102,16 +102,18 @@ def prompt_filter(prev_prompts, max_token, temperature):
     output_pr = [syspr[0]]
     category_count = 0
     for prio in prio_vals:
+        category_size = 0
         for pr in timesorted_pr:
             if pr in output_pr:
                 continue
             if pr["priority"] == prio:
+                category_size += 1
                 if not tkns + pr["tkn_len"] > max_token and stocha():
                     tkns += pr["tkn_len"]
                     output_pr.append(pr)
                 else:
                     dis_tkns += pr["tkn_len"]
-        whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}'")  # debug
+        whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
         category_count = len(output_pr)
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
