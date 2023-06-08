@@ -1,4 +1,4 @@
-from scipy.io.wavfile import write
+import torchaudio
 import hashlib
 from pathlib import Path
 import ankipandas as akp
@@ -105,10 +105,16 @@ def audio_to_anki(audio_numpy):
     whi("Sending audio to anki")
     try:
         audio_hash = hashlib.md5(audio_numpy[1]).hexdigest()
-        assert not (anki_media / f"{audio_hash}.wav").exists(), (
-            f"Audio hash already exists! {audio_hash}.wav")
-        write(f"{audio_hash}.wav", audio_numpy[0], audio_numpy[1])
-        html = f"</br>[sound:{audio_hash}.wav]"
+        audio_path = anki_media / f"WhisperToAnki_{audio_hash}.mp3"
+        assert not (audio_path).exists(), (
+            f"Audio hash already exists! {audio_path}")
+        torchaudio.save(
+                path=audio_path,
+                sample_rate=audio_numpy[0],
+                waveform=audio_numpy[1],
+                format="mp3",
+                )
+        html = f"</br>[sound:{audio_path.name}.mp3]"
         return html
     except Exception as err:
         return red(f"\n\nError when copying audio to anki media: '{err}'")

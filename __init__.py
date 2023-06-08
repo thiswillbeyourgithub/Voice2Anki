@@ -18,11 +18,6 @@ if __name__ == "__main__":
     auth_args = {"auth": ("g", "g"), "auth_message": "Please login using g/g"}
     server = None
 
-    wavfiles = [p for p in Path(".").iterdir() if str(p).endswith(".wav")]
-    if wavfiles:
-        whi(f"Found {len(wavfiles)} .wav files in root folder. Deleting them.")
-        [p.unlink() for p in wavfiles]
-
     if args:
         whi(f"Startup arguments: {args}")
 
