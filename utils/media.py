@@ -82,7 +82,8 @@ def get_img_source(gallery):
             except Exception as err:
                 red(f"Error when OCRing image: '{err}'")
             if ocr:
-                ocr = f"title=\"{json.dumps(ocr)}\" "
+                ocr = ocr.replace("\"", "").replace("'", "")
+                ocr = f"title=\"{ocr}\" "
 
             newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
 
