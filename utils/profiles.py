@@ -27,7 +27,7 @@ class previous_values:
                         new = pickle.load(f)
                 except Exception as err:
                     raise Exception(f"Error when getting {kp} from {self.p}: '{err}'")
-            if "key".startswith("audio_numpy_"):
+            if key.startswith("audio_numpy_"):
                 if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kp} from {self.p}: unexpected value for loaded value")
                     return None
