@@ -6,7 +6,7 @@ import pickle
 from bs4 import BeautifulSoup
 import cv2
 import numpy as np
-import pyperclip3
+import pyclip
 import hashlib
 from torchaudio import load
 from torchaudio.functional import vad
@@ -21,7 +21,7 @@ def get_image(gallery):
     whi("Getting image from clipboard")
     try:
         # load from clipboard
-        pasted = pyperclip3.paste()
+        pasted = pyclip.paste()
         decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
         if decoded is None:
             whi("Decoded image was Nonetype")
