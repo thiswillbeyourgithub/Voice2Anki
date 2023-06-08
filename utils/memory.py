@@ -9,8 +9,7 @@ from .misc import tokenize, transcript_template
 
 global prev_prompts
 
-default_system_prompt = [
-        {
+default_system_prompt = {
             "role": "system",
             "content": dedent("""You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into Anki flashcards.
 
@@ -21,9 +20,8 @@ default_system_prompt = [
                 * the transcript can be of poor quality, it is your job to correct transcription errors using the context.
                 * if you're absolutely certain that you can't accomplish your task: begin your answer by 'Alfred:' and I'll take a look immediately."""),
             "timestamp": int(time.time()),
-            "priority": 10,
+            "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
-        ]
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "answer", "llm_model", "tts_model"]
 
 
@@ -32,9 +30,13 @@ def check_prompts(prev_prompts):
     whi("Checking prompt validity")
     for i, mess in enumerate(prev_prompts):
 
-        assert mess["role"] in ["system", "user"], "invalid value of role value of message"
         if mess["role"] == "user":
             assert "answer" in mess, "no answer key in message"
+        elif mess["role"] == "system":
+            mess["content"] = default_system_prompt["content"]
+            mess["priority"] = default_system_prompt["priority"]
+        else:
+            raise ValueError("role of previous prompt is not user or system")
 
         assert "CONTEXT" not in mess["content"], "CONTEXT string found in message!"
         assert "TRANSCRIPT" not in mess["content"], "TRANSCRIPT string found in message!"
@@ -51,7 +53,7 @@ def check_prompts(prev_prompts):
             mess["priority"] = int(mess["priority"])
         assert isinstance(mess["priority"], int), f"priority is not int! '{mess['priority']}'"
         assert mess["priority"] <= 10, "priority above 10 !"
-        assert mess["priority"] >= 0, "priority under 0 !"
+        assert mess["priority"] >= -1, "priority under -1 !"
 
         if "tkn_len" not in mess:
             mess["tkn_len"] = len(tokenize(dedent(mess["content"]).strip()))
@@ -103,7 +105,7 @@ def prompt_filter(prev_prompts, max_token, temperature):
     assert len(syspr) == 1, "Number of system prompts != 1"
 
     # add by decreasing priority and timestamp
-    prio_vals = sorted(set([x["priority"] for x in prev_prompts]), reverse=True)
+    prio_vals = sorted(set([x["priority"] for x in prev_prompts if int(x["priority"]) != -1]), reverse=True)
     tkns = syspr[0]["tkn_len"]
     dis_tkns = 0
     output_pr = [syspr[0]]
@@ -188,7 +190,7 @@ def load_prev_prompts(profile):
         prev_prompts = check_prompts(prev_prompts)
     else:
         red(f"No memories in profile {profile} found, creating it")
-        prev_prompts = check_prompts(default_system_prompt.copy())
+        prev_prompts = check_prompts([default_system_prompt.copy()])
         with open(f"profiles/{profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4)
 
