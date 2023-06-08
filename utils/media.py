@@ -17,34 +17,46 @@ from .ocr import get_text
 from .profiles import previous_values
 
 
+def rgb_to_bgr(image):
+    """gradio is turning cv2's BGR colorspace into RGB, so
+    I need to convert it again"""
+    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+
 def get_image(gallery):
     whi("Getting image from clipboard")
     try:
         # load from clipboard
         pasted = pyclip.paste()
         decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
+        decoded = rgb_to_bgr(decoded)
+
         if decoded is None:
-            whi("Decoded image was Nonetype")
+            whi("Image from clipboard was Nonetype")
             return gallery
+
         if gallery is None:
             return [decoded]
+
         if isinstance(gallery, list):
-            out = [
-                    # gradio is turning cv2's BGR colorspace into RGB, so
-                    # I need to convert it again
-                    cv2.cvtColor(
-                        cv2.imread(
-                            i["name"],
-                            flags=1,
-                            ),
-                        cv2.COLOR_BGR2RGB,
-                        )for i in gallery
-                    ] + [decoded]
+            out = []
+            for im in gallery:
+                out.append(
+                        rgb_to_bgr(
+                            cv2.imread(
+                                im["name"],
+                                flags=1)
+                            )
+                        )
+            out += [decoded]
+
             whi("Loaded image from clipboard.")
             return out
+
         else:
             red(f'gallery is not list or None but {type(gallery)}')
             return None
+
     except Exception as err:
         red(f"Error: {err}")
         return None
