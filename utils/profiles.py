@@ -35,9 +35,9 @@ class previous_values:
         else:
             whi(f"No {kp} in store for {self.p}")
             if key == "max_tkn":
-                return 3500
+                return 2000
             if key == "temperature":
-                return 0
+                return 0.5
             if key == "txt_whisp_lang":
                 return "fr"
             return None
