@@ -106,8 +106,8 @@ def audio_to_anki(audio_numpy):
     try:
         audio_hash = hashlib.md5(audio_numpy[1]).hexdigest()
         audio_path = anki_media / f"WhisperToAnki_{audio_hash}.wav"
-        assert not (audio_path).exists(), (
-            f"Audio hash already exists! {audio_path}")
+        if (audio_path).exists():
+            red(f"Audio hash already exists! {audio_path}")
         write(audio_path, audio_numpy[0], audio_numpy[1])
         html = f"</br>[sound:{audio_path.name}.wav]"
         return html
