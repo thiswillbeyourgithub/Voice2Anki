@@ -105,6 +105,7 @@ def prompt_filter(prev_prompts, max_token, temperature):
         category_size = 0
         for pr in timesorted_pr:
             if pr in output_pr:
+                category_size += 1
                 continue
             if pr["priority"] == prio:
                 category_size += 1
