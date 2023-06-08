@@ -120,9 +120,9 @@ def prompt_filter(prev_prompts, max_token, temperature):
     assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
 
     # make it so that highest priority prompts are last in the discussion:
-    # prev_prompts.reverse()
+    prev_prompts.reverse()
     # or sort by timestamp:
-    prev_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"])
+    # prev_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"])
     # make sure the system prompt is first
     for i, p in enumerate(prev_prompts):
         if p["role"] == "system":
