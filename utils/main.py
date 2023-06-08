@@ -92,7 +92,12 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
     formatted_messages = []
     tkns = 0
     for m in prev_prompts:
-        formatted_messages.append(m.copy())
+        formatted_messages.append(
+                {
+                    "role": m["role"],
+                    "content": m["content"],
+                    }
+                )
         tkns += m["tkn_len"]
         if "answer" in m:
             assert m["role"] == "user", "expected user"
@@ -100,10 +105,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                 "role": "assistant",
                 "content": m["answer"]})
 
-    for i, fm in enumerate(formatted_messages):
-        for col in ["timestamp", "priority", "tkn_len", "answer", "disabled"]:
-            if col in fm:
-                del formatted_messages[i][col]
     formatted_messages.append(
             {
                 "role": "user",
