@@ -112,3 +112,11 @@ def switch_profile(profile):
             pv["txt_chatgpt_cloz"],
             profile,
             ]
+
+def save_tags(txt_profile, txt_tags):
+    if txt_tags:
+        previous_values(txt_profile)["txt_tags"] = txt_tags
+
+def save_deck(txt_profile, txt_deck):
+    if txt_deck:
+        previous_values(txt_profile)["txt_deck"] = txt_deck

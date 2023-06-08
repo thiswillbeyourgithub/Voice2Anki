@@ -1,6 +1,6 @@
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile, previous_values
+from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
 from .main import transcribe, alfred, main, auto_mode, semiauto_mode
 
 from .logger import get_log, whi
@@ -109,6 +109,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             fn=switch_profile,
             inputs=[txt_profile],
             outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, txt_audio, txt_chatgpt_cloz, txt_profile])
+    txt_tags.submit(fn=save_tags, inputs=[txt_profile, txt_tags])
+    txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
 
     # image
     img_btn.click(
