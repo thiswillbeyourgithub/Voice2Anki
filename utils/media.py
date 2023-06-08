@@ -31,7 +31,8 @@ def get_image(gallery):
         if isinstance(gallery, list):
             out = [
                     cv2.imread(
-                        i["name"]
+                        i["name"],
+                        flags=1,
                         ) for i in gallery
                     ] + [decoded]
             whi("Loaded image from clipboard.")
@@ -70,7 +71,7 @@ def get_img_source(gallery):
             return red("0 image found in gallery.")
         source = ""
         for img in gallery:
-            decoded = cv2.imread(img["name"])
+            decoded = cv2.imread(img["name"], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
             new = anki_media / f"{img_hash}.png"
             if not new.exists():
