@@ -203,8 +203,8 @@ def get_text(img_path: str):
 
             confidence = get_w_conf(word)
 
-            if confidence < 50:
-                tqdm.write(f"* Low confidence: {confidence}: {text}")
+            # if confidence < 50:
+            #     tqdm.write(f"* Low confidence: {confidence}: {text}")
 
             line_text += f'{spaces_before}{text}'
 
