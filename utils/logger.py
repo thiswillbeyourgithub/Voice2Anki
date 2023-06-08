@@ -7,12 +7,13 @@ from logging import handlers
 import rtoml
 import json
 
-Path("utils/logs/logs.txt").touch(exist_ok=True)
+log_file = Path("utils/logs/logs.txt")
+log_file.touch(exist_ok=True)
 log_formatter = logging.Formatter(
         fmt='%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s',
         datefmt='%d/%m/%Y %H:%M:%S')
 file_handler = handlers.RotatingFileHandler(
-        "utils/logs/logs.txt",
+        log_file,
         mode='a',
         maxBytes=1000000,
         backupCount=4,
@@ -83,7 +84,7 @@ def get_log():
     global last_log_content, latest_tail
     logcontent = []
     # updates only if the last line has changed
-    with open("logs.txt", "rb") as f:
+    with open(str(log_file), "rb") as f:
         # source: https://stackoverflow.com/questions/46258499/how-to-read-the-last-line-of-a-file-in-python
         try:  # catch OSError in case of a one line file
             f.seek(-2, os.SEEK_END)
@@ -97,7 +98,7 @@ def get_log():
             return last_log_content
 
     latest_tail = lastline
-    with open("logs.txt", "r") as f:
+    with open(str(log_file), "r") as f:
         for line in f.readlines()[-100:]:
             line = line.strip()
             if not line:
