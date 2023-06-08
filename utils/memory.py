@@ -17,7 +17,7 @@ default_system_prompt = [
             "priority": 10,
             }
         ]
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "answer"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "answer", "llm_model", "tts_model"]
 
 
 def check_prompts(prev_prompts):
@@ -152,6 +152,8 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
                     "timestamp": int(time.time()),
                     "priority": priority,
                     "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
+                    "llm_model": "gpt-3.5-turbo",
+                    "tts_model": "whisper-api",
                     }
                 ]
         if to_add[0] in prev_prompts:
