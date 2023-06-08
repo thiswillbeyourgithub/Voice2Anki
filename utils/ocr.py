@@ -99,9 +99,9 @@ def get_text(img_path: str):
             hocr = hocr_temp
             all_words = all_words_temp
 
-    red(f"Best preprocessing method: {best_method} with score {max_med:.2f} {max_mean:.2f}")
-    for m, v in preprocessings.items():
-        yel(f"* {m}: {v['median']:.2f}  {v['mean']:.2f}")
+    # red(f"Best preprocessing method: {best_method} with score {max_med:.2f} {max_mean:.2f}")
+    # for m, v in preprocessings.items():
+        # yel(f"* {m}: {v['median']:.2f}  {v['mean']:.2f}")
     del preprocessings
 
     # determine the average word height to use as threshold for the newlines
@@ -132,7 +132,7 @@ def get_text(img_path: str):
     except Exception as err:
         yel(f"Set line merging threshold to 0 because caught exception: '{err}'")
         merge_thresh = 0
-    red(f"Line merging threshold: {merge_thresh}")
+    # red(f"Line merging threshold: {merge_thresh}")
 
     # figure out the height of the line to scan at each iteration
     try:
@@ -140,7 +140,7 @@ def get_text(img_path: str):
     except Exception as err:
         yel(f"Set newline threshold to median_height because caught exception: '{err}'")
         newline_threshold = median_height
-    red(f"Median line diff: {newline_threshold}, median height: {median_height}")
+    # red(f"Median line diff: {newline_threshold}, median height: {median_height}")
 
     # figure out the offset that maximizes the number of words per lines
     incr = 5
@@ -167,7 +167,7 @@ def get_text(img_path: str):
         if v == max(scores.values()):
             best_offset = k
             break
-    red(f"Best offset: {best_offset})")
+    # red(f"Best offset: {best_offset})")
 
     # reset the best iterator
     w_done = []
