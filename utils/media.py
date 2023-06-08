@@ -30,10 +30,15 @@ def get_image(gallery):
             return [decoded]
         if isinstance(gallery, list):
             out = [
-                    cv2.imread(
-                        i["name"],
-                        flags=1,
-                        ) for i in gallery
+                    # gradio is turning cv2's BGR colorspace into RGB, so
+                    # I need to convert it again
+                    cv2.cvtColor(
+                        cv2.imread(
+                            i["name"],
+                            flags=1,
+                            ),
+                        cv2.COLOR_BGR2RGB,
+                        )for i in gallery
                     ] + [decoded]
             whi("Loaded image from clipboard.")
             return out
