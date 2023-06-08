@@ -37,7 +37,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     gr.Markdown("WhisperToAnki")
 
     # hidden, to store the request answer from chatgpt
-    txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False)
+    txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
 
     with gr.Row():
         with gr.Row():
@@ -51,15 +51,15 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                         txt_profile = gr.Textbox(value=pv["profile"], placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary").style(full_width=True)
-                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1)
-                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1)
+                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
                 with gr.Row():
                     with gr.Column(scale=1):
-                        txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang")
+                        txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
                     with gr.Column(scale=9):
                         with gr.Row():
-                            txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context")
-                            txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context")
+                            txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper")
+                            txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT")
 
     with gr.Row():
         with gr.Column(scale=1):
@@ -71,8 +71,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             audio_numpy_5 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
         with gr.Column(scale=3):
-            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10)
-            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="LLM cloze(s)", lines=5, max_lines=10)
+            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
+            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
 
     with gr.Row():
         transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
@@ -94,7 +94,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False)
+    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
 
     # events
     # darkmode
