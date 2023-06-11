@@ -254,16 +254,6 @@ def main(
     pv["txt_whisp_prompt"] = txt_whisp_prompt
     pv["txt_whisp_lang"] = txt_whisp_lang
 
-    # manage sound path
-    audio_html = audio_to_anki(audio_numpy_1)
-    if "Error" in audio_html:  # then out is an error message and not the source
-        return [
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_tkncost"],
-                to_return["txt_chatgpt_cloz"],
-                ]
-    txt_source += audio_html
-
     # save image and audio for next startup
     if gallery is not None:
         saved_gallery = [
@@ -336,6 +326,16 @@ def main(
                 ]
 
     red("Sending to anki:")
+
+    # sending sound file to anki media
+    audio_html = audio_to_anki(audio_numpy_1)
+    if "Error" in audio_html:  # then out is an error message and not the source
+        return [
+                to_return["txt_audio"],
+                to_return["txt_chatgpt_tkncost"],
+                to_return["txt_chatgpt_cloz"],
+                ]
+    txt_source += audio_html
 
     # if not found or empty: create csv file in profile containing the header
     try:
