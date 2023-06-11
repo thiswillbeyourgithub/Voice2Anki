@@ -1,10 +1,14 @@
-from scipy.io.wavfile import write
+import tempfile
 import hashlib
 from pathlib import Path
 import ankipandas as akp
 import time
 import urllib.request
 import json
+
+from scipy.io.wavfile import write
+from torchaudio import load, save
+
 from .logger import red, whi
 
 
@@ -104,12 +108,25 @@ def _call_anki(action, **params):
 def audio_to_anki(audio_numpy):
     whi("Sending audio to anki")
     try:
+
+        # save numpy audio to wav, load to torch then save to mp3 in anki dir
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="saving_to_anki")
+        write(tmp.name, audio_numpy[0], audio_numpy[1])
+        tens = load(tmp.name)
+        Path(tmp.name).unlink(missing_ok=True)
+
         audio_hash = hashlib.md5(audio_numpy[1]).hexdigest()
-        audio_path = anki_media / f"WhisperToAnki_{audio_hash}.wav"
+        audio_path = anki_media / f"WhisperToAnki_{audio_hash}.mp3"
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
-        write(audio_path, audio_numpy[0], audio_numpy[1])
-        html = f"</br>[sound:{audio_path.name}.wav]"
+        save(
+                filepath=audio_path,
+                src=tens[0],
+                sample_rate=tens[1],
+                )
+        assert (audio_path).exists(), "audio file not found in anki media!"
+
+        html = f"</br>[sound:{audio_path.name}]"
         return html
     except Exception as err:
         return red(f"\n\nError when copying audio to anki media: '{err}'")
