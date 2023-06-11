@@ -8,8 +8,7 @@ import cv2
 import numpy as np
 import pyclip
 import hashlib
-from torchaudio import load
-from torchaudio.functional import vad
+import torchaudio
 
 from .logger import whi, red
 from .anki import anki_media
@@ -174,19 +173,19 @@ def sound_preprocessing(audio_numpy_n):
     tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="preprocessing")
     write(tmp.name, audio_numpy_n[0], audio_numpy_n[1])
 
-    tens = load(tmp.name)
-    cleaned = vad(
-            waveform=tens[0],
-            sample_rate=tens[1],
-            trigger_level=7.0,
+    waveform, sample_rate = torchaudio.load(tmp.name)
+    vad_waveform = torchaudio.functional.vad(
+            waveform=waveform,
+            sample_rate=sample_rate,
+            trigger_level=5.0,
             trigger_time=0.25,
-            search_time=1.0,
-            allowed_gap=0.25,
+            search_time=0.5,
+            allowed_gap=0.10,
             pre_trigger_time=0.0,
             boot_time=0.35,
             noise_up_time=0.1,
             noise_down_time=0.01,
-            noise_reduction_amount=1.35,
+            noise_reduction_amount=1.5,
             measure_freq=20.0,
             measure_duration=None,
             measure_smooth_time=0.4,
@@ -196,8 +195,9 @@ def sound_preprocessing(audio_numpy_n):
             lp_lifter_freq=2000.0,
             )
 
+
     Path(tmp.name).unlink(missing_ok=True)
-    audio_numpy_n = tuple((audio_numpy_n[0], cleaned.numpy().T))
+    audio_numpy_n = tuple((audio_numpy_n[0], vad_waveform.numpy().T))
 
     whi("Done preprocessing audio")
     return audio_numpy_n
