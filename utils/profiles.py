@@ -71,8 +71,6 @@ class previous_values:
             if key == "txt_whisp_lang":
                 return "fr"
             if key == "latest_profile":
-                print(self.p)
-                breakpoint()
                 return "default"
             return None
         return new
