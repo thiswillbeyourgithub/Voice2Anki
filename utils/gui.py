@@ -71,8 +71,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             audio_numpy_5 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
         with gr.Column(scale=3):
-            txt_audio = gr.Textbox(value=pv["txt_audio"], label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
-            txt_chatgpt_cloz = gr.Textbox(value=pv["txt_chatgpt_cloz"], label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
+            txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
 
     with gr.Row():
         transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")

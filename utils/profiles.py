@@ -129,8 +129,8 @@ def switch_profile(profile):
             pv["txt_whisp_lang"],
             pv["gallery"],
             pv["audio_numpy_1"],
-            pv["txt_audio"],
-            pv["txt_chatgpt_cloz"],
+            None,
+            None,
             profile,
             ]
 
