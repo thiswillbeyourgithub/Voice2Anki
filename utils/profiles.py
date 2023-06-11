@@ -34,7 +34,7 @@ class previous_values:
             return new
         else:
             whi(f"No {kp} in store for {self.p}")
-            if key == "max_tkn":
+            if key == "sld_max_tkn":
                 return 2000
             if key == "temperature":
                 return 0.5
