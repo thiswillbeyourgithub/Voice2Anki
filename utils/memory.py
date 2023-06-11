@@ -87,14 +87,18 @@ def prompt_filter(prev_prompts, max_token, temperature):
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
 
-    def stocha():
-        if temperature == 0:
+    def stocha(n):
+        """if temperature of LLM is set high enough, some example filters
+        will be randomly discarder to increase randomness. But only after
+        the first few prompts were added"""
+        if temperature == 0 or n <= 5:
             return True
-        if random.random() >= min(temperature / 3, 0.33):
+        threshold = min(temperature / 3, 0.33)
+        if random.random() >= threshold:
             # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
             # no worse if temperature is higher than 1
             return True
-        red("Stochasticity decided not to include one prompt")
+        red(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f}")
         return False
 
     assert max_token >= 500, "max_token should be above 500"
@@ -117,7 +121,7 @@ def prompt_filter(prev_prompts, max_token, temperature):
                 continue
             if pr["priority"] == prio:
                 category_size += 1
-                if not tkns + pr["tkn_len"] > max_token and stocha():
+                if not tkns + pr["tkn_len"] > max_token and stocha(len(output_pr)):
                     tkns += pr["tkn_len"]
                     output_pr.append(pr)
                 else:
