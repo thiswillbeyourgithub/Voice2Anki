@@ -63,6 +63,8 @@ def check_prompts(prev_prompts):
                 assert mess["role"] == "system", "expected system message here"
         assert isinstance(mess["tkn_len"], int), "tkn_len is not int!"
         assert mess["tkn_len"] > 0, "tkn_len under 0 !"
+        if mess["tkn_len"] > 500:
+            red(f"prompt with more than 500 token: '{mess}'")
 
         # keep only the expected keys
         keys = [k for k in mess.keys() if k in expected_mess_keys]
@@ -158,23 +160,31 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
         whi("Replaced newlines in txt_chatgpt_cloz")
         txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
 
+    content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
+    answer = dedent(txt_chatgpt_cloz.replace("\n", "<br/>")).strip()
+    tkn_len = len(tokenize(content))
+    tkn_len += len(tokenize(answer))
+    if tkn_len > 500:
+        red("Recursive improvement stopped because you supplied an example "
+            f"with a surprising amount of token: '{tkn_len}'")
+        return
+
     prev_prompts = load_prev_prompts(choice_profile)
     try:
-        to_add = [
-                {
-                    "role": "user",
-                    "content": transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio),
-                    "timestamp": int(time.time()),
-                    "priority": priority,
-                    "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
-                    "llm_model": "gpt-3.5-turbo",
-                    "tts_model": "whisper-api",
-                    }
-                ]
-        if to_add[0] in prev_prompts:
+        to_add = {
+                "role": "user",
+                "content": content,
+                "timestamp": int(time.time()),
+                "priority": priority,
+                "answer": answer,
+                "llm_model": "gpt-3.5-turbo",
+                "tts_model": "whisper-api",
+                "tkn_len": tkn_len,
+                }
+        if to_add in prev_prompts:
             red("Already present in previous outputs!")
             return
-        prev_prompts.extend(to_add)
+        prev_prompts.append(to_add)
 
         prev_prompts = check_prompts(prev_prompts)
 
