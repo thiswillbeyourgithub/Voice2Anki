@@ -94,13 +94,15 @@ def get_log():
             f.seek(0)
         lastline = f.readline().decode().strip()
         lastline = re.sub(log_regex, " >           ", lastline)
-        if last_log_content and (lastline[23:] == latest_tail[23:] or "HTTP Request: POST" in latest_tail):
+        if last_log_content and (lastline[23:] == latest_tail[23:] or "HTTP Request: POST" in lastline):
             return last_log_content
 
     latest_tail = lastline
     with open(str(log_file), "r") as f:
         for line in f.readlines()[-100:]:
             line = line.strip()
+            if "HTTP Request: POST" in line:
+                continue
             if not line:
                 continue
             line = re.sub(log_regex, " >           ", line)
