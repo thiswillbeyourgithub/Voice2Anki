@@ -10,12 +10,31 @@ class previous_values:
         assert Path("./profiles").exists(), "profile folder not found"
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.isalpha(), f"profile is not alphanumeric: '{profile}'"
+        self.approved_keys = [
+                "audio_numpy_1",
+                "audio_numpy_2",
+                "audio_numpy_3",
+                "audio_numpy_4",
+                "audio_numpy_5",
+                "gallery",
+                "sld_max_tkn",
+                "temperature",
+                "txt_chatgpt_context",
+                "txt_deck",
+                "txt_tags",
+                "txt_whisp_lang",
+                "txt_whisp_prompt",
+                "latest_profile",
+                ]
+
         self.p = Path(f"./profiles/{profile}")
         if profile == "default":
             self.p.mkdir(exist_ok=True)
         assert self.p.exists(), f"{self.p} not found!"
 
     def __getitem__(self, key):
+        if key not in self.approved_keys:
+            raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         kp = key + ".pickle"
         if (self.p / kp).exists():
             try:
@@ -44,6 +63,8 @@ class previous_values:
         return new
 
     def __setitem__(self, key, item):
+        if key not in self.approved_keys:
+            raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
         try:
             with open(str(self.p / (key + ".pickle")), "w") as f:
                 return pickle.dump(item, f)
