@@ -28,53 +28,78 @@ class previous_values:
                 ]
 
         self.p = Path(f"./profiles/{profile}")
-        if profile == "default":
+        if profile != "reload":
             self.p.mkdir(exist_ok=True)
+        else:
+            whi("Reloading latest profile")
+            self.__init__(profile=self["latest_profile"])
+        whi(f"Profile loaded: {self.p.name}")
+
         assert self.p.exists(), f"{self.p} not found!"
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         kp = key + ".pickle"
-        if (self.p / kp).exists():
+        if key == "latest_profile":
+            # latest_profile.pickle is stored in the root of the profile dir
+            kf = self.p.parent / kp
+        else:
+            kf = self.p / kp
+
+        if kf.exists():
             try:
-                with open(str(self.p / kp), "r") as f:
+                with open(str(kf), "r") as f:
                     new = pickle.load(f)
             except Exception:
                 try:
-                    with open(str(self.p / kp), "rb") as f:
+                    with open(str(kf), "rb") as f:
                         new = pickle.load(f)
                 except Exception as err:
-                    raise Exception(f"Error when getting {kp} from {self.p}: '{err}'")
-            if key.startswith("audio_numpy_"):
+                    raise Exception(f"Error when getting {kf}: '{err}'")
+            if key.startswith("audio_numpy"):
                 if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
-                    red(f"Error when loading {kp} from {self.p}: unexpected value for loaded value")
+                    red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
             return new
         else:
-            whi(f"No {kp} in store for {self.p}")
+            whi(f"No {kf} stored in profile dir")
             if key == "sld_max_tkn":
                 return 2000
             if key == "temperature":
                 return 0.5
             if key == "txt_whisp_lang":
                 return "fr"
+            if key == "latest_profile":
+                print(self.p)
+                breakpoint()
+                return "default"
             return None
         return new
 
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
+        kp = key + ".pickle"
+        if key == "latest_profile":
+            if item == "default":
+                # don't store default as latest profile as it's already the default
+                return None
+            # the latest profile is stored in the root of the profile dir
+            kf = self.p.parent / kp
+        else:
+            kf = self.p / kp
+
         try:
-            with open(str(self.p / (key + ".pickle")), "w") as f:
+            with open(str(kf), "w") as f:
                 return pickle.dump(item, f)
         except Exception:
             try:
                 # try as binary
-                with open(str(self.p / (key + ".pickle")), "wb") as f:
+                with open(str(kf), "wb") as f:
                     return pickle.dump(item, f)
             except Exception as err:
-                raise Exception(f"Error when setting {key} from {self.p}: '{err}'")
+                raise Exception(f"Error when setting {kf}: '{err}'")
 
 
 def get_profiles():
@@ -118,6 +143,7 @@ def switch_profile(profile):
                 ]
 
     pv = previous_values(profile)
+    pv["latest_profile"] = profile
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")

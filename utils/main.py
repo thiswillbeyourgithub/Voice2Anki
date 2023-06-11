@@ -236,10 +236,8 @@ def main(
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     # store the default profile
-    if "pv" in globals():
-        global pv
-        pv["profile"] = profile
     pv = previous_values(profile)
+    pv["latest_profile"] = profile
 
     if gallery is None or len(gallery) == 0:
         red("you should probably specify an image in source")
@@ -252,7 +250,6 @@ def main(
     pv["txt_tags"] = txt_tags
     pv["sld_max_tkn"] = sld_max_tkn
     pv["temperature"] = sld_temp
-    pv["profile"] = profile
     pv["txt_chatgpt_context"] = txt_chatgpt_context
     pv["txt_whisp_prompt"] = txt_whisp_prompt
     pv["txt_whisp_lang"] = txt_whisp_lang

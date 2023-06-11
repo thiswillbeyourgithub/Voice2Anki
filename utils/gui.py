@@ -26,11 +26,7 @@ document.querySelector('body').classList.add('dark');
 }"""
 
 # load default profile
-pv = previous_values()
-# if last profile was not 'default', switch directly to the last used
-if pv["profile"] != "default":
-    whi(f"Loading profile '{pv['profile']}'")
-    pv = previous_values(pv["profile"])
+pv = previous_values("reload")
 
 with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as demo:
 
@@ -48,7 +44,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             with gr.Column(scale=2):
                 with gr.Row():
                     with gr.Column(scale=10):
-                        txt_profile = gr.Textbox(value=pv["profile"], placeholder=",".join(get_profiles()), label="Profile")
+                        txt_profile = gr.Textbox(value=pv["latest_profile"], placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary").style(full_width=True)
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
