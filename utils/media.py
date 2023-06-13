@@ -208,16 +208,16 @@ def sound_preprocessing(audio_numpy_n):
             ["highpass", "-2", "50"],
             ["lowpass", "-2", "5000"],
 
-            # max silence should be 1s
-            ["silence", "-l", "1", "0.1", "5%", "-1", "1.0", "5%"],
+            # # max silence should be 1s
+            # ["silence", "-l", "1", "0.1", "5%", "-1", "1.0", "5%"],
 
-            # remove leading silence
-            ["vad"],
+            # # remove leading silence
+            # ["vad"],
 
-            # and ending silence
-            ["reverse"],
-            ["vad"],
-            ["reverse"],
+            # # and ending silence
+            # ["reverse"],
+            # ["vad"],
+            # ["reverse"],
             ]
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
             waveform,
