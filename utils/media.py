@@ -174,30 +174,60 @@ def sound_preprocessing(audio_numpy_n):
     write(tmp.name, audio_numpy_n[0], audio_numpy_n[1])
 
     waveform, sample_rate = torchaudio.load(tmp.name)
-    vad_waveform = torchaudio.functional.vad(
-            waveform=waveform,
-            sample_rate=sample_rate,
-            trigger_level=5.0,
-            trigger_time=0.25,
-            search_time=0.5,
-            allowed_gap=0.10,
-            pre_trigger_time=0.0,
-            boot_time=0.35,
-            noise_up_time=0.1,
-            noise_down_time=0.01,
-            noise_reduction_amount=1.5,
-            measure_freq=20.0,
-            measure_duration=None,
-            measure_smooth_time=0.4,
-            hp_filter_freq=50.0,
-            lp_filter_freq=6000.0,
-            hp_lifter_freq=150.0,
-            lp_lifter_freq=2000.0,
+
+    # voice activity detector (i.e. trims the beginning of the sound until you speak)
+    # vad_waveform = torchaudio.functional.vad(
+    #         waveform=waveform,
+    #         sample_rate=sample_rate,
+    #         trigger_level=5.0,
+    #         trigger_time=0.25,
+    #         search_time=0.5,
+    #         allowed_gap=0.10,
+    #         pre_trigger_time=0.0,
+    #         boot_time=0.35,
+    #         noise_up_time=0.1,
+    #         noise_down_time=0.01,
+    #         noise_reduction_amount=1.5,
+    #         measure_freq=20.0,
+    #         measure_duration=None,
+    #         measure_smooth_time=0.4,
+    #         hp_filter_freq=50.0,
+    #         lp_filter_freq=6000.0,
+    #         hp_lifter_freq=150.0,
+    #         lp_lifter_freq=2000.0,
+    #         )
+
+    sox_effects = [
+            ["norm"],  # normalize audio
+
+            # isolate voice frequency
+            # -2 is for a steeper filtering
+            ["highpass", "-1", "100"],
+            ["lowpass", "-1", "3000"],
+            # removes high frequency and very low ones
+            ["highpass", "-2", "50"],
+            ["lowpass", "-2", "5000"],
+
+            # max silence should be 1s
+            ["silence", "-l", "1", "0.1", "5%", "-1", "1.0", "5%"],
+
+            # remove leading silence
+            ["vad"],
+
+            # and ending silence
+            ["reverse"],
+            ["vad"],
+            ["reverse"],
+            ]
+    waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
+            waveform,
+            sample_rate,
+            sox_effects,
             )
 
 
     Path(tmp.name).unlink(missing_ok=True)
-    audio_numpy_n = tuple((audio_numpy_n[0], vad_waveform.numpy().T))
+    audio_numpy_n = tuple((sample_rate, waveform.numpy().T))
 
     whi("Done preprocessing audio")
     return audio_numpy_n
