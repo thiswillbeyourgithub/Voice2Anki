@@ -126,7 +126,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                 red("Asking ChatGPT")
                 cnt += 1
                 response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo",
+                        model="gpt-3.5-turbo-16k",
                         messages=formatted_messages,
                         stop="END",
                         temperature=temperature,
@@ -142,7 +142,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
 
-        tkn_cost = response["usage"]["total_tokens"]
+        input_tkn_cost = response["usage"]["input_tokens"]
+        output_tkn_cost = response["usage"]["completion_tokens"]
+        tkn_cost = [input_tkn_cost, output_tkn_cost]
 
         reason = response["choices"][0]["finish_reason"]
         if reason.lower() != "stop":
@@ -273,8 +275,8 @@ def main(
         txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp)
     if not txt_chatgpt_tkncost:
         red("No token cost found, setting to 0")
-        txt_chatgpt_tkncost = 0
-    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or txt_chatgpt_tkncost == 0:
+        txt_chatgpt_tkncost = [0, 0]
+    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in txt_chatgpt_tkncost:
         return [
                 to_return["txt_audio"],
                 txt_chatgpt_tkncost,
@@ -283,7 +285,7 @@ def main(
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
     to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
 
-    tkn_cost_dol = int(txt_chatgpt_tkncost) / 1000 * 0.002
+    tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
 
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
