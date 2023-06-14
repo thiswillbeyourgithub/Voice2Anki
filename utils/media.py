@@ -198,7 +198,7 @@ def sound_preprocessing(audio_numpy_n):
     #         )
 
     sox_effects = [
-            ["norm"],  # normalize audio
+            # ["norm"],  # normalize audio
 
             # isolate voice frequency
             # -2 is for a steeper filtering
