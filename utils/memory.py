@@ -107,7 +107,7 @@ def prompt_filter(prev_prompts, max_token, temperature):
         return False
 
     assert max_token >= 500, "max_token should be above 500"
-    assert max_token <= 3500, "max_token should be under 3500"
+    assert max_token <= 15500, "max_token should be under 15500"
 
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
