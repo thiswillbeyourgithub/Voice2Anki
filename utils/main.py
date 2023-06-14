@@ -150,7 +150,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         tkn_cost_dol = input_tkn_cost / 1000 * 0.003 + output_tkn_cost / 1000 * 0.004
         pv = previous_values(profile)
         pv["total_llm_cost"] += tkn_cost_dol
-        red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f}")
+        red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f} (not counting whisper)")
 
         reason = response["choices"][0]["finish_reason"]
         if reason.lower() != "stop":
@@ -314,7 +314,7 @@ def main(
                 ]
 
     # add cloze to output
-    red(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f})")
+    red(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}, not counting whisper)")
     red(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
 
     # send to anki
