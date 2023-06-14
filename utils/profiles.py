@@ -25,6 +25,7 @@ class previous_values:
                 "txt_whisp_lang",
                 "txt_whisp_prompt",
                 "latest_profile",
+                "total_llm_cost",
                 ]
 
         self.p = Path(f"./profiles/{profile}")
@@ -63,7 +64,7 @@ class previous_values:
                     return None
             return new
         else:
-            whi(f"No {kf} stored in profile dir")
+            whi(f"No {kf} stored in profile dir, using appropriate default value")
             if key == "sld_max_tkn":
                 return 2000
             if key == "temperature":
@@ -72,6 +73,8 @@ class previous_values:
                 return "fr"
             if key == "latest_profile":
                 return "default"
+            if key == "total_llm_cost":
+                return 0
             return None
         return new
 

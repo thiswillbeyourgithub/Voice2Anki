@@ -286,6 +286,8 @@ def main(
     to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
 
     tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
+    pv["total_llm_cost"] += tkn_cost_dol
+    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f}")
 
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
