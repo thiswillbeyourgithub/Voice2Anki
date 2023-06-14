@@ -1,3 +1,4 @@
+import json
 import csv
 import cv2
 import tempfile
@@ -80,9 +81,9 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
-        return "No transcribed audio found.", None
+        return "No transcribed audio found.", [0, 0]
     if not txt_chatgpt_context:
-        return "No txt_chatgpt_context found.", None
+        return "No txt_chatgpt_context found.", [0, 0]
 
     prev_prompts = load_prev_prompts(profile)
     prev_prompts = prompt_filter(prev_prompts, max_token, temperature)
@@ -134,7 +135,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                 break
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red("ChatGPT: too many retries."), None
+                    return red("ChatGPT: too many retries."), [0, 0]
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
 
@@ -142,7 +143,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
 
-        input_tkn_cost = response["usage"]["input_tokens"]
+        input_tkn_cost = response["usage"]["prompt_tokens"]
         output_tkn_cost = response["usage"]["completion_tokens"]
         tkn_cost = [input_tkn_cost, output_tkn_cost]
 
@@ -152,7 +153,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
 
         return cloz, tkn_cost
     except Exception as err:
-        return red(f"Error with ChatGPT: '{err}'"), 0
+        return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
 def semiauto_mode(*args, **kwargs):
@@ -273,6 +274,8 @@ def main(
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
         txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp)
+    if isinstance(txt_chatgpt_tkncost, str):
+        txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
     if not txt_chatgpt_tkncost:
         red("No token cost found, setting to 0")
         txt_chatgpt_tkncost = [0, 0]
