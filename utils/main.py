@@ -119,7 +119,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
             "with fewer tokens to make sure you have room for the answer")
         return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature)
 
-    assert tkns <= 4000, f"Too many tokens! ({tkns})"
+    assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
         cnt = 0
         while True:
