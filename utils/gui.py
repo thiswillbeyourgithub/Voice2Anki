@@ -86,7 +86,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
         with gr.Column(scale=1):
             with gr.Row():
-                sld_max_tkn = gr.Slider(minimum=500, maximum=3500, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size")
+                sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
 
     # output
