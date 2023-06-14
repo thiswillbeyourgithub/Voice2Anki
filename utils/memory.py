@@ -103,7 +103,7 @@ def prompt_filter(prev_prompts, max_token, temperature):
             # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
             # no worse if temperature is higher than 1
             return True
-        red(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f}")
+        red(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
         return False
 
     assert max_token >= 500, "max_token should be above 500"
