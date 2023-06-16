@@ -126,7 +126,7 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             fn=reset_audio,
             inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
             outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5])
-    audio_numpy_1.change(fn=sound_preprocessing, inputs=[audio_numpy_1], outputs=[audio_numpy_1]).then(fn=audio_saver().n1, inputs=[txt_profile, audio_numpy_1])
+    audio_numpy_1.change(fn=audio_saver().n1, inputs=[txt_profile, audio_numpy_1])
     audio_numpy_2.change(fn=audio_saver().n2, inputs=[txt_profile, audio_numpy_2])
     audio_numpy_3.change(fn=audio_saver().n3, inputs=[txt_profile, audio_numpy_3])
     audio_numpy_4.change(fn=audio_saver().n4, inputs=[txt_profile, audio_numpy_4])
