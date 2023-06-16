@@ -22,7 +22,7 @@ default_system_prompt = {
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len", "answer", "llm_model", "tts_model"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model"]
 
 
 def check_prompts(prev_prompts):
@@ -55,15 +55,18 @@ def check_prompts(prev_prompts):
         assert mess["priority"] <= 10, "priority above 10 !"
         assert mess["priority"] >= -1, "priority under -1 !"
 
-        if "tkn_len" not in mess:
-            mess["tkn_len"] = len(tokenize(dedent(mess["content"]).strip()))
+        if "tkn_len_in" not in mess:
+            mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
             if "answer" in mess:  # system prompt has no answer
-                mess["tkn_len"] += len(tokenize(dedent(mess["answer"]).strip()))
+                mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
             else:
                 assert mess["role"] == "system", "expected system message here"
-        assert isinstance(mess["tkn_len"], int), "tkn_len is not int!"
-        assert mess["tkn_len"] > 0, "tkn_len under 0 !"
-        if mess["tkn_len"] > 500 and mess["role"] != "system":
+                mess["tkn_len_out"] = 0
+        assert isinstance(mess["tkn_len_in"], int), "tkn_len_in is not int!"
+        assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
+        assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
+        assert mess["tkn_len_out"] > 0, "tkn_len_out under 0 !"
+        if mess["tkn_len_in"] + mess["tkn_len_out"] > 500:
             if mess["priority"] > 5:
                 red(f"high priority prompt with more than 500 token: '{mess}'")
             else:
@@ -165,11 +168,11 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_cloz.replace("\n", "<br/>")).strip()
-    tkn_len = len(tokenize(content))
-    tkn_len += len(tokenize(answer))
-    if tkn_len > 500:
+    tkn_len_in = len(tokenize(content))
+    tkn_len_out = len(tokenize(answer))
+    if tkn_len_in + tkn_len_out > 500:
         red("You supplied an example "
-            f"with a surprising amount of token: '{tkn_len}' This can have "
+            f"with a surprising amount of token: '{tkn_len_in + tkn_len_out}' This can have "
             "adverse effects.")
 
     prev_prompts = load_prev_prompts(choice_profile)
@@ -182,7 +185,8 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
                 "answer": answer,
                 "llm_model": "gpt-3.5-turbo",
                 "tts_model": "whisper-api",
-                "tkn_len": tkn_len,
+                "tkn_len_in": tkn_len_in,
+                "tkn_len_out": tkn_len_out,
                 }
         if to_add in prev_prompts:
             red("Already present in previous outputs!")
