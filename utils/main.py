@@ -85,8 +85,15 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
     if not txt_chatgpt_context:
         return "No txt_chatgpt_context found.", [0, 0]
 
+    new_prompt = {
+            "role": "user",
+            "content": dedent(
+                transcript_template.replace("CONTEXT", txt_chatgpt_context
+                    ).replace("TRANSCRIPT", txt_audio))
+                }
+
     prev_prompts = load_prev_prompts(profile)
-    prev_prompts = prompt_filter(prev_prompts, max_token, temperature)
+    prev_prompts = prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=len(tokenize(new_prompt["content"])))
 
     # check the number of token is fine and format the previous
     # prompts in chatgpt format
@@ -99,18 +106,16 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                     "content": m["content"],
                     }
                 )
-        tkns += m["tkn_len"]
+        tkns += m["tkn_len_in"]
+        tkns += m["tkn_len_out"]
         if "answer" in m:
             assert m["role"] == "user", "expected user"
             formatted_messages.append({
                 "role": "assistant",
                 "content": m["answer"]})
 
-    formatted_messages.append(
-            {
-                "role": "user",
-                "content": dedent(
-                    transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio))})
+    formatted_messages.append(new_prompt)
+
     tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 

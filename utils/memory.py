@@ -1,3 +1,4 @@
+import numpy as np
 import random
 import time
 from pathlib import Path
@@ -65,7 +66,7 @@ def check_prompts(prev_prompts):
         assert isinstance(mess["tkn_len_in"], int), "tkn_len_in is not int!"
         assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
         assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
-        assert mess["tkn_len_out"] > 0, "tkn_len_out under 0 !"
+        assert mess["tkn_len_out"] > 0 or mess["role"] == "system", "tkn_len_out under 0 !"
         if mess["tkn_len_in"] + mess["tkn_len_out"] > 500:
             if mess["priority"] > 5:
                 red(f"high priority prompt with more than 500 token: '{mess}'")
@@ -86,7 +87,7 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def prompt_filter(prev_prompts, max_token, temperature):
+def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -112,15 +113,33 @@ def prompt_filter(prev_prompts, max_token, temperature):
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
 
+    if new_prompt_len:
+        # get average and spread of tkns lengths:
+        lens = [p["tkn_len_in"] for p in prev_prompts]
+        llens = np.log(lens)
+        sig = np.std(llens)
+
+        def len_check(pr):
+            if abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
+                red(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                return True
+            else:
+                yel(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                return False
+    else:
+        def len_check(pr):
+            return True
+
+
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
     assert len(syspr) == 1, "Number of system prompts != 1"
 
     # add by decreasing priority and timestamp
     prio_vals = sorted(set([x["priority"] for x in prev_prompts if int(x["priority"]) != -1]), reverse=True)
-    tkns = syspr[0]["tkn_len"]
+    tkns = syspr[0]["tkn_len_in"]
     dis_tkns = 0
-    output_pr = [syspr[0]]
+    output_pr = [syspr[0]]  # add system prompt
     category_count = 0
     for prio in prio_vals:
         category_size = 0
@@ -129,8 +148,8 @@ def prompt_filter(prev_prompts, max_token, temperature):
                 continue
             if pr["priority"] == prio:
                 category_size += 1
-                if not tkns + pr["tkn_len"] > max_token and stocha(len(output_pr)):
-                    tkns += pr["tkn_len"]
+                if not tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token and stocha(len(output_pr)) and len_check(pr):
+                    tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
                     output_pr.append(pr)
                 else:
                     dis_tkns += pr["tkn_len"]
