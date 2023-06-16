@@ -14,12 +14,7 @@ from .logger import whi, red
 from .anki import anki_media
 from .ocr import get_text
 from .profiles import previous_values
-
-
-def rgb_to_bgr(image):
-    """gradio is turning cv2's BGR colorspace into RGB, so
-    I need to convert it again"""
-    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+from .misc import rgb_to_bgr
 
 
 def get_image(gallery):

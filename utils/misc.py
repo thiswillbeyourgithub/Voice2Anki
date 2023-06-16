@@ -1,3 +1,4 @@
+import cv2
 import tiktoken
 
 
@@ -22,3 +23,8 @@ Transcript:
 TRANSCRIPT
 '''
 """
+
+def rgb_to_bgr(image):
+    """gradio is turning cv2's BGR colorspace into RGB, so
+    I need to convert it again"""
+    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)

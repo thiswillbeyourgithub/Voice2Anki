@@ -1,8 +1,10 @@
 import pickle
 from pathlib import Path
 import numpy as np
+import cv2
 
 from .logger import whi, red
+from .misc import rgb_to_bgr
 
 
 class previous_values:
@@ -62,6 +64,10 @@ class previous_values:
                 if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
+            if key == "gallery":
+                # when reloading gallery, the image has to be inverted again
+                for i, im in enumerate(new):
+                    new[i] = rgb_to_bgr(im)
             return new
         else:
             whi(f"No {kf} stored in profile dir, using appropriate default value")
