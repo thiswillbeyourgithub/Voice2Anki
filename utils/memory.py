@@ -168,9 +168,9 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
     tkn_len = len(tokenize(content))
     tkn_len += len(tokenize(answer))
     if tkn_len > 500:
-        red("Recursive improvement stopped because you supplied an example "
-            f"with a surprising amount of token: '{tkn_len}'")
-        return
+        red("You supplied an example "
+            f"with a surprising amount of token: '{tkn_len}' This can have "
+            "adverse effects.")
 
     prev_prompts = load_prev_prompts(choice_profile)
     try:
