@@ -15,7 +15,7 @@ if __name__ == "__main__":
     to_share = False
     op_br = False
     debug = False
-    auth_args = {"auth": ("g", "g"), "auth_message": "Please login using g/g"}
+    auth_args = {}
     server = None
 
     if args:
@@ -31,15 +31,15 @@ if __name__ == "__main__":
         if "--debug" in args:
             debug = True
             yel("Debug mode enabled")
-        if "--noauth" in args:
-            auth_args = {}
-            yel("Disabling authentication")
+        if "--auth" in args:
+            auth_args = {"auth": ("user", "password"), "auth_message": "Please login"}
+            yel("Authentication enabled")
         if "--localnetwork" in args:
             server = "0.0.0.0"
             yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
 
     for ar in args:
-        if ar not in ["--share", "--browser", "--debug", "--noauth", "--localnetwork"]:
+        if ar not in ["--share", "--browser", "--debug", "--auth", "--localnetwork"]:
             raise SystemExit(f"Invalid argument: '{ar}'")
 
     if not to_share:
