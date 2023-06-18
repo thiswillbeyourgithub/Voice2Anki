@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 from textwrap import dedent
 import json
+import hashlib
 
 from .logger import whi, red, yel
 from .misc import tokenize, transcript_template
@@ -23,8 +24,10 @@ default_system_prompt = {
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
+def hasher(text):
+    return hashlib.sha256(text.encode()).hexdigest()[:10]
 
 def check_prompts(prev_prompts):
     "checks validity of the previous prompts"
@@ -55,6 +58,9 @@ def check_prompts(prev_prompts):
         assert isinstance(mess["priority"], int), f"priority is not int! '{mess['priority']}'"
         assert mess["priority"] <= 10, "priority above 10 !"
         assert mess["priority"] >= -1, "priority under -1 !"
+
+        if "hash" not in mess:
+            mess["hash"] = hasher(mess["content"])
 
         if "tkn_len_in" not in mess:
             mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
@@ -206,9 +212,10 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
                 "tts_model": "whisper-api",
                 "tkn_len_in": tkn_len_in,
                 "tkn_len_out": tkn_len_out,
+                "hash": hasher(content),
                 }
-        if to_add in prev_prompts:
-            red("Already present in previous outputs!")
+        if to_add["hash"] in [pp["hash"] for pp in prev_prompts]:
+            red("This prompt is already present in the memory!")
             return
         prev_prompts.append(to_add)
 
