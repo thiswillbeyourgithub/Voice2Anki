@@ -81,9 +81,9 @@ def check_prompts(prev_prompts):
 
         # keep only the expected keys
         keys = [k for k in mess.keys() if k in expected_mess_keys]
-        for k in keys:
-            if k in prev_prompts[i]:
-                prev_prompts[i][k] = mess[k]
+        for k in prev_prompts[i]:
+            if k not in prev_prompts[i]:
+                del prev_prompts[i][k]
 
         # make sure it's stripped
         prev_prompts[i]["content"] = dedent(prev_prompts[i]["content"]).strip()
@@ -158,7 +158,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
                     tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
                     output_pr.append(pr)
                 else:
-                    dis_tkns += pr["tkn_len"]
+                    dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
         whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
         category_count = len(output_pr)
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
