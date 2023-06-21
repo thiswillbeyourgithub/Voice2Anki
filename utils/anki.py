@@ -142,7 +142,11 @@ def sync_anki():
 
 
 # load anki profile using ankipandas just to get the media folder
-db_path = akp.find_db(user="Main")
+try:
+    db_path = akp.find_db(user="Main")
+except Exception as err:
+    red(f"Exception when trying to find anki collection: '{err}'")
+    db_path = akp.Collection().path
 red(f"WhisperToAnki will use anki collection found at {db_path}")
 
 # check that akp will not go in trash
