@@ -124,6 +124,16 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
             "with fewer tokens to make sure you have room for the answer")
         return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature)
 
+    if tkns >= 3700:
+        red(f"More than 3700 token in question, using ChatGPT 16k")
+        model_to_use = "gpt-3.5-turbo-16k"
+        model_price = (0.003, 0.004)
+    else:
+    else:
+        red(f"Using ChatGPT 4k")
+        model_to_use = "gpt-3.5-turbo-4k"
+        model_price = (0.0015, 0.002)
+
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
         cnt = 0
@@ -132,7 +142,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                 red("Asking ChatGPT")
                 cnt += 1
                 response = openai.ChatCompletion.create(
-                        model="gpt-3.5-turbo-16k",
+                        model=model_to_use,
                         messages=formatted_messages,
                         stop="END",
                         temperature=temperature,
@@ -152,7 +162,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         output_tkn_cost = response["usage"]["completion_tokens"]
         tkn_cost = [input_tkn_cost, output_tkn_cost]
 
-        tkn_cost_dol = input_tkn_cost / 1000 * 0.003 + output_tkn_cost / 1000 * 0.004
+        tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
         pv = previous_values(profile)
         pv["total_llm_cost"] += tkn_cost_dol
         red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f} (not counting whisper)")
