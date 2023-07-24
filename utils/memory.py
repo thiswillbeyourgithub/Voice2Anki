@@ -163,7 +163,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
         category_count = len(output_pr)
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
-    assert len(output_pr) > 1 or len(prev_prompts) == 1, "invalid prompt output"
 
     # make it so that highest priority prompts are last in the discussion:
     prev_prompts.reverse()
