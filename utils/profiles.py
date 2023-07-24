@@ -11,7 +11,7 @@ class previous_values:
     def __init__(self, profile="default"):
         assert Path("./profiles").exists(), "profile folder not found"
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
-        assert profile.isalpha(), f"profile is not alphanumeric: '{profile}'"
+        assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
         self.approved_keys = [
                 "audio_numpy_1",
                 "audio_numpy_2",
@@ -116,8 +116,8 @@ def get_profiles():
 
 
 def switch_profile(profile):
-    if profile is None or profile.strip() == "" or "/" in profile or not profile.isalpha():
-        red("Invalid profile name, must be alphanumeric")
+    if profile is None or profile.strip() == "" or "/" in profile or not profile.replace("_", "").replace("-", "").isalpha():
+        red("Invalid profile name, must be alphanumeric (although it can include _ and -)")
         return [
                 None,
                 None,
