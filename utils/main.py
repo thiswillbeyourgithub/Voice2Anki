@@ -35,15 +35,15 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     if txt_whisp_lang is None:
         return red("Error: None whisper language")
 
+    # save audio for next startup
+    pv = previous_values(txt_profile)
+    pv["audio_numpy_1"] = audio_numpy_1
+
     # try to remove silences
     try:
         audio_numpy_1 = sound_preprocessing(audio_numpy_1)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
-
-    # save audio for next startup
-    pv = previous_values(txt_profile)
-    pv["audio_numpy_1"] = audio_numpy_1
 
     # save audio to temp file
     whi("Saving audio as wav file")
