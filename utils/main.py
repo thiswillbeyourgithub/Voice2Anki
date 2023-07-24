@@ -129,8 +129,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         model_to_use = "gpt-3.5-turbo-16k"
         model_price = (0.003, 0.004)
     else:
-        red(f"Using ChatGPT 4k")
-        model_to_use = "gpt-3.5-turbo-4k"
+        red(f"Using ChatGPT")
+        model_to_use = "gpt-3.5-turbo"
         model_price = (0.0015, 0.002)
 
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
