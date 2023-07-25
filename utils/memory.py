@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import random
 import time
@@ -11,7 +12,22 @@ from .misc import tokenize, transcript_template
 
 global prev_prompts
 
-default_system_prompt = {
+default_system_prompt_md = {
+             "role": "system",
+             "content": dedent("""You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into markdown formatted text.
+
+             Here are the rules:
+             - always end your replies by "END".
+             - separate bullet points by '-'
+             - the transcript can be of poor quality, it is your job to correct transcription errors using the context.
+             - If relevant, use LaTeX formatting in your answer.
+             - if you're absolutely certain that you can't accomplish your task: begin your answer by 'Alfred:' and I'll take a look immediately."""),
+             "timestamp": int(time.time()),
+             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
+             }
+
+
+default_system_prompt_anki = {
             "role": "system",
             "content": dedent("""You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into Anki flashcards.
 
@@ -24,6 +40,15 @@ default_system_prompt = {
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
+
+args = sys.argv[1:]
+if "--backend=anki" in args:
+    default_system_prompt = default_system_prompt_anki
+elif "--backend=markdown" in args:
+    default_system_prompt = default_system_prompt_md
+else:
+    raise Exception
+
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
 def hasher(text):
@@ -178,20 +203,20 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
     return output_pr
 
 
-def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, txt_context, priority):
+def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority):
     whi("Recursively improving")
     if not txt_audio:
         red("No audio transcripts found.")
         return
-    if not txt_chatgpt_cloz:
-        red("No chatgpt cloze found.")
+    if not txt_chatgpt_outputstr:
+        red("No chatgpt output string found.")
         return
-    if "\n" in txt_chatgpt_cloz:
-        whi("Replaced newlines in txt_chatgpt_cloz")
-        txt_chatgpt_cloz = txt_chatgpt_cloz.replace("\n", "<br/>")
+    if "\n" in txt_chatgpt_outputstr:
+        whi("Replaced newlines in txt_chatgpt_outputstr")
+        txt_chatgpt_outputstr = txt_chatgpt_outputstr.replace("\n", "<br/>")
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
-    answer = dedent(txt_chatgpt_cloz.replace("\n", "<br/>")).strip()
+    answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
     tkn_len_in = len(tokenize(content))
     tkn_len_out = len(tokenize(answer))
     if tkn_len_in + tkn_len_out > 500:
@@ -199,7 +224,7 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
             f"with a surprising amount of token: '{tkn_len_in + tkn_len_out}' This can have "
             "adverse effects.")
 
-    prev_prompts = load_prev_prompts(choice_profile)
+    prev_prompts = load_prev_prompts(txt_profile)
     try:
         to_add = {
                 "role": "user",
@@ -220,7 +245,7 @@ def recur_improv(choice_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_cloz, 
 
         prev_prompts = check_prompts(prev_prompts)
 
-        with open(f"profiles/{choice_profile}/memories.json", "w") as f:
+        with open(f"profiles/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4)
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
