@@ -38,5 +38,5 @@
 
 
 ## Gallery
-![]("./docs/anki_screenshot.png")
-![]("./docs/markdown_screenshot.png")
+![](./docs/anki_screenshot.png)
+![](./docs/markdown_screenshot.png)
