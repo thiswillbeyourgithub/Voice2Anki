@@ -1,3 +1,4 @@
+import sys
 import pickle
 from pathlib import Path
 import numpy as np
@@ -6,32 +7,44 @@ import cv2
 from .logger import whi, red
 from .misc import rgb_to_bgr
 
+approved_keys = [
+        "audio_numpy_1",
+        "audio_numpy_2",
+        "audio_numpy_3",
+        "audio_numpy_4",
+        "audio_numpy_5",
+        "sld_max_tkn",
+        "temperature",
+        "txt_chatgpt_context",
+        "txt_whisp_lang",
+        "txt_whisp_prompt",
+        "latest_profile",
+        "total_llm_cost",
+        ]
+approved_keys_anki = ["gallery", "txt_deck", "txt_tags"]
+approved_keys_md = ["txt_mdpath"]
+
 
 class previous_values:
     def __init__(self, profile="default"):
-        assert Path("./profiles").exists(), "profile folder not found"
+        Path("./profiles").mkdir(exist_ok=True)
+        Path("./profiles/anki").mkdir(exist_ok=True)
+        Path("./profiles/markdown").mkdir(exist_ok=True)
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
-        self.approved_keys = [
-                "audio_numpy_1",
-                "audio_numpy_2",
-                "audio_numpy_3",
-                "audio_numpy_4",
-                "audio_numpy_5",
-                "gallery",
-                "sld_max_tkn",
-                "temperature",
-                "txt_chatgpt_context",
-                "txt_deck",
-                "txt_tags",
-                "txt_whisp_lang",
-                "txt_whisp_prompt",
-                "latest_profile",
-                "total_llm_cost",
-                ]
 
-        Path("./profiles").mkdir(exist_ok=True)
-        self.p = Path(f"./profiles/{profile}")
+        args = sys.argv[1:]
+        if "--backend=anki" in args:
+            self.backend = "anki"
+            self.approved_keys = approved_keys + approved_keys_anki
+            self.p = Path(f"./profiles/anki/{profile}")
+        elif "--backend=markdown" in args:
+            self.backend = "markdown"
+            self.approved_keys = approved_keys + approved_keys_md
+            self.p = Path(f"./profiles/markdown/{profile}")
+        else:
+            raise Exception
+
         if profile != "reload":
             self.p.mkdir(exist_ok=True)
         else:
@@ -135,7 +148,13 @@ def switch_profile(profile):
     profile = profile.lower()
 
     if profile not in get_profiles():
-        Path(f"profiles/{profile}").mkdir(exist_ok=False)
+        args = sys.argv[1:]
+        if "--backend=anki" in args:
+            Path(f"profiles/anki/{profile}").mkdir(exist_ok=False)
+        elif "--backend=markdown" in args:
+            Path(f"profiles/markdown/{profile}").mkdir(exist_ok=False)
+        else:
+            raise Exception
         red(f"created {profile}.")
         return [
                 None,
@@ -155,18 +174,30 @@ def switch_profile(profile):
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")
-    return [
-            pv["txt_deck"],
-            pv["txt_tags"],
-            pv["txt_chatgpt_context"],
-            pv["txt_whisp_prompt"],
-            pv["txt_whisp_lang"],
-            pv["gallery"],
-            pv["audio_numpy_1"],
-            None,
-            None,
-            profile,
-            ]
+    if pv.backend == "anki":
+        return [
+                pv["txt_deck"],
+                pv["txt_tags"],
+                pv["txt_chatgpt_context"],
+                pv["txt_whisp_prompt"],
+                pv["txt_whisp_lang"],
+                pv["gallery"],
+                pv["audio_numpy_1"],
+                None,
+                None,
+                profile,
+                ]
+    elif pv.backend == "markdown":
+        return [
+                pv["txt_mdpath"],
+                pv["txt_chatgpt_context"],
+                pv["txt_whisp_prompt"],
+                pv["txt_whisp_lang"],
+                pv["audio_numpy_1"],
+                None,
+                None,
+                profile,
+                ]
 
 def save_tags(txt_profile, txt_tags):
     if txt_tags:
@@ -175,3 +206,7 @@ def save_tags(txt_profile, txt_tags):
 def save_deck(txt_profile, txt_deck):
     if txt_deck:
         previous_values(txt_profile)["txt_deck"] = txt_deck
+
+def save_path(txt_profile, txt_mdpath):
+    if txt_mdpath:
+        previous_values(txt_profile)["txt_mdpath"] = txt_mdpath

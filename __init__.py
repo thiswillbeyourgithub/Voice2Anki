@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 
-from utils.gui_anki import demo_anki
-from utils.gui_markdown import demo_markdown
 from utils.logger import whi, yel, red
 
 # misc init values
@@ -44,8 +42,10 @@ if __name__ == "__main__":
             raise SystemExit(f"Invalid argument: '{ar}'")
 
     if "--backend=anki" in args:
+        from utils.gui_anki import demo_anki
         demo = demo_anki
     elif "--backend=markdown" in args:
+        from utils.gui_markdown import demo_markdown
         demo = demo_markdown
     else:
         raise Exception(f"Invalid backend: {args}")
