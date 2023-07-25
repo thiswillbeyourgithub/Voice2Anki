@@ -7,6 +7,7 @@ from logging import handlers
 import rtoml
 import json
 
+Path("utils/logs").mkdir(exist_ok=True)
 log_file = Path("utils/logs/logs.txt")
 log_file.touch(exist_ok=True)
 log_formatter = logging.Formatter(

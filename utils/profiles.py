@@ -30,6 +30,7 @@ class previous_values:
                 "total_llm_cost",
                 ]
 
+        Path("./profiles").mkdir(exist_ok=True)
         self.p = Path(f"./profiles/{profile}")
         if profile != "reload":
             self.p.mkdir(exist_ok=True)
