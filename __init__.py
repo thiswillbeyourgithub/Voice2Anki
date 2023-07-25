@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     demo.queue(concurrency_count=3)
 
-    if Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
+    if Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
                 "ssl_keyfile": "./utils/ssl/key.pem",
                 "ssl_certfile": "./utils/ssl/cert.pem",
