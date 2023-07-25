@@ -36,3 +36,7 @@
 * Reach out if you have any issue.
 * Feedbacks (of any nature) are much appreciated.
 
+
+## Gallery
+![]("./docs/anki_screenshot.png")
+![]("./docs/markdown_screenshot.png")
