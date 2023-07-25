@@ -1,14 +1,15 @@
 import sys
 from pathlib import Path
 
-from utils.gui import demo
+from utils.gui_anki import demo_anki
+from utils.gui_markdown import demo_markdown
 from utils.logger import whi, yel, red
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
 
 if __name__ == "__main__":
-    whi("Starting WhisperToAnki\n")
+    whi("Starting VoiceToFormattedText\n")
     args = sys.argv[1:]
 
     # default argument
@@ -39,8 +40,15 @@ if __name__ == "__main__":
             yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
 
     for ar in args:
-        if ar not in ["--share", "--browser", "--debug", "--auth", "--localnetwork"]:
+        if ar not in ["--share", "--browser", "--debug", "--auth", "--localnetwork", "--backend=anki", "--backend=markdown"]:
             raise SystemExit(f"Invalid argument: '{ar}'")
+
+    if "--backend=anki" in args:
+        demo = demo_anki
+    elif "--backend=markdown" in args:
+        demo = demo_markdown
+    else:
+        raise Exception(f"Invalid backend: {args}")
 
     if not to_share:
         whi("Sharing disabled")

@@ -1,11 +1,12 @@
+from pathlib import Path
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
-from .main import transcribe, alfred, main, auto_mode, semiauto_mode
+from .profiles import get_profiles, switch_profile, previous_values, save_path
+from .main_markdown import transcribe, alfred, main, auto_mode, semiauto_mode
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing
+from .media import reset_audio, audio_saver, load_next_audio
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -28,27 +29,22 @@ document.querySelector('body').classList.add('dark');
 # load default profile
 pv = previous_values("reload")
 
-with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as demo:
+with gr.Blocks(analytics_enabled=False, title="WhisperToMarkdown", theme=theme) as demo_markdown:
 
-    gr.Markdown("WhisperToAnki")
+    gr.Markdown("WhisperToMarkdown")
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
 
     with gr.Row():
         with gr.Row():
-            with gr.Column(scale=1):
-                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[2], rows=[1], object_fit="scale-down", height="auto", container=True)
-                rst_img_btn = gr.Button(value="Clear then add", variant="secondary").style(size="sm")
-                img_btn = gr.Button(value="Add image from clipboard", variant="primary").style(size="sm")
             with gr.Column(scale=2):
                 with gr.Row():
                     with gr.Column(scale=10):
                         txt_profile = gr.Textbox(value=pv["latest_profile"], placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary").style(full_width=True)
-                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
-                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
+                txt_mdpath = gr.Textbox(value=pv["txt_mdpath"], label="Markdown file", max_lines=1, placeholder="markdown path")
                 with gr.Row():
                     with gr.Column(scale=1):
                         txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
@@ -68,15 +64,15 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
+            txt_chatgpt_outputstr = gr.Textbox(label="ChatGPT output", lines=5, max_lines=10, placeholder="The markdown text will appear here")
 
     with gr.Row():
         transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+        chatgpt_btn = gr.Button(value="2. Transcript to md text", variant="secondary")
+        tooutput_btn = gr.Button(value="3. md text to file", variant="secondary")
 
     with gr.Row():
-        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+        semiauto_btn = gr.Button(value="1+2. Speech to md text", variant="primary")
         auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
     with gr.Row():
@@ -90,7 +86,15 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
+    mdp = pv["txt_mdpath"]
+    if mdp and Path(mdp).exists():
+        output_content = "\n".join(Path(mdp).read_text().strip().split("\n")[-100:])
+    else:
+        output_content = ""
+
+    gr.Markdown("Markdown file content:")
+    mdoutput_elem = gr.Markdown(value=output_content)
+    logoutput_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
 
     # events
     # darkmode
@@ -100,26 +104,13 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     txt_profile.submit(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, txt_audio, txt_chatgpt_cloz, txt_profile])
+            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_numpy_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
     txt_profile.blur(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_numpy_1, txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_tags.submit(fn=save_tags, inputs=[txt_profile, txt_tags])
-    txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
+            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_numpy_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
+    txt_mdpath.submit(fn=save_path, inputs=[txt_profile, txt_mdpath])
 
-    # image
-    img_btn.click(
-            fn=get_image,
-            inputs=[gallery],
-            outputs=[gallery])
-    rst_img_btn.click(
-            fn=reset_image,
-            outputs=[gallery]
-            ).then(
-                    fn=get_image,
-                    inputs=[gallery],
-                    outputs=[gallery])
 
     # audio
     rst_audio_btn.click(
@@ -137,8 +128,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5]
             ).then(
                     fn=semiauto_mode,
-                    inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
+                    inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_outputstr, txt_chatgpt_context, txt_mdpath, txt_profile, sld_max_tkn, sld_temp],
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_outputstr])
 
     # load previous values
     # audio_numpy_1.value = pv["audio_numpy_1"]
@@ -157,10 +148,10 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
     chatgpt_btn.click(
             fn=alfred,
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
-            outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
+            outputs=[txt_chatgpt_outputstr, txt_chatgpt_tkncost])
 
-    # send to anki
-    anki_btn.click(
+    # send to file
+    tooutput_btn.click(
             fn=main,
             inputs=[
                 audio_numpy_1,
@@ -169,13 +160,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
 
                 txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
+                txt_mdpath,
 
-                gallery,
                 txt_profile,
                 sld_max_tkn,
                 sld_temp,
@@ -183,7 +172,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             outputs=[
                 txt_audio,
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
+                mdoutput_elem,
                 ],
             )
 
@@ -197,13 +187,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
 
                 txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
+                txt_mdpath,
 
-                gallery,
                 txt_profile,
                 sld_max_tkn,
                 sld_temp,
@@ -211,7 +199,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             outputs=[
                 txt_audio,
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
+                mdoutput_elem,
                 ],
             )
 
@@ -225,13 +214,11 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_whisp_lang,
 
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
 
                 txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
+                txt_mdpath,
 
-                gallery,
                 txt_profile,
                 sld_max_tkn,
                 sld_temp,
@@ -239,7 +226,8 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
             outputs=[
                 txt_audio,
                 txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
+                mdoutput_elem,
                 ],
             )
 
@@ -249,10 +237,10 @@ with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as d
                 txt_profile,
                 txt_audio,
                 txt_whisp_prompt,
-                txt_chatgpt_cloz,
+                txt_chatgpt_outputstr,
                 txt_chatgpt_context,
                 sld_improve,
                 ],
             )
 
-demo.queue()
+demo_markdown.queue()
