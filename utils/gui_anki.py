@@ -28,9 +28,9 @@ document.querySelector('body').classList.add('dark');
 # load default profile
 pv = previous_values("reload")
 
-with gr.Blocks(analytics_enabled=False, title="WhisperToAnki", theme=theme) as demo_anki:
+with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", theme=theme) as demo_anki:
 
-    gr.Markdown("WhisperToAnki")
+    gr.Markdown("VoiceToFormattedText - Anki")
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")

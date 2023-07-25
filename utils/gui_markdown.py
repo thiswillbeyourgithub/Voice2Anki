@@ -29,9 +29,9 @@ document.querySelector('body').classList.add('dark');
 # load default profile
 pv = previous_values("reload")
 
-with gr.Blocks(analytics_enabled=False, title="WhisperToMarkdown", theme=theme) as demo_markdown:
+with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown", theme=theme) as demo_markdown:
 
-    gr.Markdown("WhisperToMarkdown")
+    gr.Markdown("VoiceToFormattedText - Markdown")
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
