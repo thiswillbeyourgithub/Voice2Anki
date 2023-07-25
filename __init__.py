@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 from utils.gui import demo
-from utils.logger import whi, yel
+from utils.logger import whi, yel, red
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -49,6 +49,17 @@ if __name__ == "__main__":
 
     demo.queue(concurrency_count=3)
 
+    if Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
+        ssl_args = {
+                "ssl_keyfile": "./utils/ssl/key.pem",
+                "ssl_certfile": "./utils/ssl/cert.pem",
+                "ssl_keyfile_password": "fd5d63390f1a45427acfe20dd0e24a95",  # random md5
+                "ssl_verify": False,  # allow self signed
+                }
+    else:
+        red(f"SSL certificate or key not found, disabling https")
+        ssl_args = {}
+
     demo.launch(
             share=to_share,
             **auth_args,
@@ -58,8 +69,5 @@ if __name__ == "__main__":
             server_name=server,
             server_port=7860,
             show_tips=True,
-            ssl_keyfile="./utils/ssl/key.pem",
-            ssl_certfile="./utils/ssl/cert.pem",
-            ssl_keyfile_password="fd5d63390f1a45427acfe20dd0e24a95",  # random md5
-            ssl_verify=False,  # allow self signed
+            **ssl_args,
             )
