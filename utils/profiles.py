@@ -30,7 +30,7 @@ class previous_values:
         Path("./profiles").mkdir(exist_ok=True)
         Path("./profiles/anki").mkdir(exist_ok=True)
         Path("./profiles/markdown").mkdir(exist_ok=True)
-        assert len([p for p in Path("./profiles").iterdir() if p not in ["anki", "markdown"]) == 0, (
+        assert len([p for p in Path("./profiles").iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
             "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
