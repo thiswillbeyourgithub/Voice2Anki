@@ -1,3 +1,4 @@
+import torchaudio
 import json
 import tempfile
 from scipy.io.wavfile import write
@@ -41,9 +42,13 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         red(f"Error when preprocessing sound: '{err}'")
 
     # save audio to temp file
-    whi("Saving audio as wav file")
-    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="transcribe")
-    write(tmp.name, audio_numpy_1[0], audio_numpy_1[1])
+    whi("Saving audio as mp3 file")
+    tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False, prefix="transcribe")
+    torchaudio.save(
+            tmp.name,
+            waveform=audio_numpy_1[1],
+            sample_rate=audio_numpy_1[0],
+            format="mp3")
 
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
