@@ -25,3 +25,10 @@ def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+# to know if the backend chosen by the user is anki or markdown
+class backend_config_class:
+    def __init__(self):
+        self.backend = "not yet initialized"
+global backend_config
+backend_config = backend_config_class()

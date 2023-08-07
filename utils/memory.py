@@ -8,7 +8,7 @@ import json
 import hashlib
 
 from .logger import whi, red, yel
-from .misc import tokenize, transcript_template
+from .misc import tokenize, transcript_template, backend_config
 
 global prev_prompts
 
@@ -41,13 +41,14 @@ default_system_prompt_anki = {
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
 
-args = sys.argv[1:]
-if "--backend=anki" in args:
+if backend_config.backend == "anki":
     default_system_prompt = default_system_prompt_anki
-elif "--backend=markdown" in args:
+    backend = "anki"
+elif backend_config.backend == "markdown":
     default_system_prompt = default_system_prompt_md
+    backend = "markdown"
 else:
-    raise Exception
+    raise Exception(backend_config.backend)
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
@@ -256,13 +257,13 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 def load_prev_prompts(profile):
     assert Path("profiles/").exists(), "profile directory not found"
     if Path(f"profiles/{profile}/memories.json").exists():
-        with open(f"profiles/{profile}/memories.json", "r") as f:
+        with open(f"profiles/{backend}/{profile}/memories.json", "r") as f:
             prev_prompts = json.load(f)
         prev_prompts = check_prompts(prev_prompts)
     else:
         red(f"No memories in profile {profile} found, creating it")
         prev_prompts = check_prompts([default_system_prompt.copy()])
-        with open(f"profiles/{profile}/memories.json", "w") as f:
+        with open(f"profiles/{backend}/{profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4)
 
     return prev_prompts

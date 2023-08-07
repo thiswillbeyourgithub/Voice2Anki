@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 
 from .logger import whi, red
-from .misc import rgb_to_bgr
+from .misc import rgb_to_bgr, backend_config
 
 approved_keys = [
         "audio_numpy_1",
@@ -36,16 +36,16 @@ class previous_values:
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
 
         args = sys.argv[1:]
-        if "--backend=anki" in args:
+        if backend_config.backend == "anki":
             self.backend = "anki"
             self.approved_keys = approved_keys + approved_keys_anki
             self.p = Path(f"./profiles/anki/{profile}")
-        elif "--backend=markdown" in args:
+        elif backend_config.backend == "markdown":
             self.backend = "markdown"
             self.approved_keys = approved_keys + approved_keys_md
             self.p = Path(f"./profiles/markdown/{profile}")
         else:
-            raise Exception
+            raise Exception(backend_config.backend)
 
         if profile != "reload":
             self.p.mkdir(exist_ok=True)
@@ -127,6 +127,10 @@ class previous_values:
 
 def get_profiles():
     profiles = [str(p.name) for p in Path("profiles").iterdir()]
+    if backend_config.backend == "anki":
+        profiles = [str(p.name) for p in Path("profiles/anki").iterdir()]
+    elif backend_config.backend == "markdown":
+        profiles = [str(p.name) for p in Path("profiles/markdown").iterdir()]
     assert profiles, "Empty list of profiles"
     return profiles
 
@@ -151,12 +155,12 @@ def switch_profile(profile):
 
     if profile not in get_profiles():
         args = sys.argv[1:]
-        if "--backend=anki" in args:
+        if backend_config.backend == "anki":
             Path(f"profiles/anki/{profile}").mkdir(exist_ok=False)
-        elif "--backend=markdown" in args:
+        elif backend_config.backend == "markdown":
             Path(f"profiles/markdown/{profile}").mkdir(exist_ok=False)
         else:
-            raise Exception
+            raise Exception(backend_config.backend)
         red(f"created {profile}.")
         return [
                 None,
