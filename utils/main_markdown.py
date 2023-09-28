@@ -1,7 +1,6 @@
 import torchaudio
 import json
 import tempfile
-from scipy.io.wavfile import write
 from textwrap import dedent
 import time
 import openai
@@ -18,12 +17,12 @@ assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.tx
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 
-def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
-    if audio_numpy_1 is None:
-        return red("Error: None audio_numpy_1")
+    if audio_mp3_1 is None:
+        return red("Error: None audio_mp3_1")
 
     if txt_whisp_prompt is None:
         return red("Error: None whisper prompt")
@@ -33,11 +32,11 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     # save audio for next startup
     pv = previous_values(txt_profile)
-    pv["audio_numpy_1"] = audio_numpy_1
+    pv["audio_mp3_1"] = audio_mp3_1
 
     # try to remove silences
     try:
-        audio_numpy_1 = sound_preprocessing(audio_numpy_1)
+        audio_mp3_1 = sound_preprocessing(audio_mp3_1)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
@@ -46,8 +45,8 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False, prefix="transcribe")
     torchaudio.save(
             tmp.name,
-            waveform=audio_numpy_1[1],
-            sample_rate=audio_numpy_1[0],
+            waveform=audio_mp3_1[1],
+            sample_rate=audio_mp3_1[0],
             format="mp3")
 
     try:
@@ -189,7 +188,7 @@ def auto_mode(*args, **kwargs):
 
 
 def main(
-        audio_numpy_1,
+        audio_mp3_1,
         txt_audio,
         txt_whisp_prompt,
         txt_whisp_lang,
@@ -207,7 +206,7 @@ def main(
         ):
     "function called to do sequential actions: from audio to md file"
     whi("Entering main")
-    if not (audio_numpy_1):
+    if not (audio_mp3_1):
         return [
                 red("None audio in microphone #1"),
                 txt_audio,
@@ -267,7 +266,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
+        txt_audio = transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt

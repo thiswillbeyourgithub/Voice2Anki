@@ -56,11 +56,11 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
     with gr.Row():
         with gr.Column(scale=1):
             rst_audio_btn = gr.Button(value="Clear audio", variant="secondary")
-            audio_numpy_1 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
-            audio_numpy_2 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
-            audio_numpy_3 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
-            audio_numpy_4 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
-            audio_numpy_5 = gr.Audio(source="microphone", type="numpy", label="Audio", format="wav", value=None).style(size="sm")
+            audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
+            audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
+            audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
+            audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
+            audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
@@ -104,44 +104,44 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
     txt_profile.submit(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_numpy_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
+            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_mp3_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
     txt_profile.blur(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_numpy_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
+            outputs=[txt_mdpath, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, audio_mp3_1, txt_audio, txt_chatgpt_outputstr, txt_profile])
     txt_mdpath.submit(fn=save_path, inputs=[txt_profile, txt_mdpath])
 
 
     # audio
     rst_audio_btn.click(
             fn=reset_audio,
-            inputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
-            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5])
-    audio_numpy_1.change(fn=audio_saver().n1, inputs=[txt_profile, audio_numpy_1])
-    audio_numpy_2.change(fn=audio_saver().n2, inputs=[txt_profile, audio_numpy_2])
-    audio_numpy_3.change(fn=audio_saver().n3, inputs=[txt_profile, audio_numpy_3])
-    audio_numpy_4.change(fn=audio_saver().n4, inputs=[txt_profile, audio_numpy_4])
-    audio_numpy_5.change(fn=audio_saver().n5, inputs=[txt_profile, audio_numpy_5])
+            inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5])
+    audio_mp3_1.change(fn=audio_saver().n1, inputs=[txt_profile, audio_mp3_1])
+    audio_mp3_2.change(fn=audio_saver().n2, inputs=[txt_profile, audio_mp3_2])
+    audio_mp3_3.change(fn=audio_saver().n3, inputs=[txt_profile, audio_mp3_3])
+    audio_mp3_4.change(fn=audio_saver().n4, inputs=[txt_profile, audio_mp3_4])
+    audio_mp3_5.change(fn=audio_saver().n5, inputs=[txt_profile, audio_mp3_5])
     load_audio_btn.click(
             fn=load_next_audio,
-            inputs=[txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5],
-            outputs=[audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5]
+            inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
             ).then(
                     fn=semiauto_mode,
-                    inputs=[audio_numpy_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_outputstr, txt_chatgpt_context, txt_mdpath, txt_profile, sld_max_tkn, sld_temp],
+                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_outputstr, txt_chatgpt_context, txt_mdpath, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_outputstr])
 
     # load previous values
-    # audio_numpy_1.value = pv["audio_numpy_1"]
-    # audio_numpy_2.value = pv["audio_numpy_2"]
-    # audio_numpy_3.value = pv["audio_numpy_3"]
-    # audio_numpy_4.value = pv["audio_numpy_4"]
-    # audio_numpy_5.value = pv["audio_numpy_5"]
+    # audio_mp3_1.value = pv["audio_mp3_1"]
+    # audio_mp3_2.value = pv["audio_mp3_2"]
+    # audio_mp3_3.value = pv["audio_mp3_3"]
+    # audio_mp3_4.value = pv["audio_mp3_4"]
+    # audio_mp3_5.value = pv["audio_mp3_5"]
 
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
-            inputs=[audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio])
 
     # send to chatgpt
@@ -154,7 +154,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
     tooutput_btn.click(
             fn=main,
             inputs=[
-                audio_numpy_1,
+                audio_mp3_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
@@ -181,7 +181,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
     semiauto_btn.click(
             fn=semiauto_mode,
             inputs=[
-                audio_numpy_1,
+                audio_mp3_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
@@ -208,7 +208,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
     auto_btn.click(
             fn=auto_mode,
             inputs=[
-                audio_numpy_1,
+                audio_mp3_1,
                 txt_audio,
                 txt_whisp_prompt,
                 txt_whisp_lang,
