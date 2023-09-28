@@ -75,6 +75,20 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
                     Path(tmp.name).unlink(missing_ok=False)
+
+                    store_to_db(
+                            {
+                                "type": "whisper_transcription",
+                                "timestamp": time.time(),
+                                "whisper_language": txt_whisp_lang,
+                                "whisper_context": txt_whisp_prompt,
+                                "V2FT_profile": txt_profile,
+                                "transcribed_input": txt_audio,
+                                "model_name": "OpenAI Whisper Large",
+                                "audio_numpy": audio_numpy_1,
+                                }, db_name="anki_whisper")
+
+
                     return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
@@ -182,6 +196,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         # add to db to create LORA fine tunes later
         store_to_db(
                 {
+                    "type": "anki_card",
                     "timestamp": time.time(),
                     "token_cost": tkn_cost,
                     "temperature": temperature,
@@ -191,7 +206,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                     "model_name": model_to_use,
                     "last_message_from_conversation": formatted_messages[-1],
                     "system_prompt": formatted_messages[0],
-                    }, db_name="anki")
+                    "cloze": cloz,
+                    }, db_name="anki_llm")
 
         return cloz, tkn_cost
     except Exception as err:
