@@ -40,15 +40,6 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
-    # save audio to temp file
-    whi("Saving audio as mp3 file")
-    tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False, prefix="transcribe")
-    torchaudio.save(
-            tmp.name,
-            waveform=audio_mp3_1[1],
-            sample_rate=audio_mp3_1[0],
-            format="mp3")
-
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
@@ -56,7 +47,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(tmp.name, "rb") as audio_file:
+                with open(audio_mp3_1, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
                         model="whisper-1",
                         file=audio_file,
@@ -64,16 +55,16 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         language=txt_whisp_lang)
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
-                    Path(tmp.name).unlink(missing_ok=False)
+                    Path(audio_mp3_1).unlink(missing_ok=False)
                     return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
-                    Path(tmp.name).unlink(missing_ok=False)
+                    Path(audio_mp3_1).unlink(missing_ok=False)
                     return red("Whisper: too many retries.")
                 red(f"Error from whisper: '{err}'")
                 time.sleep(2 * cnt)
     except Exception as err:
-        Path(tmp.name).unlink(missing_ok=False)
+        Path(audio_mp3_1).unlink(missing_ok=False)
         return red(f"Error when transcribing audio: '{err}'")
 
 
