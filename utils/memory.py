@@ -248,7 +248,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 
         prev_prompts = check_prompts(prev_prompts)
 
-        with open(f"profiles/{txt_profile}/memories.json", "w") as f:
+        with open(f"profiles/{backend}/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4)
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
@@ -258,7 +258,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 
 def load_prev_prompts(profile):
     assert Path("profiles/").exists(), "profile directory not found"
-    if Path(f"profiles/{profile}/memories.json").exists():
+    if Path(f"profiles/{backend}/{profile}/memories.json").exists():
         with open(f"profiles/{backend}/{profile}/memories.json", "r") as f:
             prev_prompts = json.load(f)
         prev_prompts = check_prompts(prev_prompts)

@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 import hashlib
 from pathlib import Path
@@ -105,25 +106,18 @@ def _call_anki(action, **params):
     return response['result']
 
 
-def audio_to_anki(audio_numpy):
+def audio_to_anki(audio_mp3):
     whi("Sending audio to anki")
     try:
 
         # save numpy audio to wav, load to torch then save to mp3 in anki dir
-        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="saving_to_anki")
-        write(tmp.name, audio_numpy[0], audio_numpy[1])
-        tens = load(tmp.name)
-        Path(tmp.name).unlink(missing_ok=True)
-
-        audio_hash = hashlib.md5(audio_numpy[1]).hexdigest()
+        with open(audio_mp3, "rb") as audio_file:
+            content = audio_file.read()
+        audio_hash = hashlib.md5(content).hexdigest()
         audio_path = anki_media / f"WhisperToAnki_{audio_hash}.mp3"
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
-        save(
-                filepath=audio_path,
-                src=tens[0],
-                sample_rate=tens[1],
-                )
+        shutil.copy(audio_mp3, audio_path)
         assert (audio_path).exists(), "audio file not found in anki media!"
 
         html = f"</br>[sound:{audio_path.name}]"

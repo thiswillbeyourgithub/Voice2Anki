@@ -389,12 +389,12 @@ def main(
 
     # if not found or empty: create csv file in profile containing the header
     try:
-        if (not Path(f'./profiles/{profile}/sent_to_anki.csv').exists()
+        if (not Path(f'./profiles/anki/{profile}/sent_to_anki.csv').exists()
                 ) or not (
-                        Path(f'./profiles/{profile}/sent_to_anki.csv').read_text().strip()
+                        Path(f'./profiles/anki/{profile}/sent_to_anki.csv').read_text().strip()
                         ):
             yel(f"Creating sent_to_anki.csv file in profiles/{profile}")
-            with open(f'./profiles/{profile}/sent_to_anki.csv', 'w', newline='') as csvfile:
+            with open(f'./profiles/anki/{profile}/sent_to_anki.csv', 'w', newline='') as csvfile:
                 file = csv.writer(csvfile, delimiter=",")
                 file.writerow("body,source,GPToAnkiMetadata,tags,deck".split(","))
     except Exception as err:
@@ -426,7 +426,7 @@ def main(
 
         # add to csv file
         try:
-            with open(f'./profiles/{profile}/sent_to_anki.csv', 'a', newline='') as csvfile:
+            with open(f'./profiles/anki/{profile}/sent_to_anki.csv', 'a', newline='') as csvfile:
                 file = csv.writer(csvfile, delimiter=",")
                 to_add = []
                 # remove newlines
