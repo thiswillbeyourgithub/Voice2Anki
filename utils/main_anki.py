@@ -57,24 +57,26 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         file=audio_file,
                         prompt=txt_whisp_prompt,
                         language=txt_whisp_lang)
-                    txt_audio = transcript["text"]
-                    yel(f"\nWhisper transcript: {txt_audio}")
-                    Path(audio_mp3_1).unlink(missing_ok=False)
+                with open(audio_mp3_1, "rb") as audio_file:
+                    mp3_content = audio_file.read()
+                txt_audio = transcript["text"]
+                yel(f"\nWhisper transcript: {txt_audio}")
+                Path(audio_mp3_1).unlink(missing_ok=False)
 
-                    store_to_db(
-                            {
-                                "type": "whisper_transcription",
-                                "timestamp": time.time(),
-                                "whisper_language": txt_whisp_lang,
-                                "whisper_context": txt_whisp_prompt,
-                                "V2FT_profile": txt_profile,
-                                "transcribed_input": txt_audio,
-                                "model_name": "OpenAI Whisper Large",
-                                "audio_mp3": audio_mp3_1,
-                                }, db_name="anki_whisper")
+                store_to_db(
+                        {
+                            "type": "whisper_transcription",
+                            "timestamp": time.time(),
+                            "whisper_language": txt_whisp_lang,
+                            "whisper_context": txt_whisp_prompt,
+                            "V2FT_profile": txt_profile,
+                            "transcribed_input": txt_audio,
+                            "model_name": "OpenAI Whisper Large",
+                            "audio_mp3": content,
+                            }, db_name="anki_whisper")
 
 
-                    return txt_audio
+                return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
                     Path(audio_mp3_1).unlink(missing_ok=False)
