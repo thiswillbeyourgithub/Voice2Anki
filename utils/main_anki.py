@@ -19,6 +19,7 @@ from .logger import red, whi, yel
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import previous_values
+from .memory import store_to_db
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
@@ -177,6 +178,20 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
         reason = response["choices"][0]["finish_reason"]
         if reason.lower() != "stop":
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
+
+        # add to db to create LORA fine tunes later
+        store_to_db(
+                {
+                    "timestamp": time.time(),
+                    "token_cost": tkn_cost,
+                    "temperature": temperature,
+                    "LLM_context": txt_chatgpt_context,
+                    "V2FT_profile": profile,
+                    "transcribed_input": txt_audio,
+                    "model_name": model_to_use,
+                    "last_message_from_conversation": formatted_messages[-1],
+                    "system_prompt": formatted_messages[0],
+                    }, db_name="anki")
 
         return cloz, tkn_cost
     except Exception as err:

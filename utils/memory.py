@@ -1,3 +1,5 @@
+import sqlite3
+import zlib
 import sys
 import numpy as np
 import random
@@ -267,3 +269,37 @@ def load_prev_prompts(profile):
             json.dump(prev_prompts, f, indent=4)
 
     return prev_prompts
+
+
+def store_to_db(dictionnary, db_name):
+    """
+    take a dictionnary and add it to the sqlite db. This is used to store
+    all interactions with LLM and can be used later to create a dataset for
+    finetuning.
+    """
+
+    Path("databases").mkdir(exist_ok=True)
+    conn = sqlite3.connect(f"./databases/{db_name}.db")
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS dictionaries
+                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      data TEXT)''')
+
+    data = zlib.compress(json.dumps(dictionnary).encode())
+    cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def retrieve_from_db(cursor, db_name):
+    Path("databases").mkdir(exist_ok=True)
+    conn = sqlite3.connect(f"./databases/{db_name}.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT data FROM dictionaries")
+    rows = cursor.fetchall()
+    dictionaries = []
+    for row in rows:
+        dictionary = json.loads(zlib.decompress(row[0]))
+        dictionaries.append(dictionary)
+    return dictionaries
