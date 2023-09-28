@@ -25,12 +25,12 @@ assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.tx
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 
-def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
-    if audio_numpy_1 is None:
-        return red("Error: None audio_numpy_1")
+    if audio_mp3_1 is None:
+        return red("Error: None audio_mp3_1")
 
     if txt_whisp_prompt is None:
         return red("Error: None whisper prompt")
@@ -40,24 +40,13 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     # save audio for next startup
     pv = previous_values(txt_profile)
-    pv["audio_numpy_1"] = audio_numpy_1
+    pv["audio_mp3_1"] = audio_mp3_1
 
     # try to remove silences
     try:
-        audio_numpy_1 = sound_preprocessing(audio_numpy_1)
+        audio_mp3_1 = sound_preprocessing(audio_mp3_1)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
-
-    # save audio to temp file
-    whi("Saving audio as mp3 file")
-    tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False, prefix="transcribe_")
-    tmp.close()
-    torchaudio.save(
-            filepath=tmp.name,
-            src=torch.tensor(audio_numpy_1[1]),
-            sample_rate=audio_numpy_1[0],
-            format="mp3",
-            )
 
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
@@ -66,7 +55,7 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(tmp.name, "rb") as audio_file:
+                with open(audio_mp3_1, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
                         model="whisper-1",
                         file=audio_file,
@@ -74,7 +63,7 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         language=txt_whisp_lang)
                     txt_audio = transcript["text"]
                     yel(f"\nWhisper transcript: {txt_audio}")
-                    Path(tmp.name).unlink(missing_ok=False)
+                    Path(audio_mp3_1).unlink(missing_ok=False)
 
                     store_to_db(
                             {
@@ -85,19 +74,19 @@ def transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                                 "V2FT_profile": txt_profile,
                                 "transcribed_input": txt_audio,
                                 "model_name": "OpenAI Whisper Large",
-                                "audio_numpy": audio_numpy_1,
+                                "audio_mp3": audio_mp3_1,
                                 }, db_name="anki_whisper")
 
 
                     return txt_audio
             except RateLimitError as err:
                 if cnt >= 5:
-                    Path(tmp.name).unlink(missing_ok=False)
+                    Path(audio_mp3_1).unlink(missing_ok=False)
                     return red("Whisper: too many retries.")
                 red(f"Error from whisper: '{err}'")
                 time.sleep(2 * cnt)
     except Exception as err:
-        Path(tmp.name).unlink(missing_ok=False)
+        Path(audio_mp3_1).unlink(missing_ok=False)
         return red(f"Error when transcribing audio: '{err}'")
 
 
@@ -227,7 +216,7 @@ def auto_mode(*args, **kwargs):
 
 
 def main(
-        audio_numpy_1,
+        audio_mp3_1,
         txt_audio,
         txt_whisp_prompt,
         txt_whisp_lang,
@@ -247,7 +236,7 @@ def main(
         ):
     "function called to do sequential actions: from audio to anki flashcard"
     whi("Entering main")
-    if not (audio_numpy_1):
+    if not (audio_mp3_1):
         return [
                 red("None audio in microphone #1"),
                 txt_audio,
@@ -326,7 +315,7 @@ def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_numpy_1, txt_whisp_prompt, txt_whisp_lang, profile)
+        txt_audio = transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
@@ -391,7 +380,7 @@ def main(
     red("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = audio_to_anki(audio_numpy_1)
+    audio_html = audio_to_anki(audio_mp3_1)
     if "Error" in audio_html:  # then out is an error message and not the source
         return [
                 to_return["txt_audio"],

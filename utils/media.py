@@ -114,61 +114,57 @@ def reset_image():
     return None
 
 
-def reset_audio(audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5):
+def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
     whi("Resetting all audio")
     return None, None, None, None, None
 
 
-def load_next_audio(txt_profile, audio_numpy_1, audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5):
+def load_next_audio(txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
     whi("Rolling over audio samples")
     pv = previous_values(txt_profile)
-    pv["audio_numpy_1"] = audio_numpy_2
-    pv["audio_numpy_2"] = audio_numpy_3
-    pv["audio_numpy_3"] = audio_numpy_4
-    pv["audio_numpy_4"] = audio_numpy_5
-    pv["audio_numpy_5"] = None
+    pv["audio_mp3_1"] = audio_mp3_2
+    pv["audio_mp3_2"] = audio_mp3_3
+    pv["audio_mp3_3"] = audio_mp3_4
+    pv["audio_mp3_4"] = audio_mp3_5
+    pv["audio_mp3_5"] = None
 
-    return audio_numpy_2, audio_numpy_3, audio_numpy_4, audio_numpy_5, None
+    return audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
 
 
 class audio_saver:
-    def save_audio(self, txt_profile, audio_numpy_n, n):
+    def save_audio(self, txt_profile, audio_mp3_n, n):
         whi(f"Saving audio from #{n} to profile")
-        if audio_numpy_n is None:
+        if audio_mp3_n is None:
             whi("Not saving because sound is None")
             return
         pv = previous_values(txt_profile)
-        pv[f"audio_numpy_{n}"] = audio_numpy_n
+        pv[f"audio_mp3_{n}"] = audio_mp3_n
 
-    def n1(self, txt_profile, audio_numpy):
-        return self.save_audio(txt_profile, audio_numpy, n=1)
+    def n1(self, txt_profile, audio_mp3):
+        return self.save_audio(txt_profile, audio_mp3, n=1)
 
-    def n2(self, txt_profile, audio_numpy):
-        return self.save_audio(txt_profile, audio_numpy, n=2)
+    def n2(self, txt_profile, audio_mp3):
+        return self.save_audio(txt_profile, audio_mp3, n=2)
 
-    def n3(self, txt_profile, audio_numpy):
-        return self.save_audio(txt_profile, audio_numpy, n=3)
+    def n3(self, txt_profile, audio_mp3):
+        return self.save_audio(txt_profile, audio_mp3, n=3)
 
-    def n4(self, txt_profile, audio_numpy):
-        return self.save_audio(txt_profile, audio_numpy, n=4)
+    def n4(self, txt_profile, audio_mp3):
+        return self.save_audio(txt_profile, audio_mp3, n=4)
 
-    def n5(self, txt_profile, audio_numpy):
-        return self.save_audio(txt_profile, audio_numpy, n=5)
+    def n5(self, txt_profile, audio_mp3):
+        return self.save_audio(txt_profile, audio_mp3, n=5)
 
 
-def sound_preprocessing(audio_numpy_n):
+def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi("Cleaning sound with torchaudio")
 
-    if audio_numpy_n is None:
+    if audio_mp3_n is None:
         whi("Not cleaning sound because received None")
         return None
 
-    # save as wav file
-    tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, prefix="preprocessing")
-    write(tmp.name, audio_numpy_n[0], audio_numpy_n[1])
-
-    waveform, sample_rate = torchaudio.load(tmp.name)
+    waveform, sample_rate = torchaudio.load(audio_mp3_n)
 
     # voice activity detector (i.e. trims the beginning of the sound until you speak)
     # vad_waveform = torchaudio.functional.vad(
@@ -221,8 +217,7 @@ def sound_preprocessing(audio_numpy_n):
             )
 
 
-    Path(tmp.name).unlink(missing_ok=True)
-    audio_numpy_n = tuple((sample_rate, waveform.numpy().T))
+    write(audio_mp3_n, sample_rate, waveform.numpy().T)
 
     whi("Done preprocessing audio")
-    return audio_numpy_n
+    return audio_mp3_n

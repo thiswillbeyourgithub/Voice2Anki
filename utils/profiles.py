@@ -8,11 +8,11 @@ from .logger import whi, red
 from .misc import rgb_to_bgr, backend_config
 
 approved_keys = [
-        "audio_numpy_1",
-        "audio_numpy_2",
-        "audio_numpy_3",
-        "audio_numpy_4",
-        "audio_numpy_5",
+        "audio_mp3_1",
+        "audio_mp3_2",
+        "audio_mp3_3",
+        "audio_mp3_4",
+        "audio_mp3_5",
         "sld_max_tkn",
         "temperature",
         "txt_chatgpt_context",
@@ -76,7 +76,7 @@ class previous_values:
                         new = pickle.load(f)
                 except Exception as err:
                     raise Exception(f"Error when getting {kf}: '{err}'")
-            if key.startswith("audio_numpy"):
+            if key.startswith("audio_mp3"):
                 if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
@@ -188,7 +188,7 @@ def switch_profile(profile):
                 pv["txt_whisp_prompt"],
                 pv["txt_whisp_lang"],
                 pv["gallery"],
-                pv["audio_numpy_1"],
+                pv["audio_mp3_1"],
                 None,
                 None,
                 profile,
@@ -199,7 +199,7 @@ def switch_profile(profile):
                 pv["txt_chatgpt_context"],
                 pv["txt_whisp_prompt"],
                 pv["txt_whisp_lang"],
-                pv["audio_numpy_1"],
+                pv["audio_mp3_1"],
                 None,
                 None,
                 profile,
