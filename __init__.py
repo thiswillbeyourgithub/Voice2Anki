@@ -55,6 +55,9 @@ def start_voice2formattedtext(
 
     assert str(backend).lower() in ["anki", "markdown"], f"Backend argument has to be either 'anki' or 'markdown', not {backend}"
     backend = str(backend).lower()
+    assert backend in ["anki", "markdown"], (
+            "backend must be either 'anki' "
+            "or 'markdown'")
 
     whi("Starting VoiceToFormattedText\n")
     if args:
