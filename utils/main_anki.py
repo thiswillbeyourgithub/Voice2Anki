@@ -165,6 +165,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
 
         cloz = response["choices"][0]["message"]["content"]
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+        if cloz.endswith("."):
+            cloz = cloz[:-1]
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
 
         input_tkn_cost = response["usage"]["prompt_tokens"]
