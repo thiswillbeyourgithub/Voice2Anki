@@ -32,6 +32,8 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     if txt_whisp_lang is None:
         return red("Error: None whisper language")
 
+    modelname = "whisper-1"
+
     # save audio for next startup
     pv = previous_values(txt_profile)
     pv["audio_mp3_1"] = audio_mp3_1
@@ -51,7 +53,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                 cnt += 1
                 with open(audio_mp3_1, "rb") as audio_file:
                     transcript = openai.Audio.transcribe(
-                        model="whisper-1",
+                        model=modelname,
                         file=audio_file,
                         prompt=txt_whisp_prompt,
                         language=txt_whisp_lang)
@@ -69,7 +71,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                             "whisper_context": txt_whisp_prompt,
                             "V2FT_profile": txt_profile,
                             "transcribed_input": txt_audio,
-                            "model_name": "OpenAI Whisper Large",
+                            "model_name": f"OpenAI {modelname}",
                             "audio_mp3": mp3_content,
                             }, db_name="anki_whisper")
 
