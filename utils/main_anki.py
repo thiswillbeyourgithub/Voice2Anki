@@ -18,6 +18,9 @@ from .profiles import previous_values
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
+global latest_pv
+latest_pv = None
+
 
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
@@ -35,7 +38,10 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     modelname = "whisper-1"
 
     # save audio for next startup
-    pv = previous_values(txt_profile)
+    global latest_pv
+    if not latest_pv:
+        latest_pv = previous_values(txt_profile)
+    pv = latest_pv
     pv["audio_mp3_1"] = audio_mp3_1
 
     # try to remove silences
@@ -174,7 +180,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         tkn_cost = [input_tkn_cost, output_tkn_cost]
 
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-        pv = previous_values(profile)
+        global latest_pv
+        if not latest_pv:
+            latest_pv = previous_values(profile)
+        pv = latest_pv
         pv["total_llm_cost"] += tkn_cost_dol
         red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f} (not counting whisper)")
 
@@ -288,7 +297,10 @@ def main(
     to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
 
     # store the default profile
-    pv = previous_values(profile)
+    global latest_pv
+    if not latest_pv:
+        latest_pv = previous_values(profile)
+    pv = latest_pv
     pv["latest_profile"] = profile
 
     if gallery is None or len(gallery) == 0:
