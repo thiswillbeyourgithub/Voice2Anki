@@ -2,14 +2,15 @@ import fire
 import sys
 from pathlib import Path
 
-from utils.logger import whi, yel, red
+from utils.logger import whi, yel, red, print_db
 from utils.misc import backend_config
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
 
 def start_voice2formattedtext(
-        backend,
+        backend="",
+        print_db_then_exit=False,
         do_share=False,
         open_browser=False,
         debug=False,
@@ -24,6 +25,10 @@ def start_voice2formattedtext(
     ----------
     backend: str
         either "anki" or "markdown"
+    print_db_then_exit: str
+        if a string, must be the name of a database from ./databases
+        Will just output the content of the database as json then quit.
+        Example value: "anki_whisper.db"
     do_share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
@@ -37,6 +42,17 @@ def start_voice2formattedtext(
     use_ssl: bool, default False
         if True, will use the ssl configuration specified in __init__.py
     """
+    if isinstance(print_db_then_exit, str):
+        db_list = [str(f.name) for f in Path("./databases/").rglob("*db")]
+        if print_db_then_exit in db_list:
+            return print_db(print_db_then_exit)
+        else:
+            raise ValueError(
+                f"Unexpected {print_db_then_exit} value, should be "
+                f"a value from {','.join(db_list)}")
+    else:
+        assert print_db_then_exit is False, "Invalid value for print_db_then_exit"
+
     assert str(backend).lower() in ["anki", "markdown"], f"Backend argument has to be either 'anki' or 'markdown', not {backend}"
     backend = str(backend).lower()
 

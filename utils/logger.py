@@ -53,9 +53,11 @@ def store_to_db(dictionnary, db_name):
     return True
 
 
-def retrieve_from_db(cursor, db_name):
+def print_db(db_filename):
     Path("databases").mkdir(exist_ok=True)
-    conn = sqlite3.connect(f"./databases/{db_name}.db")
+    assert Path(f"./databases/{db_filename}").exists(), (
+        f"db not found: '{db_filename}'")
+    conn = sqlite3.connect(f"./databases/{db_filename}")
     cursor = conn.cursor()
     cursor.execute("SELECT data FROM dictionaries")
     rows = cursor.fetchall()
@@ -63,7 +65,7 @@ def retrieve_from_db(cursor, db_name):
     for row in rows:
         dictionary = json.loads(zlib.decompress(row[0]))
         dictionaries.append(dictionary)
-    return dictionaries
+    return json.dumps(dictionaries, indent=4)
 
 
 def coloured_log(color_asked):
