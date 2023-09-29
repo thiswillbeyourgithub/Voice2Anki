@@ -78,7 +78,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                             "V2FT_profile": txt_profile,
                             "transcribed_input": txt_audio,
                             "model_name": f"OpenAI {modelname}",
-                            "audio_mp3": mp3_content,
+                            #"audio_mp3": mp3_content.decode(),
                             }, db_name="anki_whisper")
 
 
