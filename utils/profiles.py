@@ -1,4 +1,3 @@
-import sys
 import pickle
 from pathlib import Path
 import numpy as np
@@ -35,7 +34,6 @@ class previous_values:
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
 
-        args = sys.argv[1:]
         if backend_config.backend == "anki":
             self.backend = "anki"
             self.approved_keys = approved_keys + approved_keys_anki
@@ -154,7 +152,6 @@ def switch_profile(profile):
     profile = profile.lower()
 
     if profile not in get_profiles():
-        args = sys.argv[1:]
         if backend_config.backend == "anki":
             Path(f"profiles/anki/{profile}").mkdir(exist_ok=False)
         elif backend_config.backend == "markdown":
