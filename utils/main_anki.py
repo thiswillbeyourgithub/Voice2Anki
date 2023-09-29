@@ -1,5 +1,4 @@
 import json
-import csv
 import cv2
 from textwrap import dedent
 import rtoml
@@ -9,7 +8,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from .anki import add_to_anki, audio_to_anki, sync_anki
+from .anki_utils import add_to_anki, audio_to_anki, sync_anki
 from .misc import tokenize, transcript_template
 from .logger import red, whi, yel
 from .memory import prompt_filter, load_prev_prompts
@@ -387,19 +386,6 @@ def main(
                 ]
     txt_source += audio_html
 
-    # if not found or empty: create csv file in profile containing the header
-    try:
-        if (not Path(f'./profiles/anki/{profile}/sent_to_anki.csv').exists()
-                ) or not (
-                        Path(f'./profiles/anki/{profile}/sent_to_anki.csv').read_text().strip()
-                        ):
-            yel(f"Creating sent_to_anki.csv file in profiles/{profile}")
-            with open(f'./profiles/anki/{profile}/sent_to_anki.csv', 'w', newline='') as csvfile:
-                file = csv.writer(csvfile, delimiter=",")
-                file.writerow("body,source,GPToAnkiMetadata,tags,deck".split(","))
-    except Exception as err:
-        red(f"Error when creating csv file: '{err}'")
-
     # anki tags
     d = datetime.today()
     today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
@@ -423,22 +409,6 @@ def main(
                 )
                 )
         whi(f"* {cl}")
-
-        # add to csv file
-        try:
-            with open(f'./profiles/anki/{profile}/sent_to_anki.csv', 'a', newline='') as csvfile:
-                file = csv.writer(csvfile, delimiter=",")
-                to_add = []
-                # remove newlines
-                for new in [cl, txt_source, metadata, new_tags, txt_deck]:
-                    if isinstance(new, (list, set)):
-                        new = ";".join(new)
-                    new = str(new)
-                    new = new.replace(",", r"\,").replace("\n", "\\n")
-                    to_add.append(new)
-                file.writerow(to_add)
-        except Exception as err:
-            red(f"Error when appending cloze csv file: '{err}'")
 
     results = [str(r) for r in results if str(r).isdigit()]
 
