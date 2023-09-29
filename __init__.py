@@ -9,7 +9,7 @@ from utils.misc import backend_config
 Path("./cache").mkdir(exist_ok=True)
 
 def start_voice2formattedtext(
-        backend=None,
+        backend,
         do_share=False,
         open_browser=False,
         debug=False,
