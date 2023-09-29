@@ -9,8 +9,8 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
-from .misc import tokenize, transcript_template, store_to_db
-from .logger import red, whi, yel
+from .misc import tokenize, transcript_template
+from .logger import red, whi, yel, store_to_db
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import previous_values
