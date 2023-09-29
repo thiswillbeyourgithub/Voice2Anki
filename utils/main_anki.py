@@ -9,12 +9,11 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
-from .misc import tokenize, transcript_template
+from .misc import tokenize, transcript_template, store_to_db
 from .logger import red, whi, yel
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import previous_values
-from .memory import store_to_db
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
