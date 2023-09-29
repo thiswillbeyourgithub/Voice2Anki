@@ -88,7 +88,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
@@ -132,7 +132,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature)
+        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, mode)
 
     if tkns >= 3700:
         red(f"More than 3700 token in question, using ChatGPT 16k")
@@ -192,8 +192,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature):
                     "transcribed_input": txt_audio,
                     "model_name": model_to_use,
                     "last_message_from_conversation": formatted_messages[-1],
+                    "nb_of_message_in_conversation": len(formatted_messages),
                     "system_prompt": formatted_messages[0],
                     "cloze": cloz,
+                    "V2FT_mode": mode,
                     }, db_name="anki_llm")
 
         return cloz, tkn_cost
@@ -318,7 +320,7 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp)
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp, mode)
     if isinstance(txt_chatgpt_tkncost, str):
         txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
     if not txt_chatgpt_tkncost:
