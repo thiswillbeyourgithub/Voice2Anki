@@ -11,7 +11,7 @@ import hashlib
 import torchaudio
 
 from .logger import whi, red
-from .anki import anki_media
+from .anki_utils import anki_media
 from .ocr import get_text
 from .profiles import previous_values
 from .misc import rgb_to_bgr
