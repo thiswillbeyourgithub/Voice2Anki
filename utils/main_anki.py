@@ -23,7 +23,18 @@ global latest_pv
 latest_pv = None
 
 stt_cache = joblib.Memory("transcript_cache", verbose=1)
-whisper_cached = stt_cache.cache(openai.Audio.transcribe)
+
+@stt_cache.cache
+def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
+    whi("Calling whisper instead of using cache.")
+    with open(audio_path, "rb") as audio_file:
+        transcript = openai.Audio.transcribe(
+            model=modelname,
+            file=audio_file,
+            prompt=txt_whisp_prompt,
+            language=txt_whisp_lang)
+    return transcript
+
 
 def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
@@ -54,12 +65,7 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(audio_mp3, "rb") as audio_file:
-                    transcript = whisper_cached(
-                        model=modelname,
-                        file=audio_file,
-                        prompt=txt_whisp_prompt,
-                        language=txt_whisp_lang)
+                transcript = whisper_cached(audio_mp3, modelname, txt_whisp_prompt, txt_whisp_lang)
                 return None
             except RateLimitError as err:
                 if cnt >= 5:
@@ -100,12 +106,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
             try:
                 whi("Asking Whisper")
                 cnt += 1
-                with open(audio_mp3_1, "rb") as audio_file:
-                    transcript = whisper_cached(
-                        model=modelname,
-                        file=audio_file,
-                        prompt=txt_whisp_prompt,
-                        language=txt_whisp_lang)
+                transcript = whisper_cached(audio_mp3_1, modelname, txt_whisp_prompt, txt_whisp_lang)
                 with open(audio_mp3_1, "rb") as audio_file:
                     mp3_content = audio_file.read()
                 txt_audio = transcript["text"]
