@@ -75,7 +75,7 @@ class previous_values:
                 except Exception as err:
                     raise Exception(f"Error when getting {kf}: '{err}'")
             if key.startswith("audio_mp3"):
-                if not isinstance(new, tuple) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
+                if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
             if key == "gallery":
