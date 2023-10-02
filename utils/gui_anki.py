@@ -149,13 +149,6 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
 
-    # load previous values
-    audio_mp3_1.value = pv["audio_mp3_1"]
-    audio_mp3_2.value = pv["audio_mp3_2"]
-    audio_mp3_3.value = pv["audio_mp3_3"]
-    audio_mp3_4.value = pv["audio_mp3_4"]
-    audio_mp3_5.value = pv["audio_mp3_5"]
-
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
