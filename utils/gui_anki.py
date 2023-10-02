@@ -162,25 +162,25 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
     # on another distance device
-    dir_load_btn.click(
-            fn=load_user_dir,
-            inputs={
-                audio_mp3_1,
-                audio_mp3_2,
-                audio_mp3_3,
-                audio_mp3_4,
-                audio_mp3_5,
-                gallery,
-                },
-            outputs={
-                audio_mp3_1,
-                audio_mp3_2,
-                audio_mp3_3,
-                audio_mp3_4,
-                audio_mp3_5,
-                gallery,
-                },
-            )
+    # dir_load_btn.click(
+    #         fn=load_user_dir,
+    #         inputs={
+    #             audio_mp3_1,
+    #             audio_mp3_2,
+    #             audio_mp3_3,
+    #             audio_mp3_4,
+    #             audio_mp3_5,
+    #             gallery,
+    #             },
+    #         outputs={
+    #             audio_mp3_1,
+    #             audio_mp3_2,
+    #             audio_mp3_3,
+    #             audio_mp3_4,
+    #             audio_mp3_5,
+    #             gallery,
+    #             },
+    #         )
 
     # send to whisper
     transcript_btn.click(

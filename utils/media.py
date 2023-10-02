@@ -231,6 +231,7 @@ def load_user_dir(data):
     assert Path("user_directory").exists(), "No 'user_directory' found"
     assert tododir.exists(), "No 'TODO' subdir found"
     assert doingdir.exists(), "No 'DOING' subdir found"
+    breakpoint()
 
     if data["gallery"] is not None:
         stop_at_image = True
