@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, trans
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_userdir, image_saver
+from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_user_dir, image_saver
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -164,7 +164,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
     # images. This allow to use V2FT on the computer but record the audio
     # on another distance device
     dir_load_btn.click(
-            fn=load_userdir,
+            fn=load_user_dir,
             input={
                 audio_mp3_1,
                 audio_mp3_2,
