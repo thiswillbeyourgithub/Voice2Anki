@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, trans
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_userdir
+from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_userdir, image_saver
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -122,6 +122,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
                     fn=get_image,
                     inputs=[gallery],
                     outputs=[gallery])
+    gallery.change(fn=image_saver, inputs=[gallery, txt_profile])
 
     # audio
     rst_audio_btn.click(
