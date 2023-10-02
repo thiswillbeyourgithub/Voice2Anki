@@ -1,3 +1,4 @@
+import shutil
 import json
 from pathlib import Path
 import tempfile
@@ -214,3 +215,88 @@ def sound_preprocessing(audio_mp3_n):
 
     whi("Done preprocessing audio")
     return audio_mp3_n
+
+
+tododir = Path("./user_directory/TODO")
+doingdir = Path("./user_directory/DOING")
+tmpdir = Path("/tmp/gradio")
+n_sound_slots = 5  # number of object that can store sounds
+
+
+def load_user_dir(data):
+    """
+    load the next few sounds from a directory. If an image is found, load it
+    too.
+    """
+    assert Path("user_directory").exists(), "No 'user_directory' found"
+    assert tododir.exists(), "No 'TODO' subdir found"
+    assert doingdir.exists(), "No 'DOING' subdir found"
+
+    if data["gallery"] is not None:
+        stop_at_image = True
+    else:
+        stop_at_image = False
+
+
+    # check how many audio are needed
+    sound_slots = 0
+    for key in [f"audio_mp3_{i}" for i in range(n_sound_slots, 0)]:
+        sound_slots += 1
+        if data[key] is not None:
+            break
+
+    # count the number of files in the TODO dir
+    todos = [p for p in tododir.rglob("*")]
+    assert todos, "TODO subdir is empty"
+
+    # sort by oldest
+    todos = sorted(todos, key=lambda x: x.stat().st_ctime)
+
+    # iterate over each files from the dir. If images are found, load them
+    # into gallery but if the images are found after sounds, stops iterating
+    latest_type = None
+    sound_loaded = 0
+    sounds_to_load = []
+    for path in todos:
+
+        # don't find more documents than available slots
+        if sound_loaded > sound_slots:
+            break
+
+        # found image
+        if path.name.lower().endswith("png"):
+
+            # does not load images after audio
+            if latest_type == "mp3":
+                break
+
+            # stop if the gallery was already loaded
+            if stop_at_image:
+                break
+
+            # found image, move it to doing, load it into gallery
+            moved = doingdir / path.name
+            path.rename(moved)
+            assert moved.exists() and not path.exists(), "unexpected image location"
+            if isinstance(data["gallery"], list):
+                data["gallery"].append(cv2.imread(moved, flags=1))
+            else:
+                data["gallery"] = list(cv2.imread(moved, flags=1))
+            latest_type = "png"
+
+        # found sound
+        if path.name.lower().endswith("mp3"):
+            latest_type = "mp3"
+            sound_loaded += 1
+            moved = doingdir / path.name
+            path.rename(moved)
+            shutil.copy(moved, tmpdir / moved.name)
+            assert (moved.exists() and (tmpdir / moved.name).exists()) and (
+                    not path.exists()), "unexpected sound location"
+            sounds_to_load.append(moved.absolute())
+
+    # load the path to the new audio
+    for i, sound in enumerate(sounds_to_load):
+        data[f"audio_mp3_{n_sound_slots-i}"] = sound
+
+    return data

@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, trans
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing
+from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_userdir
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -67,6 +67,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
             rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
             rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
@@ -157,6 +158,29 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
                     fn=auto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
+
+    # clicking this button will load from a user directory the next sounds and
+    # images. This allow to use V2FT on the computer but record the audio
+    # on another distance device
+    dir_load_btn.click(
+            fn=load_userdir,
+            input={
+                audio_mp3_1,
+                audio_mp3_2,
+                audio_mp3_3,
+                audio_mp3_4,
+                audio_mp3_5,
+                gallery,
+                },
+            outputs={
+                audio_mp3_1,
+                audio_mp3_2,
+                audio_mp3_3,
+                audio_mp3_4,
+                audio_mp3_5,
+                gallery,
+                },
+            )
 
     # send to whisper
     transcript_btn.click(
