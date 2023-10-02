@@ -37,13 +37,6 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     modelname = "whisper-1"
 
-    # save audio for next startup
-    global latest_pv
-    if not latest_pv:
-        latest_pv = previous_values(txt_profile)
-    pv = latest_pv
-    pv["audio_mp3_1"] = audio_mp3_1
-
     # try to remove silences
     try:
         audio_mp3_1 = sound_preprocessing(audio_mp3_1)
