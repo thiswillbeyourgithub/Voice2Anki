@@ -149,15 +149,6 @@ class audio_saver:
     def n5(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=5)
 
-def image_saver(gallery, txt_profile):
-    "save the gallery images, only if not None"
-    if gallery is None:
-        return
-
-    pv = previous_values(txt_profile)
-    pv[f"gallery"] = gallery
-
-
 
 def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
