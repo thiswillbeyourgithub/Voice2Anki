@@ -164,7 +164,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
     # on another distance device
     dir_load_btn.click(
             fn=load_user_dir,
-            input={
+            inputs={
                 audio_mp3_1,
                 audio_mp3_2,
                 audio_mp3_3,
