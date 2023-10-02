@@ -121,13 +121,6 @@ def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5)
 
 def load_next_audio(txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
     whi("Rolling over audio samples")
-    pv = previous_values(txt_profile)
-    pv["audio_mp3_1"] = audio_mp3_2
-    pv["audio_mp3_2"] = audio_mp3_3
-    pv["audio_mp3_3"] = audio_mp3_4
-    pv["audio_mp3_4"] = audio_mp3_5
-    pv["audio_mp3_5"] = None
-
     return audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
 
 
