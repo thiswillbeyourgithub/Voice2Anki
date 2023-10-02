@@ -1,7 +1,7 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
-from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode
+from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache
 
 from .logger import get_log, whi
 from .memory import recur_improv
@@ -127,11 +127,20 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
             fn=reset_audio,
             inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5])
+    # auto save audio
     audio_mp3_1.change(fn=audio_saver().n1, inputs=[txt_profile, audio_mp3_1])
     audio_mp3_2.change(fn=audio_saver().n2, inputs=[txt_profile, audio_mp3_2])
     audio_mp3_3.change(fn=audio_saver().n3, inputs=[txt_profile, audio_mp3_3])
     audio_mp3_4.change(fn=audio_saver().n4, inputs=[txt_profile, audio_mp3_4])
     audio_mp3_5.change(fn=audio_saver().n5, inputs=[txt_profile, audio_mp3_5])
+
+    # trigger whisper in advance, this way the output will be
+    # cached
+    audio_mp3_1.change(fn=transcribe_cache, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_2.change(fn=transcribe_cache, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_3.change(fn=transcribe_cache, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_4.change(fn=transcribe_cache, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_5.change(fn=transcribe_cache, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang])
     load_audio_btn.click(
             fn=load_next_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],

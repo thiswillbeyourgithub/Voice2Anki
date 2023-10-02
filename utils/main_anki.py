@@ -1,3 +1,4 @@
+import joblib
 import json
 import cv2
 from textwrap import dedent
@@ -20,6 +21,55 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 global latest_pv
 latest_pv = None
+
+stt_cache = joblib.Memory("transcript_cache", verbose=1)
+whisper_cached = stt_cache.cache(openai.Audio.transcribe)
+
+def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+    """run whisper on the audio and return nothing. This is used to cache in
+    advance and in parallel the transcription."""
+    whi("Transcribing audio for the cache")
+
+    if audio_mp3 is None:
+        return
+
+    if txt_whisp_prompt is None:
+        return
+
+    if txt_whisp_lang is None:
+        return
+
+    modelname = "whisper-1"
+
+    # try to remove silences
+    try:
+        audio_mp3 = sound_preprocessing(audio_mp3)
+    except Exception as err:
+        red(f"Error when preprocessing sound: '{err}'")
+
+    try:
+        assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
+        cnt = 0
+        while True:
+            try:
+                whi("Asking Whisper")
+                cnt += 1
+                with open(audio_mp3, "rb") as audio_file:
+                    transcript = whisper_cached(
+                        model=modelname,
+                        file=audio_file,
+                        prompt=txt_whisp_prompt,
+                        language=txt_whisp_lang)
+                return None
+            except RateLimitError as err:
+                if cnt >= 5:
+                    Path(audio_mp3).unlink(missing_ok=False)
+                    red("Cached whisper: too many retries.")
+                    return
+                red(f"Error from cached whisper: '{err}'")
+                time.sleep(2 * cnt)
+    except Exception as err:
+        return red(f"Error when cache transcribing audio: '{err}'")
 
 
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
@@ -51,7 +101,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                 whi("Asking Whisper")
                 cnt += 1
                 with open(audio_mp3_1, "rb") as audio_file:
-                    transcript = openai.Audio.transcribe(
+                    transcript = whisper_cached(
                         model=modelname,
                         file=audio_file,
                         prompt=txt_whisp_prompt,
