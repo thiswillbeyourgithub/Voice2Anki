@@ -66,6 +66,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
             load_audio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
+            load2_audio_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
@@ -137,6 +138,14 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
             ).then(
                     fn=semiauto_mode,
+                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
+    load2_audio_btn.click(
+            fn=load_next_audio,
+            inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
+            ).then(
+                    fn=auto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
 
