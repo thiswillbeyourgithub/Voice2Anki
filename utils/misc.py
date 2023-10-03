@@ -14,7 +14,7 @@ tokenize = tokenizer.encode
 
 transcript_template = """
 Context: 'CONTEXT'
-Transcript: TRANSCRIPT
+Transcript: 'TRANSCRIPT'
 """.strip()
 
 def rgb_to_bgr(image):
