@@ -13,13 +13,9 @@ tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 tokenize = tokenizer.encode
 
 transcript_template = """
-Contexte: "CONTEXT"
-
-Transcript:
-'''
-TRANSCRIPT
-'''
-"""
+Context: 'CONTEXT'
+Transcript: TRANSCRIPT
+""".strip()
 
 def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
