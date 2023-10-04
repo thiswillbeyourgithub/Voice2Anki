@@ -52,8 +52,6 @@ sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
-    whi("Transcribing audio for the cache")
-
     if audio_mp3 is None:
         return
 
@@ -63,6 +61,7 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     if txt_whisp_lang is None:
         return
 
+    whi("Transcribing audio for the cache")
     modelname = "whisper-1"
 
     # try to remove silences
