@@ -61,6 +61,7 @@ class previous_values:
         whi(f"Profile loaded: {self.p.name}")
 
         assert self.p.exists(), f"{self.p} not found!"
+        self.profile_name = profile
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
