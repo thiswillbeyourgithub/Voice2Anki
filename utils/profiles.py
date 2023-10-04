@@ -55,12 +55,16 @@ class previous_values:
 
         assert self.p.exists(), f"{self.p} not found!"
         self.running_tasks = {k: None for k in approved_keys}
+        self.cache_values = {k: None for k in approved_keys}
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         if self.running_tasks[key] is not None and not self.running_tasks[key].done():
             await self.running_tasks[key]
+
+        if self.cache_values[key] is not None:
+            return self.cache_values[key]
 
         kp = key + ".pickle"
         if key == "latest_profile":
@@ -109,6 +113,7 @@ class previous_values:
         # make sure to wait for the previous setitem of the same key to finish
         if self.running_tasks[key] is not None and not self.running_tasks[key].done():
             await self.running_tasks[key]
+        self.cache_values[key] = item
         self.running_tasks[key] = asyncio.create_task(self.__setitem__async(key, item))
 
     async def __setitem__async(self, key, item):
