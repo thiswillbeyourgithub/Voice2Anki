@@ -26,7 +26,6 @@ latest_pv = None
 
 # to avoid locking the script when saving to db
 loop = asyncio.get_event_loop()
-func_in_loop = []
 
 stt_cache = joblib.Memory("transcript_cache", verbose=1)
 
@@ -119,10 +118,9 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                 yel(f"\nWhisper transcript: {txt_audio}")
                 Path(audio_mp3_1).unlink(missing_ok=False)
 
-                await asyncio.gather(*fun_in_loop)
+                await asyncio.gather(*asyncio.Task.all_tasks())
                 loop.close()  # make sure it was closed previously
-                func_in_loop.append(
-                        asyncio.ensure_future(
+                        asyncio.create_task(
                             store_to_db(
                                 {
                                     "type": "whisper_transcription",
@@ -247,27 +245,26 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
-        await asyncio.gather(*fun_in_loop)
+        await asyncio.gather(*asyncio.Task.all_tasks())
         loop.close()  # make sure it was closed previously
-        func_in_loop.append(
-                asyncio.ensure_future(
-                store_to_db(
-                    {
-                        "type": "anki_card",
-                        "timestamp": time.time(),
-                        "token_cost": tkn_cost,
-                        "temperature": temperature,
-                        "LLM_context": txt_chatgpt_context,
-                        "V2FT_profile": profile,
-                        "transcribed_input": txt_audio,
-                        "model_name": model_to_use,
-                        "last_message_from_conversation": formatted_messages[-1],
-                        "nb_of_message_in_conversation": len(formatted_messages),
-                        "system_prompt": formatted_messages[0],
-                        "cloze": cloz,
-                        "V2FT_mode": mode,
-                        }, db_name="anki_llm")
-                    )
+        asyncio.create_task(
+            store_to_db(
+                {
+                    "type": "anki_card",
+                    "timestamp": time.time(),
+                    "token_cost": tkn_cost,
+                    "temperature": temperature,
+                    "LLM_context": txt_chatgpt_context,
+                    "V2FT_profile": profile,
+                    "transcribed_input": txt_audio,
+                    "model_name": model_to_use,
+                    "last_message_from_conversation": formatted_messages[-1],
+                    "nb_of_message_in_conversation": len(formatted_messages),
+                    "system_prompt": formatted_messages[0],
+                    "cloze": cloz,
+                    "V2FT_mode": mode,
+                    }, db_name="anki_llm")
+                )
 
 
         return cloz, tkn_cost
