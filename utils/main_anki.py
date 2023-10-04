@@ -27,6 +27,9 @@ latest_pv = None
 # to avoid locking the script when saving to db
 loop = asyncio.get_event_loop()
 
+d = datetime.today()
+today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
+
 stt_cache = joblib.Memory("transcript_cache", verbose=1)
 
 @stt_cache.cache
@@ -401,7 +404,13 @@ def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(txt_audio, txt_chatgpt_context, profile, sld_max_tkn, sld_temp, mode)
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(
+                txt_audio,
+                txt_chatgpt_context,
+                profile,
+                sld_max_tkn,
+                sld_temp,
+                mode)
     if isinstance(txt_chatgpt_tkncost, str):
         txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
     if not txt_chatgpt_tkncost:
@@ -471,8 +480,6 @@ def main(
     txt_source += audio_html
 
     # anki tags
-    d = datetime.today()
-    today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
     if "<img" not in txt_source:
         # if no image in source: add a tag to find them easily later on
