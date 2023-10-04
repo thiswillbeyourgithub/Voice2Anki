@@ -89,7 +89,7 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
         return red(f"Error when cache transcribing audio: '{err}'")
 
 def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
-    asyncio.create_task(
+    asyncio.run(
             transcribe_cache(
                 audio_mp3, txt_whisp_prompt, txt_whisp_lang
                 )
