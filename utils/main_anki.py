@@ -24,7 +24,10 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 global latest_pv
 latest_pv = None
 
-running_tasks = []
+running_tasks = {
+        "save_whisper": [],
+        "save_chatgpt": [],
+        }
 
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
@@ -129,10 +132,10 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
                 yel(f"\nWhisper transcript: {txt_audio}")
                 Path(audio_mp3_1).unlink(missing_ok=False)
 
-                await asyncio.gather(*running_tasks)
-                while running_tasks:
-                    running_tasks.pop()
-                running_tasks.append(
+                await asyncio.gather(*running_tasks["save_whisper"])
+                while running_tasks["save_whisper"]:
+                    running_tasks["save_whisper"].pop()
+                running_tasks["save_whisper"].append(
                         asyncio.create_task(
                             store_to_db(
                                 {
@@ -258,10 +261,10 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
-        await asyncio.gather(*running_tasks)
-        while running_tasks:
-            running_tasks.pop()
-        running_tasks.append(
+        await asyncio.gather(*running_tasks["save_chatgpt"])
+        while running_tasks["save_chatgpt"]:
+            running_tasks["save_chatgpt"].pop()
+        running_tasks["save_chatgpt"].append(
                 asyncio.create_task(
                     store_to_db(
                         {
