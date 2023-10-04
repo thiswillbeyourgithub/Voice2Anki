@@ -283,16 +283,16 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
-def semiauto_mode(*args, **kwargs):
+async def semiauto_mode(*args, **kwargs):
     "triggering function 'main' with mode 'semiauto'"
     whi("Triggering semiauto mode: doing everything but stop just before uploading to anki")
-    return main(*args, **kwargs, mode="semiauto")
+    return await main(*args, **kwargs, mode="semiauto")
 
 
-def auto_mode(*args, **kwargs):
+async def auto_mode(*args, **kwargs):
     "triggering function 'main' with mode 'auto'"
     whi("Triggering auto mode")
-    return main(*args, **kwargs, mode="auto")
+    return await main(*args, **kwargs, mode="auto")
 
 
 async def main(
@@ -401,12 +401,12 @@ async def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
+        txt_audio = await transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
         to_return["txt_audio"] = txt_audio
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = await alfred(
                 txt_audio,
                 txt_chatgpt_context,
                 profile,
