@@ -24,8 +24,7 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 global latest_pv
 latest_pv = None
 
-# to avoid locking the script when saving to db
-loop = asyncio.get_event_loop()
+running_tasks = []
 
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
@@ -130,20 +129,23 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
                 yel(f"\nWhisper transcript: {txt_audio}")
                 Path(audio_mp3_1).unlink(missing_ok=False)
 
-                await asyncio.gather(*asyncio.Task.all_tasks())
-                loop.close()  # make sure it was closed previously
-                asyncio.create_task(
-                    store_to_db(
-                        {
-                            "type": "whisper_transcription",
-                            "timestamp": time.time(),
-                            "whisper_language": txt_whisp_lang,
-                            "whisper_context": txt_whisp_prompt,
-                            "V2FT_profile": txt_profile,
-                            "transcribed_input": txt_audio,
-                            "model_name": f"OpenAI {modelname}",
-                            "audio_mp3": base64.b64encode(mp3_content).decode(),
-                            }, db_name="anki_whisper")
+                await asyncio.gather(*running_tasks)
+                while running_tasks:
+                    running_tasks.pop()
+                running_tasks.append(
+                        asyncio.create_task(
+                            store_to_db(
+                                {
+                                    "type": "whisper_transcription",
+                                    "timestamp": time.time(),
+                                    "whisper_language": txt_whisp_lang,
+                                    "whisper_context": txt_whisp_prompt,
+                                    "V2FT_profile": txt_profile,
+                                    "transcribed_input": txt_audio,
+                                    "model_name": f"OpenAI {modelname}",
+                                    "audio_mp3": base64.b64encode(mp3_content).decode(),
+                                    }, db_name="anki_whisper")
+                                )
                         )
 
 
@@ -256,25 +258,28 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
-        await asyncio.gather(*asyncio.Task.all_tasks())
-        loop.close()  # make sure it was closed previously
-        asyncio.create_task(
-            store_to_db(
-                {
-                    "type": "anki_card",
-                    "timestamp": time.time(),
-                    "token_cost": tkn_cost,
-                    "temperature": temperature,
-                    "LLM_context": txt_chatgpt_context,
-                    "V2FT_profile": profile,
-                    "transcribed_input": txt_audio,
-                    "model_name": model_to_use,
-                    "last_message_from_conversation": formatted_messages[-1],
-                    "nb_of_message_in_conversation": len(formatted_messages),
-                    "system_prompt": formatted_messages[0],
-                    "cloze": cloz,
-                    "V2FT_mode": mode,
-                    }, db_name="anki_llm")
+        await asyncio.gather(*running_tasks)
+        while running_tasks:
+            running_tasks.pop()
+        running_tasks.append(
+                asyncio.create_task(
+                    store_to_db(
+                        {
+                            "type": "anki_card",
+                            "timestamp": time.time(),
+                            "token_cost": tkn_cost,
+                            "temperature": temperature,
+                            "LLM_context": txt_chatgpt_context,
+                            "V2FT_profile": profile,
+                            "transcribed_input": txt_audio,
+                            "model_name": model_to_use,
+                            "last_message_from_conversation": formatted_messages[-1],
+                            "nb_of_message_in_conversation": len(formatted_messages),
+                            "system_prompt": formatted_messages[0],
+                            "cloze": cloz,
+                            "V2FT_mode": mode,
+                            }, db_name="anki_llm")
+                        )
                 )
 
 
