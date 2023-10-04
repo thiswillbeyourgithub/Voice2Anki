@@ -126,7 +126,7 @@ async def audio_to_anki(audio_mp3):
         return red(f"\n\nError when copying audio to anki media: '{err}'")
 
 
-def sync_anki():
+async def sync_anki():
     "trigger anki synchronization"
     sync_output = _call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (

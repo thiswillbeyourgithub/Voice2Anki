@@ -504,7 +504,7 @@ def main(
     results = [str(r) for r in results if str(r).isdigit()]
 
     # trigger anki sync
-    sync_anki()
+    asyncio.create_task(sync_anki())
     whi("Synchronized anki\n")
 
     if not len(results) == len(clozes):
