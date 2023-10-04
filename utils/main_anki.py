@@ -41,7 +41,7 @@ def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
     return transcript
 
 
-def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     whi("Transcribing audio for the cache")
@@ -82,6 +82,13 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     except Exception as err:
         return red(f"Error when cache transcribing audio: '{err}'")
 
+def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+    asyncio.create_task(
+            transcribe_cache(
+                audio_mp3, txt_whisp_prompt, txt_whisp_lang
+                )
+            )
+
 
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
@@ -120,19 +127,18 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
                 await asyncio.gather(*asyncio.Task.all_tasks())
                 loop.close()  # make sure it was closed previously
-                        asyncio.create_task(
-                            store_to_db(
-                                {
-                                    "type": "whisper_transcription",
-                                    "timestamp": time.time(),
-                                    "whisper_language": txt_whisp_lang,
-                                    "whisper_context": txt_whisp_prompt,
-                                    "V2FT_profile": txt_profile,
-                                    "transcribed_input": txt_audio,
-                                    "model_name": f"OpenAI {modelname}",
-                                    "audio_mp3": base64.b64encode(mp3_content).decode(),
-                                    }, db_name="anki_whisper")
-                                )
+                asyncio.create_task(
+                    store_to_db(
+                        {
+                            "type": "whisper_transcription",
+                            "timestamp": time.time(),
+                            "whisper_language": txt_whisp_lang,
+                            "whisper_context": txt_whisp_prompt,
+                            "V2FT_profile": txt_profile,
+                            "transcribed_input": txt_audio,
+                            "model_name": f"OpenAI {modelname}",
+                            "audio_mp3": base64.b64encode(mp3_content).decode(),
+                            }, db_name="anki_whisper")
                         )
 
 
