@@ -96,7 +96,7 @@ def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
             )
 
 
-def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
@@ -159,7 +159,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red(f"Error when transcribing audio: '{err}'")
 
 
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
+async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
@@ -295,7 +295,7 @@ def auto_mode(*args, **kwargs):
     return main(*args, **kwargs, mode="auto")
 
 
-def main(
+async def main(
         audio_mp3_1,
         txt_audio,
         txt_whisp_prompt,

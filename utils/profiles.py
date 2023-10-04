@@ -111,7 +111,7 @@ class previous_values:
             return None
         return new
 
-    def __setitem__(self, key, item):
+    async def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
         # make sure to wait for the previous setitem of the same key to finish
