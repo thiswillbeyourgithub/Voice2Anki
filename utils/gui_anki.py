@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, trans
 
 from .logger import get_log, whi
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, load_next_audio, sound_preprocessing, load_user_dir
+from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, load_user_dir
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -131,21 +131,16 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
 
     # auto save audio
     asv = audio_saver(pv.profile_name)
-    audio_mp3_1.change(fn=asv.n1, inputs=[txt_profile, audio_mp3_1])
-    audio_mp3_2.change(fn=asv.n2, inputs=[txt_profile, audio_mp3_2])
-    audio_mp3_3.change(fn=asv.n3, inputs=[txt_profile, audio_mp3_3])
-    audio_mp3_4.change(fn=asv.n4, inputs=[txt_profile, audio_mp3_4])
-    audio_mp3_5.change(fn=asv.n5, inputs=[txt_profile, audio_mp3_5])
-
     # trigger whisper in advance, this way the output will be cached
-    audio_mp3_1.change(fn=transcribe_cache_async, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang])
-    audio_mp3_2.change(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang])
-    audio_mp3_3.change(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang])
-    audio_mp3_4.change(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang])
-    audio_mp3_5.change(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_1.stop_recording(fn=asv.n1, inputs=[txt_profile, audio_mp3_1]).then(fn=transcribe_cache_async, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_2.stop_recording(fn=asv.n2, inputs=[txt_profile, audio_mp3_2]).then(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_3.stop_recording(fn=asv.n3, inputs=[txt_profile, audio_mp3_3]).then(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_4.stop_recording(fn=asv.n4, inputs=[txt_profile, audio_mp3_4]).then(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang])
+    audio_mp3_5.stop_recording(fn=asv.n5, inputs=[txt_profile, audio_mp3_5]).then(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang])
+
 
     rollaudio_btn.click(
-            fn=load_next_audio,
+            fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
             ).then(
@@ -153,7 +148,7 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
     rollaudio2_btn.click(
-            fn=load_next_audio,
+            fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
             ).then(

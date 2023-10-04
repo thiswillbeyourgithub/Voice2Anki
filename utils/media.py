@@ -120,14 +120,29 @@ def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5)
     return None, None, None, None, None
 
 
-def load_next_audio(txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
-    whi("Rolling over audio samples")
-    return audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
-
 
 class audio_saver:
     def __init__(self, txt_profile):
         self.pv = previous_values(txt_profile)
+
+    def roll_audio(
+            self,
+            txt_profile,
+            audio_mp3_1,
+            audio_mp3_2,
+            audio_mp3_3,
+            audio_mp3_4,
+            audio_mp3_5):
+        whi("Rolling over audio samples")
+        if self.pv.profile_name != txt_profile:
+            self.pv = previous_values(txt_profile)
+        self.pv["audio_mp3_1"] = audio_mp3_2
+        self.pv["audio_mp3_2"] = audio_mp3_3
+        self.pv["audio_mp3_3"] = audio_mp3_4
+        self.pv["audio_mp3_4"] = audio_mp3_5
+        self.pv["audio_mp3_5"] = None
+        return audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
+
 
     def save_audio(self, txt_profile, audio_mp3_n, n):
         if self.pv.profile_name != txt_profile:
