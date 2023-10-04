@@ -31,6 +31,7 @@ d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 stt_cache = joblib.Memory("transcript_cache", verbose=1)
+soundpreprocess_cache = joblib.Memory("sound_preprocessing_cache", verbose=1)
 
 @stt_cache.cache
 def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
@@ -42,6 +43,8 @@ def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
             prompt=txt_whisp_prompt,
             language=txt_whisp_lang)
     return transcript
+
+sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
 
 async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
@@ -62,7 +65,7 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
 
     # try to remove silences
     try:
-        audio_mp3 = sound_preprocessing(audio_mp3)
+        audio_mp3 = sound_preprocessing_cached(audio_mp3)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
@@ -110,7 +113,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     # try to remove silences
     try:
-        audio_mp3_1 = sound_preprocessing(audio_mp3_1)
+        audio_mp3_1 = sound_preprocessing_cached(audio_mp3_1)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
