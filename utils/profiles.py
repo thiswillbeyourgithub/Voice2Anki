@@ -1,3 +1,4 @@
+import time
 import asyncio
 import pickle
 from pathlib import Path
@@ -7,7 +8,7 @@ import cv2
 from .logger import whi, red
 from .misc import rgb_to_bgr, backend_config
 
-approved_keys = [
+approved_keys_all = [
         "audio_mp3_1",
         "audio_mp3_2",
         "audio_mp3_3",
@@ -21,8 +22,8 @@ approved_keys = [
         "latest_profile",
         "total_llm_cost",
         ]
-approved_keys_anki = ["gallery", "txt_deck", "txt_tags"]
-approved_keys_md = ["txt_mdpath"]
+approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
+approved_keys_md = approved_keys_all + ["txt_mdpath"]
 
 profile_path = Path("./profiles")
 anki_path = profile_path / "anki"
@@ -41,14 +42,16 @@ class previous_values:
 
         if backend_config.backend == "anki":
             self.backend = "anki"
-            self.approved_keys = approved_keys + approved_keys_anki
+            self.approved_keys = approved_keys_anki
             self.p = anki_path / profile
         elif backend_config.backend == "markdown":
             self.backend = "markdown"
-            self.approved_keys = approved_keys + approved_keys_md
+            self.approved_keys = approved_keys_md
             self.p = md_path / profile
         else:
             raise Exception(backend_config.backend)
+        self.running_tasks = {k: None for k in self.approved_keys}
+        self.cache_values = {k: None for k in self.approved_keys}
 
         if profile != "reload":
             self.p.mkdir(exist_ok=True)
@@ -58,14 +61,17 @@ class previous_values:
         whi(f"Profile loaded: {self.p.name}")
 
         assert self.p.exists(), f"{self.p} not found!"
-        self.running_tasks = {k: None for k in approved_keys}
-        self.cache_values = {k: None for k in approved_keys}
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         if self.running_tasks[key] is not None and not self.running_tasks[key].done():
-            await self.running_tasks[key]
+            i = 0
+            while not self.running_tasks[key].done():
+                i += 1
+                time.sleep(0.01)
+                if i > 100 and i % 100 == 0:
+                    red(f"Waiting for task of {key} to finish.")
 
         if self.cache_values[key] is not None:
             return self.cache_values[key]
