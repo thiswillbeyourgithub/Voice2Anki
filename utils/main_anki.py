@@ -76,7 +76,7 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
         cnt = 0
         while True:
             try:
-                whi("Asking Whisper")
+                whi("Asking Whisper (mp3 not in cache)")
                 cnt += 1
                 transcript = whisper_cached(audio_mp3, modelname, txt_whisp_prompt, txt_whisp_lang)
                 return None
@@ -123,7 +123,7 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
         cnt = 0
         while True:
             try:
-                whi("Asking Whisper")
+                whi("Asking Whisper (using cache)")
                 cnt += 1
                 transcript = whisper_cached(audio_mp3_1, modelname, txt_whisp_prompt, txt_whisp_lang)
                 with open(audio_mp3_1, "rb") as audio_file:
