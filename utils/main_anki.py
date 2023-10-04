@@ -111,8 +111,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     modelname = "whisper-1"
 
-    # try to remove silences
-    try:
+    try:  # preprocess sound, cached to make sure it only run once
         audio_mp3_1 = sound_preprocessing_cached(audio_mp3_1)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
