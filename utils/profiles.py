@@ -24,13 +24,17 @@ approved_keys = [
 approved_keys_anki = ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = ["txt_mdpath"]
 
+profile_path = Path("./profiles")
+anki_path = profile_path / "anki"
+md_path = profile_path / "markdown"
+
+profile_path.mkdir(exist_ok=True)
+anki_path.mkdir(exist_ok=True)
+md_path.mkdir(exist_ok=True)
 
 class previous_values:
     def __init__(self, profile="default"):
-        Path("./profiles").mkdir(exist_ok=True)
-        Path("./profiles/anki").mkdir(exist_ok=True)
-        Path("./profiles/markdown").mkdir(exist_ok=True)
-        assert len([p for p in Path("./profiles").iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
+        assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
             "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
@@ -38,11 +42,11 @@ class previous_values:
         if backend_config.backend == "anki":
             self.backend = "anki"
             self.approved_keys = approved_keys + approved_keys_anki
-            self.p = Path(f"./profiles/anki/{profile}")
+            self.p = anki_path / profile
         elif backend_config.backend == "markdown":
             self.backend = "markdown"
             self.approved_keys = approved_keys + approved_keys_md
-            self.p = Path(f"./profiles/markdown/{profile}")
+            self.p = md_path / profile
         else:
             raise Exception(backend_config.backend)
 
@@ -140,11 +144,11 @@ class previous_values:
 
 
 def get_profiles():
-    profiles = [str(p.name) for p in Path("profiles").iterdir()]
+    profiles = [str(p.name) for p in profile_path.iterdir()]
     if backend_config.backend == "anki":
-        profiles = [str(p.name) for p in Path("profiles/anki").iterdir()]
+        profiles = [str(p.name) for p in anki_path.iterdir()]
     elif backend_config.backend == "markdown":
-        profiles = [str(p.name) for p in Path("profiles/markdown").iterdir()]
+        profiles = [str(p.name) for p in md_path.iterdir()]
     assert profiles, "Empty list of profiles"
     return profiles
 
@@ -169,9 +173,9 @@ def switch_profile(profile):
 
     if profile not in get_profiles():
         if backend_config.backend == "anki":
-            Path(f"profiles/anki/{profile}").mkdir(exist_ok=False)
+            (anki_path / profile).mkdir(exist_ok=False)
         elif backend_config.backend == "markdown":
-            Path(f"profiles/markdown/{profile}").mkdir(exist_ok=False)
+            (md_path / profile).mkdir(exist_ok=False)
         else:
             raise Exception(backend_config.backend)
         red(f"created {profile}.")
