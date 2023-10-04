@@ -354,6 +354,9 @@ def main(
                 txt_chatgpt_cloz,
                 ]
 
+    if mode != "semiauto":  # start copying the sound file right away
+        audio_to_anki_task = asyncio.create_task(audio_to_anki(audio_mp3_1))
+
     # to_return allows to keep track of what to output to which widget
     to_return = {}
     to_return["txt_audio"] = txt_audio
@@ -458,7 +461,7 @@ def main(
     red("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = audio_to_anki(audio_mp3_1)
+    audio_html = await audio_to_anki_task
     if "Error" in audio_html:  # then out is an error message and not the source
         return [
                 to_return["txt_audio"],

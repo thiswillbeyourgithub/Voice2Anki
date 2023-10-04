@@ -106,7 +106,7 @@ def _call_anki(action, **params):
     return response['result']
 
 
-def audio_to_anki(audio_mp3):
+async def audio_to_anki(audio_mp3):
     whi("Sending audio to anki")
     try:
 
