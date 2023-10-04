@@ -117,8 +117,9 @@ class previous_values:
         # make sure to wait for the previous setitem of the same key to finish
         if self.running_tasks[key] is not None and not self.running_tasks[key].done():
             await self.running_tasks[key]
-        self.cache_values[key] = item
-        self.running_tasks[key] = asyncio.create_task(self.__setitem__async(key, item))
+        if item != self.cache_values[key]:
+            self.cache_values[key] = item
+            self.running_tasks[key] = asyncio.create_task(self.__setitem__async(key, item))
 
     async def __setitem__async(self, key, item):
         kp = key + ".pickle"
