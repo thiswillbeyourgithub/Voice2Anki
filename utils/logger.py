@@ -46,7 +46,10 @@ def store_to_db(dictionnary, db_name):
                       (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       data TEXT)''')
 
-    data = zlib.compress(json.dumps(dictionnary).encode())
+    data = zlib.compress(
+            data=json.dumps(dictionnary).encode(),
+            level=1,  # 1: fast but large
+            )
     cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
     conn.commit()
     conn.close()
