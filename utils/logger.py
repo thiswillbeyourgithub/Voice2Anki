@@ -47,7 +47,7 @@ async def store_to_db(dictionnary, db_name):
                       data TEXT)''')
 
     data = zlib.compress(
-            data=json.dumps(dictionnary).encode(),
+            json.dumps(dictionnary).encode(),
             level=9,  # 1: fast but large, 9 slow but small
             )
     cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
