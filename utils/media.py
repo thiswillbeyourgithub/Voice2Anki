@@ -126,13 +126,18 @@ def load_next_audio(txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp
 
 
 class audio_saver:
+    def __init__(self, txt_profile):
+        self.pv = previous_values(txt_profile)
+
     def save_audio(self, txt_profile, audio_mp3_n, n):
+        if self.pv.profile_name != txt_profile:
+            self.pv = previous_values(txt_profile)
+
         whi(f"Saving audio from #{n} to profile")
         if audio_mp3_n is None:
             whi("Not saving because sound is None")
             return
-        pv = previous_values(txt_profile)
-        pv[f"audio_mp3_{n}"] = audio_mp3_n
+        self.pv[f"audio_mp3_{n}"] = audio_mp3_n
 
     def n1(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=1)
