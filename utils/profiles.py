@@ -1,3 +1,4 @@
+import asyncio
 import pickle
 from pathlib import Path
 import numpy as np
@@ -53,10 +54,14 @@ class previous_values:
         whi(f"Profile loaded: {self.p.name}")
 
         assert self.p.exists(), f"{self.p} not found!"
+        self.running_tasks = {k: None for k in approved_keys}
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
+        if self.running_tasks[key] is not None and not self.running_tasks[key].done():
+            await self.running_tasks[key]
+
         kp = key + ".pickle"
         if key == "latest_profile":
             # latest_profile.pickle is stored in the root of the profile dir
@@ -101,6 +106,12 @@ class previous_values:
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
+        # make sure to wait for the previous setitem of the same key to finish
+        if self.running_tasks[key] is not None and not self.running_tasks[key].done():
+            await self.running_tasks[key]
+        self.running_tasks[key] = asyncio.create_task(self.__setitem__async(key, item))
+
+    async def __setitem__async(self, key, item):
         kp = key + ".pickle"
         if key == "latest_profile":
             if item == "default":
