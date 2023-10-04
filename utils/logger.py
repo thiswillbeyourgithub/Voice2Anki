@@ -32,7 +32,7 @@ log.addHandler(file_handler)
 log_regex = re.compile(" ##.*?##")
 
 
-def store_to_db(dictionnary, db_name):
+async def store_to_db(dictionnary, db_name):
     """
     take a dictionnary and add it to the sqlite db. This is used to store
     all interactions with LLM and can be used later to create a dataset for
