@@ -26,6 +26,7 @@ latest_pv = None
 
 # to avoid locking the script when saving to db
 loop = asyncio.get_event_loop()
+func_in_loop = []
 
 stt_cache = joblib.Memory("transcript_cache", verbose=1)
 
@@ -118,19 +119,23 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                 yel(f"\nWhisper transcript: {txt_audio}")
                 Path(audio_mp3_1).unlink(missing_ok=False)
 
+                await asyncio.gather(*fun_in_loop)
                 loop.close()  # make sure it was closed previously
-                loop.create_task(
-                        store_to_db(
-                            {
-                                "type": "whisper_transcription",
-                                "timestamp": time.time(),
-                                "whisper_language": txt_whisp_lang,
-                                "whisper_context": txt_whisp_prompt,
-                                "V2FT_profile": txt_profile,
-                                "transcribed_input": txt_audio,
-                                "model_name": f"OpenAI {modelname}",
-                                "audio_mp3": base64.b64encode(mp3_content).decode(),
-                                }, db_name="anki_whisper"))
+                func_in_loop.append(
+                        asyncio.ensure_future(
+                            store_to_db(
+                                {
+                                    "type": "whisper_transcription",
+                                    "timestamp": time.time(),
+                                    "whisper_language": txt_whisp_lang,
+                                    "whisper_context": txt_whisp_prompt,
+                                    "V2FT_profile": txt_profile,
+                                    "transcribed_input": txt_audio,
+                                    "model_name": f"OpenAI {modelname}",
+                                    "audio_mp3": base64.b64encode(mp3_content).decode(),
+                                    }, db_name="anki_whisper")
+                                )
+                        )
 
 
                 return txt_audio
@@ -242,8 +247,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
+        await asyncio.gather(*fun_in_loop)
         loop.close()  # make sure it was closed previously
-        loop.create_task(
+        func_in_loop.append(
+                asyncio.ensure_future(
                 store_to_db(
                     {
                         "type": "anki_card",
