@@ -134,6 +134,8 @@ class audio_saver:
             audio_mp3_4,
             audio_mp3_5):
         whi("Rolling over audio samples")
+        if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
+            return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
         if self.pv.profile_name != txt_profile:
             self.pv = previous_values(txt_profile)
         while audio_mp3_2 is None:
