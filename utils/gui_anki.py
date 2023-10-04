@@ -28,7 +28,11 @@ document.querySelector('body').classList.add('dark');
 # load default profile
 pv = previous_values("reload")
 
-with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", theme=theme) as demo_anki:
+with gr.Blocks(
+        analytics_enabled=False,
+        title="VoiceToFormattedText - Anki",
+        theme=theme,
+        ) as demo_anki:
 
     gr.Markdown("VoiceToFormattedText - Anki")
 
