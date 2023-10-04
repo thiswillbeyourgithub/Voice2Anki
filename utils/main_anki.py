@@ -223,7 +223,7 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
         cnt = 0
         while True:
             try:
-                red("Asking ChatGPT")
+                whi("Asking ChatGPT")
                 cnt += 1
                 response = openai.ChatCompletion.create(
                         model=model_to_use,
@@ -453,8 +453,8 @@ async def main(
                 ]
 
     # add cloze to output
-    red(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}, not counting whisper)")
-    red(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
+    whi(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}, not counting whisper)")
+    whi(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
 
     # send to anki
     metadata = rtoml.dumps(
@@ -474,7 +474,7 @@ async def main(
                 to_return["txt_chatgpt_cloz"],
                 ]
 
-    red("Sending to anki:")
+    whi("Sending to anki:")
 
     # sending sound file to anki media
     audio_html = await audio_to_anki_task

@@ -138,7 +138,6 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Anki", the
     audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4])
     audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5])
 
-
     rollaudio_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
