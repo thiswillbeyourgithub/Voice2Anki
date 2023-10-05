@@ -134,7 +134,35 @@ with gr.Blocks(
 
     # trigger whisper in advance, this way the output will be cached
     aud_cache_event = []
-    aud_cache_event.append(audio_mp3_1.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n1, inputs=[txt_profile, audio_mp3_1]))
+    # the first slot will directly trigger 1+2 while the other slots will
+    # just trigger caching
+    aud_cache_event.append(audio_mp3_1.stop_recording(
+        fn=semiauto_mode,
+        inputs=[
+            audio_mp3_1,
+            txt_audio,
+            txt_whisp_prompt,
+            txt_whisp_lang,
+
+            txt_chatgpt_tkncost,
+            txt_chatgpt_cloz,
+
+            txt_chatgpt_context,
+            txt_deck,
+            txt_tags,
+
+            gallery,
+            txt_profile,
+            sld_max_tkn,
+            sld_temp,
+            ],
+        outputs=[
+            txt_audio,
+            txt_chatgpt_tkncost,
+            txt_chatgpt_cloz,
+            ]
+        )
+    )
     aud_cache_event.append(audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2]))
     aud_cache_event.append(audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3]))
     aud_cache_event.append(audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4]))
