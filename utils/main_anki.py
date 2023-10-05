@@ -293,7 +293,7 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
         if pv.profile_name != profile:
             pv = previous_values(profile)
         pv["total_llm_cost"] += tkn_cost_dol
-        red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f} (not counting whisper)")
+        red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
         reason = response["choices"][0]["finish_reason"]
         if reason.lower() != "stop":
