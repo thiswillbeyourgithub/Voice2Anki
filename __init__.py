@@ -95,8 +95,6 @@ def start_voice2formattedtext(
     else:
         raise ValueError(backend)
 
-    demo.queue(concurrency_count=3)
-
     if use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
                 "ssl_keyfile": "./utils/ssl/key.pem",
@@ -108,6 +106,7 @@ def start_voice2formattedtext(
         red(f"Will not use SSL")
         ssl_args = {}
 
+    demo.queue(concurrency_count=3)
     demo.launch(
             share=do_share,
             **auth_args,
