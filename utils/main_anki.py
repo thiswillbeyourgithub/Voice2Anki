@@ -25,6 +25,8 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 global pv
 pv = previous_values("reload")
 
+message_buffer = {"question": [], "answer": []}
+
 running_tasks = {
         "save_whisper": [],
         "save_chatgpt": [],
@@ -222,6 +224,15 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
                 "role": "assistant",
                 "content": m["answer"]})
 
+    if message_buffer["question"] and message_buffer["answer"]:
+        if txt_audio.lower() not in json.dumps(message_buffer["question"]).lower() and json.dumps(message_buffer["question"]).lower() not in txt_audio:
+            formatted_messages.append(message_buffer["question"])
+            formatted_messages.append(
+                    {
+                        "role": "assistant",
+                        "content": message_buffer["answer"],
+                        }
+                    )
     formatted_messages.append(new_prompt)
 
     tkns += len(tokenize(formatted_messages[-1]["content"]))
@@ -261,6 +272,8 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
                 time.sleep(2 * cnt)
 
         cloz = response["choices"][0]["message"]["content"]
+        message_buffer["question"] = new_prompt
+        message_buffer["answer"] = cloz
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
 
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
