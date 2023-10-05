@@ -164,7 +164,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
             return True
 
     def _filter_out(pr, tkns, output_pr):
-        if not tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+        if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
             return False
 
         if not favor_list:  # the txt_audio does not ask for a list
