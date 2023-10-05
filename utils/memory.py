@@ -173,7 +173,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
             else:
                 return False
         else:  # if favoring lists, don't use stochasticity
-            if "list" in pr["context"].lower():
+            if "list" in pr["content"].lower():
                 return True
             else:
                 return False
