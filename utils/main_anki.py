@@ -364,9 +364,6 @@ async def main(
                 txt_chatgpt_cloz,
                 ]
 
-    if mode != "semiauto":  # start copying the sound file right away
-        audio_to_anki_task = asyncio.create_task(audio_to_anki(audio_mp3_1))
-
     # to_return allows to keep track of what to output to which widget
     to_return = {}
     to_return["txt_audio"] = txt_audio
@@ -407,6 +404,9 @@ async def main(
     if (not txt_audio) or mode in ["auto", "semiauto"]:
         txt_audio = await transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
         to_return["txt_audio"] = txt_audio
+
+    if mode != "semiauto":  # start copying the sound file right away
+        audio_to_anki_task = asyncio.create_task(audio_to_anki(audio_mp3_1))
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
