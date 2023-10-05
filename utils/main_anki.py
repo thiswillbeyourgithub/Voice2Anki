@@ -308,10 +308,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
-        if running_tasks["saving chatgpt"]:
+        if running_tasks["saving_chatgpt"]:
             running_tasks["saving_chatgpt"][-1].join()
         while running_tasks["saving_chatgpt"]:
-            running_tasks["saving chatgpt"].pop()
+            running_tasks["saving_chatgpt"].pop()
         thread = threading.Thread(
                 target=store_to_db,
                 name="saving_chatgpt",
