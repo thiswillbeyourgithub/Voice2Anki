@@ -1,3 +1,5 @@
+import threading
+import pickle
 import hashlib
 import base64
 import asyncio
@@ -28,8 +30,8 @@ pv = previous_values("reload")
 message_buffer = {"question": [], "answer": []}
 
 running_tasks = {
-        "save_whisper": [],
-        "save_chatgpt": [],
+        "saving_chatgpt": [],
+        "saving_whisper": [],
         }
 
 d = datetime.today()
@@ -156,25 +158,28 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
                 yel(f"\nWhisper transcript: {txt_audio}")
                 Path(audio_mp3_1).unlink(missing_ok=False)
 
-                await asyncio.gather(*running_tasks["save_whisper"])
-                while running_tasks["save_whisper"]:
-                    running_tasks["save_whisper"].pop()
-                running_tasks["save_whisper"].append(
-                        asyncio.create_task(
-                            store_to_db(
-                                {
-                                    "type": "whisper_transcription",
-                                    "timestamp": time.time(),
-                                    "whisper_language": txt_whisp_lang,
-                                    "whisper_context": txt_whisp_prompt,
-                                    "V2FT_profile": txt_profile,
-                                    "transcribed_input": txt_audio,
-                                    "model_name": f"OpenAI {modelname}",
-                                    "audio_mp3": base64.b64encode(mp3_content).decode(),
-                                    }, db_name="anki_whisper")
-                                )
-                        )
-
+                if running_tasks["saving_whisper"]:
+                    running_tasks["saving_whisper"][-1].join()
+                while running_tasks["saving_whisper"]:
+                    running_tasks["saving_whisper"].pop()
+                thread = threading.Thread(
+                        target=store_to_db,
+                        name="saving_whisper",
+                        kwargs={
+                            "dictionnary": {
+                                "type": "whisper_transcription",
+                                "timestamp": time.time(),
+                                "whisper_language": txt_whisp_lang,
+                                "whisper_context": txt_whisp_prompt,
+                                "V2FT_profile": txt_profile,
+                                "transcribed_input": txt_audio,
+                                "model_name": f"OpenAI {modelname}",
+                                "audio_mp3": base64.b64encode(mp3_content).decode(),
+                                },
+                            "db_name": "anki_whisper"
+                            })
+                thread.start()
+                running_tasks["saving_whisper"].append(thread)
 
                 return txt_audio
             except RateLimitError as err:
@@ -188,7 +193,7 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
         return red(f"Error when transcribing audio: '{err}'")
 
 
-async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
@@ -300,29 +305,32 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
             red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
-        await asyncio.gather(*running_tasks["save_chatgpt"])
-        while running_tasks["save_chatgpt"]:
-            running_tasks["save_chatgpt"].pop()
-        running_tasks["save_chatgpt"].append(
-                asyncio.create_task(
-                    store_to_db(
-                        {
-                            "type": "anki_card",
-                            "timestamp": time.time(),
-                            "token_cost": tkn_cost,
-                            "temperature": temperature,
-                            "LLM_context": txt_chatgpt_context,
-                            "V2FT_profile": profile,
-                            "transcribed_input": txt_audio,
-                            "model_name": model_to_use,
-                            "last_message_from_conversation": formatted_messages[-1],
-                            "nb_of_message_in_conversation": len(formatted_messages),
-                            "system_prompt": formatted_messages[0],
-                            "cloze": cloz,
-                            "V2FT_mode": mode,
-                            }, db_name="anki_llm")
-                        )
-                )
+        if running_tasks["saving chatgpt"]:
+            running_tasks["saving_chatgpt"][-1].join()
+        while running_tasks["saving_chatgpt"]:
+            running_tasks["saving chatgpt"].pop()
+        thread = threading.Thread(
+                target=store_to_db,
+                name="saving_chatgpt",
+                kwargs={
+                    "dictionnary": {
+                        "type": "anki_card",
+                        "timestamp": time.time(),
+                        "token_cost": tkn_cost,
+                        "temperature": temperature,
+                        "LLM_context": txt_chatgpt_context,
+                        "V2FT_profile": profile,
+                        "transcribed_input": txt_audio,
+                        "model_name": model_to_use,
+                        "last_message_from_conversation": formatted_messages[-1],
+                        "nb_of_message_in_conversation": len(formatted_messages),
+                        "system_prompt": formatted_messages[0],
+                        "cloze": cloz,
+                        "V2FT_mode": mode,
+                        },
+                    "db_name": "anki_llm"})
+        thread.start()
+        running_tasks["saving_whisper"].append(thread)
 
 
         return cloz, tkn_cost
@@ -451,7 +459,7 @@ async def main(
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = await alfred(
+        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(
                 txt_audio,
                 txt_chatgpt_context,
                 profile,
