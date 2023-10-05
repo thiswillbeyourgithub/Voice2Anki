@@ -109,8 +109,15 @@ def _call_anki(action, **params):
 async def audio_to_anki(audio_mp3):
     whi("Sending audio to anki")
     try:
+        if not Path(audio_mp3).exists():
+            red(f"File {audio_mp3} not found, looking for the right file")
+            candidates = [str(p) for p in Path(audio_mp3).parent.iterdir()]
+            if len(candidates) != 1:
+                raise Exception(f"Multiple candidate mp3 file: '{candidates}'")
+            else:
+                audio_mp3 = candidates[0]
+                red(f"Right file found: '{audio_mp3}'")
 
-        # save numpy audio to wav, load to torch then save to mp3 in anki dir
         with open(audio_mp3, "rb") as audio_file:
             content = audio_file.read()
         audio_hash = hashlib.md5(content).hexdigest()
