@@ -1,3 +1,4 @@
+import hashlib
 import base64
 import asyncio
 import joblib
@@ -35,9 +36,11 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
 soundpreprocess_cache = joblib.Memory("sound_preprocessing_cache", verbose=0)
 
-@stt_cache.cache
-def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
-    whi("Calling whisper instead of using cache.")
+def _whisper_cached(audio_path, audio_hash, modelname, txt_whisp_prompt, txt_whisp_lang):
+    """this is a call to openai's whisper. It's called as soon as the
+    recording is done to begin caching. The audio_path can change so a hash
+    of the content is used instead."""
+    whi(f"Calling whisper instead of using cache for {audio_path}")
     with open(audio_path, "rb") as audio_file:
         transcript = openai.Audio.transcribe(
             model=modelname,
@@ -45,6 +48,10 @@ def whisper_cached(audio_path, modelname, txt_whisp_prompt, txt_whisp_lang):
             prompt=txt_whisp_prompt,
             language=txt_whisp_lang)
     return transcript
+whisper_cached = stt_cache.cache(
+        func=_whisper_cached,
+        ignore=["audio_path"],
+        )
 
 sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
@@ -70,14 +77,22 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
+    with open(audio_mp3, "rb") as f:
+        audio_hash = hashlib.sha256(f.read()).hexdigest()
+
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
+        yel(f"Asking Whisper ({audio_mp3} not in cache)")
         while True:
             try:
-                whi("Asking Whisper (mp3 not in cache)")
                 cnt += 1
-                transcript = whisper_cached(audio_mp3, modelname, txt_whisp_prompt, txt_whisp_lang)
+                transcript = whisper_cached(
+                        audio_mp3,
+                        audio_hash,
+                        modelname,
+                        txt_whisp_prompt,
+                        txt_whisp_lang)
                 return None
             except RateLimitError as err:
                 if cnt >= 5:
@@ -117,14 +132,22 @@ async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile)
     except Exception as err:
         red(f"Error when preprocessing sound: '{err}'")
 
+    with open(audio_mp3_1, "rb") as f:
+        audio_hash = hashlib.sha256(f.read()).hexdigest()
+
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
         while True:
             try:
-                whi("Asking Whisper (using cache)")
+                whi("Asking Whisper for {audio_mp3_1} using cache")
                 cnt += 1
-                transcript = whisper_cached(audio_mp3_1, modelname, txt_whisp_prompt, txt_whisp_lang)
+                transcript = whisper_cached(
+                        audio_mp3_1,
+                        audio_hash,
+                        modelname,
+                        txt_whisp_prompt,
+                        txt_whisp_lang)
                 with open(audio_mp3_1, "rb") as audio_file:
                     mp3_content = audio_file.read()
                 txt_audio = transcript["text"]
