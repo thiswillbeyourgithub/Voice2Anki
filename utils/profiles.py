@@ -50,6 +50,9 @@ class previous_values:
             self.p = md_path / profile
         else:
             raise Exception(backend_config.backend)
+
+        self.event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.event_loop)
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
 
@@ -59,7 +62,6 @@ class previous_values:
             whi("Reloading latest profile")
             self.__init__(profile=self["latest_profile"])
         whi(f"Profile loaded: {self.p.name}")
-
         assert self.p.exists(), f"{self.p} not found!"
         self.profile_name = profile
 
@@ -118,15 +120,32 @@ class previous_values:
             return None
         return new
 
-    async def __setitem__(self, key, item):
+    def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
         if item != self.cache_values[key]:
             # make sure to wait for the previous setitem of the same key to finish
             if self.running_tasks[key] is not None and not self.running_tasks[key].done():
-                await self.running_tasks[key]
+                i = 0
+                while not self.running_tasks[key].done():
+                    i += 1
+                    time.sleep(0.01)
+                    if i > 100 and i % 100 == 0:
+                        red(f"Waiting for task of {key} to finish.")
+                if item == self.cache_values[key]:  # value might
+                    # have changed during the await
+                    return
             self.cache_values[key] = item
-            self.running_tasks[key] = asyncio.create_task(self.__setitem__async(key, item))
+            if self.event_loop.is_closed():
+                self.event_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.event_loop)
+            self.running_tasks[key] = self.event_loop.create_task(
+                    self.__setitem__async(key, item))
+            try:
+                self.event_loop.run_until_complete(self.running_tasks[key])
+            except Exception as e:
+                raise e
+
 
     async def __setitem__async(self, key, item):
         kp = key + ".pickle"
