@@ -12,6 +12,12 @@ from torchaudio import load, save
 
 from .logger import red, whi
 
+try:
+    from .author_cloze_editor import cloze_editor
+except:
+    def cloze_editor(cloze):
+        return cloze
+
 
 def add_to_anki(
         body,
@@ -24,6 +30,9 @@ def add_to_anki(
     assert isinstance(tags, list), "tags have to be a list"
     model_name = False
     other_fields = {}
+
+    body = cloze_editor(body)
+
     if "Clozolkor" in _call_anki(action="modelNames"):
         model_name = "Clozolkor"
         other_fields = {
