@@ -64,11 +64,11 @@ with gr.Blocks(
     with gr.Row():
         with gr.Column(scale=1):
             rst_audio_btn = gr.Button(value="Clear audio", variant="secondary")
-            audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
-            audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
-            audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
-            audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
-            audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio", format="mp3", value=None).style(size="sm")
+            audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None).style(size="sm")
+            audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None).style(size="sm")
+            audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None).style(size="sm")
+            audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None).style(size="sm")
+            audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None).style(size="sm")
             rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
             rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
             dir_load_btn = gr.Button(value="Dirload", variant="secondary")
