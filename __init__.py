@@ -1,3 +1,4 @@
+import os
 import fire
 import sys
 from pathlib import Path
@@ -7,6 +8,8 @@ from utils.misc import backend_config
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
+
+os.environ["PYTHONTRACEMALLOC"] = "1"
 
 def start_voice2formattedtext(
         backend="",
