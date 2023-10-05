@@ -128,19 +128,23 @@ with gr.Blocks(
                     outputs=[gallery])
 
     # audio
-    rst_audio_btn.click(
-            fn=reset_audio,
-            inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5])
 
     # auto save audio
     asv = audio_saver(pv.profile_name)
+
     # trigger whisper in advance, this way the output will be cached
-    audio_mp3_1.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n1, inputs=[txt_profile, audio_mp3_1])
-    audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2])
-    audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3])
-    audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4])
-    audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5])
+    aud_cache_event = []
+    aud_cache_event.append(audio_mp3_1.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n1, inputs=[txt_profile, audio_mp3_1]))
+    aud_cache_event.append(audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2]))
+    aud_cache_event.append(audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3]))
+    aud_cache_event.append(audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4]))
+    aud_cache_event.append(audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang]).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5]))
+
+    rst_audio_btn.click(
+            fn=reset_audio,
+            cancels=aud_cache_event,
+            inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5])
 
     rollaudio_btn.click(
             fn=asv.roll_audio,
