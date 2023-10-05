@@ -55,15 +55,15 @@ class previous_values:
         asyncio.set_event_loop(self.event_loop)
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
+        self.profile_name = profile
 
         if profile != "reload":
             self.p.mkdir(exist_ok=True)
         else:
             whi("Reloading latest profile")
-            self.__init__(profile=self["latest_profile"])
+            return self.__init__(profile=self["latest_profile"])
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
-        self.profile_name = profile
 
     def __getitem__(self, key):
         if key not in self.approved_keys:
