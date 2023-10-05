@@ -42,15 +42,15 @@ with gr.Blocks(
     with gr.Row():
         with gr.Row():
             with gr.Column(scale=1):
-                gallery = gr.Gallery(value=pv["gallery"], label="Source images").style(columns=[2], rows=[1], object_fit="scale-down", height="auto", container=True)
-                rst_img_btn = gr.Button(value="Clear then add", variant="secondary").style(size="sm")
-                img_btn = gr.Button(value="Add image from clipboard", variant="primary").style(size="sm")
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[2], rows=[1], object_fit="scale-down", height="auto", container=True)
+                rst_img_btn = gr.Button(value="Clear then add", variant="secondary", size="sm")
+                img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
             with gr.Column(scale=2):
                 with gr.Row():
                     with gr.Column(scale=10):
                         txt_profile = gr.Textbox(value=pv["latest_profile"], placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
-                         dark_mode_btn = gr.Button("Dark Mode", variant="secondary").style(full_width=True)
+                         dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
                 txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
                 with gr.Row():
@@ -64,11 +64,11 @@ with gr.Blocks(
     with gr.Row():
         with gr.Column(scale=1):
             rst_audio_btn = gr.Button(value="Clear audio", variant="secondary")
-            audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None).style(size="sm")
-            audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None).style(size="sm")
-            audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None).style(size="sm")
-            audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None).style(size="sm")
-            audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None).style(size="sm")
+            audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None)
+            audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None)
+            audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None)
+            audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None)
+            audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None)
             rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
             rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
             dir_load_btn = gr.Button(value="Dirload", variant="secondary")
