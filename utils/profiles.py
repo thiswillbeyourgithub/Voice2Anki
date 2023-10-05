@@ -1,5 +1,5 @@
+import threading
 import time
-import asyncio
 import pickle
 from pathlib import Path
 import numpy as np
@@ -52,8 +52,6 @@ class previous_values:
         with open(str(md_path / "latest_profile.pickle"), "wb") as f:
             pickle.dump(profile, f)
 
-        self.event_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.event_loop)
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
         self.profile_name = profile
@@ -64,13 +62,9 @@ class previous_values:
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
-        if self.running_tasks[key] is not None and not self.running_tasks[key].done():
-            i = 0
-            while not self.running_tasks[key].done():
-                i += 1
-                time.sleep(0.01)
-                if i > 100 and i % 100 == 0:
-                    red(f"Waiting for task of {key} to finish.")
+        if self.running_tasks[key] is not None:
+            red(f"Waiting for task of {key} to finish.")
+            self.running_tasks[key].join()
 
         if self.cache_values[key] is not None:
             return self.cache_values[key]
@@ -96,62 +90,53 @@ class previous_values:
                 # when reloading gallery, the image has to be inverted again
                 for i, im in enumerate(new):
                     new[i] = rgb_to_bgr(im)
+            self.cache_values[key] = new
             return new
         else:
             whi(f"No {kf} stored in profile dir, using appropriate default value")
             if key == "sld_max_tkn":
-                return 2000
+                default = 2000
             if key == "temperature":
-                return 0.5
+                default = 0.5
             if key == "txt_whisp_lang":
-                return "fr"
+                default = "fr"
             if key == "total_llm_cost":
-                return 0
-            return None
-        return new
+                default = 0
+            else:
+                default = None
+            self.cache_values[key] = default
+            return default
 
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
         if item != self.cache_values[key]:
             # make sure to wait for the previous setitem of the same key to finish
-            if self.running_tasks[key] is not None and not self.running_tasks[key].done():
-                i = 0
-                while not self.running_tasks[key].done():
-                    i += 1
-                    time.sleep(0.01)
-                    if i > 100 and i % 100 == 0:
-                        red(f"Waiting for task of {key} to finish.")
+            if self.running_tasks[key] is not None:
+                red(f"Waiting for task of {key} to finish.")
+                self.running_tasks[key].join()
                 if item == self.cache_values[key]:  # value might
                     # have changed during the await
                     return
-            self.cache_values[key] = item
-            try:
-                self.event_loop = asyncio.get_event_loop()
-            except:
-                self.event_loop = asyncio.new_event_loop()
-            if self.event_loop.is_closed():
-                self.event_loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(self.event_loop)
-            self.running_tasks[key] = self.event_loop.create_task(
-                    self.__setitem__async(key, item))
-            if self.event_loop.is_running():
-                # Schedule the task on the existing event loop
-                asyncio.ensure_future(self.running_tasks[key])
-            else:
-                self.event_loop.run_until_complete(self.running_tasks[key])
+            thread = threading.Thread(
+                    target=self.__setitem__async,
+                    kwargs={"key": key, "item": item})
+            thread.start()
+            self.running_tasks[key] = thread
 
 
-    async def __setitem__async(self, key, item):
+    def __setitem__async(self, key, item):
         kp = key + ".pickle"
         kf = self.p / kp
 
         try:
+            self.cache_values[key] = item
             with open(str(kf), "w") as f:
                 return pickle.dump(item, f)
         except Exception:
             try:
                 # try as binary
+                self.cache_values[key] = item
                 with open(str(kf), "wb") as f:
                     return pickle.dump(item, f)
             except Exception as err:
