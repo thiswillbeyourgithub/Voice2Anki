@@ -118,7 +118,22 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
+def stocha(n, temperature):
+    """if temperature of LLM is set high enough, some example filters
+    will be randomly discarder to increase randomness. But only after
+    the first few prompts were added"""
+    if temperature == 0 or n <= 5:
+        return True
+    threshold = min(temperature / 3, 0.33)
+    if random.random() >= threshold:
+        # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
+        # no worse if temperature is higher than 1
+        return True
+    yel(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
+    return False
+
+
+def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, favor_list=False):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -127,19 +142,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
 
-    def stocha(n):
-        """if temperature of LLM is set high enough, some example filters
-        will be randomly discarder to increase randomness. But only after
-        the first few prompts were added"""
-        if temperature == 0 or n <= 5:
-            return True
-        threshold = min(temperature / 3, 0.33)
-        if random.random() >= threshold:
-            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
-            # no worse if temperature is higher than 1
-            return True
-        yel(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
-        return False
 
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
@@ -161,6 +163,20 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
         def len_check(pr):
             return True
 
+    def _filter_out(pr, tkns, output_pr):
+        if not tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+            return False
+
+        if not favor_list:  # the txt_audio does not ask for a list
+            if stocha(len(output_pr), temperature) and len_check(pr):  # stochastic
+                return True
+            else:
+                return False
+        else:  # if favoring lists, don't use stochasticity
+            if "list" in pr["context"].lower():
+                return True
+            else:
+                return False
 
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
@@ -179,7 +195,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None):
                 continue
             if pr["priority"] == prio:
                 category_size += 1
-                if not tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token and stocha(len(output_pr)) and len_check(pr):
+                if _filter_out(pr, tkns, output_pr):
                     tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
                     output_pr.append(pr)
                 else:

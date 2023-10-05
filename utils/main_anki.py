@@ -203,7 +203,13 @@ async def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature
                 }
 
     prev_prompts = load_prev_prompts(profile)
-    prev_prompts = prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=len(tokenize(new_prompt["content"])))
+    prev_prompts = prompt_filter(
+            prev_prompts,
+            max_token,
+            temperature,
+            new_prompt_len=len(tokenize(new_prompt["content"])),
+            favor_list=True if "list" in txt_audio.lower() else False
+            )
 
     # check the number of token is fine and format the previous
     # prompts in chatgpt format
