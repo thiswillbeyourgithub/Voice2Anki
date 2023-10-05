@@ -1,9 +1,11 @@
 import gradio as gr
+from pathlib import Path
+import pickle
 
 from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
 from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache_async
 
-from .logger import get_log, whi
+from .logger import get_log, whi, red
 from .memory import recur_improv
 from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, load_user_dir
 
@@ -26,7 +28,15 @@ document.querySelector('body').classList.add('dark');
 }"""
 
 # load default profile
-pv = previous_values("reload")
+Path("profiles").mkdir(exist_ok=True)
+Path("profiles/anki").mkdir(exist_ok=True)
+if Path("profiles/anki/latest_profile.pickle").exists():
+    whi("Reloading previous profile.")
+    with open("profiles/anki/latest_profile.pickle", "rb") as f:
+        pv = previous_values(pickle.load(f))
+else:
+    red("Loading default profile")
+    pv = previous_values("default")
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -48,7 +58,7 @@ with gr.Blocks(
             with gr.Column(scale=2):
                 with gr.Row():
                     with gr.Column(scale=10):
-                        txt_profile = gr.Textbox(value=pv["latest_profile"], placeholder=",".join(get_profiles()), label="Profile")
+                        txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")

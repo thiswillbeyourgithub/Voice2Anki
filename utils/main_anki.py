@@ -416,7 +416,6 @@ async def main(
     global pv
     if pv.profile_name != profile:
         pv = previous_values(profile)
-    pv["latest_profile"] = profile
 
     if gallery is None or len(gallery) == 0:
         red("you should probably specify an image in source")

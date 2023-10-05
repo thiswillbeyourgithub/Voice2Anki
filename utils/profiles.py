@@ -19,7 +19,6 @@ approved_keys_all = [
         "txt_chatgpt_context",
         "txt_whisp_lang",
         "txt_whisp_prompt",
-        "latest_profile",
         "total_llm_cost",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
@@ -50,6 +49,8 @@ class previous_values:
             self.p = md_path / profile
         else:
             raise Exception(backend_config.backend)
+        with open(str(md_path / "latest_profile.pickle"), "wb") as f:
+            pickle.dump(profile, f)
 
         self.event_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.event_loop)
@@ -57,11 +58,6 @@ class previous_values:
         self.cache_values = {k: None for k in self.approved_keys}
         self.profile_name = profile
 
-        if profile != "reload":
-            self.p.mkdir(exist_ok=True)
-        else:
-            whi("Reloading latest profile")
-            return self.__init__(profile=self["latest_profile"])
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
 
@@ -80,11 +76,7 @@ class previous_values:
             return self.cache_values[key]
 
         kp = key + ".pickle"
-        if key == "latest_profile":
-            # latest_profile.pickle is stored in the root of the profile dir
-            kf = self.p.parent / kp
-        else:
-            kf = self.p / kp
+        kf = self.p / kp
 
         if kf.exists():
             try:
@@ -113,8 +105,6 @@ class previous_values:
                 return 0.5
             if key == "txt_whisp_lang":
                 return "fr"
-            if key == "latest_profile":
-                return "default"
             if key == "total_llm_cost":
                 return 0
             return None
@@ -136,27 +126,25 @@ class previous_values:
                     # have changed during the await
                     return
             self.cache_values[key] = item
+            try:
+                self.event_loop = asyncio.get_event_loop()
+            except:
+                self.event_loop = asyncio.new_event_loop()
             if self.event_loop.is_closed():
                 self.event_loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(self.event_loop)
+                asyncio.set_event_loop(self.event_loop)
             self.running_tasks[key] = self.event_loop.create_task(
                     self.__setitem__async(key, item))
-            try:
+            if self.event_loop.is_running():
+                # Schedule the task on the existing event loop
+                asyncio.ensure_future(self.running_tasks[key])
+            else:
                 self.event_loop.run_until_complete(self.running_tasks[key])
-            except Exception as e:
-                raise e
 
 
     async def __setitem__async(self, key, item):
         kp = key + ".pickle"
-        if key == "latest_profile":
-            if item == "default":
-                # don't store default as latest profile as it's already the default
-                return None
-            # the latest profile is stored in the root of the profile dir
-            kf = self.p.parent / kp
-        else:
-            kf = self.p / kp
+        kf = self.p / kp
 
         try:
             with open(str(kf), "w") as f:
@@ -220,7 +208,6 @@ def switch_profile(profile):
                 ]
 
     pv = previous_values(profile)
-    pv["latest_profile"] = profile
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")
