@@ -1,4 +1,3 @@
-import exiftool
 import shutil
 import json
 from pathlib import Path
@@ -250,14 +249,8 @@ done_dir = Path("./user_directory/DONE")
 unsplitted_dir = Path("./user_directory/unsplitted")
 tmpdir = Path("/tmp/gradio")
 
-def get_audio_metadata(file_path):
-    """get the metadata from the file, normally when the audio is splitted it
-    should also include the whisper output of the split"""
-    with exiftool.ExifTool() as et:
-        return et.get_metadata(file_path)
 
-
-def load_splitted_audio(a1, a2, a3, a4, a5, txt_audio):
+def load_splitted_audio(a1, a2, a3, a4, a5):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -291,18 +284,14 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_audio):
         if loaded_sounds > sound_slots:
             break
 
-        metadata = get_audio_metadata(path)
-        assert "whisper_transcript" in metadata, f"missing metadata for file {path}"
-        transcript = metadata["whisper_transcript"]
-
-        loaded_sounds += 1
-
         moved = unsplitted_dir / path.name
         path.rename(moved)
         shutil.copy(moved, tmpdir / moved.name)
         assert (moved.exists() and (tmpdir / moved.name).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(moved.absolute())
+
+        loaded_sounds += 1
 
     whi(f"Loading {loaded_sounds} sounds from splitted")
 
@@ -311,4 +300,4 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_audio):
         filled_slots[-i] = sound
     filled_slots.reverse()
 
-    return filled_slots + [txt_audio]
+    return filled_slots
