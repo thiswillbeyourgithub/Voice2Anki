@@ -3,7 +3,7 @@ import hashlib
 import re
 import joblib
 import time
-import pyexiftool
+import exiftool
 from tqdm import tqdm
 import openai
 import fire
@@ -12,24 +12,12 @@ import os
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
-from .logger import whi, yel, red
+from logger import whi, yel, red
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
-
-
-def whisper_splitter(audio_path, audio_hash, prompt, language):
-    with open(audio_path, "rb") as audio_file:
-        transcript = openai.Audio.transcribe(
-            model="whisper-1",
-            file=audio_file,
-            prompt=prompt,
-            language=language,
-            response_format="verbose_json",
-            )
-    return transcript
 
 
 class AudioSplitter:
@@ -40,8 +28,8 @@ class AudioSplitter:
             language="fr",
             n_todo=1,
             unsplitted_dir="./user_directory/unsplitted",
-            splitted_dir="../user_directory/splitted",
-            done_dir = "../user_directory/done",
+            splitted_dir="./user_directory/splitted",
+            done_dir = "./user_directory/done",
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
@@ -51,7 +39,7 @@ class AudioSplitter:
         assert self.done_dir.exists(), "missing done dir"
 
         assert isinstance(prompt, str), "prompt argument should be string"
-        assert isinstance(n_todo, (float, int)) and n > 0, "n_todo should be a number greater than 0"
+        assert isinstance(n_todo, (float, int)) and n_todo > 0, "n_todo should be a number greater than 0"
 
         self.prompt = prompt
         self.n_todo = n_todo
@@ -64,10 +52,9 @@ class AudioSplitter:
 
         for file in tqdm(self.to_split, unit="file"):
             self.split_one_file(file)
-            shutil.move(file, self.done_dir / file.name)
 
     def gather_todos(self):
-        to_split = [p for p in self.unsp_dir.iterdir("*.mp3")]
+        to_split = [p for p in self.unsp_dir.rglob("*.mp3")]
         assert to_split, f"no mp3 found in {self.unsp_dir}"
         to_split = sorted(to_split, key=lambda x: x.stat().st_ctime)
         whi(f"Total number of files to split: {len(to_split)}")
@@ -78,33 +65,40 @@ class AudioSplitter:
     def split_one_file(self, file_path):
         # run whisper
         transcript = self.run_whisper(file_path)
+        segments = re.split(r"\d+\n", transcript)
+        segments = [s.strip() for s in segments]
 
-        duration = transcript["duration"]
-        whi(f"Duration of {file_path}: {duration}")
-
-        full_text = transcript["text"]
-        whi(f"Full text of {file_path}:\n'''\n{full_text}\n'''")
+        time_pattern = r"(\d{2}):(\d{2}):(\d{2}),\d{0,3}"
 
         # find where stop is pronounced
         text_segments = [""]
         cut_time = [0]
-        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
-            st = segment["start"]
-            ed = segment["end"]
-            text = segment["text"]
-
-            text_segments[-1] += text
-            if not [re.search(stop, text) for stop in self.stop_list]:
-                whi(f"Found stop in {text} ({st}->{ed})")
-                text_segments.append("")
-                cut_time[-1] = ed
-                cut_time.append(0)
-
-        assert 0 not in cut_time, "0 found in cut_time"
-        assert len(cut_time) == len(text_segments), "invalid lengths"
+        for line in tqdm(segments, unit="segment", desc="parsing"):
+            if " --> " in line:
+                matches = re.findall(time_pattern, line)
+                assert len(matches) == 2, f"invalid size of matches: {len(matches)}"
+                assert len(matches[0]) == 3, f"invalid size of matches[0]: {matches}"
+                assert len(matches[1]) == 3, f"invalid size of matches[1]: {matches}"
+                st = int(matches[0][0]) * 60 * 60 + int(matches[0][1]) * 60 + int(matches[0][2])
+                ed = int(matches[1][0]) * 60 * 60 + int(matches[1][1]) * 60 + int(matches[1][2])
+            else:
+                text_segments[-1] += line
+                if not [re.search(stop, line) for stop in self.stop_list]:
+                    whi(f"Found stop in {line} ({st}->{ed})")
+                    text_segments.append("")
+                    cut_time[-1] = ed
+                    cut_time.append(0)
 
         n = len(text_segments)
         whi(f"Found {n} audio segments in {file_path}")
+
+        if len(cut_time) == 1:
+            whi(f"Stopping there for {file_path} as there is no cutting to do")
+            shutil.move(file_path, self.sp_dir / file.name)
+            return
+
+        assert 0 not in cut_time, "0 found in cut_time"
+        assert len(cut_time) == len(text_segments), "invalid lengths"
 
         audio = AudioSegment.from_mp3(file_path)
 
@@ -125,10 +119,13 @@ class AudioSplitter:
                     "chunk total": n,
                     }
             whi(f"Setting metadata for {out_file}")
-            with pyexiftool.ExifTool() as et:
+            with exiftool.ExifTool() as et:
                 et.set_metadata(
                         out_file,
                         metadata)
+
+        whi(f"Moving {file_path} to {self.done_dir} dir")
+        shutil.move(file_path, self.done_dir / file.name)
 
     def run_whisper(self, audio_path):
         whi(f"Running whisper on {audio_path}")
@@ -165,6 +162,18 @@ class AudioSplitter:
         chunks = split_on_silence(audio, min_silence_duration, silence_thresh=-40)
 
         return chunks
+
+
+def whisper_splitter(audio_path, audio_hash, prompt, language):
+    with open(audio_path, "rb") as audio_file:
+        transcript = openai.Audio.transcribe(
+            model="whisper-1",
+            file=audio_file,
+            prompt=prompt,
+            language=language,
+            response_format="srt",
+            )
+    return transcript
 
 if __name__ == "__main__":
     fire.Fire(AudioSplitter)
