@@ -64,45 +64,61 @@ class AudioSplitter:
 
     def split_one_file(self, file_path):
         transcript = self.run_whisper(file_path)
-        segments = re.split(r"\d+\n", transcript)
-        segments = [s.strip() for s in segments]
 
-        time_pattern = r"(\d{2}):(\d{2}):(\d{2}),\d{0,3}"
 
         # find where stop is pronounced
+        duration = transcript["duration"]
+        whi(f"Duration of {file_path}: {duration}")
+
+        full_text = transcript["text"]
+        whi(f"Full text of {file_path}:\n'''\n{full_text}\n'''")
+
+        # verbose_json
         text_segments = [""]
-        cut_time = [0]
-        for line in tqdm(segments, unit="segment", desc="parsing"):
-            if " --> " in line:
-                matches = re.findall(time_pattern, line)
-                assert len(matches) == 2, f"invalid size of matches: {len(matches)}"
-                assert len(matches[0]) == 3, f"invalid size of matches[0]: {matches}"
-                assert len(matches[1]) == 3, f"invalid size of matches[1]: {matches}"
-                st = int(matches[0][0]) * 60 * 60 + int(matches[0][1]) * 60 + int(matches[0][2])
-                ed = int(matches[1][0]) * 60 * 60 + int(matches[1][1]) * 60 + int(matches[1][2])
-            else:
-                text_segments[-1] += line
-                if not [re.search(stop, line) for stop in self.stop_list]:
-                    whi(f"Found stop in {line} ({st}->{ed})")
-                    text_segments.append("")
-                    cut_time[-1] = ed
-                    cut_time.append(0)
+        times_to_keep = [[0, 0]]
+        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
+            st = segment["start"]
+            ed = segment["end"]
+            text = segment["text"]
+
+            if not [re.search(stop, text) for stop in self.stop_list]:
+                # not stopping
+                text_segments[-1] += text
+                times_to_keep[-1][1] = ed
+                continue
+
+            exit_loop = False
+            for w in segment["words"]:
+                word = w["word"]
+                if exit_loop:
+                    break
+                for stop in self.stop_list:
+                    if re.search(stop, word):
+                        whi(f"Found {stop} in {text} ({st}->{ed})")
+                        text_segments.append("")
+                        times_to_keep[-1][1] = w["start"]
+                        times_to_keep.append([w["end"], -1])
+                        break
+
+        assert 0 not in times_to_keep, "0 found in times_to_keep"
+        assert -1 not in times_to_keep, "-1 found in times_to_keep"
+        assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
         n = len(text_segments)
         whi(f"Found {n} audio segments in {file_path}")
 
-        if len(cut_time) == 1:
+        if len(times_to_keep) == 1:
             whi(f"Stopping there for {file_path} as there is no cutting to do")
-            shutil.move(file_path, self.sp_dir / file.name)
+            shutil.move(file_path, self.sp_dir / file_path.name)
             return
 
-        assert 0 not in cut_time, "0 found in cut_time"
-        assert len(cut_time) == len(text_segments), "invalid lengths"
+        assert 0 not in times_to_keep, "0 found in times_to_keep"
+        assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
         audio = AudioSegment.from_mp3(file_path)
 
         prev_cut = 0
-        for i, cut in tqdm(enumerate(cut_time), unit="segment", desc="cutting"):
+        for i, cut in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
             sliced = audio[prev_cut:cut]
             out_file = self.sp_dir / f"{file_path.name}_{i:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
@@ -110,7 +126,7 @@ class AudioSplitter:
             whi(f"Sliced to {out_file}")
             prev_cut = cut
 
-            # for each file, keep the relevant transcript and 
+            # for each file, keep the relevant transcript
             metadata = {
                     "whisper_transcript": text_segments[i],
                     "transcription_date": time.time(),
@@ -146,7 +162,6 @@ class AudioSplitter:
         except Exception as err:
             red(f"Exception when running whisper: '{err}'")
             raise
-        breakpoint()
 
         return transcript
 
@@ -172,7 +187,6 @@ def whisper_splitter(audio_path, audio_hash, prompt, language):
             "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
             input={
                 "audio": open(audio_path, "rb"),
-                #"audio": audio_path,
                 "model": "large-v2",
                 "language": language,
                 "temperature": 0,
