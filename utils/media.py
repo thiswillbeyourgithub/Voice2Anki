@@ -1,3 +1,4 @@
+import exiftool
 import shutil
 import json
 from pathlib import Path
@@ -244,87 +245,70 @@ def sound_preprocessing(audio_mp3_n):
     return audio_mp3_n
 
 
-tododir = Path("./user_directory/TODO")
-doingdir = Path("./user_directory/DOING")
+splitted_dir = Path("./user_directory/splitted")
+done_dir = Path("./user_directory/DONE")
+unsplitted_dir = Path("./user_directory/unsplitted")
 tmpdir = Path("/tmp/gradio")
-n_sound_slots = 5  # number of object that can store sounds
+
+def get_audio_metadata(file_path):
+    """get the metadata from the file, normally when the audio is splitted it
+    should also include the whisper output of the split"""
+    with exiftool.ExifTool() as et:
+        return et.get_metadata(file_path)
 
 
-def load_user_dir(data):
+def load_splitted_audio(a1, a2, a3, a4, a5, txt_audio):
     """
-    load the next few sounds from a directory. If an image is found, load it
-    too.
+    load the audio file that were splitted previously one by one in the
+    available audio slots
     """
     assert Path("user_directory").exists(), "No 'user_directory' found"
-    assert tododir.exists(), "No 'TODO' subdir found"
-    assert doingdir.exists(), "No 'DOING' subdir found"
-    breakpoint()
-
-    if data["gallery"] is not None:
-        stop_at_image = True
-    else:
-        stop_at_image = False
-
+    assert splitted_dir.exists(), "No 'splitted' subdir found"
+    assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
 
     # check how many audio are needed
     sound_slots = 0
-    for key in [f"audio_mp3_{i}" for i in range(n_sound_slots, 0)]:
-        sound_slots += 1
-        if data[key] is not None:
+    for sound in [a5, a4, a3, a2, a1]:
+        if sound is not None:
+            sound_slots += 1
+            continue
+        else:
             break
 
-    # count the number of files in the TODO dir
-    todos = [p for p in tododir.rglob("*")]
-    assert todos, "TODO subdir is empty"
+    # count the number of mp3 files in the splitted dir
+    splitteds = [p for p in splitted_dir.rglob("*.mp3")]
+    assert splitteds, "splitted subdir contains no mp3")
 
     # sort by oldest
-    todos = sorted(todos, key=lambda x: x.stat().st_ctime)
+    splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
 
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
-    latest_type = None
-    sound_loaded = 0
+    loaded_sounds = 0
     sounds_to_load = []
-    for path in todos:
-
+    for path in splitteds:
         # don't find more documents than available slots
-        if sound_loaded > sound_slots:
+        if loaded_sounds > sound_slots:
             break
 
-        # found image
-        if path.name.lower().endswith("png"):
+        metadata = get_audio_metadata(path)
+        assert "whisper_transcript" in metadata, f"missing metadata for file {path}"
+        transcript = metadata["whisper_transcript"]
 
-            # does not load images after audio
-            if latest_type == "mp3":
-                break
+        loaded_sounds += 1
 
-            # stop if the gallery was already loaded
-            if stop_at_image:
-                break
+        moved = unsplitted_dir / path.name
+        path.rename(moved)
+        shutil.copy(moved, tmpdir / moved.name)
+        assert (moved.exists() and (tmpdir / moved.name).exists()) and (
+                not path.exists()), "unexpected sound location"
+        sounds_to_load.append(moved.absolute())
 
-            # found image, move it to doing, load it into gallery
-            moved = doingdir / path.name
-            path.rename(moved)
-            assert moved.exists() and not path.exists(), "unexpected image location"
-            if isinstance(data["gallery"], list):
-                data["gallery"].append(cv2.imread(moved, flags=1))
-            else:
-                data["gallery"] = list(cv2.imread(moved, flags=1))
-            latest_type = "png"
+    whi(f"Loading {loaded_sounds} sounds from splitted")
 
-        # found sound
-        if path.name.lower().endswith("mp3"):
-            latest_type = "mp3"
-            sound_loaded += 1
-            moved = doingdir / path.name
-            path.rename(moved)
-            shutil.copy(moved, tmpdir / moved.name)
-            assert (moved.exists() and (tmpdir / moved.name).exists()) and (
-                    not path.exists()), "unexpected sound location"
-            sounds_to_load.append(moved.absolute())
-
-    # load the path to the new audio
+    filled_slots = [a5, a4, a3, a2, a1]
     for i, sound in enumerate(sounds_to_load):
-        data[f"audio_mp3_{n_sound_slots-i}"] = sound
+        filled_slots[-i] = sound
+    filled_slots.reverse()
 
-    return data
+    return filled_slots + [txt_audio]

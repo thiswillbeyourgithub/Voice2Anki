@@ -7,7 +7,7 @@ from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, trans
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, load_user_dir
+from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, load_splitted_audio
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -210,25 +210,25 @@ with gr.Blocks(
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
     # on another distance device
-    # dir_load_btn.click(
-    #         fn=load_user_dir,
-    #         inputs={
-    #             audio_mp3_1,
-    #             audio_mp3_2,
-    #             audio_mp3_3,
-    #             audio_mp3_4,
-    #             audio_mp3_5,
-    #             gallery,
-    #             },
-    #         outputs={
-    #             audio_mp3_1,
-    #             audio_mp3_2,
-    #             audio_mp3_3,
-    #             audio_mp3_4,
-    #             audio_mp3_5,
-    #             gallery,
-    #             },
-    #         )
+    dir_load_btn.click(
+            fn=load_splitted_audio,
+            inputs=[
+                audio_mp3_1,
+                audio_mp3_2,
+                audio_mp3_3,
+                audio_mp3_4,
+                audio_mp3_5,
+                txt_audio,
+                ],
+            outputs=[
+                audio_mp3_1,
+                audio_mp3_2,
+                audio_mp3_3,
+                audio_mp3_4,
+                audio_mp3_5,
+                txt_audio,
+                ],
+            )
 
     # send to whisper
     transcript_btn.click(
