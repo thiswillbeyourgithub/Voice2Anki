@@ -125,7 +125,7 @@ class AudioSplitter:
                         metadata)
 
         whi(f"Moving {file_path} to {self.done_dir} dir")
-        shutil.move(file_path, self.done_dir / file.name)
+        shutil.move(file_path, self.done_dir / f"{file_path.name}_too_small.mp3")
 
     def run_whisper(self, audio_path):
         whi(f"Running whisper on {audio_path}")
