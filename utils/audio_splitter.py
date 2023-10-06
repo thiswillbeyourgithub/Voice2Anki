@@ -63,19 +63,18 @@ class AudioSplitter:
         return to_split
 
     def split_one_file(self, file_path):
-        transcript = self.run_whisper(file_path)
-
+        transcript = self.run_whisperx(file_path)
 
         # find where stop is pronounced
-        duration = transcript["duration"]
+        duration = transcript["segments"][-1]["end"]
         whi(f"Duration of {file_path}: {duration}")
 
-        full_text = transcript["text"]
+        full_text = transcript["transcription"]
         whi(f"Full text of {file_path}:\n'''\n{full_text}\n'''")
 
         # verbose_json
         text_segments = [""]
-        times_to_keep = [[0, 0]]
+        times_to_keep = [[0, duration]]
         for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
             st = segment["start"]
             ed = segment["end"]
@@ -83,52 +82,57 @@ class AudioSplitter:
 
             if not [re.search(stop, text) for stop in self.stop_list]:
                 # not stopping
-                text_segments[-1] += text
+                text_segments[-1] += f" {text}"
                 times_to_keep[-1][1] = ed
                 continue
 
-            exit_loop = False
             for w in segment["words"]:
                 word = w["word"]
-                if exit_loop:
-                    break
+                not_matched = True
                 for stop in self.stop_list:
                     if re.search(stop, word):
                         whi(f"Found {stop} in {text} ({st}->{ed})")
-                        text_segments.append("")
                         times_to_keep[-1][1] = w["start"]
-                        times_to_keep.append([w["end"], -1])
+                        times_to_keep.append([w["end"], duration])
+                        text_segments.append("")
+                        not_matched = False
                         break
-
-        assert 0 not in times_to_keep, "0 found in times_to_keep"
-        assert -1 not in times_to_keep, "-1 found in times_to_keep"
-        assert len(times_to_keep) == len(text_segments), "invalid lengths"
+                if not_matched:
+                    text_segments[-1] += f" {word}"
+                    times_to_keep[-1][1] = duration
 
         n = len(text_segments)
         whi(f"Found {n} audio segments in {file_path}")
+
+        for i, (start, end) in enumerate(times_to_keep):
+            if end - start < 1:
+                times_to_keep[i] = None
+        times_to_keep = [t for t in times_to_keep if t is not None]
+
+        n = len(text_segments)
+        whi(f"Kept {n} audio segments when removing <1s in {file_path}")
+
+        text_segments = [t.strip() for t in text_segments]
+
+        assert len(times_to_keep) + 1 == len(text_segments), "invalid lengths"
 
         if len(times_to_keep) == 1:
             whi(f"Stopping there for {file_path} as there is no cutting to do")
             shutil.move(file_path, self.sp_dir / file_path.name)
             return
 
-        assert 0 not in times_to_keep, "0 found in times_to_keep"
-        assert len(times_to_keep) == len(text_segments), "invalid lengths"
-
         audio = AudioSegment.from_mp3(file_path)
 
-        prev_cut = 0
-        for i, cut in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
-            sliced = audio[prev_cut:cut]
+        for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
+            sliced = audio[start_cut:end_cut]
             out_file = self.sp_dir / f"{file_path.name}_{i:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
             sliced.export(out_file, format="mp3")
             whi(f"Sliced to {out_file}")
-            prev_cut = cut
 
             # for each file, keep the relevant transcript
             metadata = {
-                    "whisper_transcript": text_segments[i],
+                    "whisperx_transcript": text_segments[i],
                     "transcription_date": time.time(),
                     "chunk nb": i,
                     "chunk total": n,
@@ -142,17 +146,17 @@ class AudioSplitter:
         whi(f"Moving {file_path} to {self.done_dir} dir")
         shutil.move(file_path, self.done_dir / f"{file_path.name}_too_small.mp3")
 
-    def run_whisper(self, audio_path):
-        whi(f"Running whisper on {audio_path}")
+    def run_whisperx(self, audio_path):
+        whi(f"Running whisperx on {audio_path}")
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        whisper_cached = stt_cache.cache(
-                func=whisper_splitter,
+        whisperx_cached = stt_cache.cache(
+                func=whisperx_splitter,
                 ignore=["audio_path"])
 
         try:
-            transcript = whisper_cached(
+            transcript = whisperx_cached(
                     audio_path=audio_path,
                     audio_hash=audio_hash,
                     prompt=self.prompt,
@@ -160,7 +164,7 @@ class AudioSplitter:
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
-            red(f"Exception when running whisper: '{err}'")
+            red(f"Exception when running whisperx: '{err}'")
             raise
 
         return transcript
@@ -180,7 +184,7 @@ class AudioSplitter:
         return chunks
 
 
-def whisper_splitter(audio_path, audio_hash, prompt, language):
+def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
     start = time.time()
     transcript = replicate.run(
@@ -188,14 +192,15 @@ def whisper_splitter(audio_path, audio_hash, prompt, language):
             input={
                 "audio": open(audio_path, "rb"),
                 "model": "large-v2",
+                #"model": "medium",
                 "language": language,
                 "temperature": 0,
                 "initial_prompt": prompt,
-                "condition_on_previous_text": True,
+                "condition_on_previous_text": False,
                 "word_timestamps": True,
                 },
             )
-    whi(f"Finished with replicate in {int(time.time()-start)}")
+    whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
 
 if __name__ == "__main__":
