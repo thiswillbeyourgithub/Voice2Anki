@@ -1,3 +1,4 @@
+import replicate
 import shutil
 import hashlib
 import re
@@ -5,7 +6,6 @@ import joblib
 import time
 import exiftool
 from tqdm import tqdm
-import openai
 import fire
 from pathlib import Path
 import os
@@ -14,11 +14,11 @@ from pydub.silence import split_on_silence
 
 from logger import whi, yel, red
 
-assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
-openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
+# TODO fix that
+assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file REPLICATE8API_KEY.txt and paste your openai API key inside"
+os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text()).strip()
 
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
-
 
 class AudioSplitter:
     def __init__(
@@ -63,7 +63,6 @@ class AudioSplitter:
         return to_split
 
     def split_one_file(self, file_path):
-        # run whisper
         transcript = self.run_whisper(file_path)
         segments = re.split(r"\d+\n", transcript)
         segments = [s.strip() for s in segments]
@@ -146,6 +145,8 @@ class AudioSplitter:
             # TODO handle case where sound too long, must be cut
         except Exception as err:
             red(f"Exception when running whisper: '{err}'")
+            raise
+        breakpoint()
 
         return transcript
 
@@ -165,14 +166,22 @@ class AudioSplitter:
 
 
 def whisper_splitter(audio_path, audio_hash, prompt, language):
-    with open(audio_path, "rb") as audio_file:
-        transcript = openai.Audio.transcribe(
-            model="whisper-1",
-            file=audio_file,
-            prompt=prompt,
-            language=language,
-            response_format="srt",
+    whi("Starting replicate")
+    start = time.time()
+    transcript = replicate.run(
+            "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
+            input={
+                "audio": open(audio_path, "rb"),
+                #"audio": audio_path,
+                "model": "large-v2",
+                "language": language,
+                "temperature": 0,
+                "initial_prompt": prompt,
+                "condition_on_previous_text": True,
+                "word_timestamps": True,
+                },
             )
+    whi(f"Finished with replicate in {int(time.time()-start)}")
     return transcript
 
 if __name__ == "__main__":
