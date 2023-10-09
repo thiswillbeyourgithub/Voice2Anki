@@ -383,12 +383,13 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
         moved = done_dir / path.name
         path.rename(moved)
-        shutil.copy(moved, tmp_dir / moved.name)
-        assert (moved.exists() and (tmp_dir / moved.name).exists()) and (
+        to_temp = tmp_dir / moved.name
+        shutil.copy(moved, to_temp)
+        assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
-        sounds_to_load.append(moved.absolute())
+        sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
-            transcribe_cache_async(moved, txt_whisp_prompt, txt_whisp_lang)
+            transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang)
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
