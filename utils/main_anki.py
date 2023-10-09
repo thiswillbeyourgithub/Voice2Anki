@@ -1,3 +1,4 @@
+import shutil
 import threading
 import pickle
 import hashlib
@@ -23,7 +24,7 @@ from .profiles import previous_values
 
 
 splitted_dir = Path("./user_directory/splitted")
-done_dir = Path("./user_directory/DONE")
+done_dir = Path("./user_directory/done")
 unsplitted_dir = Path("./user_directory/unsplitted")
 tmp_dir = Path("/tmp/gradio")
 
@@ -340,7 +341,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                     "db_name": "anki_llm"})
         thread.start()
         running_tasks["saving_whisper"].append(thread)
-
 
         return cloz, tkn_cost
     except Exception as err:
