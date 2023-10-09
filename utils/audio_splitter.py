@@ -72,6 +72,8 @@ class AudioSplitter:
         # find where stop is pronounced
         duration = transcript["segments"][-1]["end"]
         whi(f"Duration of {file_path}: {duration}")
+        # note: duration is not the total recording duration but rather the
+        # time of the end of the last pronounced word
 
         full_text = transcript["transcription"]
         whi(f"Full text of {file_path}:\n'''\n{full_text}\n'''")
