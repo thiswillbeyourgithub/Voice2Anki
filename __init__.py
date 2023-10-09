@@ -45,6 +45,9 @@ def start_voice2formattedtext(
     use_ssl: bool, default False
         if True, will use the ssl configuration specified in __init__.py
     """
+    if "help" in kwargs or "h" in args:
+        return help(start_voice2formattedtext)
+
     if isinstance(print_db_then_exit, str):
         db_list = [str(f.name) for f in Path("./databases/").rglob("*db")]
         if print_db_then_exit in db_list:
