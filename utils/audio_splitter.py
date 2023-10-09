@@ -129,7 +129,7 @@ class AudioSplitter:
 
         for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
             sliced = audio[start_cut:end_cut]
-            out_file = self.sp_dir / f"{file_path.name}_{today}_{i:03d}.mp3"
+            out_file = self.sp_dir / f"{file_path.name}_{today}_{i+1:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
             sliced.export(out_file, format="mp3")
             whi(f"Sliced to {out_file}")
