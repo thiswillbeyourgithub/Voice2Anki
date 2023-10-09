@@ -122,7 +122,7 @@ class AudioSplitter:
 
         if len(times_to_keep) == 1:
             whi(f"Stopping there for {file_path} as there is no cutting to do")
-            shutil.move(file_path, self.done_dir / f"{file_path.name}_too_small.mp3")
+            shutil.move(file_path, self.sp_dir / f"{file_path.name}_too_small.mp3")
             return
 
         audio = AudioSegment.from_mp3(file_path)
@@ -144,7 +144,7 @@ class AudioSplitter:
             #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
 
         whi(f"Moving {file_path} to {self.done_dir} dir")
-        shutil.move(file_path, self.sp_dir / file_path.name)
+        shutil.move(file_path, self.done_dir / file_path.name)
 
     def run_whisperx(self, audio_path):
         whi(f"Running whisperx on {audio_path}")
