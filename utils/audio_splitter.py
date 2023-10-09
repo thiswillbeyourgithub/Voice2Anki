@@ -134,6 +134,7 @@ class AudioSplitter:
             sliced.export(out_file, format="mp3")
             whi(f"Sliced to {out_file}")
 
+            # TODO fix metadata setting
             # for each file, keep the relevant transcript
             # whi(f"Setting metadata for {out_file}")
             # with exiftool.ExifToolHelper() as et:
