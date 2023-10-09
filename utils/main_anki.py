@@ -392,7 +392,6 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
-    sounds_to_load.reverse()
     output = filled_slots[:-len(sounds_to_load)] + sounds_to_load
     assert len(filled_slots) == len(output), "invalid output length"
 
