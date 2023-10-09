@@ -135,17 +135,12 @@ class AudioSplitter:
             whi(f"Sliced to {out_file}")
 
             # for each file, keep the relevant transcript
-            metadata = {
-                    "whisperx_transcript": text_segments[i],
-                    "transcription_date": time.time(),
-                    "chunk nb": i,
-                    "chunk total": n,
-                    }
-            whi(f"Setting metadata for {out_file}")
-            with exiftool.ExifTool() as et:
-                et.set_metadata(
-                        out_file,
-                        metadata)
+            # whi(f"Setting metadata for {out_file}")
+            # with exiftool.ExifToolHelper() as et:
+            #     et.execute(b"-whisperx_transcript='" + bytes(text_segments[i].replace(" ", "\ ")) + b"'", str(out_file))
+            #     et.execute(b"-transcription_date=" + bytes(int(time.time())), str(out_file))
+            #     et.execute(b"-chunk_i=" + bytes(i), str(out_file))
+            #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
 
         whi(f"Moving {file_path} to {self.done_dir} dir")
         shutil.move(file_path, self.done_dir / f"{file_path.name}_too_small.mp3")
