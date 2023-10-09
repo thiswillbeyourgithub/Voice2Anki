@@ -3,11 +3,11 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
-from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache_async
+from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache_async, load_splitted_audio
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, load_splitted_audio
+from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -218,7 +218,7 @@ with gr.Blocks(
                 audio_mp3_3,
                 audio_mp3_4,
                 audio_mp3_5,
-                txt_audio,
+                txt_whisp_prompt, txt_whisp_lang
                 ],
             outputs=[
                 audio_mp3_1,
@@ -226,7 +226,6 @@ with gr.Blocks(
                 audio_mp3_3,
                 audio_mp3_4,
                 audio_mp3_5,
-                txt_audio,
                 ],
             )
 

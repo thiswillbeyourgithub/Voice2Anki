@@ -21,6 +21,12 @@ from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import previous_values
 
+
+splitted_dir = Path("./user_directory/splitted")
+done_dir = Path("./user_directory/DONE")
+unsplitted_dir = Path("./user_directory/unsplitted")
+tmp_dir = Path("/tmp/gradio")
+
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
@@ -339,6 +345,62 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         return cloz, tkn_cost
     except Exception as err:
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
+
+
+def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
+    """
+    load the audio file that were splitted previously one by one in the
+    available audio slots
+    """
+    assert Path("user_directory").exists(), "No 'user_directory' found"
+    assert splitted_dir.exists(), "No 'splitted' subdir found"
+    assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
+    assert done_dir.exists(), "No 'done' subdir found"
+
+    # check how many audio are needed
+    sound_slots = 0
+    for sound in [a5, a4, a3, a2, a1]:
+        if sound is not None:
+            sound_slots += 1
+            continue
+        else:
+            break
+
+    # count the number of mp3 files in the splitted dir
+    splitteds = [p for p in splitted_dir.rglob("*.mp3")]
+    assert splitteds, "splitted subdir contains no mp3"
+
+    # sort by oldest
+    splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
+
+    # iterate over each files from the dir. If images are found, load them
+    # into gallery but if the images are found after sounds, stops iterating
+    loaded_sounds = 0
+    sounds_to_load = []
+    for path in splitteds:
+        # don't find more documents than available slots
+        if loaded_sounds > sound_slots:
+            break
+
+        moved = done_dir / path.name
+        path.rename(moved)
+        shutil.copy(moved, tmp_dir / moved.name)
+        assert (moved.exists() and (tmp_dir / moved.name).exists()) and (
+                not path.exists()), "unexpected sound location"
+        sounds_to_load.append(moved.absolute())
+
+        loaded_sounds += 1
+
+    whi(f"Loading {loaded_sounds} sounds from splitted")
+
+    filled_slots = [a5, a4, a3, a2, a1]
+    for i, sound in enumerate(sounds_to_load):
+        if txt_whisp_prompt and txt_whisp_lang:
+            transcribe_cache_async(sound, txt_whisp_prompt, txt_whisp_lang)
+        filled_slots[-i] = sound
+    filled_slots.reverse()
+
+    return filled_slots
 
 
 async def semiauto_mode(*args, **kwargs):

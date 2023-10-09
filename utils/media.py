@@ -1,7 +1,3 @@
-import shutil
-import json
-from pathlib import Path
-import tempfile
 from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
@@ -242,63 +238,3 @@ def sound_preprocessing(audio_mp3_n):
 
     whi("Done preprocessing audio")
     return audio_mp3_n
-
-
-splitted_dir = Path("./user_directory/splitted")
-done_dir = Path("./user_directory/DONE")
-unsplitted_dir = Path("./user_directory/unsplitted")
-tmp_dir = Path("/tmp/gradio")
-
-
-def load_splitted_audio(a1, a2, a3, a4, a5):
-    """
-    load the audio file that were splitted previously one by one in the
-    available audio slots
-    """
-    assert Path("user_directory").exists(), "No 'user_directory' found"
-    assert splitted_dir.exists(), "No 'splitted' subdir found"
-    assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
-    assert done_dir.exists(), "No 'done' subdir found"
-
-    # check how many audio are needed
-    sound_slots = 0
-    for sound in [a5, a4, a3, a2, a1]:
-        if sound is not None:
-            sound_slots += 1
-            continue
-        else:
-            break
-
-    # count the number of mp3 files in the splitted dir
-    splitteds = [p for p in splitted_dir.rglob("*.mp3")]
-    assert splitteds, "splitted subdir contains no mp3"
-
-    # sort by oldest
-    splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
-
-    # iterate over each files from the dir. If images are found, load them
-    # into gallery but if the images are found after sounds, stops iterating
-    loaded_sounds = 0
-    sounds_to_load = []
-    for path in splitteds:
-        # don't find more documents than available slots
-        if loaded_sounds > sound_slots:
-            break
-
-        moved = done_dir / path.name
-        path.rename(moved)
-        shutil.copy(moved, tmp_dir / moved.name)
-        assert (moved.exists() and (tmp_dir / moved.name).exists()) and (
-                not path.exists()), "unexpected sound location"
-        sounds_to_load.append(moved.absolute())
-
-        loaded_sounds += 1
-
-    whi(f"Loading {loaded_sounds} sounds from splitted")
-
-    filled_slots = [a5, a4, a3, a2, a1]
-    for i, sound in enumerate(sounds_to_load):
-        filled_slots[-i] = sound
-    filled_slots.reverse()
-
-    return filled_slots
