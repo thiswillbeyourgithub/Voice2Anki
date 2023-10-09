@@ -360,11 +360,11 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     # check how many audio are needed
     sound_slots = 0
     for sound in [a5, a4, a3, a2, a1]:
-        if sound is not None:
+        if sound is None:
             sound_slots += 1
-            continue
         else:
             break
+    whi(f"Number of empty sound slots: {sound_slots}")
 
     # count the number of mp3 files in the splitted dir
     splitteds = [p for p in splitted_dir.rglob("*.mp3")]
@@ -375,11 +375,10 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
-    loaded_sounds = 0
     sounds_to_load = []
     for path in splitteds:
         # don't find more documents than available slots
-        if loaded_sounds > sound_slots:
+        if len(sounds_to_load) > sound_slots:
             break
 
         moved = done_dir / path.name
@@ -388,19 +387,20 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         assert (moved.exists() and (tmp_dir / moved.name).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(moved.absolute())
-
-        loaded_sounds += 1
-
-    whi(f"Loading {loaded_sounds} sounds from splitted")
-
-    filled_slots = [a5, a4, a3, a2, a1]
-    for i, sound in enumerate(sounds_to_load):
         if txt_whisp_prompt and txt_whisp_lang:
-            transcribe_cache_async(sound, txt_whisp_prompt, txt_whisp_lang)
-        filled_slots[-i] = sound
-    filled_slots.reverse()
+            transcribe_cache_async(moved, txt_whisp_prompt, txt_whisp_lang)
 
-    return filled_slots
+    whi(f"Loading {len(sounds_to_load)} sounds from splitted")
+    filled_slots = [a1, a2, a3, a4, a5]
+    sounds_to_load.reverse()
+    output = filled_slots[:-len(sounds_to_load)] + sounds_to_load
+    assert len(filled_slots) == len(output), "invalid output length"
+
+    # auto roll over if leading None present
+    while output[0] is None:
+        output.append(output.pop(0))
+
+    return output
 
 
 async def semiauto_mode(*args, **kwargs):
