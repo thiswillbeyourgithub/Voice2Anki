@@ -22,7 +22,7 @@ os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text(
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
 
 d = datetime.today()
-today = f"{d.day:02d}/{d.month:02d}"
+today = f"{d.day:02d}_{d.month:02d}"
 
 class AudioSplitter:
     def __init__(
