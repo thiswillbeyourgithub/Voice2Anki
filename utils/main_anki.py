@@ -25,8 +25,21 @@ from .profiles import previous_values
 
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
+doing_dir = Path("./user_directory/doing")
 unsplitted_dir = Path("./user_directory/unsplitted")
 tmp_dir = Path("/tmp/gradio")
+
+assert Path("user_directory").exists(), "No 'user_directory' found"
+assert splitted_dir.exists(), "No 'splitted' subdir found"
+assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
+assert done_dir.exists(), "No 'done' subdir found"
+assert doing_dir.exists(), "No 'doing' subdir found"
+
+# move any file in doing to todos
+doings = [p for p in doing_dir.rglob("*.mp3")]
+for p in doings:
+    whi(f"Starting up so moved files from doing to splitted: {p}")
+    p.rename(splitted_dir / p.name)
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
@@ -352,10 +365,6 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
-    assert Path("user_directory").exists(), "No 'user_directory' found"
-    assert splitted_dir.exists(), "No 'splitted' subdir found"
-    assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
-    assert done_dir.exists(), "No 'done' subdir found"
 
     # check how many audio are needed
     sound_slots = 0
@@ -381,7 +390,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         if len(sounds_to_load) > sound_slots:
             break
 
-        moved = done_dir / path.name
+        moved = doing_dir / path.name
         path.rename(moved)
         to_temp = tmp_dir / moved.name
         shutil.copy(moved, to_temp)
