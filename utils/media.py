@@ -247,7 +247,7 @@ def sound_preprocessing(audio_mp3_n):
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/DONE")
 unsplitted_dir = Path("./user_directory/unsplitted")
-tmpdir = Path("/tmp/gradio")
+tmp_dir = Path("/tmp/gradio")
 
 
 def load_splitted_audio(a1, a2, a3, a4, a5):
@@ -258,6 +258,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5):
     assert Path("user_directory").exists(), "No 'user_directory' found"
     assert splitted_dir.exists(), "No 'splitted' subdir found"
     assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
+    assert done_dir.exists(), "No 'done' subdir found"
 
     # check how many audio are needed
     sound_slots = 0
@@ -270,7 +271,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5):
 
     # count the number of mp3 files in the splitted dir
     splitteds = [p for p in splitted_dir.rglob("*.mp3")]
-    assert splitteds, "splitted subdir contains no mp3")
+    assert splitteds, "splitted subdir contains no mp3"
 
     # sort by oldest
     splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
@@ -284,10 +285,10 @@ def load_splitted_audio(a1, a2, a3, a4, a5):
         if loaded_sounds > sound_slots:
             break
 
-        moved = unsplitted_dir / path.name
+        moved = done_dir / path.name
         path.rename(moved)
-        shutil.copy(moved, tmpdir / moved.name)
-        assert (moved.exists() and (tmpdir / moved.name).exists()) and (
+        shutil.copy(moved, tmp_dir / moved.name)
+        assert (moved.exists() and (tmp_dir / moved.name).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(moved.absolute())
 
