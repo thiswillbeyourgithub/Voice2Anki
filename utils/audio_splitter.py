@@ -11,7 +11,6 @@ import fire
 from pathlib import Path
 import os
 from pydub import AudioSegment
-from pydub.silence import split_on_silence
 
 from logger import whi, yel, red
 
@@ -170,20 +169,6 @@ class AudioSplitter:
             raise
 
         return transcript
-
-    def detect_silences(self, file_path):
-        """if the audio file is too long, chunk it by cutting when there are
-        silences"""
-        # Set the minimum duration of silence (in milliseconds) to detect for cutting
-        min_silence_duration = 2000
-
-        # Load the audio file
-        audio = AudioSegment.from_file(file_path)
-
-        # Split the audio based on silence periods
-        chunks = split_on_silence(audio, min_silence_duration, silence_thresh=-40)
-
-        return chunks
 
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
