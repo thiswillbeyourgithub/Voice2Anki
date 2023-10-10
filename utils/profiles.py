@@ -117,7 +117,7 @@ class ValueStorage:
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
-        if self.__check_equality(item, self.cache_values[key]):
+        if not self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
             if self.running_tasks[key] is not None:
                 red(f"Waiting for task of {key} to finish.")
