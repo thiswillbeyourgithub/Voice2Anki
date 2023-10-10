@@ -137,6 +137,7 @@ def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
             args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang)
             )
     thread.start()
+    return thread
 
 
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
@@ -391,6 +392,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
+    threads = []
     for path in splitteds[:sound_slots]:
         moved = doing_dir / path.name
         path.rename(moved)
@@ -400,7 +402,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
-            transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang)
+            threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
@@ -411,6 +413,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     while output[0] is None:
         output.append(output.pop(0))
 
+    [t.join() for t in threads]
     return output
 
 def gather_threads(threads):
