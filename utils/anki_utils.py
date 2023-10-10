@@ -133,7 +133,7 @@ async def audio_to_anki(audio_mp3):
         audio_path = anki_media / f"WhisperToAnki_{audio_hash}.mp3"
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
-        shutil.copy(audio_mp3, audio_path)
+        shutil.copy2(audio_mp3, audio_path)
         assert (audio_path).exists(), "audio file not found in anki media!"
 
         html = f"</br>[sound:{audio_path.name}]"

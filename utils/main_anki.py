@@ -393,7 +393,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         moved = doing_dir / path.name
         path.rename(moved)
         to_temp = tmp_dir / moved.name
-        shutil.copy(moved, to_temp)
+        shutil.copy2(moved, to_temp)
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(to_temp)
