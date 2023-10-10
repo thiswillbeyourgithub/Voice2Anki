@@ -541,7 +541,7 @@ def main(
                 args=(audio_mp3_1, audio_to_anki_queue),
                 )
         thread.start()
-        threads.append(thred)
+        threads.append(thread)
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
