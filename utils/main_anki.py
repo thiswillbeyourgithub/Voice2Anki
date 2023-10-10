@@ -368,6 +368,8 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     """
     # move any file in doing to done
     doings = [p for p in doing_dir.rglob("*.mp3")]
+    if not doings:
+        whi("No mp3 files in doing")
     for p in doings:
         whi(f"Refilling so moving files from doing to done: {p}")
         p.rename(done_dir / p.name)
