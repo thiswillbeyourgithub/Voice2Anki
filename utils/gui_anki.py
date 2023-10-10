@@ -2,7 +2,7 @@ import gradio as gr
 from pathlib import Path
 import pickle
 
-from .profiles import get_profiles, switch_profile, previous_values, save_tags, save_deck
+from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
 from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache_async, load_splitted_audio
 
 from .logger import get_log, whi, red
@@ -33,10 +33,10 @@ Path("profiles/anki").mkdir(exist_ok=True)
 if Path("profiles/anki/latest_profile.pickle").exists():
     whi("Reloading previous profile.")
     with open("profiles/anki/latest_profile.pickle", "rb") as f:
-        pv = previous_values(pickle.load(f))
+        pv = ValueStorage(pickle.load(f))
 else:
     red("Loading default profile")
-    pv = previous_values("default")
+    pv = ValueStorage("default")
 
 with gr.Blocks(
         analytics_enabled=False,

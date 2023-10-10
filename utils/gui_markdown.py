@@ -1,7 +1,7 @@
 from pathlib import Path
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile, previous_values, save_path
+from .profiles import get_profiles, switch_profile, ValueStorage, save_path
 from .main_markdown import transcribe, alfred, main, auto_mode, semiauto_mode
 
 from .logger import get_log, whi
@@ -27,7 +27,7 @@ document.querySelector('body').classList.add('dark');
 }"""
 
 # load default profile
-pv = previous_values("reload")
+pv = ValueStorage("reload")
 
 with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown", theme=theme) as demo_markdown:
 

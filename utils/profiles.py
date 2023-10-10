@@ -32,7 +32,7 @@ profile_path.mkdir(exist_ok=True)
 anki_path.mkdir(exist_ok=True)
 md_path.mkdir(exist_ok=True)
 
-class previous_values:
+class ValueStorage:
     def __init__(self, profile="default"):
         assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
             "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
@@ -192,7 +192,7 @@ def switch_profile(profile):
                 profile,
                 ]
 
-    pv = previous_values(profile)
+    pv = ValueStorage(profile)
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")
@@ -223,12 +223,12 @@ def switch_profile(profile):
 
 def save_tags(txt_profile, txt_tags):
     if txt_tags:
-        previous_values(txt_profile)["txt_tags"] = txt_tags
+        ValueStorage(txt_profile)["txt_tags"] = txt_tags
 
 def save_deck(txt_profile, txt_deck):
     if txt_deck:
-        previous_values(txt_profile)["txt_deck"] = txt_deck
+        ValueStorage(txt_profile)["txt_deck"] = txt_deck
 
 def save_path(txt_profile, txt_mdpath):
     if txt_mdpath:
-        previous_values(txt_profile)["txt_mdpath"] = txt_mdpath
+        ValueStorage(txt_profile)["txt_mdpath"] = txt_mdpath

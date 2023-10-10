@@ -11,7 +11,7 @@ from .misc import tokenize, transcript_template
 from .logger import red, whi, yel
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing
-from .profiles import previous_values
+from .profiles import ValueStorage
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
@@ -31,7 +31,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red("Error: None whisper language")
 
     # save audio for next startup
-    pv = previous_values(txt_profile)
+    pv = ValueStorage(txt_profile)
     pv["audio_mp3_1"] = audio_mp3_1
 
     # try to remove silences
@@ -153,7 +153,7 @@ def alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature):
         tkn_cost = [input_tkn_cost, output_tkn_cost]
 
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-        pv = previous_values(txt_profile)
+        pv = ValueStorage(txt_profile)
         pv["total_llm_cost"] += tkn_cost_dol
         red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.2f} (not counting whisper)")
 
@@ -244,7 +244,7 @@ def main(
         to_return["mdoutput_elem"] = f"File '{txt_mdpath}' not found"
 
     # store the default profile
-    pv = previous_values(txt_profile)
+    pv = ValueStorage(txt_profile)
     pv["latest_profile"] = txt_profile
 
     # save state for next start

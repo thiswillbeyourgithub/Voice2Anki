@@ -20,7 +20,7 @@ from .misc import tokenize, transcript_template
 from .logger import red, whi, yel, store_to_db
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
-from .profiles import previous_values
+from .profiles import ValueStorage
 
 
 splitted_dir = Path("./user_directory/splitted")
@@ -48,7 +48,7 @@ global pv
 assert Path("profiles/anki/latest_profile.pickle").exists(), "latest_profile not found, it should be created by gui_anki before!"
 whi("Reloading previous profile.")
 with open("profiles/anki/latest_profile.pickle", "rb") as f:
-    pv = previous_values(pickle.load(f))
+    pv = ValueStorage(pickle.load(f))
 
 message_buffer = {"question": [], "answer": []}
 
@@ -319,7 +319,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
         global pv
         if pv.profile_name != profile:
-            pv = previous_values(profile)
+            pv = ValueStorage(profile)
         pv["total_llm_cost"] += tkn_cost_dol
         red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
@@ -497,7 +497,7 @@ async def main(
     # store the default profile
     global pv
     if pv.profile_name != profile:
-        pv = previous_values(profile)
+        pv = ValueStorage(profile)
 
     if gallery is None or len(gallery) == 0:
         red("you should probably specify an image in source")

@@ -10,7 +10,7 @@ import torchaudio
 from .logger import whi, red
 from .anki_utils import anki_media
 from .ocr import get_text
-from .profiles import previous_values
+from .profiles import ValueStorage
 from .misc import rgb_to_bgr
 
 
@@ -119,7 +119,7 @@ def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5)
 
 class audio_saver:
     def __init__(self, txt_profile):
-        self.pv = previous_values(txt_profile)
+        self.pv = ValueStorage(txt_profile)
 
     def roll_audio(
             self,
@@ -133,7 +133,7 @@ class audio_saver:
         if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
             return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
         if self.pv.profile_name != txt_profile:
-            self.pv = previous_values(txt_profile)
+            self.pv = ValueStorage(txt_profile)
         while audio_mp3_2 is None:
             audio_mp3_2 = audio_mp3_3
             audio_mp3_3 = audio_mp3_4
@@ -149,7 +149,7 @@ class audio_saver:
 
     def save_audio(self, txt_profile, audio_mp3_n, n):
         if self.pv.profile_name != txt_profile:
-            self.pv = previous_values(txt_profile)
+            self.pv = ValueStorage(txt_profile)
 
         whi(f"Saving audio from #{n} to profile")
         if audio_mp3_n is None:
