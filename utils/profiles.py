@@ -116,7 +116,7 @@ class previous_values:
                 red(f"Waiting for task of {key} to finish.")
                 self.running_tasks[key].join()
                 if item == self.cache_values[key]:  # value might
-                    # have changed during the await
+                    # have changed during the execution
                     return
             thread = threading.Thread(
                     target=self.__setitem__async,
