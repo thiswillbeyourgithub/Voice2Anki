@@ -107,10 +107,17 @@ class ValueStorage:
             self.cache_values[key] = default
             return default
 
+    def __check_equality(self, a, b):
+        if not isinstance(a, type(b)):
+            return False
+        if isinstance(a, np.ndarray):
+            return (a == b).all()
+        return a == b
+
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
-        if item != self.cache_values[key]:
+        if self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
             if self.running_tasks[key] is not None:
                 red(f"Waiting for task of {key} to finish.")
