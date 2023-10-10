@@ -342,4 +342,3 @@ with gr.Blocks(
                 ],
             )
 
-demo_anki.queue()

@@ -243,4 +243,3 @@ with gr.Blocks(analytics_enabled=False, title="VoiceToFormattedText - Markdown",
                 ],
             )
 
-demo_markdown.queue()
