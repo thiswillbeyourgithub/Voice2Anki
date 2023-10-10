@@ -1,9 +1,9 @@
 import shutil
+import queue
 import threading
 import pickle
 import hashlib
 import base64
-import asyncio
 import joblib
 import json
 import cv2
@@ -83,7 +83,7 @@ whisper_cached = stt_cache.cache(
 sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
 
-async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -132,14 +132,14 @@ async def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
         return red(f"Error when cache transcribing audio: '{err}'")
 
 def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
-    asyncio.run(
-            transcribe_cache(
-                audio_mp3, txt_whisp_prompt, txt_whisp_lang
-                )
+    thread = threading.Thread(
+            target=transcribe_cache,
+            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang)
             )
+    thread.start()
 
 
-async def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
@@ -411,20 +411,27 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
     return output
 
+def gather_threads(threads):
+    n = len([t for t in threads if t.is_alive()])
+    while n:
+        n = len([t for t in threads if t.is_alive()])
+        time.sleep(0.5)
+        yel(f"Waiting for {n} threads to finish")
 
-async def semiauto_mode(*args, **kwargs):
+
+def semiauto_mode(*args, **kwargs):
     "triggering function 'main' with mode 'semiauto'"
     whi("Triggering semiauto mode: doing everything but stop just before uploading to anki")
-    return await main(*args, **kwargs, mode="semiauto")
+    return main(*args, **kwargs, mode="semiauto")
 
 
-async def auto_mode(*args, **kwargs):
+def auto_mode(*args, **kwargs):
     "triggering function 'main' with mode 'auto'"
     whi("Triggering auto mode")
-    return await main(*args, **kwargs, mode="auto")
+    return main(*args, **kwargs, mode="auto")
 
 
-async def main(
+def main(
         audio_mp3_1,
         txt_audio,
         txt_whisp_prompt,
@@ -488,6 +495,8 @@ async def main(
                 txt_chatgpt_cloz,
                 ]
 
+    threads = []
+
     # to_return allows to keep track of what to output to which widget
     to_return = {}
     to_return["txt_audio"] = txt_audio
@@ -525,11 +534,17 @@ async def main(
 
     # get text from audio if not already parsed
     if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = await transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
+        txt_audio = transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
         to_return["txt_audio"] = txt_audio
 
     if mode != "semiauto":  # start copying the sound file right away
-        audio_to_anki_task = asyncio.create_task(audio_to_anki(audio_mp3_1))
+        audio_to_anki_queue = queue.Queue()
+        thread = threading.Thread(
+                target=audio_to_anki,
+                args=(audio_mp3_1, audio_to_anki_queue),
+                )
+        thread.start()
+        threads.append(thred)
 
     # ask chatgpt
     if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
@@ -560,6 +575,7 @@ async def main(
     clozes = txt_chatgpt_cloz.split("#####")
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
         red(f"Invalid cloze: '{txt_chatgpt_cloz}'")
+        gather_threads(threads)
         return [
                 to_return["txt_audio"],
                 txt_chatgpt_tkncost,
@@ -568,6 +584,7 @@ async def main(
 
     if "alfred" in txt_chatgpt_cloz.lower():
         red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
+        gather_threads(threads)
         return [
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
@@ -590,6 +607,7 @@ async def main(
 
     if mode == "semiauto":
         yel("Semiauto mode: stopping just before uploading to anki")
+        gather_threads(threads)
         return [
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
@@ -599,8 +617,9 @@ async def main(
     whi("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = await audio_to_anki_task
+    audio_html = audio_to_anki_queue.get()
     if "Error" in audio_html:  # then out is an error message and not the source
+        gather_threads(threads)
         return [
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
@@ -633,11 +652,15 @@ async def main(
     results = [str(r) for r in results if str(r).isdigit()]
 
     # trigger anki sync
-    asyncio.create_task(sync_anki())
+    thread = threading.Thread(target=sync_anki)
+    thread.start()
+    threads.append(thread)
     whi("Synchronized anki\n")
+
 
     if not len(results) == len(clozes):
         red(f"Some flashcards were not added!"),
+        gather_threads(threads)
         return [
                 to_return["txt_audio"],
                 to_return["txt_chatgpt_tkncost"],
@@ -648,6 +671,7 @@ async def main(
 
     whi("\n\n ------------------------------------- \n\n")
 
+    gather_threads(threads)
     return [
             to_return["txt_audio"],
             to_return["txt_chatgpt_tkncost"],

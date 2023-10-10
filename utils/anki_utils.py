@@ -115,7 +115,7 @@ def _call_anki(action, **params):
     return response['result']
 
 
-async def audio_to_anki(audio_mp3):
+def audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
         if not Path(audio_mp3).exists():
@@ -137,12 +137,14 @@ async def audio_to_anki(audio_mp3):
         assert (audio_path).exists(), "audio file not found in anki media!"
 
         html = f"</br>[sound:{audio_path.name}]"
+        queue.put(html)
         return html
     except Exception as err:
+        queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
         return red(f"\n\nError when copying audio to anki media: '{err}'")
 
 
-async def sync_anki():
+def sync_anki():
     "trigger anki synchronization"
     sync_output = _call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
