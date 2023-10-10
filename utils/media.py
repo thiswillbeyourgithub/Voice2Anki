@@ -130,21 +130,27 @@ class audio_saver:
             audio_mp3_4,
             audio_mp3_5):
         whi("Rolling over audio samples")
+
+        # if 2-5 are None, keep the 1
         if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
             return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
+
+        # reload if changed
         if self.pv.profile_name != txt_profile:
             self.pv = ValueStorage(txt_profile)
-        while audio_mp3_2 is None:
-            audio_mp3_2 = audio_mp3_3
-            audio_mp3_3 = audio_mp3_4
-            audio_mp3_4 = audio_mp3_5
-            audio_mp3_5 = None
-        self.pv["audio_mp3_1"] = audio_mp3_2
-        self.pv["audio_mp3_2"] = audio_mp3_3
-        self.pv["audio_mp3_3"] = audio_mp3_4
-        self.pv["audio_mp3_4"] = audio_mp3_5
-        self.pv["audio_mp3_5"] = None
-        return audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
+
+        audio_mp3_1 = None
+        while audio_mp3_1 is None:  # roll
+            audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5 = audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
+
+        # store value
+        self.pv["audio_mp3_1"] = audio_mp3_1
+        self.pv["audio_mp3_2"] = audio_mp3_2
+        self.pv["audio_mp3_3"] = audio_mp3_3
+        self.pv["audio_mp3_4"] = audio_mp3_4
+        self.pv["audio_mp3_5"] = audio_mp3_5
+        whi("Done rolling")
+        return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
 
 
     def save_audio(self, txt_profile, audio_mp3_n, n):
