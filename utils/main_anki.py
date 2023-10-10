@@ -55,6 +55,7 @@ message_buffer = {"question": [], "answer": []}
 running_tasks = {
         "saving_chatgpt": [],
         "saving_whisper": [],
+        "transcribing_audio": [],
         }
 
 d = datetime.today()
@@ -396,7 +397,6 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
-    threads = []
     for path in splitteds[:sound_slots]:
         moved = doing_dir / path.name
         path.rename(moved)
@@ -406,7 +406,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
-            threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
+            running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
@@ -417,15 +417,15 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     while output[0] is None:
         output.append(output.pop(0))
 
-    [t.join() for t in threads]
+    gather_threads(running_tasks["transcribing_audio"], source="transcribing audio")
     return output
 
-def gather_threads(threads):
+def gather_threads(threads, source="main"):
     n = len([t for t in threads if t.is_alive()])
     while n:
         n = len([t for t in threads if t.is_alive()])
         time.sleep(0.5)
-        yel(f"Waiting for {n} threads to finish")
+        yel(f"Waiting for {n} threads to finish in {source}")
 
 
 def semiauto_mode(*args, **kwargs):
