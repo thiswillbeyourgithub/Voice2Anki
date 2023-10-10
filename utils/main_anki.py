@@ -365,6 +365,11 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
+    # move any file in doing to done
+    doings = [p for p in doing_dir.rglob("*.mp3")]
+    for p in doings:
+        whi(f"Refilling so moving files from doing to done: {p}")
+        p.rename(done_dir / p.name)
 
     # check how many audio are needed
     sound_slots = 0
