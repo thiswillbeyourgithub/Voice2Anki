@@ -380,16 +380,13 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     assert splitteds, "splitted subdir contains no mp3"
 
     # sort by oldest
-    splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
+    #splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
+    splitteds = sorted(splitteds, key=lambda x: str(x))
 
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
-    for path in splitteds:
-        # don't find more documents than available slots
-        if len(sounds_to_load) > sound_slots:
-            break
-
+    for path in splitteds[:sound_slots]:
         moved = doing_dir / path.name
         path.rename(moved)
         to_temp = tmp_dir / moved.name
@@ -403,7 +400,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
     output = filled_slots[:-len(sounds_to_load)] + sounds_to_load
-    assert len(filled_slots) == len(output), "invalid output length"
+    assert len(filled_slots) == len(output), f"invalid output length: {len(filled_slots)} vs {len(output)}"
 
     # auto roll over if leading None present
     while output[0] is None:
