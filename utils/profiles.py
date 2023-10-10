@@ -110,14 +110,15 @@ class ValueStorage:
     def __check_equality(self, a, b):
         if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
             return False
-        if isinstance(a, np.ndarray):
-            return (a == b).all()
         if isinstance(a, list):
             for i in range(len(a)):
                 if not self.__check_equality(a[i], b[i]):
                     return False
             return True
-        return a == b
+        try:
+            return (a == b).all()
+        except Exception:
+            return a == b
 
     def __setitem__(self, key, item):
         if key not in self.approved_keys:
