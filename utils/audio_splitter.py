@@ -11,6 +11,7 @@ import fire
 from pathlib import Path
 import os
 from pydub import AudioSegment
+from pydub.silence import detect_leading_silence
 
 from logger import whi, yel, red
 
@@ -132,8 +133,9 @@ class AudioSplitter:
             sliced = audio[start_cut*1000:end_cut*1000]
             out_file = self.sp_dir / f"{file_path.name}_{today}_{i+1:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
-            sliced.export(out_file, format="mp3")
-            whi(f"Sliced to {out_file}")
+            trimmed = self.trim_silences(sliced)
+            trimmed.export(out_file, format="mp3")
+            whi(f"Saved sliced to {out_file}")
 
             # TODO fix metadata setting
             # for each file, keep the relevant transcript
@@ -169,6 +171,12 @@ class AudioSplitter:
             raise
 
         return transcript
+
+    def trim_silences(self, audio):
+        whi(f"Audio length before trimming silence: {len(audio)}ms")
+        trimmed = audio[detect_leading_silence(audio):-detect_leading_silence(audio.reverse())]
+        whi(f"Audio length after trimming silence: {len(trimmed)}ms")
+        return trimmed
 
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
