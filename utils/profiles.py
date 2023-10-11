@@ -97,7 +97,7 @@ class ValueStorage:
             if key == "sld_max_tkn":
                 default = 2000
             if key == "temperature":
-                default = 0.5
+                default = 0.3
             if key == "txt_whisp_lang":
                 default = "fr"
             if key == "total_llm_cost":
