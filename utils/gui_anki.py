@@ -232,7 +232,13 @@ with gr.Blocks(
                 audio_mp3_4,
                 audio_mp3_5,
                 ],
-            )
+            ).then(
+                    fn=semiauto_mode,
+                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
+                    #preprocess=False,
+                    #postprocess=False,
+                    )
 
     # send to whisper
     transcript_btn.click(
