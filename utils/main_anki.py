@@ -100,10 +100,10 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     modelname = "whisper-1"
 
     # try to remove silences
-    try:
-        audio_mp3 = sound_preprocessing_cached(audio_mp3)
-    except Exception as err:
-        red(f"Error when preprocessing sound: '{err}'")
+    # try:
+    #     audio_mp3 = sound_preprocessing_cached(audio_mp3)
+    # except Exception as err:
+    #     red(f"Error when preprocessing sound: '{err}'")
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -405,8 +405,8 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(to_temp)
-        if txt_whisp_prompt and txt_whisp_lang:
-            running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
+        # if txt_whisp_prompt and txt_whisp_lang:
+        #     running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
