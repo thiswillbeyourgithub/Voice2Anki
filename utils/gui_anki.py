@@ -193,13 +193,13 @@ with gr.Blocks(
     rollaudio_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             preprocess=False,
             postprocess=False,
             ).then(
                     fn=semiauto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz]
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
                     )
