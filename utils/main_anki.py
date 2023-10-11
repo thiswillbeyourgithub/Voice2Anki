@@ -39,7 +39,7 @@ assert doing_dir.exists(), "No 'doing' subdir found"
 doings = [p for p in doing_dir.rglob("*.mp3")]
 for p in doings:
     whi(f"Starting up so moved files from doing to splitted: {p}")
-    p.rename(splitted_dir / p.name)
+    shutil.move(p, splitted_dir / p.name)
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
@@ -373,7 +373,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         whi("No mp3 files in doing")
     for p in doings:
         whi(f"Refilling so moving files from doing to done: {p}")
-        p.rename(done_dir / p.name)
+        shutil.move(p, done_dir / p.name)
 
     # check how many audio are needed
     sound_slots = 0
@@ -399,7 +399,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     sounds_to_load = []
     for path in splitteds[:sound_slots]:
         moved = doing_dir / path.name
-        path.rename(moved)
+        shutil.move(path, moved)
         to_temp = tmp_dir / moved.name
         shutil.copy2(moved, to_temp)
         assert (moved.exists() and (to_temp).exists()) and (
