@@ -117,10 +117,10 @@ with gr.Blocks(
             fn=switch_profile,
             inputs=[txt_profile],
             outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_mp3_1, txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_profile.blur(
-            fn=switch_profile,
-            inputs=[txt_profile],
-            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_mp3_1, txt_audio, txt_chatgpt_cloz, txt_profile])
+    # txt_profile.blur(
+    #         fn=switch_profile,
+    #         inputs=[txt_profile],
+    #         outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_mp3_1, txt_audio, txt_chatgpt_cloz, txt_profile])
     txt_tags.submit(fn=save_tags, inputs=[txt_profile, txt_tags])
     txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
 
