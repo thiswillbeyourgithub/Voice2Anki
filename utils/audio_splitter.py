@@ -134,6 +134,9 @@ class AudioSplitter:
             out_file = self.sp_dir / f"{file_path.name}_{today}_{i+1:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
             trimmed = self.trim_silences(sliced)
+            if len(trimmed) < 3 * 1000:
+                red(f"Audio too short so ignored: {out_file} of length {len(trimmed)/1000:.1f}f")
+                continue
             trimmed.export(out_file, format="mp3")
             whi(f"Saved sliced to {out_file}")
 
