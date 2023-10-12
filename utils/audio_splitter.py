@@ -113,10 +113,23 @@ class AudioSplitter:
         for i, (start, end) in enumerate(times_to_keep):
             if end - start < 3:
                 times_to_keep[i] = None
+                text_segments[i] = None
+            else:
+                while "  " in text_segments[i]:
+                    text_segments[i] = text_segments[i].replace("  ", " ").strip()
+        text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
-
         n = len(text_segments)
         whi(f"Kept {n} audio segments when removing <3s in {file_path}")
+
+        for i, te in enumerate(text_segments):
+            if len(te.split(" ")) < 5:
+                text_segments[i] = None
+                times_to_keep[i] = None
+        text_segments = [t for t in text_segments if t is not None]
+        times_to_keep = [t for t in times_to_keep if t is not None]
+        n = len(text_segments)
+        whi(f"Kept {n} audio segments where more than 5 words found {file_path}")
 
         text_segments = [t.strip() for t in text_segments]
 
