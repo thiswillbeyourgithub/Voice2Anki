@@ -110,8 +110,9 @@ class AudioSplitter:
         n = len(text_segments)
         whi(f"Found {n} audio segments in {file_path}")
 
+        # remove too short
         for i, (start, end) in enumerate(times_to_keep):
-            if end - start < 3:
+            if end - start < 1:
                 times_to_keep[i] = None
                 text_segments[i] = None
             else:
@@ -120,20 +121,21 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments when removing <3s in {file_path}")
+        whi(f"Kept {n} audio segments when removing <1s in {file_path}")
 
+        # remove almost no words
         for i, te in enumerate(text_segments):
-            if len(te.split(" ")) < 5:
+            if len(te.split(" ")) <= 4 and "alfred" not in te.lower() and "image" not in te.lower():
                 text_segments[i] = None
                 times_to_keep[i] = None
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments where more than 5 words found {file_path}")
+        whi(f"Kept {n} audio segments with > 4 words {file_path}")
 
         text_segments = [t.strip() for t in text_segments]
 
-        assert len(times_to_keep) + 1 == len(text_segments), "invalid lengths"
+        assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
         if len(times_to_keep) == 1:
             whi(f"Stopping there for {file_path} as there is no cutting to do")
@@ -147,8 +149,8 @@ class AudioSplitter:
             out_file = self.sp_dir / f"{file_path.name}_{today}_{i+1:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
             trimmed = self.trim_silences(sliced)
-            if len(trimmed) < 3 * 1000:
-                red(f"Audio too short so ignored: {out_file} of length {len(trimmed)/1000:.1f}f")
+            if len(trimmed) < 1000:
+                red(f"Audio too short so ignored: {out_file} of length {len(trimmed)/1000:.1f}s")
                 continue
             trimmed.export(out_file, format="mp3")
             whi(f"Saved sliced to {out_file}")
