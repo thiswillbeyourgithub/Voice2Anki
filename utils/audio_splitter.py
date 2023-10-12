@@ -111,12 +111,12 @@ class AudioSplitter:
         whi(f"Found {n} audio segments in {file_path}")
 
         for i, (start, end) in enumerate(times_to_keep):
-            if end - start < 1:
+            if end - start < 3:
                 times_to_keep[i] = None
         times_to_keep = [t for t in times_to_keep if t is not None]
 
         n = len(text_segments)
-        whi(f"Kept {n} audio segments when removing <1s in {file_path}")
+        whi(f"Kept {n} audio segments when removing <3s in {file_path}")
 
         text_segments = [t.strip() for t in text_segments]
 
