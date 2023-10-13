@@ -193,7 +193,9 @@ class AudioSplitter:
 
     def trim_silences(self, audio):
         whi(f"Audio length before trimming silence: {len(audio)}ms")
-        trimmed = audio[detect_leading_silence(audio):-detect_leading_silence(audio.reverse())]
+        db_threshold = 20  # dB
+        threshold = - 10 ** (db_threshold / 20)  # in dFBS
+        trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
         return trimmed
 
