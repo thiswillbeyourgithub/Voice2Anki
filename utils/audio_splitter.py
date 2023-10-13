@@ -94,10 +94,11 @@ class AudioSplitter:
 
             for w in segment["words"]:
                 word = w["word"]
+                whi(f"Word: {word}")
                 not_matched = True
                 for stop in self.stop_list:
                     if re.search(stop, word):
-                        whi(f"Found {stop} in {text} ({st}->{ed})")
+                        whi(f"Found {stop.pattern} in '{text}' ({st}->{ed})")
                         times_to_keep[-1][1] = w["start"]
                         times_to_keep.append([w["end"], duration])
                         text_segments.append("")
