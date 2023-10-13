@@ -34,6 +34,7 @@ class AudioSplitter:
             unsplitted_dir="./user_directory/unsplitted",
             splitted_dir="./user_directory/splitted",
             done_dir = "./user_directory/done",
+            remove_silence=False,
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
@@ -48,6 +49,7 @@ class AudioSplitter:
         self.prompt = prompt
         self.n_todo = n_todo
         self.language = language
+        self.remove_silence = remove_silence
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -149,11 +151,12 @@ class AudioSplitter:
             sliced = audio[start_cut*1000:end_cut*1000]
             out_file = self.sp_dir / f"{file_path.name}_{today}_{i+1:03d}.mp3"
             assert not out_file.exists(), f"file {out_file} already exists!"
-            trimmed = self.trim_silences(sliced)
-            if len(trimmed) < 1000:
-                red(f"Audio too short so ignored: {out_file} of length {len(trimmed)/1000:.1f}s")
+            if self.remove_silence:
+                sliced = self.trim_silences(sliced)
+            if len(sliced) < 1000:
+                red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                 continue
-            trimmed.export(out_file, format="mp3")
+            sliced.export(out_file, format="mp3")
             whi(f"Saved sliced to {out_file}")
 
             # TODO fix metadata setting
