@@ -1,3 +1,4 @@
+import uuid
 import shutil
 import queue
 import threading
@@ -22,6 +23,7 @@ from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import ValueStorage
 
+user_identifier = str(uuid.uuid4())
 
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
@@ -299,6 +301,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                         messages=formatted_messages,
                         stop="END",
                         temperature=temperature,
+                        user=user_identifier,
                         )
                 break
             except RateLimitError as err:
