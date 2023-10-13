@@ -138,6 +138,10 @@ class AudioSplitter:
 
         text_segments = [t.strip() for t in text_segments]
 
+        whi("Text segments found:")
+        for i, t in enumerate(text_segments):
+            whi(f"\t{i:03d}: {t}")
+
         assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
         if len(times_to_keep) == 1:
