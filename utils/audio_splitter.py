@@ -94,7 +94,7 @@ class AudioSplitter:
 
             for w in segment["words"]:
                 word = w["word"]
-                whi(f"Word: {word}")
+                # whi(f"Word: {word}")
                 not_matched = True
                 for stop in self.stop_list:
                     if re.search(stop, word):
