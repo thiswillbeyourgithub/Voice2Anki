@@ -88,11 +88,11 @@ class AudioSplitter:
             ed = segment["end"]
             text = segment["text"]
 
-            if not [re.search(stop, text) for stop in self.stop_list]:
-                # not stopping
-                text_segments[-1] += f" {text}"
-                times_to_keep[-1][1] = ed
-                continue
+            # if not [re.search(stop, text) for stop in self.stop_list]:
+            #     # not stopping
+            #     text_segments[-1] += f" {text}"
+            #     times_to_keep[-1][1] = ed
+            #     continue
 
             for w in segment["words"]:
                 word = w["word"]
@@ -100,7 +100,7 @@ class AudioSplitter:
                 not_matched = True
                 for stop in self.stop_list:
                     if re.search(stop, word):
-                        whi(f"Found {stop.pattern} in '{text}' ({st}->{ed})")
+                        # whi(f"Found {stop.pattern} in '{text}' ({st}->{ed})")
                         times_to_keep[-1][1] = w["start"]
                         times_to_keep.append([w["end"], duration])
                         text_segments.append("")
@@ -140,7 +140,7 @@ class AudioSplitter:
 
         whi("Text segments found:")
         for i, t in enumerate(text_segments):
-            whi(f"\t{i:03d}: {t}")
+            whi(f"* {i:03d}: {t}\n")
 
         assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
