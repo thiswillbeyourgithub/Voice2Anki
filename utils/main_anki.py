@@ -610,11 +610,13 @@ def main(
     # send to anki
     metadata = rtoml.dumps(
             {
-            "author": "WhisperToAnki",
-            "transcripted_text": txt_audio,
-            "chatgpt_tkn_cost": txt_chatgpt_tkncost,
-            "chatgpt_dollars_cost": tkn_cost_dol,
-            }, pretty=True)
+                "author": "Voice2FormattedText",
+                "transcripted_text": txt_audio,
+                "chatgpt_context": txt_chatgpt_context,
+                "chatgpt_tkn_cost": txt_chatgpt_tkncost,
+                "chatgpt_dollars_cost": tkn_cost_dol,
+                "timestamp": time.time(),
+                }, pretty=True)
     results = []
 
     if mode == "semiauto":
