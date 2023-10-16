@@ -129,7 +129,7 @@ def stocha(n, temperature):
         # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
         # no worse if temperature is higher than 1
         return True
-    yel(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
+    # whi(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
     return False
 
 
@@ -154,10 +154,10 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
 
         def len_check(pr):
             if abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
-                red(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                # whi(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
                 return True
             else:
-                yel(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
                 return False
     else:
         def len_check(pr):
