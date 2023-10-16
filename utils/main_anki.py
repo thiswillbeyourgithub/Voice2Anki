@@ -362,6 +362,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
 
         return cloz, tkn_cost
     except Exception as err:
+        message_buffer["question"] = []
+        message_buffer["answer"] = []
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
