@@ -1,3 +1,4 @@
+import time
 from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
@@ -129,6 +130,7 @@ class audio_saver:
             audio_mp3_3,
             audio_mp3_4,
             audio_mp3_5):
+        t = time.time()
         whi("Rolling over audio samples")
 
         # if 2-5 are None, keep the 1
@@ -149,7 +151,7 @@ class audio_saver:
         self.pv["audio_mp3_3"] = audio_mp3_3
         self.pv["audio_mp3_4"] = audio_mp3_4
         self.pv["audio_mp3_5"] = audio_mp3_5
-        whi("Done rolling")
+        whi(f"Done rolling (took {time.time()-t:.2f)}s)")
         return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
 
 
