@@ -59,7 +59,7 @@ def add_to_anki(
                         **other_fields,
                         },
                     "tags": tags,
-                    "options": {"allowDuplicate": True}})
+                    "options": {"allowDuplicate": False}})
         return res
     else:
         # create note type model that has the right fields
