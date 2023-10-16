@@ -330,7 +330,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
 
         reason = response["choices"][0]["finish_reason"]
         if reason.lower() != "stop":
-            red(f"ChatGPT's reason to strop was not 'stop' but '{reason}'")
+            red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
 
         # add to db to create LORA fine tunes later
         if running_tasks["saving_chatgpt"]:
