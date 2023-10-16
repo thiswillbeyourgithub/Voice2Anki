@@ -149,6 +149,16 @@ class AudioSplitter:
             shutil.move(file_path, self.sp_dir / f"{file_path.name}_too_small.mp3")
             return
 
+        failed_test = False
+        for i, (t0, t1) in enumerate(times_to_keep):
+            dur = t1 - t0
+            if dur > 45:
+                failed_test = True
+                red(f"Found audio with too long duration: {dur}s.")
+                red(f"Text content: {text_segments[i]}\n")
+        if failed_test:
+            raise Exception("Some audios were suspiciously long. Exiting.")
+
         audio = AudioSegment.from_mp3(file_path)
 
         for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
