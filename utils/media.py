@@ -151,7 +151,7 @@ class audio_saver:
         self.pv["audio_mp3_3"] = audio_mp3_3
         self.pv["audio_mp3_4"] = audio_mp3_4
         self.pv["audio_mp3_5"] = audio_mp3_5
-        whi(f"Done rolling (took {time.time()-t:.2f)}s)")
+        whi(f"Done rolling (took {time.time()-t:.2f}s)")
         return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
 
 
