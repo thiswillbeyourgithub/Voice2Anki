@@ -106,7 +106,7 @@ with gr.Blocks(
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
+    # output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
 
     # events
     # darkmode
@@ -347,4 +347,3 @@ with gr.Blocks(
                 sld_improve,
                 ],
             )
-
