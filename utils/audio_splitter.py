@@ -27,7 +27,7 @@ today = f"{d.day:02d}_{d.month:02d}"
 class AudioSplitter:
     def __init__(
             self,
-            prompt=None,
+            prompt="Lecture de mes notes de cours separées par 'STOP' : ",
             stop_list=["stop", "nouvelles? cartes?", "nouvelles? questions?"],
             language="fr",
             n_todo=1,
