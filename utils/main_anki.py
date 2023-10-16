@@ -310,12 +310,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
 
-        cloz = response["choices"][0]["message"]["content"]
-        message_buffer["question"] = new_prompt
-        message_buffer["answer"] = cloz
-        cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
-
-        yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
 
         input_tkn_cost = response["usage"]["prompt_tokens"]
         output_tkn_cost = response["usage"]["completion_tokens"]
@@ -326,6 +320,12 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         if pv.profile_name != profile:
             pv = ValueStorage(profile)
         pv["total_llm_cost"] += tkn_cost_dol
+        cloz = response["choices"][0]["message"]["content"]
+        message_buffer["question"] = new_prompt
+        message_buffer["answer"] = cloz
+        cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+
+        yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
         red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
         reason = response["choices"][0]["finish_reason"]
