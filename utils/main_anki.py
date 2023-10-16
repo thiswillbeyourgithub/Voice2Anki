@@ -395,6 +395,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
     # sort by oldest
     #splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
+    # sort by name
     splitteds = sorted(splitteds, key=lambda x: str(x))
 
     # iterate over each files from the dir. If images are found, load them
