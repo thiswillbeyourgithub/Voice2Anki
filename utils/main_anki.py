@@ -426,8 +426,8 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
         sounds_to_load.append(to_temp)
-        # if txt_whisp_prompt and txt_whisp_lang:
-        #     running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
+        if txt_whisp_prompt and txt_whisp_lang:
+            running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
