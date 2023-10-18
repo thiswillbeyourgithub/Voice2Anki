@@ -81,7 +81,7 @@ with gr.Blocks(
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None)
             rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
             rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
-            dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
+            dir_load_btn = gr.Button(value="Dirload 1+2+3", variant="secondary")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here")
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here")
@@ -241,7 +241,7 @@ with gr.Blocks(
                 audio_mp3_5,
                 ],
             ).then(
-                    fn=semiauto_mode,
+                    fn=auto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
                     preprocess=False,
