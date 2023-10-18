@@ -63,28 +63,43 @@ running_tasks = {
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
-stt_cache = joblib.Memory("transcript_cache", verbose=0)
 soundpreprocess_cache = joblib.Memory("sound_preprocessing_cache", verbose=0)
+sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
-def _whisper_cached(audio_path, audio_hash, modelname, txt_whisp_prompt, txt_whisp_lang):
+stt_cache = joblib.Memory("transcript_cache", verbose=0)
+
+@stt_cache.cache(ignore=["audio_path"])
+def whisper_cached(
+        audio_path,
+        audio_hash,
+        modelname,
+        txt_whisp_prompt,
+        txt_whisp_lang):
     """this is a call to openai's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
     red(f"Calling whisper instead of using cache for {audio_path}")
-    with open(audio_path, "rb") as audio_file:
-        transcript = openai.Audio.transcribe(
-            model=modelname,
-            file=audio_file,
-            prompt=txt_whisp_prompt,
-            language=txt_whisp_lang)
-    return transcript
-whisper_cached = stt_cache.cache(
-        func=_whisper_cached,
-        ignore=["audio_path"],
-        )
-
-sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
-
+    assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
+    try:
+        cnt = 0
+        while True:
+            try:
+                cnt += 1
+                with open(audio_path, "rb") as audio_file:
+                    transcript = openai.Audio.transcribe(
+                        model=modelname,
+                        file=audio_file,
+                        prompt=txt_whisp_prompt,
+                        language=txt_whisp_lang)
+                return transcript
+            except RateLimitError as err:
+                if cnt >= 5:
+                    return red(f"Cached whisper: RateLimitError >5: '{err}'")
+                else:
+                    red(f"Cached whisper: RateLimitError #{cnt}/5 from cached whisper: '{err}'")
+                    time.sleep(2 * cnt)
+    except Exception as err:
+        return red(f"Error when cache transcribing audio: '{err}'")
 
 def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
@@ -111,28 +126,14 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-    try:
-        assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
-        cnt = 0
-        while True:
-            try:
-                cnt += 1
-                transcript = whisper_cached(
-                        audio_mp3,
-                        audio_hash,
-                        modelname,
-                        txt_whisp_prompt,
-                        txt_whisp_lang)
-                return None
-            except RateLimitError as err:
-                if cnt >= 5:
-                    Path(audio_mp3).unlink(missing_ok=False)
-                    red("Cached whisper: too many retries.")
-                    return
-                red(f"Error from cached whisper: '{err}'")
-                time.sleep(2 * cnt)
-    except Exception as err:
-        return red(f"Error when cache transcribing audio: '{err}'")
+    _ = whisper_cached(
+            audio_mp3,
+            audio_hash,
+            modelname,
+            txt_whisp_prompt,
+            txt_whisp_lang)
+    return None
+
 
 def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     thread = threading.Thread(
@@ -169,57 +170,44 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
     try:
-        assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
-        cnt = 0
-        while True:
-            try:
-                whi(f"Asking Whisper for {audio_mp3_1}")
-                cnt += 1
-                transcript = whisper_cached(
-                        audio_mp3_1,
-                        audio_hash,
-                        modelname,
-                        txt_whisp_prompt,
-                        txt_whisp_lang)
-                with open(audio_mp3_1, "rb") as audio_file:
-                    mp3_content = audio_file.read()
-                txt_audio = transcript["text"]
-                yel(f"\nWhisper transcript: {txt_audio}")
-                Path(audio_mp3_1).unlink(missing_ok=False)
+        whi(f"Asking Whisper for {audio_mp3_1}")
+        transcript = whisper_cached(
+                audio_mp3_1,
+                audio_hash,
+                modelname,
+                txt_whisp_prompt,
+                txt_whisp_lang)
+        with open(audio_mp3_1, "rb") as audio_file:
+            mp3_content = audio_file.read()
+        txt_audio = transcript["text"]
+        yel(f"\nWhisper transcript: {txt_audio}")
 
-                if running_tasks["saving_whisper"]:
-                    running_tasks["saving_whisper"][-1].join()
-                while running_tasks["saving_whisper"]:
-                    running_tasks["saving_whisper"].pop()
-                thread = threading.Thread(
-                        target=store_to_db,
-                        name="saving_whisper",
-                        kwargs={
-                            "dictionnary": {
-                                "type": "whisper_transcription",
-                                "timestamp": time.time(),
-                                "whisper_language": txt_whisp_lang,
-                                "whisper_context": txt_whisp_prompt,
-                                "V2FT_profile": txt_profile,
-                                "transcribed_input": txt_audio,
-                                "model_name": f"OpenAI {modelname}",
-                                "audio_mp3": base64.b64encode(mp3_content).decode(),
-                                "V2FT_version": backend_config.VERSION,
-                                },
-                            "db_name": "anki_whisper"
-                            })
-                thread.start()
-                running_tasks["saving_whisper"].append(thread)
+        if running_tasks["saving_whisper"]:
+            running_tasks["saving_whisper"][-1].join()
+        while running_tasks["saving_whisper"]:
+            running_tasks["saving_whisper"].pop()
+        thread = threading.Thread(
+                target=store_to_db,
+                name="saving_whisper",
+                kwargs={
+                    "dictionnary": {
+                        "type": "whisper_transcription",
+                        "timestamp": time.time(),
+                        "whisper_language": txt_whisp_lang,
+                        "whisper_context": txt_whisp_prompt,
+                        "V2FT_profile": txt_profile,
+                        "transcribed_input": txt_audio,
+                        "model_name": f"OpenAI {modelname}",
+                        "audio_mp3": base64.b64encode(mp3_content).decode(),
+                        "V2FT_version": backend_config.VERSION,
+                        },
+                    "db_name": "anki_whisper"
+                    })
+        thread.start()
+        running_tasks["saving_whisper"].append(thread)
 
-                return txt_audio
-            except RateLimitError as err:
-                if cnt >= 5:
-                    Path(audio_mp3_1).unlink(missing_ok=False)
-                    return red("Whisper: too many retries.")
-                red(f"Error from whisper: '{err}'")
-                time.sleep(2 * cnt)
+        return txt_audio
     except Exception as err:
-        Path(audio_mp3_1).unlink(missing_ok=False)
         return red(f"Error when transcribing audio: '{err}'")
 
 
