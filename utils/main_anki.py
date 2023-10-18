@@ -227,6 +227,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
     if not txt_chatgpt_context:
         return "No txt_chatgpt_context found.", [0, 0]
 
+    prev_prompts = load_prev_prompts(profile)
     new_prompt = {
             "role": "user",
             "content": dedent(
@@ -234,13 +235,35 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                     ).replace("TRANSCRIPT", txt_audio))
                 }
 
-    prev_prompts = load_prev_prompts(profile)
+    # the last transcript/answer pair is always saved in message_buffer
+    # even if it will not be saved to memory.
+    buffer_to_add = []
+    if message_buffer["question"] and message_buffer["answer"]:
+        if txt_audio.lower() not in message_buffer["question"].lower() and message_buffer["question"].lower() not in txt_audio:
+            buffer_to_add = [
+                    {
+                        "role": "user",
+                        "content": message_buffer["question"]
+                        },
+                    {
+                        "role": "assistant",
+                        "content": message_buffer["answer"]
+                        }
+                    ]
+            whi("Added message_buffer to the prompt.")
+        else:
+            message_buffer["question"] = ""
+            message_buffer["answer"] = ""
+
+    prompt_len_already = len(tokenize(new_prompt["content"]))
+    for p in buffer_to_add:
+        prompt_len_already += len(tokenize(p["content"]))
     prev_prompts = prompt_filter(
             prev_prompts,
             max_token,
             temperature,
-            new_prompt_len=len(tokenize(new_prompt["content"])),
-            favor_list=True if "list" in txt_audio.lower() else False
+            new_prompt_len=prompt_len_already,
+            favor_list=True if " list" in txt_audio.lower() else False
             )
 
     # check the number of token is fine and format the previous
@@ -262,16 +285,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                 "role": "assistant",
                 "content": m["answer"]})
 
-    if message_buffer["question"] and message_buffer["answer"]:
-        if txt_audio.lower() not in message_buffer["question"].lower() and message_buffer["question"].lower() not in txt_audio:
-            formatted_messages.append(message_buffer["question"])
-            formatted_messages.append(
-                    {
-                        "role": "assistant",
-                        "content": message_buffer["answer"],
-                        }
-                    )
-            whi("Added message_buffer to the prompt.")
+    formatted_messages.extend(buffer_to_add)
     formatted_messages.append(new_prompt)
 
     tkns += len(tokenize(formatted_messages[-1]["content"]))

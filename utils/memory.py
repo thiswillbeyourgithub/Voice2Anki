@@ -168,7 +168,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
             return False
 
         if not favor_list:  # the txt_audio does not ask for a list
-            if "list" in pr["content"].lower():
+            if " list" in pr["content"].lower():
                 # exclude list cards if not asking for a list
                 return False
             elif stocha(len(output_pr), temperature) and len_check(pr):  # stochastic
