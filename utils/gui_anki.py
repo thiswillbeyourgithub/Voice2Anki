@@ -194,23 +194,28 @@ with gr.Blocks(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            #preprocess=False,
-            #postprocess=False,
+            preprocess=False,
+            postprocess=False,
             ).then(
                     fn=semiauto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
-                    #preprocess=False,
-                    #postprocess=False,
+                    preprocess=False,
+                    postprocess=False,
                     )
     rollaudio2_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5]
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            preprocess=False,
+            postprocess=False,
             ).then(
                     fn=auto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz])
+                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
+                    preprocess=False,
+                    postprocess=False,
+                    )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -236,15 +241,18 @@ with gr.Blocks(
                     fn=semiauto_mode,
                     inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
-                    #preprocess=False,
-                    #postprocess=False,
+                    preprocess=False,
+                    postprocess=False,
                     )
 
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            outputs=[txt_audio])
+            outputs=[txt_audio],
+            preprocess=False,
+            postprocess=False,
+            )
 
     # send to chatgpt
     chatgpt_btn.click(
@@ -278,6 +286,8 @@ with gr.Blocks(
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ],
+            preprocess=False,
+            postprocess=False,
             )
 
     # 1+2
@@ -306,6 +316,8 @@ with gr.Blocks(
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ],
+            preprocess=False,
+            postprocess=False,
             )
 
     # 1+2+3
@@ -334,6 +346,8 @@ with gr.Blocks(
                 txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
                 ],
+            preprocess=False,
+            postprocess=False,
             )
 
     improve_btn.click(
@@ -346,4 +360,6 @@ with gr.Blocks(
                 txt_chatgpt_context,
                 sld_improve,
                 ],
+            preprocess=False,
+            postprocess=False,
             )
