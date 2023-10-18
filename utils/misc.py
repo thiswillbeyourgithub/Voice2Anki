@@ -29,3 +29,12 @@ class backend_config_class:
         self.backend = "not yet initialized"
 global backend_config
 backend_config = backend_config_class()
+
+def format_audio_component(audio):
+    """to make the whole UI faster, preprocessing and postprocessing is disabled
+    but this sometimes make the audio component output a dict instead of
+    the audio path. This fixes it."""
+    if isinstance(audio, dict):
+        assert audio["is_file"], "unexpected dict instead of audio"
+        audio = audio["name"]
+    return audio

@@ -17,7 +17,7 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
-from .misc import tokenize, transcript_template, backend_config
+from .misc import tokenize, transcript_template, backend_config, format_audio_component
 from .logger import red, whi, yel, store_to_db
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
@@ -100,9 +100,7 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
 
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
-    if isinstance(audio_mp3, dict):
-        assert audio_mp3["is_file"], "unexpected dict instead of audio"
-        audio_mp3 = audio_mp3["name"]
+    audio_mp3 = format_audio_component(audio_mp3)
 
     # try to remove silences
     # try:
@@ -160,9 +158,8 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red("Error: None whisper language")
 
     modelname = "whisper-1"
-    if isinstance(audio_mp3_1, dict):
-        assert audio_mp3_1["is_file"], "unexpected dict instead of audio"
-        audio_mp3_1 = audio_mp3_1["name"]
+
+    audio_mp3_1 = format_audio_component(audio_mp3_1)
 
     # try:  # preprocess sound, cached to make sure it only run once
     #     audio_mp3_1 = sound_preprocessing_cached(audio_mp3_1)

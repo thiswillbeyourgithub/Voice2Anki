@@ -11,6 +11,7 @@ from scipy.io.wavfile import write
 from torchaudio import load, save
 
 from .logger import red, whi
+from .misc import format_audio_component
 
 try:
     from .author_cloze_editor import cloze_editor
@@ -118,6 +119,7 @@ def _call_anki(action, **params):
 def audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
+        audio_mp3 = format_audio_component(audio_mp3)
         if not Path(audio_mp3).exists():
             red(f"File {audio_mp3} not found, looking for the right file")
             candidates = [str(p) for p in Path(audio_mp3).parent.iterdir()]
