@@ -1,4 +1,5 @@
 import uuid
+import Levenshtein as lev
 import shutil
 import queue
 import threading
@@ -226,7 +227,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
     # even if it will not be saved to memory.
     buffer_to_add = []
     for i in len(message_buffer["question"]):
-        if txt_audio.lower() not in message_buffer["question"][i].lower() and message_buffer["question"][i].lower() not in txt_audio:
+        if lev.ratio(
+                txt_audio.lower(),
+                message_buffer["question"][i].lower(),
+                ) < 0.8 :
             buffer_to_add.extend(
                     [
                         {
