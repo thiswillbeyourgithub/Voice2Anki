@@ -188,7 +188,10 @@ with gr.Blocks(
             fn=reset_audio,
             cancels=aud_cache_event,
             inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5])
+            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            preprocess=False,
+            postprocess=False,
+            )
 
     rollaudio_btn.click(
             fn=asv.roll_audio,
