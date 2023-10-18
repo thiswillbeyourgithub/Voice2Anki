@@ -24,6 +24,7 @@ def rgb_to_bgr(image):
 
 # to know if the backend chosen by the user is anki or markdown
 class backend_config_class:
+    VERSION = 0.1
     def __init__(self):
         self.backend = "not yet initialized"
 global backend_config

@@ -17,7 +17,7 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
-from .misc import tokenize, transcript_template
+from .misc import tokenize, transcript_template, backend_config
 from .logger import red, whi, yel, store_to_db
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
@@ -630,6 +630,7 @@ def main(
                 "transcripted_text": txt_audio,
                 "chatgpt_context": txt_chatgpt_context,
                 "model": "chatgpt",
+                "version": backend_config.VERSION,
                 "chatgpt_tkn_cost": txt_chatgpt_tkncost,
                 "chatgpt_dollars_cost": tkn_cost_dol,
                 "timestamp": time.time(),
