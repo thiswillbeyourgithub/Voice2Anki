@@ -173,7 +173,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         cnt = 0
         while True:
             try:
-                whi(f"Asking Whisper for {audio_mp3_1} using cache")
+                whi(f"Asking Whisper for {audio_mp3_1}")
                 cnt += 1
                 transcript = whisper_cached(
                         audio_mp3_1,

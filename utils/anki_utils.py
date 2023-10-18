@@ -122,12 +122,16 @@ def audio_to_anki(audio_mp3, queue):
         audio_mp3 = format_audio_component(audio_mp3)
         if not Path(audio_mp3).exists():
             red(f"File {audio_mp3} not found, looking for the right file")
-            candidates = [str(p) for p in Path(audio_mp3).parent.iterdir()]
-            if len(candidates) != 1:
-                raise Exception(f"Multiple candidate mp3 file: '{candidates}'")
-            else:
-                audio_mp3 = candidates[0]
+            if (Path(audio_mp3).parent.parent / Path(audio_mp3).name).exists():
+                audio_mp3 = (Path(audio_mp3).parent.parent / Path(audio_mp3).name).absolute()
                 red(f"Right file found: '{audio_mp3}'")
+            else:
+                candidates = [str(p) for p in Path(audio_mp3).parent.iterdir()]
+                if len(candidates) != 1:
+                    raise Exception(f"Multiple candidate mp3 file: '{candidates}'")
+                else:
+                    audio_mp3 = candidates[0]
+                    red(f"Right file found: '{audio_mp3}'")
 
         with open(audio_mp3, "rb") as audio_file:
             content = audio_file.read()
