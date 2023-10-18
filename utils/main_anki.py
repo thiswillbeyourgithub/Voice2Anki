@@ -52,7 +52,11 @@ whi("Reloading previous profile.")
 with open("profiles/anki/latest_profile.pickle", "rb") as f:
     pv = ValueStorage(pickle.load(f))
 
-message_buffer = {"question": "", "answer": ""}
+message_buffer = {
+        "question": [],
+        "answer": [],
+        }
+
 
 running_tasks = {
         "saving_chatgpt": [],
@@ -218,25 +222,24 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                     ).replace("TRANSCRIPT", txt_audio))
                 }
 
-    # the last transcript/answer pair is always saved in message_buffer
+    # the last few transcript/answer pair is always saved in message_buffer
     # even if it will not be saved to memory.
     buffer_to_add = []
-    if message_buffer["question"] and message_buffer["answer"]:
-        if txt_audio.lower() not in message_buffer["question"].lower() and message_buffer["question"].lower() not in txt_audio:
-            buffer_to_add = [
-                    {
-                        "role": "user",
-                        "content": message_buffer["question"]
-                        },
-                    {
-                        "role": "assistant",
-                        "content": message_buffer["answer"]
-                        }
-                    ]
+    for i in len(message_buffer["question"]):
+        if txt_audio.lower() not in message_buffer["question"][i].lower() and message_buffer["question"][i].lower() not in txt_audio:
+            buffer_to_add.extend(
+                    [
+                        {
+                            "role": "user",
+                            "content": message_buffer["question"][i]
+                            },
+                        {
+                            "role": "assistant",
+                            "content": message_buffer["answer"][i]
+                            }
+                        ]
+                    )
             whi("Added message_buffer to the prompt.")
-        else:
-            message_buffer["question"] = ""
-            message_buffer["answer"] = ""
 
     prompt_len_already = len(tokenize(new_prompt["content"]))
     for p in buffer_to_add:
@@ -359,8 +362,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
 
         return cloz, tkn_cost
     except Exception as err:
-        message_buffer["question"] = ""
-        message_buffer["answer"] = ""
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
@@ -693,8 +694,13 @@ def main(
 
     whi("\n\n ------------------------------------- \n\n")
 
-    message_buffer["question"] = txt_audio
-    message_buffer["answer"] = txt_chatgpt_cloz
+    message_buffer["question"].append(txt_audio)
+    message_buffer["answer"].append(txt_chatgpt_cloz)
+
+    buffer_limit = 2
+    message_buffer["question"] = message_buffer["question"][-buffer_limit:]
+    message_buffer["answer"] = message_buffer["answer"][-buffer_limit:]
+
 
     gather_threads(threads)
     return [
