@@ -202,6 +202,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                                 "transcribed_input": txt_audio,
                                 "model_name": f"OpenAI {modelname}",
                                 "audio_mp3": base64.b64encode(mp3_content).decode(),
+                                "V2FT_version": backend_config.VERSION,
                                 },
                             "db_name": "anki_whisper"
                             })
@@ -368,6 +369,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                         "system_prompt": formatted_messages[0],
                         "cloze": cloz,
                         "V2FT_mode": mode,
+                        "V2FT_version": backend_config.VERSION,
                         },
                     "db_name": "anki_llm"})
         thread.start()
