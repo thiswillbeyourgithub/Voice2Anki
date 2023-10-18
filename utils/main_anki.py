@@ -117,12 +117,6 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     modelname = "whisper-1"
     audio_mp3 = format_audio_component(audio_mp3)
 
-    # try to remove silences
-    # try:
-    #     audio_mp3 = sound_preprocessing_cached(audio_mp3)
-    # except Exception as err:
-    #     red(f"Error when preprocessing sound: '{err}'")
-
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
@@ -160,11 +154,6 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     modelname = "whisper-1"
 
     audio_mp3_1 = format_audio_component(audio_mp3_1)
-
-    # try:  # preprocess sound, cached to make sure it only run once
-    #     audio_mp3_1 = sound_preprocessing_cached(audio_mp3_1)
-    # except Exception as err:
-    #     red(f"Error when preprocessing sound: '{err}'")
 
     with open(audio_mp3_1, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -418,6 +407,12 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
         shutil.copy2(moved, to_temp)
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
+
+        try:  # preprocess sound
+            to_temp = sound_preprocessing_cached(to_temp)
+        except Exception as err:
+            red(f"Error when preprocessing sound {to_temp}: '{err}'")
+
         sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
             running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
