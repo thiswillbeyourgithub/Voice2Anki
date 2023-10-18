@@ -70,7 +70,7 @@ def _whisper_cached(audio_path, audio_hash, modelname, txt_whisp_prompt, txt_whi
     """this is a call to openai's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
-    whi(f"Calling whisper instead of using cache for {audio_path}")
+    red(f"Calling whisper instead of using cache for {audio_path}")
     with open(audio_path, "rb") as audio_file:
         transcript = openai.Audio.transcribe(
             model=modelname,
@@ -114,7 +114,6 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     try:
         assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
         cnt = 0
-        yel(f"Asking Whisper ({audio_mp3} not in cache)")
         while True:
             try:
                 cnt += 1
