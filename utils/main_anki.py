@@ -100,6 +100,9 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
 
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
+    if isinstance(audio_mp3, dict):
+        assert audio_mp3["is_file"], "unexpected dict instead of audio"
+        audio_mp3 = audio_mp3["name"]
 
     # try to remove silences
     # try:
@@ -157,6 +160,9 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red("Error: None whisper language")
 
     modelname = "whisper-1"
+    if isinstance(audio_mp3_1, dict):
+        assert audio_mp3_1["is_file"], "unexpected dict instead of audio"
+        audio_mp3_1 = audio_mp3_1["name"]
 
     # try:  # preprocess sound, cached to make sure it only run once
     #     audio_mp3_1 = sound_preprocessing_cached(audio_mp3_1)
