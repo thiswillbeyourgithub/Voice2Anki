@@ -629,6 +629,7 @@ def main(
                 "author": "Voice2FormattedText",
                 "transcripted_text": txt_audio,
                 "chatgpt_context": txt_chatgpt_context,
+                "model": "chatgpt",
                 "chatgpt_tkn_cost": txt_chatgpt_tkncost,
                 "chatgpt_dollars_cost": tkn_cost_dol,
                 "timestamp": time.time(),
