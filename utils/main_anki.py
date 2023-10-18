@@ -230,6 +230,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
     if not txt_chatgpt_context:
         return "No txt_chatgpt_context found.", [0, 0]
 
+    if "alfred" in txt_audio.lower() and "image" in txt_audio.lower() and len(txt_audio) < 40:
+        return f"Image change detected: '{txt_audio}'"
+
     prev_prompts = load_prev_prompts(profile)
     new_prompt = {
             "role": "user",
