@@ -52,7 +52,7 @@ whi("Reloading previous profile.")
 with open("profiles/anki/latest_profile.pickle", "rb") as f:
     pv = ValueStorage(pickle.load(f))
 
-message_buffer = {"question": [], "answer": []}
+message_buffer = {"question": "", "answer": ""}
 
 running_tasks = {
         "saving_chatgpt": [],
@@ -263,7 +263,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                 "content": m["answer"]})
 
     if message_buffer["question"] and message_buffer["answer"]:
-        if txt_audio.lower() not in json.dumps(message_buffer["question"]).lower() and json.dumps(message_buffer["question"]).lower() not in txt_audio:
+        if txt_audio.lower() not in message_buffer["question"].lower() and message_buffer["question"].lower() not in txt_audio:
             formatted_messages.append(message_buffer["question"])
             formatted_messages.append(
                     {
@@ -271,6 +271,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
                         "content": message_buffer["answer"],
                         }
                     )
+            whi("Added message_buffer to the prompt.")
     formatted_messages.append(new_prompt)
 
     tkns += len(tokenize(formatted_messages[-1]["content"]))
@@ -321,8 +322,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
             pv = ValueStorage(profile)
         pv["total_llm_cost"] += tkn_cost_dol
         cloz = response["choices"][0]["message"]["content"]
-        message_buffer["question"] = new_prompt
-        message_buffer["answer"] = cloz
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
 
         yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
@@ -362,8 +361,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
 
         return cloz, tkn_cost
     except Exception as err:
-        message_buffer["question"] = []
-        message_buffer["answer"] = []
+        message_buffer["question"] = ""
+        message_buffer["answer"] = ""
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
@@ -687,6 +686,9 @@ def main(
     whi("Finished adding card.\n\n")
 
     whi("\n\n ------------------------------------- \n\n")
+
+    message_buffer["question"] = txt_audio
+    message_buffer["answer"] = txt_chatgpt_cloz
 
     gather_threads(threads)
     return [
