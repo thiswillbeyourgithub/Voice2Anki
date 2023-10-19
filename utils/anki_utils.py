@@ -160,7 +160,7 @@ def sync_anki():
     # time.sleep(1)  # wait for sync to finish, just in case
 
 @trace
-def threaded_sync_anki()
+def threaded_sync_anki():
     # trigger anki sync
     thread = threading.Thread(target=sync_anki)
     thread.start()
