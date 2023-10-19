@@ -457,12 +457,15 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
     return output
 
 @trace
-def gather_threads(threads, source="main"):
+def gather_threads(threads, source="to_anki"):
     n = len([t for t in threads if t.is_alive()])
+    i = 0
     while n:
+        i += 1
         n = len([t for t in threads if t.is_alive()])
-        time.sleep(0.5)
-        yel(f"Waiting for {n} threads to finish in {source}")
+        if i % 10 == 0:
+            yel(f"Waiting for {n} threads to finish from {source}")
+        time.sleep(0.1)
 
 
 @trace
