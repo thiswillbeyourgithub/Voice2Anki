@@ -157,7 +157,7 @@ def sync_anki():
     sync_output = _call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
         f"Error during sync?: '{sync_output}'")
-    time.sleep(1)  # wait for sync to finish, just in case
+    # time.sleep(1)  # wait for sync to finish, just in case
     whi("Done syncing!")
 
 
