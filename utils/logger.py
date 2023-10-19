@@ -186,6 +186,10 @@ def trace(func):
         purp(f" => Entering {func}")
         t = time.time()
         result = func(*args, **kwargs)
-        purp(f" =>| Exiting {func} after {time.time() - t:.1f}s")
+        tt = time.time() - t
+        if tt > 0.5:
+            red(f" =>| Exiting {func} after {tt:.1f}s")
+        else:
+            purp(f" =>| Exiting {func} after {tt:.1f}s")
         return result
     return wrapper
