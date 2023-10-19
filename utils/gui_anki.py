@@ -246,7 +246,7 @@ with gr.Blocks(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             ).then(
                     fn=transcribe,
@@ -265,7 +265,7 @@ with gr.Blocks(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             ).then(
                     fn=transcribe,
