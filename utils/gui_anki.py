@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
-from .main_anki import transcribe, alfred, main, auto_mode, semiauto_mode, transcribe_cache_async, load_splitted_audio
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
@@ -92,8 +92,8 @@ with gr.Blocks(
         anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
 
     with gr.Row():
-        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
-        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
+        12_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+        auto_btn = gr.Button(value="1+2+3. 123pilot", variant="primary")
 
     with gr.Row():
         with gr.Column(scale=9):
@@ -146,37 +146,42 @@ with gr.Blocks(
     aud_cache_event = []
     # the first slot will directly trigger 1+2 while the other slots will
     # just trigger caching
-    aud_cache_event.append(audio_mp3_1.stop_recording(
-        fn=semiauto_mode,
-        inputs=[
-            audio_mp3_1,
-            txt_audio,
-            txt_whisp_prompt,
-            txt_whisp_lang,
 
-            txt_chatgpt_tkncost,
-            txt_chatgpt_cloz,
-
-            txt_chatgpt_context,
-            txt_deck,
-            txt_tags,
-
-            gallery,
-            txt_profile,
-            sld_max_tkn,
-            sld_temp,
-            ],
-        outputs=[
-            txt_audio,
-            txt_chatgpt_tkncost,
-            txt_chatgpt_cloz,
-            ]
-        )
-    )
-    aud_cache_event.append(audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang], preprocess=False, postprocess=False, queue=True).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang], preprocess=False, postprocess=False, queue=True).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang], preprocess=False, postprocess=False, queue=True).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang], preprocess=False, postprocess=False, queue=True).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5], preprocess=False, postprocess=False, queue=True))
+    # semi auto mode
+    aud_cache_event.append(
+            audio_mp3_1.stop_recording(
+                fn=transcribe,
+                inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                outputs=[txt_audio],
+                preprocess=False,
+                postprocess=False,
+                ).then(
+                    fn=alfred,
+                    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                    outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                    preprocess=False,
+                    postprocess=False,
+                    ).then(
+                        fn=to_anki,
+                        inputs=[
+                            audio_mp3_1,
+                            txt_audio,
+                            txt_chatgpt_cloz,
+                            txt_chatgpt_context,
+                            txt_chatgpt_tkncost,
+                            txt_deck,
+                            txt_tags,
+                            txt_profile,
+                            gallery,
+                            ],
+                        preprocess=False,
+                        postprocess=False,
+                        )
+                    )
+    aud_cache_event.append(audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2], preprocess=False, postprocess=False, queue=True))
+    aud_cache_event.append(audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3], preprocess=False, postprocess=False, queue=True))
+    aud_cache_event.append(audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4], preprocess=False, postprocess=False, queue=True))
+    aud_cache_event.append(audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5], preprocess=False, postprocess=False, queue=True))
 
     audio_mp3_1.clear(cancels=aud_cache_event)
     audio_mp3_2.clear(cancels=aud_cache_event)
@@ -200,12 +205,18 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             ).then(
-                    fn=semiauto_mode,
-                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
+                    fn=transcribe,
+                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    )
+                    ).then(
+                        fn=alfred,
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                        outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                        preprocess=False,
+                        postprocess=False,
+                        )
     rollaudio2_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
@@ -213,12 +224,34 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             ).then(
-                    fn=auto_mode,
-                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
+                    fn=transcribe,
+                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    )
+                    ).then(
+                        fn=alfred,
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                        outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                        preprocess=False,
+                        postprocess=False,
+                        ).then(
+                            fn=to_anki,
+                            inputs=[
+                                audio_mp3_1,
+                                txt_audio,
+                                txt_chatgpt_cloz,
+                                txt_chatgpt_context,
+                                txt_chatgpt_tkncost,
+                                txt_deck,
+                                txt_tags,
+                                txt_profile,
+                                gallery,
+                                ],
+                            preprocess=False,
+                            postprocess=False,
+                            )
+                        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -232,6 +265,7 @@ with gr.Blocks(
                 audio_mp3_4,
                 audio_mp3_5,
                 txt_whisp_prompt, txt_whisp_lang
+                txt_profile,
                 ],
             outputs=[
                 audio_mp3_1,
@@ -241,12 +275,34 @@ with gr.Blocks(
                 audio_mp3_5,
                 ],
             ).then(
-                    fn=auto_mode,
-                    inputs=[audio_mp3_1, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_tkncost, txt_chatgpt_cloz, txt_chatgpt_context, txt_deck, txt_tags, gallery, txt_profile, sld_max_tkn, sld_temp],
-                    outputs=[txt_audio, txt_chatgpt_tkncost, txt_chatgpt_cloz],
+                    fn=transcribe,
+                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    )
+                    ).then(
+                        fn=alfred,
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                        outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                        preprocess=False,
+                        postprocess=False,
+                        ).then(
+                            fn=to_anki,
+                            inputs=[
+                                audio_mp3_1,
+                                txt_audio,
+                                txt_chatgpt_cloz,
+                                txt_chatgpt_context,
+                                txt_chatgpt_tkncost,
+                                txt_deck,
+                                txt_tags,
+                                txt_profile,
+                                gallery,
+                                ],
+                            preprocess=False,
+                            postprocess=False,
+                            )
+                        )
 
     # send to whisper
     transcript_btn.click(
@@ -265,93 +321,82 @@ with gr.Blocks(
 
     # send to anki
     anki_btn.click(
-            fn=main,
+            fn=to_anki,
             inputs=[
                 audio_mp3_1,
                 txt_audio,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-
-                txt_chatgpt_tkncost,
                 txt_chatgpt_cloz,
-
                 txt_chatgpt_context,
+                txt_chatgpt_tkncost,
                 txt_deck,
                 txt_tags,
-
-                gallery,
                 txt_profile,
-                sld_max_tkn,
-                sld_temp,
-                ],
-            outputs=[
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
+                gallery,
                 ],
             preprocess=False,
             postprocess=False,
             )
 
     # 1+2
-    semiauto_btn.click(
-            fn=semiauto_mode,
-            inputs=[
-                audio_mp3_1,
-                txt_audio,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-
-                txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
-
-                gallery,
-                txt_profile,
-                sld_max_tkn,
-                sld_temp,
-                ],
-            outputs=[
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ],
+    12_btn.click(
+            fn=transcribe,
+            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            )
+            ).then(
+                fn=alfred,
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                preprocess=False,
+                postprocess=False,
+                ).then(
+                    fn=to_anki,
+                    inputs=[
+                        audio_mp3_1,
+                        txt_audio,
+                        txt_chatgpt_cloz,
+                        txt_chatgpt_context,
+                        txt_chatgpt_tkncost,
+                        txt_deck,
+                        txt_tags,
+                        txt_profile,
+                        gallery,
+                        ],
+                    preprocess=False,
+                    postprocess=False,
+                    )
 
     # 1+2+3
-    auto_btn.click(
-            fn=auto_mode,
-            inputs=[
-                audio_mp3_1,
-                txt_audio,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-
-                txt_chatgpt_context,
-                txt_deck,
-                txt_tags,
-
-                gallery,
-                txt_profile,
-                sld_max_tkn,
-                sld_temp,
-                ],
-            outputs=[
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ],
+    123_btn.click(
+            fn=transcribe,
+            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            )
+            ).then(
+                fn=alfred,
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
+                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                preprocess=False,
+                postprocess=False,
+                ).then(
+                    fn=to_anki,
+                    inputs=[
+                        audio_mp3_1,
+                        txt_audio,
+                        txt_chatgpt_cloz,
+                        txt_chatgpt_context,
+                        txt_chatgpt_tkncost,
+                        txt_deck,
+                        txt_tags,
+                        txt_profile,
+                        gallery,
+                        ],
+                    preprocess=False,
+                    postprocess=False,
+                    )
+                )
 
     improve_btn.click(
             fn=recur_improv,

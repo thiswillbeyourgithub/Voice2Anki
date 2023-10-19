@@ -106,7 +106,7 @@ def whisper_cached(
     except Exception as err:
         return red(f"Error when cache transcribing audio: '{err}'")
 
-def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -117,6 +117,12 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
 
     if txt_whisp_lang is None:
         return
+
+    global pv
+    if pv.profile_name != txt_profile:
+        pv = ValueStorage(txt_profile)
+    pv["txt_whisp_prompt"] = txt_whisp_prompt
+    pv["txt_whisp_lang"] = txt_whisp_lang
 
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
@@ -134,10 +140,10 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     return None
 
 
-def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     thread = threading.Thread(
             target=transcribe_cache,
-            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang)
+            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile)
             )
     thread.start()
     return thread
@@ -364,12 +370,17 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         thread.start()
         running_tasks["saving_whisper"].append(thread)
 
+        pv["sld_max_tkn"] = max_token
+        pv["temperature"] = temperature
+        pv["txt_chatgpt_context"] = txt_chatgpt_context
+
+
         return cloz, tkn_cost
     except Exception as err:
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
-def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
+def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -421,7 +432,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
         sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
-            new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
+            new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang, txt_profile))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
@@ -447,111 +458,87 @@ def gather_threads(threads, source="main"):
         yel(f"Waiting for {n} threads to finish in {source}")
 
 
-def semiauto_mode(*args, **kwargs):
-    "triggering function 'main' with mode 'semiauto'"
-    whi("Triggering semiauto mode: doing everything but stop just before uploading to anki")
-    return main(*args, **kwargs, mode="semiauto")
-
-
-def auto_mode(*args, **kwargs):
-    "triggering function 'main' with mode 'auto'"
-    whi("Triggering auto mode")
-    return main(*args, **kwargs, mode="auto")
-
-
-def main(
+def to_anki(
         audio_mp3_1,
         txt_audio,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-
-        txt_chatgpt_tkncost,
         txt_chatgpt_cloz,
-
         txt_chatgpt_context,
+        txt_chatgpt_tkncost,
         txt_deck,
         txt_tags,
-
+        txt_profile,
         gallery,
-        profile,
-        sld_max_tkn,
-        sld_temp,
-        mode="one",
         ):
-    "function called to do sequential actions: from audio to anki flashcard"
-    whi("Entering main")
-    if not (audio_mp3_1):
-        return [
-                red("None audio in microphone #1"),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
-    if not txt_whisp_prompt:
-        return [
-                red("No whisper prompt found."),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
-    if not txt_whisp_lang:
-        return [
-                red("No whisper language found."),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
-    if not txt_chatgpt_context:
-        return [
-                red("No txt_chatgpt_context found."),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
+    "function called to do wrap it up and send to anki"
+    whi("Entering to_anki")
+    if not txt_audio:
+        red("missing txt_audio")
+        return
+    if not txt_chatgpt_cloz:
+        red("missing txt_chatgpt_cloz")
+        return
     if not txt_deck:
-        return [
-                red("you should specify a deck"),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
+        red("missing txt_deck")
+        return
     if not txt_tags:
-        return [
-                red("you should specify tags"),
-                txt_audio,
-                txt_chatgpt_tkncost,
-                txt_chatgpt_cloz,
-                ]
+        red("missing txt_tags")
+        return
+    if not txt_profile:
+        red("missing txt_profile")
+        return
+
+    # check that the tkn_cost is sound
+    if isinstance(txt_chatgpt_tkncost, str):
+        txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
+    if not txt_chatgpt_tkncost:
+        red("No token cost found, setting to 0")
+        txt_chatgpt_tkncost = [0, 0]
+    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in txt_chatgpt_tkncost:
+        red(f"Error with chatgpt: '{txt_chatgpt_cloz}'")
+        return
+
+    # checks clozes validity
+    clozes = txt_chatgpt_cloz.split("#####")
+    if not clozes or "{{c1::" not in txt_chatgpt_cloz:
+        red(f"Invalid cloze: '{txt_chatgpt_cloz}'")
+        return
+
+    if "alfred" in txt_chatgpt_cloz.lower():
+        red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
+        return
 
     threads = []
 
-    # to_return allows to keep track of what to output to which widget
-    to_return = {}
-    to_return["txt_audio"] = txt_audio
-    to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
-    to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
-
-    # store the default profile
-    global pv
-    if pv.profile_name != profile:
-        pv = ValueStorage(profile)
-
+    # load the source text of the image in the gallery
+    txt_source_queue = queue.Queue()
+    txt_source = ""
     if gallery is None or len(gallery) == 0:
         red("you should probably specify an image in source")
         txt_source = "<br>"
     else:
-        txt_source = get_img_source(gallery)
+        thread = threading.Thread(
+                target=get_img_source,
+                args=(gallery, txt_source_queue)
+                )
+        thread.start()
+        threads.append(thread)
+
+    # send audio to anki
+    audio_to_anki_queue = queue.Queue()
+    thread = threading.Thread(
+            target=audio_to_anki,
+            args=(audio_mp3_1, audio_to_anki_queue),
+            )
+    thread.start()
+    threads.append(thread)
+
+    global pv
+    if pv.profile_name != txt_profile:
+        pv = ValueStorage(txt_profile)
 
     # save state for next start
     pv["txt_deck"] = txt_deck
     pv["txt_tags"] = txt_tags
-    pv["sld_max_tkn"] = sld_max_tkn
-    pv["temperature"] = sld_temp
-    pv["txt_chatgpt_context"] = txt_chatgpt_context
-    pv["txt_whisp_prompt"] = txt_whisp_prompt
-    pv["txt_whisp_lang"] = txt_whisp_lang
-
-    # save image and audio for next startup
     if gallery is not None:
         saved_gallery = [
                     cv2.imread(
@@ -560,64 +547,7 @@ def main(
                     ]
         pv["gallery"] = saved_gallery
 
-    # get text from audio if not already parsed
-    if (not txt_audio) or mode in ["auto", "semiauto"]:
-        txt_audio = transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, profile)
-        to_return["txt_audio"] = txt_audio
-
-    if mode != "semiauto":  # start copying the sound file right away
-        audio_to_anki_queue = queue.Queue()
-        thread = threading.Thread(
-                target=audio_to_anki,
-                args=(audio_mp3_1, audio_to_anki_queue),
-                )
-        thread.start()
-        threads.append(thread)
-
-    # ask chatgpt
-    if (not txt_chatgpt_cloz) or mode in ["auto", "semiauto"]:
-        txt_chatgpt_cloz, txt_chatgpt_tkncost = alfred(
-                txt_audio,
-                txt_chatgpt_context,
-                profile,
-                sld_max_tkn,
-                sld_temp,
-                mode)
-    if isinstance(txt_chatgpt_tkncost, str):
-        txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
-    if not txt_chatgpt_tkncost:
-        red("No token cost found, setting to 0")
-        txt_chatgpt_tkncost = [0, 0]
-    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in txt_chatgpt_tkncost:
-        return [
-                to_return["txt_audio"],
-                txt_chatgpt_tkncost,
-                to_return["txt_chatgpt_cloz"],
-                ]
-    to_return["txt_chatgpt_cloz"] = txt_chatgpt_cloz
-    to_return["txt_chatgpt_tkncost"] = txt_chatgpt_tkncost
-
     tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
-
-    # checks clozes validity
-    clozes = txt_chatgpt_cloz.split("#####")
-    if not clozes or "{{c1::" not in txt_chatgpt_cloz:
-        red(f"Invalid cloze: '{txt_chatgpt_cloz}'")
-        gather_threads(threads)
-        return [
-                to_return["txt_audio"],
-                txt_chatgpt_tkncost,
-                to_return["txt_chatgpt_cloz"],
-                ]
-
-    if "alfred" in txt_chatgpt_cloz.lower():
-        red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
-        gather_threads(threads)
-        return [
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_tkncost"],
-                to_return["txt_chatgpt_cloz"],
-                ]
 
     # add cloze to output
     whi(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}, not counting whisper)")
@@ -637,27 +567,19 @@ def main(
                 }, pretty=True)
     results = []
 
-    if mode == "semiauto":
-        yel("Semiauto mode: stopping just before uploading to anki")
-        gather_threads(threads)
-        return [
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_tkncost"],
-                to_return["txt_chatgpt_cloz"],
-                ]
-
     whi("Sending to anki:")
 
     # sending sound file to anki media
     audio_html = audio_to_anki_queue.get()
     if "Error" in audio_html:  # then out is an error message and not the source
         gather_threads(threads)
-        return [
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_tkncost"],
-                to_return["txt_chatgpt_cloz"],
-                ]
-    txt_source += audio_html
+        return
+
+    # gather text from the source image(s)
+    if not txt_source:
+        txt_source = txt_source_queue.get() + audio_html
+    else:
+        txt_source += audio_html
 
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
@@ -689,31 +611,21 @@ def main(
     threads.append(thread)
     whi("Synchronized anki\n")
 
-
     if not len(results) == len(clozes):
-        red(f"Some flashcards were not added!"),
+        red("Some flashcards were not added!"),
         gather_threads(threads)
-        return [
-                to_return["txt_audio"],
-                to_return["txt_chatgpt_tkncost"],
-                to_return["txt_chatgpt_cloz"],
-                ]
+        return
 
     whi("Finished adding card.\n\n")
 
     whi("\n\n ------------------------------------- \n\n")
 
+    # add the latest generated cards to the message bugger
     message_buffer["question"].append(txt_audio)
     message_buffer["answer"].append(txt_chatgpt_cloz)
-
     buffer_limit = 2
     message_buffer["question"] = message_buffer["question"][-buffer_limit:]
     message_buffer["answer"] = message_buffer["answer"][-buffer_limit:]
 
-
     gather_threads(threads)
-    return [
-            to_return["txt_audio"],
-            to_return["txt_chatgpt_tkncost"],
-            to_return["txt_chatgpt_cloz"],
-            ]
+    return

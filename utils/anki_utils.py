@@ -145,10 +145,8 @@ def audio_to_anki(audio_mp3, queue):
 
         html = f"</br>[sound:{audio_path.name}]"
         queue.put(html)
-        return html
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
-        return red(f"\n\nError when copying audio to anki media: '{err}'")
 
 
 def sync_anki():

@@ -70,14 +70,14 @@ def check_source(source):
     return source
 
 
-def get_img_source(gallery):
+def get_img_source(gallery, queue):
     whi("Getting source from image")
     try:
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
         if gallery is None:
-            return red("No image in gallery.")
+            queue.put(red("No image in gallery."))
         if len(gallery) == 0:
-            return red("0 image found in gallery.")
+            queue.put(red("0 image found in gallery."))
         source = ""
         for img in gallery:
             decoded = cv2.imread(img["name"], flags=1)
@@ -102,9 +102,9 @@ def get_img_source(gallery):
                 source += newsource
 
         source = check_source(source)
-        return source
+        queue.put(source)
     except Exception as err:
-        return red(f"Error getting source: '{err}'")
+        queue.put(red(f"Error getting source: '{err}'"))
 
 
 def reset_image():
