@@ -77,6 +77,7 @@ def coloured_log(color_asked):
     col_red = "\033[91m"
     col_yel = "\033[93m"
     col_rst = "\033[0m"
+    col_prpl = "\033[95m"
 
     # all logs are considered "errors" otherwise the datascience libs just
     # overwhelm the logs
@@ -119,6 +120,19 @@ def coloured_log(color_asked):
             string = str(string)
             log.info(string)
             tqdm.write(col_red + string + col_rst, **args)
+            return string
+    elif color_asked == "purple":
+        def printer(string, **args):
+            if isinstance(string, dict):
+                try:
+                    string = rtoml.dumps(string)
+                except Exception:
+                    string = json.dumps(string)
+            if isinstance(string, list):
+                string = ",".join(string)
+            string = str(string)
+            log.info(string)
+            tqdm.write(col_prpl + string + col_rst, **args)
             return string
     return printer
 
@@ -163,14 +177,15 @@ last_log_content = None
 whi = coloured_log("white")
 yel = coloured_log("yellow")
 red = coloured_log("red")
+purp = coloured_log("purple")
 
 def trace(func):
     """simple wrapper to use as decorator to print when a function is used
     and for how long"""
     def wrapper(*args, **kwargs):
-        whi(f" => Entering {func}")
+        purp(f" => Entering {func}")
         t = time.time()
         result = func(*args, **kwargs)
-        whi(f" =>| Exiting {func} after {time.time() - t:.1f}s")
+        purp(f" =>| Exiting {func} after {time.time() - t:.1f}s")
         return result
     return wrapper
