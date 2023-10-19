@@ -110,13 +110,13 @@ def get_img_source(gallery, queue):
         queue.put(red(f"Error getting source: '{err}'"))
 
 
-@trace
+# @trace
 def reset_image():
     whi("Reset images.")
     return None
 
 
-@trace
+# @trace
 def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
     whi("Resetting all audio")
     return None, None, None, None, None
