@@ -405,6 +405,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
+    new_threads = []
     for path in splitteds[:sound_slots]:
         moved = doing_dir / path.name
         shutil.move(path, moved)
@@ -420,7 +421,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
 
         sounds_to_load.append(to_temp)
         if txt_whisp_prompt and txt_whisp_lang:
-            running_tasks["transcribing_audio"].append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
+            new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
@@ -431,7 +432,11 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang):
     while output[0] is None:
         output.append(output.pop(0))
 
-    gather_threads(running_tasks["transcribing_audio"], source="transcribing audio")
+    # wait for at least the first transcription to finish
+    if new_threads:
+        new_threads[0].join()
+        running_tasks["transcribing_audio"].extend(new_threads[1:])
+
     return output
 
 def gather_threads(threads, source="main"):
