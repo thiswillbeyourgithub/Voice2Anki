@@ -1,5 +1,6 @@
 import cv2
 import tiktoken
+from .logger import red, whi
 
 
 # string at the end of the prompt
@@ -34,7 +35,11 @@ def format_audio_component(audio):
     """to make the whole UI faster, preprocessing and postprocessing is disabled
     but this sometimes make the audio component output a dict instead of
     the audio path. This fixes it."""
-    if isinstance(audio, dict):
-        assert audio["is_file"], "unexpected dict instead of audio"
-        audio = audio["name"]
+    try:
+        if isinstance(audio, dict):
+            assert audio["is_file"], "unexpected dict instead of audio"
+            audio = audio["name"]
+    except Exception:
+        red(audio)
+        raise
     return audio

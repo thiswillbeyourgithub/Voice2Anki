@@ -232,7 +232,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
     # the last few transcript/answer pair is always saved in message_buffer
     # even if it will not be saved to memory.
     buffer_to_add = []
-    for i in len(message_buffer["question"]):
+    for i in range(len(message_buffer["question"])):
         if lev.ratio(
                 txt_audio.lower(),
                 message_buffer["question"][i].lower(),

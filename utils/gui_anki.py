@@ -153,13 +153,13 @@ with gr.Blocks(
                 fn=transcribe,
                 inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                 outputs=[txt_audio],
-                preprocess=False,
+                # preprocess=False,
                 postprocess=False,
                 ).then(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                     outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=to_anki,
@@ -174,14 +174,58 @@ with gr.Blocks(
                             txt_profile,
                             gallery,
                             ],
-                        preprocess=False,
+                        # preprocess=False,
                         postprocess=False,
                         )
                     )
-    aud_cache_event.append(audio_mp3_2.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n2, inputs=[txt_profile, audio_mp3_2], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_3.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n3, inputs=[txt_profile, audio_mp3_3], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_4.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n4, inputs=[txt_profile, audio_mp3_4], preprocess=False, postprocess=False, queue=True))
-    aud_cache_event.append(audio_mp3_5.stop_recording(fn=transcribe_cache_async, inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile], preprocess=False, postprocess=False, queue=True).then(fn=asv.n5, inputs=[txt_profile, audio_mp3_5], preprocess=False, postprocess=False, queue=True))
+    aud_cache_event.append(
+        audio_mp3_2.stop_recording(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            # preprocess=False,
+            postprocess=False,
+            queue=True).then(
+                fn=asv.n2,
+                inputs=[txt_profile, audio_mp3_2],
+                # preprocess=False,
+                postprocess=False,
+                queue=True))
+    aud_cache_event.append(
+        audio_mp3_3.stop_recording(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            # preprocess=False,
+            postprocess=False,
+            queue=True).then(
+                fn=asv.n3,
+                inputs=[txt_profile, audio_mp3_3],
+                # preprocess=False,
+                postprocess=False,
+                queue=True))
+    aud_cache_event.append(
+        audio_mp3_4.stop_recording(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            # preprocess=False,
+            postprocess=False,
+            queue=True).then(
+                fn=asv.n4,
+                inputs=[txt_profile, audio_mp3_4],
+                # preprocess=False,
+                postprocess=False,
+                queue=True))
+    aud_cache_event.append(
+        audio_mp3_5.stop_recording(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            # preprocess=False,
+            postprocess=False,
+            queue=True).then(
+                fn=asv.n5,
+                inputs=[txt_profile, audio_mp3_5],
+                # preprocess=False,
+                postprocess=False,
+                queue=True))
 
     audio_mp3_1.clear(cancels=aud_cache_event)
     audio_mp3_2.clear(cancels=aud_cache_event)
@@ -194,7 +238,7 @@ with gr.Blocks(
             cancels=aud_cache_event,
             inputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             )
 
@@ -202,38 +246,38 @@ with gr.Blocks(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             ).then(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                        preprocess=False,
+                        # preprocess=False,
                         postprocess=False,
                         )
     rollaudio2_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             ).then(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                        preprocess=False,
+                        # preprocess=False,
                         postprocess=False,
                         ).then(
                             fn=to_anki,
@@ -248,7 +292,7 @@ with gr.Blocks(
                                 txt_profile,
                                 gallery,
                                 ],
-                            preprocess=False,
+                            # preprocess=False,
                             postprocess=False,
                             )
 
@@ -278,13 +322,13 @@ with gr.Blocks(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                        preprocess=False,
+                        # preprocess=False,
                         postprocess=False,
                         ).then(
                             fn=to_anki,
@@ -299,7 +343,7 @@ with gr.Blocks(
                                 txt_profile,
                                 gallery,
                                 ],
-                            preprocess=False,
+                            # preprocess=False,
                             postprocess=False,
                             )
 
@@ -308,7 +352,7 @@ with gr.Blocks(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             )
 
@@ -332,7 +376,7 @@ with gr.Blocks(
                 txt_profile,
                 gallery,
                 ],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             )
 
@@ -341,13 +385,13 @@ with gr.Blocks(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                preprocess=False,
+                # preprocess=False,
                 postprocess=False,
                 ).then(
                     fn=to_anki,
@@ -362,7 +406,7 @@ with gr.Blocks(
                         txt_profile,
                         gallery,
                         ],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     )
 
@@ -371,13 +415,13 @@ with gr.Blocks(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                preprocess=False,
+                # preprocess=False,
                 postprocess=False,
                 ).then(
                     fn=to_anki,
@@ -392,7 +436,7 @@ with gr.Blocks(
                         txt_profile,
                         gallery,
                         ],
-                    preprocess=False,
+                    # preprocess=False,
                     postprocess=False,
                     )
 
@@ -406,6 +450,6 @@ with gr.Blocks(
                 txt_chatgpt_context,
                 sld_improve,
                 ],
-            preprocess=False,
+            # preprocess=False,
             postprocess=False,
             )
