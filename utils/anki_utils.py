@@ -158,8 +158,12 @@ def sync_anki():
     assert sync_output is None or sync_output == "None", (
         f"Error during sync?: '{sync_output}'")
     # time.sleep(1)  # wait for sync to finish, just in case
-    whi("Done syncing!")
 
+@trace
+def threaded_sync_anki()
+    # trigger anki sync
+    thread = threading.Thread(target=sync_anki)
+    thread.start()
 
 # load anki profile using ankipandas just to get the media folder
 try:

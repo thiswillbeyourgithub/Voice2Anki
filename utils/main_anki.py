@@ -17,7 +17,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from .anki_utils import add_to_anki, audio_to_anki, sync_anki
+from .anki_utils import add_to_anki, audio_to_anki
 from .misc import tokenize, transcript_template, backend_config, format_audio_component
 from .logger import red, whi, yel, store_to_db, trace
 from .memory import prompt_filter, load_prev_prompts
@@ -615,12 +615,6 @@ def to_anki(
         whi(f"* {cl}")
 
     results = [str(r) for r in results if str(r).isdigit()]
-
-    # trigger anki sync
-    thread = threading.Thread(target=sync_anki)
-    thread.start()
-    threads.append(thread)
-    whi("Synchronized anki\n")
 
     if not len(results) == len(clozes):
         red("Some flashcards were not added!"),

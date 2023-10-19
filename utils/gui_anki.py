@@ -4,6 +4,7 @@ import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
 from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio
+from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
@@ -98,6 +99,7 @@ with gr.Blocks(
     with gr.Row():
         with gr.Column(scale=9):
             with gr.Row():
+                sync_btn = gr.Button(value="Sync anki", variant="primary")
                 improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
                 sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
         with gr.Column(scale=1):
@@ -111,6 +113,7 @@ with gr.Blocks(
     # events
     # darkmode
     dark_mode_btn.click(fn=None, _js=darkmode_js)
+    sync_btn.click(fn=threaded_sync_anki, queue=True)
 
     # change profile and load previous data
     txt_profile.submit(
