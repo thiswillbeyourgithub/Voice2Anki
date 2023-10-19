@@ -135,7 +135,7 @@ def get_log():
         except OSError:
             f.seek(0)
         lastline = f.readline().decode().strip()
-        lastline = re.sub(log_regex, " >           ", lastline)
+        lastline = re.sub(log_regex, " >        ", lastline)[11:]
         if last_log_content and (lastline[23:] == latest_tail[23:] or "HTTP Request: POST" in lastline):
             return last_log_content
 
@@ -147,7 +147,7 @@ def get_log():
                 continue
             if not line:
                 continue
-            line = re.sub(log_regex, " >           ", line)
+            line = re.sub(log_regex, " >        ", line)[11:]
             logcontent.append(line)
     if not logcontent:
         return "Empty log"
