@@ -186,6 +186,7 @@ def trace(func):
     and for how long"""
     def wrapper(*args, **kwargs):
         global indent
+        indent += 2
         spacer = indent * ' '
         purp(f"{spacer}=> Entering {func}")
         t = time.time()
@@ -195,5 +196,6 @@ def trace(func):
             red(f"{spacer}=>| Exiting {func} after {tt:.1f}s")
         else:
             purp(f"{spacer}=>| Exiting {func} after {tt:.1f}s")
+        indent -= 2
         return result
     return wrapper
