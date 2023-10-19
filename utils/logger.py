@@ -1,3 +1,4 @@
+import time
 import sqlite3
 import zlib
 import re
@@ -162,3 +163,14 @@ last_log_content = None
 whi = coloured_log("white")
 yel = coloured_log("yellow")
 red = coloured_log("red")
+
+def trace(func):
+    """simple wrapper to use as decorator to print when a function is used
+    and for how long"""
+    def wrapper(*args, **kwargs):
+        whi(f" => Entering {func}")
+        t = time.time()
+        result = func(*args, **kwargs)
+        whi(f" =>| Exiting {func} after {time.time() - t:.1f}s")
+        return result
+    return wrapper

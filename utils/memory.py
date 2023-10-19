@@ -6,7 +6,7 @@ from textwrap import dedent
 import json
 import hashlib
 
-from .logger import whi, red, yel
+from .logger import whi, red, yel, trace
 from .misc import tokenize, transcript_template, backend_config
 
 global prev_prompts
@@ -54,6 +54,7 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
+@trace
 def check_prompts(prev_prompts):
     "checks validity of the previous prompts"
     whi("Checking prompt validity")
@@ -133,6 +134,7 @@ def stocha(n, temperature):
     return False
 
 
+@trace
 def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, favor_list=False):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
@@ -222,6 +224,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
     return output_pr
 
 
+@trace
 def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority):
     whi("Recursively improving")
     if not txt_audio:
@@ -272,6 +275,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
     whi(f"Recursively improved: {len(prev_prompts)} total examples")
 
 
+@trace
 def load_prev_prompts(profile):
     assert Path("profiles/").exists(), "profile directory not found"
     if Path(f"profiles/{backend}/{profile}/memories.json").exists():

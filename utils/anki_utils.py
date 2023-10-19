@@ -10,7 +10,7 @@ import json
 from scipy.io.wavfile import write
 from torchaudio import load, save
 
-from .logger import red, whi
+from .logger import red, whi, trace
 from .misc import format_audio_component
 
 try:
@@ -20,6 +20,7 @@ except:
         return cloze
 
 
+@trace
 def add_to_anki(
         body,
         source,
@@ -116,6 +117,7 @@ def _call_anki(action, **params):
     return response['result']
 
 
+@trace
 def audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
@@ -149,6 +151,7 @@ def audio_to_anki(audio_mp3, queue):
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
 
+@trace
 def sync_anki():
     "trigger anki synchronization"
     sync_output = _call_anki(action="sync")

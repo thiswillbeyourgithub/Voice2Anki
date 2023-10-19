@@ -19,7 +19,7 @@ from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
 from .misc import tokenize, transcript_template, backend_config, format_audio_component
-from .logger import red, whi, yel, store_to_db
+from .logger import red, whi, yel, store_to_db, trace
 from .memory import prompt_filter, load_prev_prompts
 from .media import sound_preprocessing, get_img_source
 from .profiles import ValueStorage
@@ -73,6 +73,7 @@ sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
 
+@trace
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
         audio_path,
@@ -106,6 +107,7 @@ def whisper_cached(
     except Exception as err:
         return red(f"Error when cache transcribing audio: '{err}'")
 
+@trace
 def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
@@ -140,6 +142,7 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     return None
 
 
+@trace
 def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     thread = threading.Thread(
             target=transcribe_cache,
@@ -149,6 +152,7 @@ def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_prof
     return thread
 
 
+@trace
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
@@ -211,6 +215,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         return red(f"Error when transcribing audio: '{err}'")
 
 
+@trace
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode="one"):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
@@ -380,6 +385,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, mode
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
 
 
+@trace
 def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, txt_profile):
     """
     load the audio file that were splitted previously one by one in the
@@ -450,6 +456,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
 
     return output
 
+@trace
 def gather_threads(threads, source="main"):
     n = len([t for t in threads if t.is_alive()])
     while n:
@@ -458,6 +465,7 @@ def gather_threads(threads, source="main"):
         yel(f"Waiting for {n} threads to finish in {source}")
 
 
+@trace
 def to_anki(
         audio_mp3_1,
         txt_audio,

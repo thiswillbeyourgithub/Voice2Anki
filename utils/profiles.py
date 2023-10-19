@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import cv2
 
-from .logger import whi, red
+from .logger import whi, red, trace
 from .misc import rgb_to_bgr, backend_config
 
 approved_keys_all = [
@@ -33,6 +33,7 @@ anki_path.mkdir(exist_ok=True)
 md_path.mkdir(exist_ok=True)
 
 class ValueStorage:
+    @trace
     def __init__(self, profile="default"):
         assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
             "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
@@ -156,6 +157,7 @@ class ValueStorage:
                 raise Exception(f"Error when setting {kf}: '{err}'")
 
 
+@trace
 def get_profiles():
     profiles = [str(p.name) for p in profile_path.iterdir()]
     if backend_config.backend == "anki":
@@ -166,6 +168,7 @@ def get_profiles():
     return profiles
 
 
+@trace
 def switch_profile(profile):
     if profile is None or profile.strip() == "" or "/" in profile or not profile.replace("_", "").replace("-", "").isalpha():
         red("Invalid profile name, must be alphanumeric (although it can include _ and -)")
@@ -234,14 +237,20 @@ def switch_profile(profile):
                 profile,
                 ]
 
+
+@trace
 def save_tags(txt_profile, txt_tags):
     if txt_tags:
         ValueStorage(txt_profile)["txt_tags"] = txt_tags
 
+
+@trace
 def save_deck(txt_profile, txt_deck):
     if txt_deck:
         ValueStorage(txt_profile)["txt_deck"] = txt_deck
 
+
+@trace
 def save_path(txt_profile, txt_mdpath):
     if txt_mdpath:
         ValueStorage(txt_profile)["txt_mdpath"] = txt_mdpath

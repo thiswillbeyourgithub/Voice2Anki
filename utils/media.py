@@ -8,13 +8,14 @@ import pyclip
 import hashlib
 import torchaudio
 
-from .logger import whi, red
+from .logger import whi, red, trace
 from .anki_utils import anki_media
 from .ocr import get_text
 from .profiles import ValueStorage
 from .misc import rgb_to_bgr
 
 
+@trace
 def get_image(gallery):
     whi("Getting image from clipboard")
     try:
@@ -54,6 +55,7 @@ def get_image(gallery):
         return None
 
 
+@trace
 def check_source(source):
     "makes sure the source is only an img"
     whi("Checking source")
@@ -70,6 +72,7 @@ def check_source(source):
     return source
 
 
+@trace
 def get_img_source(gallery, queue):
     whi("Getting source from image")
     try:
@@ -107,11 +110,13 @@ def get_img_source(gallery, queue):
         queue.put(red(f"Error getting source: '{err}'"))
 
 
+@trace
 def reset_image():
     whi("Reset images.")
     return None
 
 
+@trace
 def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
     whi("Resetting all audio")
     return None, None, None, None, None
@@ -119,9 +124,11 @@ def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5)
 
 
 class audio_saver:
+    @trace
     def __init__(self, txt_profile):
         self.pv = ValueStorage(txt_profile)
 
+    @trace
     def roll_audio(
             self,
             txt_profile,
@@ -131,7 +138,6 @@ class audio_saver:
             audio_mp3_4,
             audio_mp3_5):
         t = time.time()
-        whi("Rolling over audio samples")
 
         # if 2-5 are None, keep the 1
         if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
@@ -151,10 +157,10 @@ class audio_saver:
         self.pv["audio_mp3_3"] = audio_mp3_3
         self.pv["audio_mp3_4"] = audio_mp3_4
         self.pv["audio_mp3_5"] = audio_mp3_5
-        whi(f"Done rolling (took {time.time()-t:.2f}s)")
         return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
 
 
+    @trace
     def save_audio(self, txt_profile, audio_mp3_n, n):
         if self.pv.profile_name != txt_profile:
             self.pv = ValueStorage(txt_profile)
@@ -165,22 +171,28 @@ class audio_saver:
             return
         self.pv[f"audio_mp3_{n}"] = audio_mp3_n
 
+    @trace
     def n1(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=1)
 
+    @trace
     def n2(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=2)
 
+    @trace
     def n3(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=3)
 
+    @trace
     def n4(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=4)
 
+    @trace
     def n5(self, txt_profile, audio_mp3):
         return self.save_audio(txt_profile, audio_mp3, n=5)
 
 
+@trace
 def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi("Cleaning sound with torchaudio")

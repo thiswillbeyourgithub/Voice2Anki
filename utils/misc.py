@@ -1,6 +1,6 @@
 import cv2
 import tiktoken
-from .logger import red, whi
+from .logger import red, whi, trace
 
 
 # string at the end of the prompt
@@ -18,6 +18,7 @@ Context: 'CONTEXT'
 Transcript: 'TRANSCRIPT'
 """.strip()
 
+@trace
 def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
@@ -31,6 +32,7 @@ class backend_config_class:
 global backend_config
 backend_config = backend_config_class()
 
+@trace
 def format_audio_component(audio):
     """to make the whole UI faster, preprocessing and postprocessing is disabled
     but this sometimes make the audio component output a dict instead of
