@@ -92,7 +92,7 @@ with gr.Blocks(
         anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
 
     with gr.Row():
-        12_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
         auto_btn = gr.Button(value="1+2+3. 123pilot", variant="primary")
 
     with gr.Row():
@@ -251,7 +251,6 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             )
-                        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -264,7 +263,8 @@ with gr.Blocks(
                 audio_mp3_3,
                 audio_mp3_4,
                 audio_mp3_5,
-                txt_whisp_prompt, txt_whisp_lang
+                txt_whisp_prompt,
+                txt_whisp_lang,
                 txt_profile,
                 ],
             outputs=[
@@ -302,7 +302,6 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             )
-                        )
 
     # send to whisper
     transcript_btn.click(
@@ -338,7 +337,7 @@ with gr.Blocks(
             )
 
     # 1+2
-    12_btn.click(
+    semiauto_btn.click(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
@@ -368,7 +367,7 @@ with gr.Blocks(
                     )
 
     # 1+2+3
-    123_btn.click(
+    auto_btn.click(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
@@ -396,7 +395,6 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     )
-                )
 
     improve_btn.click(
             fn=recur_improv,
