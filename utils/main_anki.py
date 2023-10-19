@@ -73,7 +73,6 @@ sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
 
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
 
-@trace
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
         audio_path,
