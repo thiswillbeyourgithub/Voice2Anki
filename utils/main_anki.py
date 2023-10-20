@@ -466,6 +466,7 @@ def gather_threads(threads, source="to_anki"):
             yel(f"Waiting for {n} threads to finish from {source}")
         time.sleep(0.1)
 
+@trace
 def wait_for_queue(q, source, t=1):
     "source : https://stackoverflow.com/questions/19206130/does-queue-get-block-main"
     start = time.time()
