@@ -188,14 +188,14 @@ def trace(func):
         global indent
         indent += 2
         spacer = indent * ' '
-        purp(f"{spacer}=> Entering {func}")
+        purp(f"{spacer}-> Entering {func}")
         t = time.time()
         result = func(*args, **kwargs)
         tt = time.time() - t
         if tt > 0.5:
-            red(f"{spacer}=>| Exiting {func} after {tt:.1f}s")
+            red(f"{spacer}   Exiting {func} after {tt:.1f}s")
         else:
-            purp(f"{spacer}=>| Exiting {func} after {tt:.1f}s")
+            purp(f"{spacer}   Exiting {func} after {tt:.1f}s")
         indent -= 2
         return result
     return wrapper
