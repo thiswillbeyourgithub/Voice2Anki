@@ -187,54 +187,54 @@ with gr.Blocks(
             inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             preprocess=False,
             postprocess=False,
-            queue=True).then(
+            queue=False).then(
                 fn=asv.n2,
                 inputs=[txt_profile, audio_mp3_2],
                 # preprocess=False,
                 postprocess=False,
-                queue=True))
+                queue=False))
     aud_cache_event.append(
         audio_mp3_3.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             preprocess=False,
             postprocess=False,
-            queue=True).then(
+            queue=False).then(
                 fn=asv.n3,
                 inputs=[txt_profile, audio_mp3_3],
                 # preprocess=False,
                 postprocess=False,
-                queue=True))
+                queue=False))
     aud_cache_event.append(
         audio_mp3_4.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             preprocess=False,
             postprocess=False,
-            queue=True).then(
+            queue=False).then(
                 fn=asv.n4,
                 inputs=[txt_profile, audio_mp3_4],
                 # preprocess=False,
                 postprocess=False,
-                queue=True))
+                queue=False))
     aud_cache_event.append(
         audio_mp3_5.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             preprocess=False,
             postprocess=False,
-            queue=True).then(
+            queue=False).then(
                 fn=asv.n5,
                 inputs=[txt_profile, audio_mp3_5],
                 # preprocess=False,
                 postprocess=False,
-                queue=True))
+                queue=False))
 
-    audio_mp3_1.clear(cancels=aud_cache_event)
-    audio_mp3_2.clear(cancels=aud_cache_event)
-    audio_mp3_3.clear(cancels=aud_cache_event)
-    audio_mp3_4.clear(cancels=aud_cache_event)
-    audio_mp3_5.clear(cancels=aud_cache_event)
+    # audio_mp3_1.clear(cancels=aud_cache_event)
+    # audio_mp3_2.clear(cancels=aud_cache_event)
+    # audio_mp3_3.clear(cancels=aud_cache_event)
+    # audio_mp3_4.clear(cancels=aud_cache_event)
+    # audio_mp3_5.clear(cancels=aud_cache_event)
 
     rst_audio_btn.click(
             fn=reset_audio,
