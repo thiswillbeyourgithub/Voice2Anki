@@ -156,7 +156,7 @@ with gr.Blocks(
                 fn=transcribe,
                 inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                 outputs=[txt_audio],
-                # preprocess=False,
+                preprocess=False,
                 postprocess=False,
                 ).then(
                     fn=alfred,
@@ -185,7 +185,7 @@ with gr.Blocks(
         audio_mp3_2.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             queue=True).then(
                 fn=asv.n2,
@@ -197,7 +197,7 @@ with gr.Blocks(
         audio_mp3_3.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             queue=True).then(
                 fn=asv.n3,
@@ -209,7 +209,7 @@ with gr.Blocks(
         audio_mp3_4.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             queue=True).then(
                 fn=asv.n4,
@@ -221,7 +221,7 @@ with gr.Blocks(
         audio_mp3_5.stop_recording(
             fn=transcribe_cache_async,
             inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            # preprocess=False,
+            preprocess=False,
             postprocess=False,
             queue=True).then(
                 fn=asv.n5,
@@ -255,7 +255,7 @@ with gr.Blocks(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
-                    # preprocess=False,
+                    preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=alfred,
@@ -274,7 +274,7 @@ with gr.Blocks(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
-                    # preprocess=False,
+                    preprocess=False,
                     postprocess=False,
                     ).then(
                         fn=alfred,
