@@ -466,6 +466,24 @@ def gather_threads(threads, source="to_anki"):
             yel(f"Waiting for {n} threads to finish from {source}")
         time.sleep(0.1)
 
+def wait_for_queue(q, source, t=1):
+    "source : https://stackoverflow.com/questions/19206130/does-queue-get-block-main"
+    start = time.time()
+    while True:
+        # try:
+        #     data = q.get(False)
+        #     # If `False`, the program is not blocked. `Queue.Empty` is thrown if
+        #     # the queue is empty
+        # except queue.Queue.Empty:
+        #     data = None
+
+        try:
+            data = q.get(True, t)
+            # Waits for X seconds, otherwise throws `Queue.Empty`
+        except queue.Queue.Empty:
+            red(f"Waiting for {source} queue to output (for {start - time.time():.1f}s)")
+            data = None
+    return data
 
 @trace
 def to_anki(
@@ -580,14 +598,14 @@ def to_anki(
     whi("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = audio_to_anki_queue.get()
+    audio_html = wait_for_queue(audio_to_anki_queue, "audio_to_anki")
     if "Error" in audio_html:  # then out is an error message and not the source
         gather_threads(threads)
         return
 
     # gather text from the source image(s)
     if not txt_source:
-        txt_source = txt_source_queue.get() + audio_html
+        txt_source = wait_for_queue(txt_source_queue, "txt_source") + audio_html
     else:
         txt_source += audio_html
 
