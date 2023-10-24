@@ -57,7 +57,8 @@ class AudioSplitter:
         self.to_split = self.gather_todos()
 
         for file in tqdm(self.to_split, unit="file"):
-            self.split_one_file(file)
+            transcript = self.run_whisperx(file)
+            self.split_one_transcript(transcript, file)
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.rglob("*.mp3")]
@@ -68,8 +69,7 @@ class AudioSplitter:
 
         return to_split
 
-    def split_one_file(self, file_path):
-        transcript = self.run_whisperx(file_path)
+    def split_one_transcript(self, transcript, file_path):
 
         # find where stop is pronounced
         duration = transcript["segments"][-1]["end"]
