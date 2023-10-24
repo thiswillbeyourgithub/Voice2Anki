@@ -479,10 +479,11 @@ def wait_for_queue(q, source, t=1):
         #     data = None
 
         try:
-            data = q.get(True, t)
             # Waits for X seconds, otherwise throws `Queue.Empty`
-        except queue.Queue.Empty:
-            red(f"Waiting for {source} queue to output (for {start - time.time():.1f}s)")
+            data = q.get(True, t)
+            break
+        except queue.Empty:
+            red(f"Waiting for {source} queue to output (for {time.time()-start:.1f}s)")
             data = None
     return data
 
