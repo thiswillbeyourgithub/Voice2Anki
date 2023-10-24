@@ -59,7 +59,48 @@ class AudioSplitter:
         for file in tqdm(self.to_split, unit="file"):
             whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
-            self.split_one_transcript(transcript, file)
+            times_to_keep, text_segments = self.split_one_transcript(transcript)
+
+            if len(times_to_keep) == 1:
+                whi(f"Stopping there for {file} as there is no cutting to do")
+                shutil.move(file, self.sp_dir / f"{file.name}_too_small.mp3")
+                return
+
+            failed_test = False
+            for i, (t0, t1) in enumerate(times_to_keep):
+                dur = t1 - t0
+                if dur > 45:
+                    failed_test = True
+                    red(f"Found audio with too long duration: {dur}s.")
+                    red(f"Text content: {text_segments[i]}\n")
+            if failed_test:
+                raise Exception("Some audios were suspiciously long. Exiting.")
+
+            audio = AudioSegment.from_mp3(file)
+
+            for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
+                sliced = audio[start_cut*1000:end_cut*1000]
+                out_file = self.sp_dir / f"{int(time.time())}_{today}_{file.name}_{i+1:03d}.mp3"
+                assert not out_file.exists(), f"file {out_file} already exists!"
+                if self.remove_silence:
+                    sliced = self.trim_silences(sliced)
+                if len(sliced) < 1000:
+                    red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
+                    continue
+                sliced.export(out_file, format="mp3")
+                whi(f"Saved sliced to {out_file}")
+
+                # TODO fix metadata setting
+                # for each file, keep the relevant transcript
+                # whi(f"Setting metadata for {out_file}")
+                # with exiftool.ExifToolHelper() as et:
+                #     et.execute(b"-whisperx_transcript='" + bytes(text_segments[i].replace(" ", "\ ")) + b"'", str(out_file))
+                #     et.execute(b"-transcription_date=" + bytes(int(time.time())), str(out_file))
+                #     et.execute(b"-chunk_i=" + bytes(i), str(out_file))
+                #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
+
+            whi(f"Moving {file} to {self.done_dir} dir")
+            shutil.move(file, self.done_dir / file.name)
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.rglob("*.mp3")]
@@ -70,7 +111,7 @@ class AudioSplitter:
 
         return to_split
 
-    def split_one_transcript(self, transcript, file_path):
+    def split_one_transcript(self, transcript):
         duration = transcript["segments"][-1]["end"]
         whi(f"Duration: {duration}")
         # note: duration is not the total recording duration but rather the
@@ -110,7 +151,7 @@ class AudioSplitter:
                     times_to_keep[-1][1] = duration
 
         n = len(text_segments)
-        whi(f"Found {n} audio segments in {file_path}")
+        whi(f"Found {n} audio segments")
 
         # remove too short
         for i, (start, end) in enumerate(times_to_keep):
@@ -123,7 +164,7 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments when removing <1s in {file_path}")
+        whi(f"Kept {n} audio segments when removing <1s")
 
         # remove almost no words
         for i, te in enumerate(text_segments):
@@ -133,7 +174,7 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments with > 4 words {file_path}")
+        whi(f"Kept {n} audio segments with > 4 words")
 
         text_segments = [t.strip() for t in text_segments]
 
@@ -143,46 +184,7 @@ class AudioSplitter:
 
         assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
-        if len(times_to_keep) == 1:
-            whi(f"Stopping there for {file_path} as there is no cutting to do")
-            shutil.move(file_path, self.sp_dir / f"{file_path.name}_too_small.mp3")
-            return
-
-        failed_test = False
-        for i, (t0, t1) in enumerate(times_to_keep):
-            dur = t1 - t0
-            if dur > 45:
-                failed_test = True
-                red(f"Found audio with too long duration: {dur}s.")
-                red(f"Text content: {text_segments[i]}\n")
-        if failed_test:
-            raise Exception("Some audios were suspiciously long. Exiting.")
-
-        audio = AudioSegment.from_mp3(file_path)
-
-        for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
-            sliced = audio[start_cut*1000:end_cut*1000]
-            out_file = self.sp_dir / f"{int(time.time())}_{today}_{file_path.name}_{i+1:03d}.mp3"
-            assert not out_file.exists(), f"file {out_file} already exists!"
-            if self.remove_silence:
-                sliced = self.trim_silences(sliced)
-            if len(sliced) < 1000:
-                red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
-                continue
-            sliced.export(out_file, format="mp3")
-            whi(f"Saved sliced to {out_file}")
-
-            # TODO fix metadata setting
-            # for each file, keep the relevant transcript
-            # whi(f"Setting metadata for {out_file}")
-            # with exiftool.ExifToolHelper() as et:
-            #     et.execute(b"-whisperx_transcript='" + bytes(text_segments[i].replace(" ", "\ ")) + b"'", str(out_file))
-            #     et.execute(b"-transcription_date=" + bytes(int(time.time())), str(out_file))
-            #     et.execute(b"-chunk_i=" + bytes(i), str(out_file))
-            #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
-
-        whi(f"Moving {file_path} to {self.done_dir} dir")
-        shutil.move(file_path, self.done_dir / file_path.name)
+        return times_to_keep, text_segments
 
     def run_whisperx(self, audio_path):
         whi(f"Running whisperx on {audio_path}")
