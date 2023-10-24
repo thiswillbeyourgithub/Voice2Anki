@@ -334,18 +334,21 @@ with gr.Blocks(
                 audio_mp3_4,
                 audio_mp3_5,
                 ],
+            queue=True,
             ).then(
                     fn=transcribe,
                     inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
                     # preprocess=False,
                     postprocess=False,
+                    queue=True,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         # preprocess=False,
                         postprocess=False,
+                        queue=True,
                         ).then(
                             fn=to_anki,
                             inputs=[
@@ -361,6 +364,7 @@ with gr.Blocks(
                                 ],
                             # preprocess=False,
                             postprocess=False,
+                            queue=True,
                             )
 
     # send to whisper
@@ -370,13 +374,16 @@ with gr.Blocks(
             outputs=[txt_audio],
             # preprocess=False,
             postprocess=False,
+            queue=True,
             )
 
     # send to chatgpt
     chatgpt_btn.click(
             fn=alfred,
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
-            outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost])
+            outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+            queue=True,
+            )
 
     # send to anki
     anki_btn.click(
@@ -394,6 +401,7 @@ with gr.Blocks(
                 ],
             # preprocess=False,
             postprocess=False,
+            queue=True,
             )
 
     # 1+2
@@ -403,12 +411,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             # preprocess=False,
             postprocess=False,
+            queue=True,
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 # preprocess=False,
                 postprocess=False,
+                queue=True,
                 ).then(
                     fn=to_anki,
                     inputs=[
@@ -424,6 +434,7 @@ with gr.Blocks(
                         ],
                     # preprocess=False,
                     postprocess=False,
+                    queue=True,
                     )
 
     # 1+2+3
@@ -433,12 +444,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             # preprocess=False,
             postprocess=False,
+            queue=True,
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 # preprocess=False,
                 postprocess=False,
+                queue=True,
                 ).then(
                     fn=to_anki,
                     inputs=[
@@ -454,6 +467,7 @@ with gr.Blocks(
                         ],
                     # preprocess=False,
                     postprocess=False,
+                    queue=True,
                     )
 
     improve_btn.click(
@@ -468,4 +482,5 @@ with gr.Blocks(
                 ],
             # preprocess=False,
             postprocess=False,
+            queue=True,
             )
