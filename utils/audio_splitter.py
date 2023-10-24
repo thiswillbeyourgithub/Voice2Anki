@@ -57,6 +57,7 @@ class AudioSplitter:
         self.to_split = self.gather_todos()
 
         for file in tqdm(self.to_split, unit="file"):
+            whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
             self.split_one_transcript(transcript, file)
 
@@ -70,15 +71,13 @@ class AudioSplitter:
         return to_split
 
     def split_one_transcript(self, transcript, file_path):
-
-        # find where stop is pronounced
         duration = transcript["segments"][-1]["end"]
-        whi(f"Duration of {file_path}: {duration}")
+        whi(f"Duration: {duration}")
         # note: duration is not the total recording duration but rather the
         # time of the end of the last pronounced word
 
         full_text = transcript["transcription"]
-        whi(f"Full text of {file_path}:\n'''\n{full_text}\n'''")
+        whi(f"Full text:\n'''\n{full_text}\n'''")
 
         # verbose_json
         text_segments = [""]
