@@ -88,11 +88,11 @@ class AudioSplitter:
             ed = segment["end"]
             text = segment["text"]
 
-            # if not [re.search(stop, text) for stop in self.stop_list]:
-            #     # not stopping
-            #     text_segments[-1] += f" {text}"
-            #     times_to_keep[-1][1] = ed
-            #     continue
+            if not [re.search(stop, text) for stop in self.stop_list]:
+                # not stopping
+                text_segments[-1] += f" {text}"
+                times_to_keep[-1][1] = ed
+                continue
 
             for w in segment["words"]:
                 word = w["word"]
