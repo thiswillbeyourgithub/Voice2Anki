@@ -1,3 +1,6 @@
+import soundfile as sf
+import tempfile
+import pyrubberband as pyrb
 from datetime import datetime
 import replicate
 import shutil
@@ -66,17 +69,50 @@ class AudioSplitter:
                 shutil.move(file, self.sp_dir / f"{file.name}_too_small.mp3")
                 return
 
-            failed_test = False
+            audio = AudioSegment.from_mp3(file)
+
+            alterations = {}
+            spf = 0.7  # speed factor
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 if dur > 45:
-                    failed_test = True
-                    red(f"Found audio with too long duration: {dur}s.")
+                    red(f"Audio #{i} has too long duration: {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
-            if failed_test:
-                raise Exception("Some audios were suspiciously long. Exiting.")
 
-            audio = AudioSegment.from_mp3(file)
+                    # take the suspicious segment, slow it down and
+                    # re analyse it
+                    sub_audio = audio[t0 * 1000:t1 * 1000]
+                    tempf = tempfile.NamedTemporaryFile(delete=False)
+                    whi(f"Saving segment to {tempf.name} as wav")
+                    # we need to use sf and pyrb because
+                    # pydub is buggingly slow to change the speedup
+                    sub_audio.export(tempf.name, format="wav")
+                    whi("Stretching time")
+                    y, sr = sf.read(tempf.name)
+                    y2 = pyrb.time_stretch(y, sr, spf)
+                    whi("Saving as wav")
+                    sf.write(tempf.name, y2, sr, format='wav')
+                    sub_audio = AudioSegment.from_wav(tempf.name)
+                    whi("Resaving as mp3")
+                    sub_audio.export(tempf.name, format="mp3")
+                    transcript = self.run_whisperx(tempf.name)
+                    sub_ttk, sub_ts = self.split_one_transcript(transcript)
+                    new_times = [ [t0 + k / spf, t0 + v / spf] for k, v in sub_ttk]
+                    alterations[i] = [new_times, sub_ts]
+                    # Path(tempf.name).unlink()
+
+            red(f"Found {len(alterations)} segments that needed slower analysis")
+            for i, vals in tqdm(alterations.items(), desc="Fixing previously long audio"):
+                new_times = vals[0]
+                sub_ts = vals[1]
+                times_to_keep[i:i+1] = new_times
+                text_segments[i:i+1] = sub_ts
+
+            for i, (t0, t1) in enumerate(times_to_keep):
+                dur = t1 - t0
+                if dur > 45:
+                    red(f"Audio #{i} has too long duration even after correction! {dur}s.")
+                    red(f"Text content: {text_segments[i]}\n")
 
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio[start_cut*1000:end_cut*1000]
@@ -180,7 +216,7 @@ class AudioSplitter:
 
         whi("Text segments found:")
         for i, t in enumerate(text_segments):
-            whi(f"* {i:03d}: {t}\n")
+            whi(f"* {i:03d}: {t}")
 
         assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
