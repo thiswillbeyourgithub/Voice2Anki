@@ -143,8 +143,9 @@ def audio_to_anki(audio_mp3, queue):
         audio_path = anki_media / f"Voice2FormattedText_{audio_hash}_{audio_file_name}.mp3"
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
-        shutil.copy2(audio_mp3, audio_path)
-        assert (audio_path).exists(), "audio file not found in anki media!"
+        else:
+            shutil.copy2(audio_mp3, audio_path)
+            assert (audio_path).exists(), "audio file not found in anki media!"
 
         html = f"</br>[sound:{audio_path.name}]"
         queue.put(html)
