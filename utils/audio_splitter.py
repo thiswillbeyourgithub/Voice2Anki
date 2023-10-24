@@ -108,11 +108,16 @@ class AudioSplitter:
                 times_to_keep[i:i+1] = new_times
                 text_segments[i:i+1] = sub_ts
 
+            prev_t0 = 0
+            prev_t1 = 0
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
+                assert t0 > prev_t0 and t1 >= prev_t1, "overlapping audio!"
                 if dur > 45:
                     red(f"Audio #{i} has too long duration even after correction! {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
+                prev_t0 = t0
+                prev_t1 = t1
 
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio[start_cut*1000:end_cut*1000]
