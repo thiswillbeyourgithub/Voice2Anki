@@ -129,7 +129,7 @@ class AudioSplitter:
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{file.name}_{i+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
                 if self.remove_silence:
-                    sliced = self.trim_silences(sliced)
+                    sliced = self.trim_silences(sliced, 20)
                 if len(sliced) < 1000:
                     red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                     continue
@@ -255,9 +255,8 @@ class AudioSplitter:
 
         return transcript
 
-    def trim_silences(self, audio):
+    def trim_silences(self, audio, db_threshold):
         whi(f"Audio length before trimming silence: {len(audio)}ms")
-        db_threshold = 20  # dB
         threshold = - 10 ** (db_threshold / 20)  # in dFBS
         trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
