@@ -1,3 +1,4 @@
+import gradio as gr
 import cv2
 import tiktoken
 from .logger import red, whi, trace
@@ -32,6 +33,7 @@ class backend_config_class:
 global backend_config
 backend_config = backend_config_class()
 
+btn = gr.Audio(source="microphone", type="filepath", label="dummy_audio", format="mp3", value=None, container=False)
 @trace
 def format_audio_component(audio):
     """to make the whole UI faster, preprocessing and postprocessing is disabled
@@ -39,8 +41,11 @@ def format_audio_component(audio):
     the audio path. This fixes it."""
     try:
         if isinstance(audio, dict):
-            assert audio["is_file"], "unexpected dict instead of audio"
-            audio = audio["name"]
+            if "is_file" in audio:
+                audio = audio["name"]
+            else:
+                red("Unexpected dict instead of audio")
+                audio = btn.preprocess(audio)
     except Exception:
         red(audio)
         raise
