@@ -450,7 +450,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
 
     # wait for at least the first transcription to finish
     if new_threads:
-        new_threads[0].join()
+        gather_threads([new_threads[0]], "Transcribing first file")
         running_tasks["transcribing_audio"].extend(new_threads[1:])
 
     return output
