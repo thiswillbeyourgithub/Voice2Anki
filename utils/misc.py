@@ -33,7 +33,8 @@ class backend_config_class:
 global backend_config
 backend_config = backend_config_class()
 
-btn = gr.Audio(source="microphone", type="filepath", label="dummy_audio", format="mp3", value=None, container=False)
+dummy_btn = gr.Audio(source="microphone", type="filepath", label="dummy_audio", format="mp3", value=None, container=False)
+
 @trace
 def format_audio_component(audio):
     """to make the whole UI faster, preprocessing and postprocessing is disabled
@@ -45,7 +46,7 @@ def format_audio_component(audio):
                 audio = audio["name"]
             else:
                 red("Unexpected dict instead of audio")
-                audio = btn.preprocess(audio)
+                audio = dummy_btn.preprocess(audio)
     except Exception:
         red(audio)
         raise
