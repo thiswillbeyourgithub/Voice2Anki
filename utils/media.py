@@ -117,7 +117,7 @@ def reset_image():
 
 
 # @trace
-def reset_audio(audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5):
+def reset_audio():
     whi("Resetting all audio")
     return None, None, None, None, None
 
