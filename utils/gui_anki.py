@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio, get_card_status
 from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
@@ -71,6 +71,7 @@ with gr.Blocks(
                         with gr.Row():
                             txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper")
                             txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT")
+                            txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True)
 
     with gr.Row():
         with gr.Column(scale=1):
@@ -109,6 +110,12 @@ with gr.Blocks(
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
+    txt_card_done.blur(
+            fn=get_card_status,
+            inputs=[txt_chatgpt_cloz],
+            outputs=[txt_card_done],
+            )
+
 
     # events
     # darkmode

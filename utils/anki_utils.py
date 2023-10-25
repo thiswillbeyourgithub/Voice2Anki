@@ -152,6 +152,14 @@ def audio_to_anki(audio_mp3, queue):
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
+def look_for_card(cloz):
+    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ")
+    print(cloz)
+    state = _call_anki(
+            action="findCards",
+            query=f"added:2 {cloz}"
+            )
+    return state
 
 @trace
 def sync_anki():

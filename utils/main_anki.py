@@ -17,7 +17,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from .anki_utils import add_to_anki, audio_to_anki
+from .anki_utils import add_to_anki, audio_to_anki, look_for_card
 from .misc import tokenize, transcript_template, backend_config, format_audio_component
 from .logger import red, whi, yel, store_to_db, trace
 from .memory import prompt_filter, load_prev_prompts
@@ -486,6 +486,18 @@ def wait_for_queue(q, source, t=1):
             red(f"Waiting for {source} queue to output (for {time.time()-start:.1f}s)")
             data = None
     return data
+
+
+@trace
+def get_card_status(txt_chatgpt_cloz):
+    """return True or False depending on if the card written in
+    txt_chatgpt_cloz is already in anki or not"""
+    state = look_for_card(txt_chatgpt_cloz)
+    if state:
+        return "Present"
+    else:
+        return "Absent"
+
 
 @trace
 def to_anki(
