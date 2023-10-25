@@ -122,7 +122,6 @@ def reset_audio():
     return None, None, None, None, None
 
 
-
 class audio_saver:
     @trace
     def __init__(self, txt_profile):
@@ -137,8 +136,6 @@ class audio_saver:
             audio_mp3_3,
             audio_mp3_4,
             audio_mp3_5):
-        t = time.time()
-
         # if 2-5 are None, keep the 1
         if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
             return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
@@ -158,7 +155,6 @@ class audio_saver:
         self.pv["audio_mp3_4"] = audio_mp3_4
         self.pv["audio_mp3_5"] = audio_mp3_5
         return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
-
 
     @trace
     def save_audio(self, txt_profile, audio_mp3_n, n):
