@@ -33,21 +33,31 @@ class backend_config_class:
 global backend_config
 backend_config = backend_config_class()
 
-dummy_btn = gr.Audio(source="microphone", type="filepath", label="dummy_audio", format="mp3", value=None, container=False)
+# create dummy button to use the preprocessing code if needed
+dummy_btn = gr.Audio(
+        source="microphone",
+        type="filepath",
+        label="dummy_audio",
+        format="mp3",
+        value=None,
+        container=False)
 
 @trace
 def format_audio_component(audio):
-    """to make the whole UI faster, preprocessing and postprocessing is disabled
-    but this sometimes make the audio component output a dict instead of
-    the audio path. This fixes it."""
-    try:
-        if isinstance(audio, dict):
-            if "is_file" in audio:
-                audio = audio["name"]
-            else:
-                red("Unexpected dict instead of audio")
-                audio = dummy_btn.preprocess(audio)
-    except Exception:
-        red(audio)
-        raise
+    """to make the whole UI faster and avoid sending multiple slightly
+    differently processed audio to whisper: preprocessing and postprocessing
+    are disabled but this sometimes make the audio component output a dict
+    instead of the mp3 audio path. This fixes it while still keeping the cache
+    working."""
+    if isinstance(audio, dict):
+        if "is_file" in audio:
+            audio = audio["name"]
+        else:
+            new_audio = dummy_btn.preprocess(audio)
+            red(f"Unexpected dict instead of audio for '{audio['name']}' -> '{new_audio}'")
+            audio = new_audio
+    elif isinstance(audio, str):
+        whi(f"Not audio formating needed for '{audio}'")
+    else:
+        raise ValueError(red(f"Unexpected audio format: {audio}"))
     return audio
