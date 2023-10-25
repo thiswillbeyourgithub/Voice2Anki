@@ -56,22 +56,22 @@ with gr.Blocks(
                 gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[2], rows=[1], object_fit="scale-down", height="auto", container=False)
                 rst_img_btn = gr.Button(value="Clear then add", variant="secondary", size="sm")
                 img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
-            with gr.Column(scale=2):
+            with gr.Column(scale=3):
                 with gr.Row():
                     with gr.Column(scale=10):
-                        txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
+                        txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
                     with gr.Column(scale=1):
                          dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
-                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
-                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
+                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
                 with gr.Row():
                     with gr.Column(scale=1, min_width=50):
-                        txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
+                        txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
                     with gr.Column(scale=5):
                         with gr.Row():
-                            txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper")
-                            txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT")
-                            txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True)
+                            txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper", container=False)
+                            txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT", container=False)
+                            txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
                 with gr.Row():
                     rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
                     rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
