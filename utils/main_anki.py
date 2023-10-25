@@ -83,7 +83,7 @@ def whisper_cached(
     """this is a call to openai's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
-    red(f"Calling whisper instead of using cache for {audio_path}")
+    red(f"Calling whisper because not in cache: {audio_path}")
     assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
     try:
         cnt = 0
@@ -173,7 +173,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
     try:
-        whi(f"Asking Whisper for {audio_mp3_1}")
+        whi(f"Asking Cached Whisper for {audio_mp3_1}")
         transcript = whisper_cached(
                 audio_mp3_1,
                 audio_hash,
