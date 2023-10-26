@@ -119,23 +119,45 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def stocha(n, temperature):
-    """if temperature of LLM is set high enough, some example filters
-    will be randomly discarder to increase randomness. But only after
-    the first few prompts were added"""
-    if temperature == 0 or n <= 5:
-        return True
-    threshold = min(temperature / 3, 0.33)
-    if random.random() >= threshold:
-        # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
-        # no worse if temperature is higher than 1
-        return True
-    # whi(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
-    return False
+def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig):
+    """apply a list of criteria to keep the most relevant previous memories
+    in the prompt"""
+    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+        return False
 
+    if not favor_list:  # the txt_audio does not ask for a list
+        if " list" in pr["content"].lower():
+            # exclude list cards if not asking for a list
+            return False
+
+        # stochastic check
+        # if temperature of LLM is set high enough, some example filters
+        # will be randomly discarder to increase randomness. But only after
+        # the first few prompts were added
+        threshold = min(temperature / 3, 0.33)
+        if (temperature == 0 or n <= 5) or (random.random() >= threshold):
+            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
+            # no worse if temperature is higher than 1
+
+            # length check
+            if abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
+                # whi(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                return True
+            else:
+                # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+                return False
+        else:
+            # whi(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
+            return False
+
+    else:  # if favoring lists, don't use stochastic check
+        if "list" in pr["content"].lower():
+            return True
+        else:
+            return False
 
 @trace
-def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, favor_list=False):
+def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, favor_list):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -148,40 +170,10 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
 
-    if new_prompt_len:
-        # get average and spread of tkns lengths:
-        lens = [p["tkn_len_in"] for p in prev_prompts]
-        llens = np.log(lens)
-        sig = np.std(llens)
-
-        def len_check(pr):
-            if abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
-                # whi(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-                return True
-            else:
-                # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-                return False
-    else:
-        def len_check(pr):
-            return True
-
-    def _filter_out(pr, tkns, output_pr):
-        if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
-            return False
-
-        if not favor_list:  # the txt_audio does not ask for a list
-            if " list" in pr["content"].lower():
-                # exclude list cards if not asking for a list
-                return False
-            elif stocha(len(output_pr), temperature) and len_check(pr):  # stochastic
-                return True
-            else:
-                return False
-        else:  # if favoring lists, don't use stochasticity
-            if "list" in pr["content"].lower():
-                return True
-            else:
-                return False
+    # get average and spread of tkns lengths to keep only the most similar
+    lens = [p["tkn_len_in"] for p in prev_prompts]
+    llens = np.log(lens)
+    sig = np.std(llens)
 
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
@@ -200,7 +192,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len=None, fav
                 continue
             if pr["priority"] == prio:
                 category_size += 1
-                if _filter_out(pr, tkns, output_pr):
+                if filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig):
                     tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
                     output_pr.append(pr)
                 else:
