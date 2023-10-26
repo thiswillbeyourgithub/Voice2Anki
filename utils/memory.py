@@ -108,7 +108,7 @@ def check_prompts(prev_prompts):
         # keep only the expected keys
         keys = [k for k in mess.keys() if k in expected_mess_keys]
         for k in prev_prompts[i]:
-            if k not in prev_prompts[i]:
+            if k not in keys:
                 del prev_prompts[i][k]
 
         # make sure it's stripped
