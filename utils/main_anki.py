@@ -237,6 +237,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, chec
     # even if it will not be saved to memory.
     buffer_to_add = []
     if check_buffer:
+        whi(f"Length of message_buffer: {len(message_buffer['answer']}")
         for i in range(len(message_buffer["question"])):
             if lev.ratio(
                     txt_audio.lower(),
