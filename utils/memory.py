@@ -5,6 +5,8 @@ from pathlib import Path
 from textwrap import dedent
 import json
 import hashlib
+from joblib import Memory
+from sentence_transformers import SentenceTransformer, util
 
 from .logger import whi, red, yel, trace
 from .misc import tokenize, transcript_template, backend_config
@@ -50,6 +52,15 @@ else:
     raise Exception(backend_config.backend)
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
+
+embeddings_cache = Memory(".cache/memory_embeddings", verbose=0)
+embed_model = SentenceTransformer("average_word_embeddings_glove.6B.300d")
+
+
+@trace
+@embeddings_cache.cache
+def embedder(*args, **kwargs):
+    return embed_model.encode(*args, **kwargs)
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
@@ -119,7 +130,7 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig):
+def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig, dist_check):
     """apply a list of criteria to keep the most relevant previous memories
     in the prompt"""
     if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
@@ -128,6 +139,10 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
     if not favor_list:  # the txt_audio does not ask for a list
         if " list" in pr["content"].lower():
             # exclude list cards if not asking for a list
+            return False
+
+        if dist_check == 0:
+            # ignored because is in the cards with the lowest similarity
             return False
 
         # stochastic check
@@ -157,7 +172,7 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
             return False
 
 @trace
-def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, favor_list):
+def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, favor_list):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -179,6 +194,16 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, favor_li
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
     assert len(syspr) == 1, "Number of system prompts != 1"
 
+    whi("Computing embeddings")
+    embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
+
+    whi("Computing cosine distance")
+    distances = [util.cos_sim(new_prompt_vec, e) for e in embeddings]
+
+    percentile = np.percentile(distances, 25)
+    dist_check = [1 if d >= percentile else 0 for d in distances]
+    assert len(dist_check) == len(timesorted_pr), "unexpected length"
+
     # add by decreasing priority and timestamp
     prio_vals = sorted(set([x["priority"] for x in prev_prompts if int(x["priority"]) != -1]), reverse=True)
     tkns = syspr[0]["tkn_len_in"]
@@ -187,12 +212,22 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, favor_li
     category_count = 0
     for prio in prio_vals:
         category_size = 0
-        for pr in timesorted_pr:
+        for pr_idx, pr in enumerate(timesorted_pr):
             if pr in output_pr:
                 continue
             if pr["priority"] == prio:
                 category_size += 1
-                if filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig):
+                if filter_out(
+                        pr,
+                        tkns,
+                        output_pr,
+                        max_token,
+                        temperature,
+                        favor_list,
+                        new_prompt_len,
+                        sig,
+                        dist_check[pr_idx],
+                        ):
                     tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
                     output_pr.append(pr)
                 else:

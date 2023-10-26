@@ -20,7 +20,7 @@ from pathlib import Path
 from .anki_utils import add_to_anki, audio_to_anki, look_for_card
 from .misc import tokenize, transcript_template, backend_config, format_audio_component
 from .logger import red, whi, yel, store_to_db, trace
-from .memory import prompt_filter, load_prev_prompts
+from .memory import prompt_filter, load_prev_prompts, embedder
 from .media import sound_preprocessing, get_img_source
 from .profiles import ValueStorage
 
@@ -267,6 +267,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, chec
             max_token,
             temperature,
             new_prompt_len=prompt_len_already,
+            new_prompt_vec=embedder([new_prompt["content"]]),
             favor_list=True if " list" in txt_audio.lower() else False
             )
 
