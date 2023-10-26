@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio, get_card_status, reset_buffer
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio, get_card_status
 from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
@@ -116,9 +116,6 @@ with gr.Blocks(
             inputs=[txt_chatgpt_cloz],
             outputs=[txt_card_done],
             )
-
-    sld_temp.change(fn=reset_buffer)
-    sld_max_tkn.change(fn=reset_buffer)
 
 
     # events

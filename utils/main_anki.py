@@ -487,12 +487,6 @@ def wait_for_queue(q, source, t=1):
             data = None
     return data
 
-@trace
-def reset_buffer():
-    "when moving the temperature or max_tkn slider, reset the message_buffer"
-    message_buffer["question"] = []
-    message_buffer["anser"] = []
-
 
 @trace
 def get_card_status(txt_chatgpt_cloz):
