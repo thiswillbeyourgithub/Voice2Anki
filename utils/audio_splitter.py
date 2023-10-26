@@ -14,7 +14,7 @@ import fire
 from pathlib import Path
 import os
 from pydub import AudioSegment
-from pydub.silence import detect_leading_silence
+from pydub.silence import detect_leading_silence, split_on_silence
 
 from logger import whi, yel, red
 
@@ -58,6 +58,13 @@ class AudioSplitter:
                 for s in stop_list]
 
         self.to_split = self.gather_todos()
+
+        # removing silences
+        if self.remove_silence:
+            for i, file in tqdm(enumerate(self.to_split), unit="file"):
+                if "unsilenced_" not in file:
+                    new_filename = self.unsilence_audio(file)
+                    self.to_split[i] = new_filename
 
         for file in tqdm(self.to_split, unit="file"):
             whi(f"Splitting file {file}")
@@ -262,6 +269,29 @@ class AudioSplitter:
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
         return trimmed
 
+    def unsilence_audio(self, file):
+        whi(f"Removing silence from {file}")
+        audio = AudioSegment.from_mp3(file)
+        previous_len = len(audio) // 1000
+        splitted = split_on_silence(
+                audio,
+                min_silence_len=500,
+                silence_thresh=-20,
+                seek_step=1,
+                keep_silence=500,
+                )
+        new_audio = splitted[0]
+        for chunk in splitted[1:]:
+            new_audio += chunk
+        new_len = len(new_audio) // 1000
+        red(f"Removed silence of {file} from {previous_len}s to {new_len}s")
+
+        assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
+
+        new_audio.export("unsilenced_" + file, format="mp3")
+        whi(f"Moving {file} to {self.done_dir} dir")
+        shutil.move(file, self.done_dir / file.name)
+        return "unsilenced_" + file
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
