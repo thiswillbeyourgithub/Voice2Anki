@@ -295,9 +295,12 @@ class AudioSplitter:
             new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
         elif self.silence_method == "sox":
             # sox way, fast but needs linux
-            sox_cmd = f"sox \"{file.absolute()}\" \"{new_filename.absolute()}\" silence -l 1 0.1 1% -1 0.3 1%"
-            whi(f"Using sox to remove silences: {sox_cmd}")
-            os.system(sox_cmd)
+            f1 = "\"" + str(file.name) + "\""
+            f2 = "\"" + str(new_filename.name) + "\""
+            d = "\"" + str(file.parent.absolute()) + "\""
+
+            sox_cmd = f"cd {d} && rm tmpoutput*.mp3 ; sox {f1} tmpoutput.mp3 silence 1 1 0.1% 1 1 0.1% : newfile : restart && cat tmpoutput*.mp3 > {f2} && rm -v tmpout*.mp3"
+            self.exec(sox_cmd)
             assert new_filename.exists(), f"new file not found: '{new_filename}'"
             new_audio = AudioSegment.from_mp3(new_filename)
         else:
@@ -312,6 +315,10 @@ class AudioSplitter:
         shutil.move(file, self.done_dir / file.name)
 
         return new_filename
+
+    def exec(self, cmd):
+        whi(f"Shell command: {cmd}")
+        os.system(cmd)
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
