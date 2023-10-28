@@ -8,7 +8,7 @@ import hashlib
 import re
 import joblib
 import time
-import exiftool
+# import exiftool
 from tqdm import tqdm
 import fire
 from pathlib import Path
@@ -274,25 +274,38 @@ class AudioSplitter:
         whi(f"Removing silence from {file}")
         audio = AudioSegment.from_mp3(file)
         previous_len = len(audio) // 1000
-        splitted = split_on_silence(
-                audio,
-                min_silence_len=500,
-                silence_thresh=-20,
-                seek_step=1,
-                keep_silence=500,
-                )
-        new_audio = splitted[0]
-        for chunk in splitted[1:]:
-            new_audio += chunk
+
+        new_filename = file.parent / ("unsilenced_" + file.name)
+
+        # pydub's way (very slow)
+        # splitted = split_on_silence(
+        #         audio,
+        #         min_silence_len=500,
+        #         silence_thresh=-20,
+        #         seek_step=1,
+        #         keep_silence=500,
+        #         )
+        # new_audio = splitted[0]
+        # for chunk in splitted[1:]:
+        #     new_audio += chunk
+
+        # sox way, fast but needs linux
+        sox_cmd = f"sox {file.absolute} \"{new_filename}\" silence -l 1 0.1 1% -1 0.3 1%"
+        whi(f"Using sox to remove silences: {sox_cmd}")
+        os.system(sox_cmd)
+        new_audio = AudioSegment.from_mp3(new_filename)
+
         new_len = len(new_audio) // 1000
         red(f"Removed silence of {file} from {previous_len}s to {new_len}s")
 
         assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
 
-        new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
-        whi(f"Moving {file} to {self.done_dir} dir")
-        shutil.move(file, self.done_dir / file.name)
-        return file.parent / ("unsilenced_" + file.name)
+        # end of pydub's way
+        # new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
+        # whi(f"Moving {file} to {self.done_dir} dir")
+        # shutil.move(file, self.done_dir / file.name)
+
+        return new_filename
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
