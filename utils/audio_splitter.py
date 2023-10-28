@@ -38,10 +38,13 @@ class AudioSplitter:
             splitted_dir="./user_directory/splitted",
             done_dir = "./user_directory/done",
             remove_silence=True,
+            silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
+        self.silence_method = silence_method
+        assert silence_method in ["sox", "pydub"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
@@ -278,32 +281,35 @@ class AudioSplitter:
         new_filename = file.parent / ("unsilenced_" + file.name)
 
         # pydub's way (very slow)
-        # splitted = split_on_silence(
-        #         audio,
-        #         min_silence_len=500,
-        #         silence_thresh=-20,
-        #         seek_step=1,
-        #         keep_silence=500,
-        #         )
-        # new_audio = splitted[0]
-        # for chunk in splitted[1:]:
-        #     new_audio += chunk
-
-        # sox way, fast but needs linux
-        sox_cmd = f"sox {file.absolute} \"{new_filename}\" silence -l 1 0.1 1% -1 0.3 1%"
-        whi(f"Using sox to remove silences: {sox_cmd}")
-        os.system(sox_cmd)
-        new_audio = AudioSegment.from_mp3(new_filename)
+        if self.silence_method == "pydub":
+            splitted = split_on_silence(
+                    audio,
+                    min_silence_len=500,
+                    silence_thresh=-20,
+                    seek_step=1,
+                    keep_silence=500,
+                    )
+            new_audio = splitted[0]
+            for chunk in splitted[1:]:
+                new_audio += chunk
+            new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
+        elif self.silence_method == "sox":
+            # sox way, fast but needs linux
+            sox_cmd = f"sox \"{file.absolute()}\" \"{new_filename.absolute()}\" silence -l 1 0.1 1% -1 0.3 1%"
+            whi(f"Using sox to remove silences: {sox_cmd}")
+            os.system(sox_cmd)
+            assert new_filename.exists(), f"new file not found: '{new_filename}'"
+            new_audio = AudioSegment.from_mp3(new_filename)
+        else:
+            raise ValueError(self.silence_method)
 
         new_len = len(new_audio) // 1000
         red(f"Removed silence of {file} from {previous_len}s to {new_len}s")
 
         assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
 
-        # end of pydub's way
-        # new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
-        # whi(f"Moving {file} to {self.done_dir} dir")
-        # shutil.move(file, self.done_dir / file.name)
+        whi(f"Moving {file} to {self.done_dir} dir")
+        shutil.move(file, self.done_dir / file.name)
 
         return new_filename
 
