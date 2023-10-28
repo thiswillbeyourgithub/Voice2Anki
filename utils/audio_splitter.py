@@ -252,7 +252,7 @@ class AudioSplitter:
 
         try:
             transcript = whisperx_splitter(
-                    audio_path=audio_path,
+                    audio_path=str(audio_path),
                     audio_hash=audio_hash,
                     prompt=self.prompt,
                     language=self.language,
