@@ -67,7 +67,7 @@ class AudioSplitter:
             for i, file in tqdm(enumerate(self.to_split), unit="file"):
                 if "unsilenced_" not in str(file):
                     new_filename = self.unsilence_audio(file)
-                    assert "unsilenced_" not in str(new_filename), "error"
+                    assert "unsilenced_" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
         for file in tqdm(self.to_split, unit="file"):
