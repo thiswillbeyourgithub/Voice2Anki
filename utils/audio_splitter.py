@@ -271,7 +271,11 @@ class AudioSplitter:
         threshold = - 10 ** (db_threshold / 20)  # in dFBS
         trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
-        return trimmed
+        if len(audio) / len(trimmed) < 2 or len(trimmed) <= 3000:
+            red(f"Trimming silence of audio would be too harsh so keeping the original")
+            return audio
+        else:
+            return trimmed
 
     def unsilence_audio(self, file):
         whi(f"Removing silence from {file}")
