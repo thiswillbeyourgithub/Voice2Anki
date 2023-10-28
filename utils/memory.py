@@ -53,7 +53,7 @@ else:
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
-embedding_model_name = "average_word_embeddings_glove.6B.300d"
+embedding_model_name = "paraphrase-multilingual-mpnet-base-v2"
 embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
 embed_model = SentenceTransformer(embedding_model_name)
 
