@@ -22,7 +22,7 @@ assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file 
 os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text()).strip()
 import replicate
 
-stt_cache = joblib.Memory("transcript_cache", verbose=0)
+stt_cache = joblib.Memory("transcript_cache", verbose=1)
 
 d = datetime.today()
 today = f"{d.day:02d}_{d.month:02d}"
@@ -325,7 +325,7 @@ class AudioSplitter:
 
 @stt_cache.cache(ignore=["audio_path"])
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
-    whi("Starting replicate")
+    whi("Starting replicate (meaning cache is not used)")
     start = time.time()
     transcript = replicate.run(
             "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
