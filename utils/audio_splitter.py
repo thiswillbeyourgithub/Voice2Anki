@@ -38,12 +38,12 @@ class AudioSplitter:
             splitted_dir="./user_directory/splitted",
             done_dir = "./user_directory/done",
             remove_silence=True,
+            trim_splitted_silence=False,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
-        self.silence_method = silence_method
         assert silence_method in ["sox", "pydub"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
@@ -56,6 +56,8 @@ class AudioSplitter:
         self.n_todo = n_todo
         self.language = language
         self.remove_silence = remove_silence
+        self.trim_splitted_silence = trim_splitted_silence
+        self.silence_method = silence_method
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -139,7 +141,7 @@ class AudioSplitter:
                 sliced = audio[start_cut*1000:end_cut*1000]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{file.name}_{i+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
-                if self.remove_silence:
+                if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced, 20)
                 if len(sliced) < 1000:
                     red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
