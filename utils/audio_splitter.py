@@ -250,12 +250,8 @@ class AudioSplitter:
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        whisperx_cached = stt_cache.cache(
-                func=whisperx_splitter,
-                ignore=["audio_path"])
-
         try:
-            transcript = whisperx_cached(
+            transcript = whisperx_splitter(
                     audio_path=audio_path,
                     audio_hash=audio_hash,
                     prompt=self.prompt,
@@ -326,6 +322,8 @@ class AudioSplitter:
         whi(f"Shell command: {cmd}")
         os.system(cmd)
 
+
+@stt_cache.cache(ignore=["audio_path"])
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
     start = time.time()
