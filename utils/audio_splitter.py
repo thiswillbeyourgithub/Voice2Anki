@@ -62,8 +62,9 @@ class AudioSplitter:
         # removing silences
         if self.remove_silence:
             for i, file in tqdm(enumerate(self.to_split), unit="file"):
-                if "unsilenced_" not in file:
+                if "unsilenced_" not in str(file):
                     new_filename = self.unsilence_audio(file)
+                    assert "unsilenced_" not in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
         for file in tqdm(self.to_split, unit="file"):
@@ -288,10 +289,10 @@ class AudioSplitter:
 
         assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
 
-        new_audio.export("unsilenced_" + file, format="mp3")
+        new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
         whi(f"Moving {file} to {self.done_dir} dir")
         shutil.move(file, self.done_dir / file.name)
-        return "unsilenced_" + file
+        return file.parent / ("unsilenced_" + file.name)
 
 def whisperx_splitter(audio_path, audio_hash, prompt, language):
     whi("Starting replicate")
