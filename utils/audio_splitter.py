@@ -110,8 +110,9 @@ class AudioSplitter:
                     sub_audio.export(tempf.name, format="mp3")
                     transcript = self.run_whisperx(tempf.name)
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
-                    new_times = [ [t0 + k / spf, t0 + v / spf] for k, v in sub_ttk]
+                    new_times = [ [t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
                     alterations[i] = [new_times, sub_ts]
+                    assert new_times[-1][-1] <= t1, "unexpected audio timeline"
                     # Path(tempf.name).unlink()
 
             red(f"Found {len(alterations)} segments that needed slower analysis")
