@@ -2,7 +2,6 @@ import soundfile as sf
 import tempfile
 import pyrubberband as pyrb
 from datetime import datetime
-import replicate
 import shutil
 import hashlib
 import re
@@ -18,9 +17,10 @@ from pydub.silence import detect_leading_silence, split_on_silence
 
 from logger import whi, yel, red
 
-# TODO fix that
+# replicate has to be imported after the api is loader
 assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file REPLICATE8API_KEY.txt and paste your openai API key inside"
 os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text()).strip()
+import replicate
 
 stt_cache = joblib.Memory("transcript_cache", verbose=0)
 
