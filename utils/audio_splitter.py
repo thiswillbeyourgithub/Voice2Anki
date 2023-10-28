@@ -124,8 +124,8 @@ class AudioSplitter:
                     "Unexpected new length when altering audio")
                 assert len(times_to_keep) == len(text_segments), "unexpected length"
 
-            prev_t0 = 0
-            prev_t1 = 0
+            prev_t0 = -1
+            prev_t1 = -1
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping audio!"
