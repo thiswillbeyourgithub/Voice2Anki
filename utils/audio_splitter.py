@@ -36,7 +36,7 @@ class AudioSplitter:
             n_todo=1,
             unsplitted_dir="./user_directory/unsplitted",
             splitted_dir="./user_directory/splitted",
-            done_dir = "./user_directory/done",
+            done_dir="./user_directory/done",
             remove_silence=True,
             trim_splitted_silence=False,
             silence_method="sox",
