@@ -199,9 +199,9 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
 
     whi("Computing cosine distance")
-    distances = [util.cos_sim(new_prompt_vec, e) for e in embeddings]
+    distances = [float(util.cos_sim(new_prompt_vec, e)) for e in embeddings]
 
-    percentile = np.percentile(distances, 25)
+    percentile = float(np.percentile(distances, 25))
     dist_check = [1 if d >= percentile else 0 for d in distances]
     assert len(dist_check) == len(timesorted_pr), "unexpected length"
 
