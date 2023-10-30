@@ -37,8 +37,8 @@ class AudioSplitter:
             unsplitted_dir="./user_directory/unsplitted",
             splitted_dir="./user_directory/splitted",
             done_dir="./user_directory/done",
-            remove_silence=True,
-            trim_splitted_silence=False,
+            remove_silence=False,
+            trim_splitted_silence=True,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
