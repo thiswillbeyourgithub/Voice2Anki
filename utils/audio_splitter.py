@@ -165,7 +165,8 @@ class AudioSplitter:
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.rglob("*.mp3")]
         assert to_split, f"no mp3 found in {self.unsp_dir}"
-        to_split = sorted(to_split, key=lambda x: x.stat().st_ctime)
+        # to_split = sorted(to_split, key=lambda x: x.stat().st_mtime)
+        to_split = sorted(to_split, key=lambda x: x.name)
         to_split = to_split[:self.n_todo]
         whi(f"Total number of files to split: {len(to_split)}")
 
