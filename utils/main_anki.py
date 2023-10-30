@@ -39,7 +39,7 @@ assert done_dir.exists(), "No 'done' subdir found"
 assert doing_dir.exists(), "No 'doing' subdir found"
 
 # move any file in doing to todos
-doings = [p for p in doing_dir.rglob("*.mp3")]
+doings = sorted([p for p in doing_dir.rglob("*.mp3")])
 for p in doings:
     whi(f"Starting up so moved files from doing to splitted: {p}")
     shutil.move(p, splitted_dir / p.name)
