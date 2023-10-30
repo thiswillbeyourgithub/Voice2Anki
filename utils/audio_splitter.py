@@ -271,8 +271,8 @@ class AudioSplitter:
         threshold = - 10 ** (db_threshold / 20)  # in dFBS
         trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
-        if len(audio) / len(trimmed) < 2 or len(trimmed) <= 3000:
-            red(f"Trimming silence of audio would be too harsh so keeping the original")
+        if len(trimmed) <= 2000 or len(audio) / len(trimmed) < 2:
+            red("Trimming silence of audio would be too harsh so keeping the original")
             return audio
         else:
             return trimmed
