@@ -151,7 +151,7 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
         # will be randomly discarder to increase randomness. But only after
         # the first few prompts were added
         threshold = min(temperature / 3, 0.33)
-        if (temperature == 0 or n <= 5) or (random.random() >= threshold):
+        if (temperature == 0) or (random.random() >= threshold):
             # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
             # no worse if temperature is higher than 1
 
