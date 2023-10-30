@@ -143,7 +143,7 @@ class AudioSplitter:
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{file.name}_{i+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
                 if self.trim_splitted_silence:
-                    sliced = self.trim_silences(sliced, 20)
+                    sliced = self.trim_silences(sliced)
                 if len(sliced) < 1000:
                     red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                     continue
@@ -266,9 +266,14 @@ class AudioSplitter:
 
         return transcript
 
-    def trim_silences(self, audio, db_threshold):
+    def trim_silences(self, audio, db_threshold=None, dbfs_threshold=-50):
+        # pydub's default DBFs default is -50
         whi(f"Audio length before trimming silence: {len(audio)}ms")
-        threshold = - 10 ** (db_threshold / 20)  # in dFBS
+        assert db_threshold or dbfs_threshold, "must receive threshold"
+        if dbfs_threshold is None:
+            dbfs_threshold = - 10 ** (db_threshold / 20)  # in dFBS
+        assert dbfs_threshold is None
+        threshold = dbfs_threshold
         trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
         whi(f"Audio length after trimming silence: {len(trimmed)}ms")
         if len(trimmed) <= 2000 or len(audio) / len(trimmed) < 2:
