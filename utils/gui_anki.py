@@ -75,7 +75,7 @@ with gr.Blocks(
                 with gr.Row():
                     rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
                     rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
-                    dir_load_btn = gr.Button(value="Dirload 1+2+3", variant="secondary")
+                    dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
 
     with gr.Row():
         with gr.Column(scale=1, min_width=250):
@@ -357,23 +357,23 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         queue=True,
-                        ).then(
-                            fn=to_anki,
-                            inputs=[
-                                audio_mp3_1,
-                                txt_audio,
-                                txt_chatgpt_cloz,
-                                txt_chatgpt_context,
-                                txt_chatgpt_tkncost,
-                                txt_deck,
-                                txt_tags,
-                                txt_profile,
-                                gallery,
-                                ],
-                            preprocess=False,
-                            postprocess=False,
-                            queue=True,
-                            )
+                        )# .then(
+                         #    fn=to_anki,
+                         #    inputs=[
+                         #        audio_mp3_1,
+                         #        txt_audio,
+                         #        txt_chatgpt_cloz,
+                         #        txt_chatgpt_context,
+                         #        txt_chatgpt_tkncost,
+                         #        txt_deck,
+                         #        txt_tags,
+                         #        txt_profile,
+                         #        gallery,
+                         #        ],
+                         #    preprocess=False,
+                         #    postprocess=False,
+                         #    queue=True,
+                         #    )
 
     # send to whisper
     transcript_btn.click(
