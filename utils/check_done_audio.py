@@ -59,7 +59,7 @@ class DoneAudioChecker:
 
 
         print("\n\n")
-        issues = []
+        issues = {}
         for p in tqdm(done_list, desc="Checking"):
             suffix = p.suffix
             name = p.name.replace("-0-100", "")
@@ -68,11 +68,11 @@ class DoneAudioChecker:
                 name = name.replace(".mp3", "", 1)
             if name not in media_dict[suffix]:
                 audio = AudioSegment.from_mp3(p)
-                if len(audio) <= 4000:
+                if len(audio) <= 5000:
                     whi(f"Ignored {p.name} (too short)")
                 else:
                     whi(f"ISSUE {p.name}")
-                    issues.append(p)
+                    issues[p.name] = audio
             else:
                 whi(f"Ignored {p.name} (found)")
         breakpoint()
