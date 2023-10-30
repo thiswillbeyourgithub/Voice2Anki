@@ -59,5 +59,5 @@ def format_audio_component(audio):
     elif isinstance(audio, str):
         whi(f"Not audio formating needed for '{audio}'")
     else:
-        raise ValueError(red(f"Unexpected audio format: {audio}"))
+        raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))
     return audio
