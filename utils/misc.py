@@ -1,3 +1,4 @@
+from pathlib import Path
 import gradio as gr
 import cv2
 import tiktoken
@@ -56,7 +57,7 @@ def format_audio_component(audio):
             new_audio = dummy_btn.preprocess(audio)
             red(f"Unexpected dict instead of audio for '{audio['name']}' -> '{new_audio}'")
             audio = new_audio
-    elif isinstance(audio, str):
+    elif isinstance(audio, (str, type(Path()))):
         whi(f"Not audio formating needed for '{audio}'")
     else:
         raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))

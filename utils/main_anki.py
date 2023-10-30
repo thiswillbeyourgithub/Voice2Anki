@@ -442,7 +442,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
         except Exception as err:
             red(f"Error when preprocessing sound {to_temp}: '{err}'")
 
-        sounds_to_load.append(to_temp)
+        sounds_to_load.append(str(to_temp))
         if txt_whisp_prompt and txt_whisp_lang:
             new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang, txt_profile))
 
