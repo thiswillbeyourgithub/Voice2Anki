@@ -118,16 +118,19 @@ class AudioSplitter:
                     # Path(tempf.name).unlink()
 
             red(f"Found {len(alterations)} segments that needed slower analysis")
+            offset = 0
             for i, vals in tqdm(alterations.items(), desc="Fixing previously long audio"):
                 new_times = vals[0]
                 sub_ts = vals[1]
                 old_len = len(times_to_keep)
                 assert old_len == len(text_segments), "unexpected length"
-                times_to_keep[i:i+1] = new_times
-                text_segments[i:i+1] = sub_ts
+
+                times_to_keep[i+offset:i+1+offset] = new_times
+                text_segments[i+offset:i+1+offset] = sub_ts
                 assert old_len + len(new_times) - 1 == len(times_to_keep), (
                     "Unexpected new length when altering audio")
                 assert len(times_to_keep) == len(text_segments), "unexpected length"
+                offset = len(new_times)
 
             prev_t0 = -1
             prev_t1 = -1
