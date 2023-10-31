@@ -142,6 +142,7 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
             # exclude list cards if not asking for a list
             return False
 
+        # semantic similarity check
         if dist_check == 0:
             # ignored because is in the cards with the lowest similarity
             return False
@@ -170,6 +171,7 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
         if not "list" in pr["content"].lower():
             return False
 
+        # semantic similarity check
         if dist_check == 0:
             # ignored because is in the cards with the lowest similarity
             return False
