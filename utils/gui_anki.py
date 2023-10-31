@@ -63,22 +63,20 @@ with gr.Blocks(
             rst_img_btn = gr.Button(value="Clear then add", variant="secondary", size="sm")
             img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
         with gr.Column(scale=3):
+            txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=20, placeholder="The anki flashcard will appear here", container=False)
             with gr.Row():
                 rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
-                dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
-            txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=20, placeholder="The anki flashcard will appear here", container=False)
 
             with gr.Row():
-                with gr.Row():
-                    transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-                    chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-                    anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+                semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+                auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
-                with gr.Row():
-                    semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
-                    auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
+            with gr.Row():
+                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
+                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
+                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
 
             with gr.Row():
                 improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
