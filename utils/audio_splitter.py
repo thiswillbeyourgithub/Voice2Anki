@@ -348,7 +348,13 @@ class AudioSplitter:
             dbfs_threshold = - 10 ** (db_threshold / 20)  # in dFBS
         assert dbfs_threshold is not None
         threshold = dbfs_threshold
-        trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
+
+        # trim only the beginning
+        trimmed = audio[detect_leading_silence(audio, threshold):]
+
+        # trim the end
+        # trimmed = trimmed[:-detect_leading_silence(trimmed.reverse(), threshold)]
+
         whi(f"Audio length after trimming silence: {len(trimmed)}ms (depth={depth})")
         if len(trimmed) <= 2000 or len(audio) / len(trimmed) >= 3:
             red("Trimming silence of audio would be too harsh so reducing threshold")
