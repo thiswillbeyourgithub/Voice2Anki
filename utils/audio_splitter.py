@@ -80,7 +80,7 @@ class AudioSplitter:
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {file} as there is no cutting to do")
-                shutil.move(file, self.sp_dir / f"{file.name}_too_small.mp3")
+                shutil.move(file, self.sp_dir / f"{file.stem}_too_small.{file.suffix}")
                 return
 
             audio = AudioSegment.from_mp3(file)
