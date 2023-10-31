@@ -184,7 +184,7 @@ class AudioSplitter:
                 assert old_len + len(new_times) - 1 == len(times_to_keep), (
                     "Unexpected new length when altering audio")
                 assert len(times_to_keep) == len(text_segments), "unexpected length"
-                offset = len(new_times)
+                offset += len(new_times)
 
             prev_t0 = -1
             prev_t1 = -1
