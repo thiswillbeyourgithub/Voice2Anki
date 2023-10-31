@@ -125,6 +125,18 @@ class AudioSplitter:
                 old_len = len(times_to_keep)
                 assert old_len == len(text_segments), "unexpected length"
 
+                old_times = times_to_keep[i-1+offset]
+                if len(new_times) == 1:
+                    whi(f"The slowed down audio #{i} is not split "
+                        "differently than the original so keeping the "
+                        f"original: {old_times} vs {new_times}")
+                    assert abs(1 - new_times[0][1] / old_times[1]) <= 0.1
+                    if old_times[0]:
+                        assert abs(1 - new_times[0][0] / old_times[0]) <= 0.1
+                    continue
+                else:
+                    whi(f"Found {len(new_times)} new splits inside audio {i}/{n}")
+
                 times_to_keep[i+offset:i+1+offset] = new_times
                 text_segments[i+offset:i+1+offset] = sub_ts
                 assert old_len + len(new_times) - 1 == len(times_to_keep), (
