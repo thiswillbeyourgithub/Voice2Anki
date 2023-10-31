@@ -146,25 +146,24 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
             # ignored because is in the cards with the lowest similarity
             return False
 
-        # stochastic check
-        # if temperature of LLM is set high enough, some example filters
-        # will be randomly discarder to increase randomness. But only after
-        # the first few prompts were added
-        threshold = min(temperature / 3, 0.33)
-        if (temperature == 0) or (random.random() >= threshold):
-            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
-            # no worse if temperature is higher than 1
-
-            # length check
-            if abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
-                # whi(f"Accepted prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-                return True
-            else:
-                # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-                return False
-        else:
-            # whi(f"Stochasticity decided not to include one prompt (thresh: {threshold:.2f})")
+        # length check
+        if not abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
+            # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
             return False
+
+        # stochastic check
+        if temperature > 0.3:
+            # if temperature of LLM is set high enough, some example filters
+            # will be randomly discarder to increase randomness. But only after
+            # the first few prompts were added
+            threshold = min(temperature / 3, 0.33)
+            if random.random() < threshold:
+                # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
+                # no worse if temperature is higher than 1
+                return False
+
+        # passed all tests
+        return True
 
     else:  # if favoring lists, don't use stochastic check
         if "list" in pr["content"].lower():
