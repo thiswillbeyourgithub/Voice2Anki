@@ -84,12 +84,14 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(file)
 
+            whi("\nChecking if some audio are too long")
             alterations = {}
             spf = 0.7  # speed factor
+            n = len(times_to_keep)
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 if dur > 45:
-                    red(f"Audio #{i} has too long duration: {dur}s.")
+                    red(f"Audio #{i}/{n} has too long duration: {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
 
                     # take the suspicious segment, slow it down and
@@ -129,11 +131,13 @@ class AudioSplitter:
 
             prev_t0 = -1
             prev_t1 = -1
+            n = len(times_to_keep)
+            whi("\nChecking if some audio are still too long")
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping audio!"
                 if dur > 45:
-                    red(f"Audio #{i} has too long duration even after correction! {dur}s.")
+                    red(f"Audio #{i}/{n} has too long duration even after correction! {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
                 prev_t0 = t0
                 prev_t1 = t1
