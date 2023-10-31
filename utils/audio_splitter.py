@@ -356,7 +356,7 @@ class AudioSplitter:
         if ln == 0:
             red("Trimming silence is way too harsch on this file, changing threshold a lot")
             return self.trim_silences(audio, dbfs_threshold=dbfs_threshold - 10, depth=depth + 1)
-        if ln <= 2000 or len(audio) / ln >= 3:
+        if ln <= 1000 or len(audio) / ln >= 3:
             red("Trimming silence of audio would be too harsh so reducing threshold")
             return self.trim_silences(audio, dbfs_threshold=dbfs_threshold - 5, depth=depth + 1)
         else:
