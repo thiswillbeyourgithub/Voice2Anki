@@ -73,6 +73,8 @@ class AudioSplitter:
                     assert "unsilenced_" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
+        # contains the original file path, while self.to_split will contain
+        # the path to the slowed down /tmp versions
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
