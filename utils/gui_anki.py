@@ -75,8 +75,8 @@ with gr.Blocks(
                     rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
                     rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
                     dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
-                txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here", container=False)
-                txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here", container=False)
+                txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
+                txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=20, placeholder="The anki flashcard will appear here", container=False)
 
     with gr.Row():
         with gr.Column(scale=1, min_width=250):
