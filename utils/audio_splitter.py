@@ -157,34 +157,36 @@ class AudioSplitter:
                     # Path(tempf.name).unlink()
 
             red(f"Found {len(alterations)} segments that needed slower analysis")
-            offset = 0
             for i, vals in tqdm(alterations.items(), desc="Fixing previously long split"):
                 new_times = vals[0]
                 sub_ts = vals[1]
+
+                # find the corresponding segment: it's when the start
+                # time is very close
+                old_times = None
+                for j, old_vals in enumerate(times_to_keep):
+                    if abs(old_vals[0] - new_times[0][0]) <= 0.1:
+                        old_times = times_to_keep[j]
+                        break
+                assert old_times
+
                 old_len = len(times_to_keep)
                 assert old_len == len(text_segments), "unexpected length"
+                assert abs(old_vals[0] - new_times[0][0]) <= 0.1, "start time are different!"
 
-                if offset == 0:
-                    old_times = times_to_keep[i]
-                else:
-                    old_times = times_to_keep[i-1+offset]
                 if len(new_times) == 1:
                     whi(f"The slowed down split #{i} is not split "
                         "differently than the original so keeping the "
                         f"original: {old_times} vs {new_times}")
-                    assert abs(1 - new_times[0][1] / old_times[1]) <= 0.15
-                    if old_times[0]:
-                        assert abs(1 - new_times[0][0] / old_times[0]) <= 0.15
-                    continue
+                    assert abs(1 - old_vals[1] / new_times[0][1]) <= 0.05, "end times are different!"
                 else:
                     whi(f"Found {len(new_times)} new splits inside split #{i}/{n}")
 
-                times_to_keep[i+offset:i+1+offset] = new_times
-                text_segments[i+offset:i+1+offset] = sub_ts
-                assert old_len + len(new_times) - 1 == len(times_to_keep), (
-                    "Unexpected new length when altering audio")
-                assert len(times_to_keep) == len(text_segments), "unexpected length"
-                offset += len(new_times)
+                    times_to_keep[j:j+1] = new_times
+                    text_segments[j:j+1] = sub_ts
+                    assert old_len + len(new_times) - 1 == len(times_to_keep), (
+                        "Unexpected new length when altering audio")
+                    assert len(times_to_keep) == len(text_segments), "unexpected length"
 
             prev_t0 = -1
             prev_t1 = -1
