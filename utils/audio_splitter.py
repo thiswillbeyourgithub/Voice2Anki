@@ -73,7 +73,7 @@ class AudioSplitter:
                     self.to_split[i] = new_filename
 
         # splitting the long audio
-        for file in tqdm(self.to_split, unit="file"):
+        for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
             times_to_keep, text_segments = self.split_one_transcript(transcript)
