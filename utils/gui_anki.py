@@ -70,13 +70,13 @@ with gr.Blocks(
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
 
             with gr.Row():
-                semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
-                auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
-
-            with gr.Row():
                 transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
                 chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
                 anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+
+            with gr.Row():
+                semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+                auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
             with gr.Row():
                 improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
