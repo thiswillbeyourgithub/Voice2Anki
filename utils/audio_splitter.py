@@ -82,6 +82,7 @@ class AudioSplitter:
         # slow down a bit each audio
         if self.slow_down_all:
             self.spf = 0.9  # speed factor
+            raise NotImplementedError("slowing down the whole audio is buggy at the moment")
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
                 audio = AudioSegment.from_mp3(file)
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
