@@ -337,7 +337,7 @@ class AudioSplitter:
         return transcript
 
     def trim_silences(self, audio, dbfs_threshold=-50, depth=0):
-        if depth >= 5:
+        if depth >= 10:
             red("Recursion limit of self.trim_silences reached, not trimming this split.")
             return audio
         # pydub's default DBFs default is -50
