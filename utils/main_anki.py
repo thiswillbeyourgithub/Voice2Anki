@@ -312,6 +312,12 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         model_to_use = "gpt-3.5-turbo"
         model_price = (0.0015, 0.002)
 
+    # print prompts used for the call:
+    n = len(formatted_messages)
+    whi("ChatGPT prompt :")
+    for i, p in enumerate(formatted_messages):
+        whi(f"    * {i+1}/{n}: {p['role']:>10}: {str(p['content'])[:50]}")
+
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
         cnt = 0
