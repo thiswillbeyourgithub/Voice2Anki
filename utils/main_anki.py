@@ -219,6 +219,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
+    if txt_audio.startswith("Error: "):
+        return "Error when transcribing sound.", [0, 0]
     if not txt_chatgpt_context:
         return "No txt_chatgpt_context found.", [0, 0]
 
