@@ -267,7 +267,7 @@ class AudioSplitter:
         # remove too short
         latest_kept_i = 0
         for i, (start, end) in enumerate(times_to_keep):
-            assert end - start > 0
+            assert end - start >= 0
             if end - start < 1:
 
                 assert times_to_keep[latest_kept_i][1] <= end
