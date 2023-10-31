@@ -71,11 +71,12 @@ with gr.Blocks(
                         with gr.Row():
                             txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper", container=False)
                             txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT", container=False)
-                            txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
                 with gr.Row():
                     rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary")
                     rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary")
                     dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
+                txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here", container=False)
+                txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here", container=False)
 
     with gr.Row():
         with gr.Column(scale=1, min_width=250):
@@ -85,30 +86,23 @@ with gr.Blocks(
             audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
-        with gr.Column(scale=3):
-            txt_audio = gr.Textbox(label="Transcript", lines=5, max_lines=10, placeholder="The transcript of the audio recording will appear here", container=False)
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=5, max_lines=10, placeholder="The anki flashcard will appear here", container=False)
 
-    with gr.Row():
-        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+        with gr.Column(scale=1, min_width=250):
+            transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
+            chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
+            anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+            semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
+            auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
-    with gr.Row():
-        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
-        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
-
-    with gr.Row():
-        with gr.Column(scale=9):
+        with gr.Column(scale=1):
+            improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
+            sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
+            sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
+            sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
             with gr.Row():
                 sync_btn = gr.Button(value="Sync anki", variant="primary")
-                improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
-                sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
-        with gr.Column(scale=1):
-            with gr.Row():
-                sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
-                sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
-                check_buffer = gr.Checkbox(value=True, label="Buffer", show_label=False, container=False, min_width=50)
+                txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
+                check_buffer = gr.Checkbox(value=True, label="Buffer", show_label=False, container=True, min_width=50)
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
