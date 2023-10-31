@@ -102,7 +102,7 @@ with gr.Blocks(
             with gr.Row():
                 sync_btn = gr.Button(value="Sync anki", variant="primary")
                 txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
-                check_buffer = gr.Checkbox(value=True, label="Buffer", show_label=False, container=True, min_width=50)
+                sld_buffer = gr.Slider(minimum=0, maximum=10, label="Buffer size", show_label=True, container=True, min_width=50)
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
@@ -167,7 +167,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,
@@ -269,7 +269,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -291,7 +291,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -346,7 +346,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -382,7 +382,7 @@ with gr.Blocks(
     # send to chatgpt
     chatgpt_btn.click(
             fn=alfred,
-            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
             outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
             queue=True,
             )
@@ -416,7 +416,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,
@@ -449,7 +449,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, check_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,

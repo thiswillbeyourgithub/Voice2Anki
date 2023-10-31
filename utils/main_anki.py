@@ -215,7 +215,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
 
 @trace
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, check_buffer):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
@@ -239,22 +239,22 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, chec
     # the last few transcript/answer pair is always saved in message_buffer
     # even if it will not be saved to memory.
     buffer_to_add = []
-    if check_buffer:
+    if sld_buffer and message_buffer["question"]:
         whi(f"Length of message_buffer: {len(message_buffer['answer'])}")
-        for i in range(len(message_buffer["question"])):
+        for i in range(min(len(message_buffer["question"]), sld_buffer), 0):
             if lev.ratio(
                     txt_audio.lower(),
-                    message_buffer["question"][i].lower(),
+                    message_buffer["question"][-i].lower(),
                     ) < 0.8 :
                 buffer_to_add.extend(
                         [
                             {
                                 "role": "user",
-                                "content": message_buffer["question"][i]
+                                "content": message_buffer["question"][-i]
                                 },
                             {
                                 "role": "assistant",
-                                "content": message_buffer["answer"][i]
+                                "content": message_buffer["answer"][-i]
                                 }
                             ]
                         )
@@ -302,7 +302,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, chec
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, check_buffer)
+        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer)
 
     if tkns >= 3700:
         red(f"More than 3700 token in question, using ChatGPT 16k")
