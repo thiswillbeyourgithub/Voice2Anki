@@ -2,7 +2,7 @@ import gradio as gr
 from pathlib import Path
 import pickle
 
-from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck
+from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck, save_buffer
 from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio, get_card_status
 from .anki_utils import threaded_sync_anki
 
@@ -52,6 +52,7 @@ with gr.Blocks(
 
     with gr.Row():
         with gr.Column(scale=1, min_width=50):
+            dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
             audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None, container=False)
             audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None, container=False)
             audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
@@ -118,6 +119,8 @@ with gr.Blocks(
     # darkmode
     dark_mode_btn.click(fn=None, _js=darkmode_js)
     sync_btn.click(fn=threaded_sync_anki, queue=True)
+
+    sld_buffer.change(fn=save_buffer, inputs=[txt_profile, sld_buffer])
 
     # change profile and load previous data
     txt_profile.submit(

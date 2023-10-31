@@ -252,6 +252,10 @@ def save_deck(txt_profile, txt_deck):
     if txt_deck:
         ValueStorage(txt_profile)["txt_deck"] = txt_deck
 
+@trace
+def save_buffer(txt_profile, sld_buffer):
+    ValueStorage(txt_profile)["sld_buffer"] = sld_buffer
+
 
 @trace
 def save_path(txt_profile, txt_mdpath):
