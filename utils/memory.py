@@ -214,6 +214,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     # add by decreasing priority and timestamp
     prio_vals = sorted(set([x["priority"] for x in prev_prompts if int(x["priority"]) != -1]), reverse=True)
     tkns = syspr[0]["tkn_len_in"]
+    tkns += new_prompt_len
     dis_tkns = 0
     output_pr = [syspr[0]]  # add system prompt
     category_count = 0
