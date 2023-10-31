@@ -217,31 +217,48 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     tkns += new_prompt_len
     dis_tkns = 0
     output_pr = [syspr[0]]  # add system prompt
-    category_count = 0
-    for prio in prio_vals:
-        category_size = 0
-        for pr_idx, pr in enumerate(timesorted_pr):
-            if pr in output_pr:
-                continue
-            if pr["priority"] == prio:
-                category_size += 1
-                if filter_out(
-                        pr,
-                        tkns,
-                        output_pr,
-                        max_token,
-                        temperature,
-                        favor_list,
-                        new_prompt_len,
-                        sig,
-                        dist_check[pr_idx],
-                        ):
-                    tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
-                    output_pr.append(pr)
-                else:
-                    dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
-        whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
-        category_count = len(output_pr)
+
+    exit_while = False
+    cnt = 0
+    while not exit_while:
+        category_count = 0
+        cnt += 1
+        for prio in prio_vals:
+            category_size = 0
+            if exit_while:
+                break
+            for pr_idx, pr in enumerate(timesorted_pr):
+                if pr in output_pr:
+                    continue
+                if pr["priority"] == prio:
+                    category_size += 1
+
+                    if cnt > 10:
+                        whi("Exited while loop after 10 iterations")
+                        exit_while = True
+                        break
+                    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+                        # will exit while at the end of this loop but not
+                        # before
+                        exit_while = True
+
+                    if filter_out(
+                            pr,
+                            tkns,
+                            output_pr,
+                            max_token,
+                            temperature,
+                            favor_list,
+                            new_prompt_len,
+                            sig,
+                            dist_check[pr_idx],
+                            ):
+                        tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
+                        output_pr.append(pr)
+                    else:
+                        dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
+            whi(f"* Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
+            category_count = len(output_pr)
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
