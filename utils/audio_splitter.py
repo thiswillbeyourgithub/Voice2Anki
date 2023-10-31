@@ -203,7 +203,7 @@ class AudioSplitter:
 
             audio_o = AudioSegment.from_mp3(fileo)
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
-                sliced = audio_o[start_cut*1000 / self.spf:end_cut*1000 / self.spf]
+                sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{i+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
                 if self.trim_splitted_silence:
