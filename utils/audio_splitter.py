@@ -1,3 +1,4 @@
+import copy
 import soundfile as sf
 import tempfile
 import pyrubberband as pyrb
@@ -72,18 +73,37 @@ class AudioSplitter:
                     assert "unsilenced_" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
+        # slow down a bit each audio
+        self.spf = 0.9  # speed factor
+        self.to_split_original = copy.deepcopy(self.to_split)
+        for i, file in tqdm(enumerate(self.to_split), unit="file", desc="Slowing down"):
+            audio = AudioSegment.from_mp3(file)
+            tempf = tempfile.NamedTemporaryFile(delete=False)
+            whi(f"Saving long audio to {tempf.name} as wav")
+            # we need to use sf and pyrb because
+            # pydub is buggingly slow to change the speedup
+            audio.export(tempf.name, format="wav")
+            whi("Stretching time of wav")
+            y, sr = sf.read(tempf.name)
+            y2 = pyrb.time_stretch(y, sr, self.spf)
+            whi("Saving streched wav")
+            sf.write(tempf.name, y2, sr, format='wav')
+            whi(f"Slowed down {file} and stored to {tempf.name}")
+            self.to_split[i] = tempf.name
+
         # splitting the long audio
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
             times_to_keep, text_segments = self.split_one_transcript(transcript)
+            fileo = self.to_split_original[i]
 
             if len(times_to_keep) == 1:
-                whi(f"Stopping there for {file} as there is no cutting to do")
-                shutil.move(file, self.sp_dir / f"{file.stem}_too_small.{file.suffix}")
-                return
+                whi(f"Stopping there for {fileo} as there is no cutting to do")
+                shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
+                continue
 
-            audio = AudioSegment.from_mp3(file)
+            audio = AudioSegment.from_wav(file)
 
             whi("\nChecking if some splits are too long")
             alterations = {}
@@ -109,8 +129,6 @@ class AudioSplitter:
                     whi("Saving as wav")
                     sf.write(tempf.name, y2, sr, format='wav')
                     sub_audio = AudioSegment.from_wav(tempf.name)
-                    whi("Resaving as mp3")
-                    sub_audio.export(tempf.name, format="mp3")
                     transcript = self.run_whisperx(tempf.name)
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
                     new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
@@ -160,15 +178,15 @@ class AudioSplitter:
 
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio[start_cut*1000:end_cut*1000]
-                out_file = self.sp_dir / f"{int(time.time())}_{today}_{file.stem}_{i+1:03d}.mp3"
+                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{i+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
                 if len(sliced) < 1000:
                     red(f"Split too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                     continue
-                sliced.export(out_file, format="mp3")
-                whi(f"Saved sliced to {out_file}")
+                whi(f"Saving sliced to {out_file}")
+                sliced.speedup(1/self.spf).export(out_file, format="mp3")
 
                 # TODO fix metadata setting
                 # for each file, keep the relevant transcript
@@ -179,8 +197,8 @@ class AudioSplitter:
                 #     et.execute(b"-chunk_i=" + bytes(i), str(out_file))
                 #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
 
-            whi(f"Moving {file} to {self.done_dir} dir")
-            shutil.move(file, self.done_dir / file.name)
+            whi(f"Moving {fileo} to {self.done_dir} dir")
+            shutil.move(fileo, self.done_dir / fileo.name)
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
