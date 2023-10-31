@@ -166,10 +166,15 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
         return True
 
     else:  # if favoring lists, don't use stochastic check
-        if "list" in pr["content"].lower():
-            return True
-        else:
+        # candidate is not a list
+        if not "list" in pr["content"].lower():
             return False
+
+        if dist_check == 0:
+            # ignored because is in the cards with the lowest similarity
+            return False
+
+        return True
 
 @trace
 def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, favor_list):
