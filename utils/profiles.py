@@ -15,6 +15,7 @@ approved_keys_all = [
         "audio_mp3_4",
         "audio_mp3_5",
         "sld_max_tkn",
+        "sld_buffer",
         "temperature",
         "txt_chatgpt_context",
         "txt_whisp_lang",
@@ -97,6 +98,8 @@ class ValueStorage:
             whi(f"No {kf} stored in profile dir, using appropriate default value")
             if key == "sld_max_tkn":
                 default = 2000
+            if key == "sld_buffer":
+                default = 3
             if key == "temperature":
                 default = 0.3
             if key == "txt_whisp_lang":

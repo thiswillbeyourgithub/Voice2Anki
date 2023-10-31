@@ -99,7 +99,7 @@ with gr.Blocks(
             sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
             sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
             sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
-            sld_buffer = gr.Slider(minimum=0, maximum=10, label="Buffer size", show_label=True, container=True, min_width=50)
+            sld_buffer = gr.Slider(minimum=0, maximum=10, value=pv["sld_buffer"], label="Buffer size", show_label=True, container=True, min_width=50)
             with gr.Row():
                 sync_btn = gr.Button(value="Sync anki", variant="primary")
                 txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
