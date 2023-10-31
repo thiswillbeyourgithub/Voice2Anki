@@ -73,10 +73,11 @@ class AudioSplitter:
                     assert "unsilenced_" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
+        self.to_split_original = copy.deepcopy(self.to_split)
+
         # slow down a bit each audio
         self.spf = 0.9  # speed factor
-        self.to_split_original = copy.deepcopy(self.to_split)
-        for i, file in tqdm(enumerate(self.to_split), unit="file", desc="Slowing down"):
+        for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
             audio = AudioSegment.from_mp3(file)
             tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem)
             whi(f"Saving slowed down {file} to {tempf.name} as wav")
