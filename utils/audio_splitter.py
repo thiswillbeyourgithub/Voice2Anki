@@ -183,8 +183,8 @@ class AudioSplitter:
             shutil.move(file, self.done_dir / file.name)
 
     def gather_todos(self):
-        to_split = [p for p in self.unsp_dir.rglob("*.mp3")]
-        assert to_split, f"no mp3 found in {self.unsp_dir}"
+        to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
+        assert to_split, f"no mp3/wav found in {self.unsp_dir}"
         # to_split = sorted(to_split, key=lambda x: x.stat().st_mtime)
         to_split = sorted(to_split, key=lambda x: x.name)
         to_split = to_split[:self.n_todo]
