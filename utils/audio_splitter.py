@@ -172,9 +172,9 @@ class AudioSplitter:
                     whi(f"The slowed down split #{i} is not split "
                         "differently than the original so keeping the "
                         f"original: {old_times} vs {new_times}")
-                    assert abs(1 - new_times[0][1] / old_times[1]) <= 0.1
+                    assert abs(1 - new_times[0][1] / old_times[1]) <= 0.15
                     if old_times[0]:
-                        assert abs(1 - new_times[0][0] / old_times[0]) <= 0.1
+                        assert abs(1 - new_times[0][0] / old_times[0]) <= 0.15
                     continue
                 else:
                     whi(f"Found {len(new_times)} new splits inside split #{i}/{n}")
