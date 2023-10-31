@@ -52,13 +52,13 @@ with gr.Blocks(
 
     with gr.Row():
         with gr.Column(scale=1, min_width=50):
+            rst_audio_btn = gr.Button(value="Clear audio", variant="primary")
             dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
             audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None, container=False)
             audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None, container=False)
             audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
-            rst_audio_btn = gr.Button(value="Clear audio", variant="secondary")
             gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[2], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
             rst_img_btn = gr.Button(value="Clear then add", variant="secondary", size="sm")
             img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
