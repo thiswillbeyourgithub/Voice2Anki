@@ -89,15 +89,14 @@ class AudioSplitter:
                 # we need to use sf and pyrb because
                 # pydub is buggingly slow to change the speedup
                 audio.export(tempf.name, format="wav")
-                whi("Stretching time of wav")
+                whi("  Stretching time of wav")
                 y, sr = sf.read(tempf.name)
                 y2 = pyrb.time_stretch(y, sr, self.spf)
-                whi("Saving streched wav")
+                whi("  Saving streched wav")
                 sf.write(tempf.name, y2, sr, format='wav')
                 sub_audio = AudioSegment.from_wav(tempf.name)
-                whi("Resaving as mp3")
+                whi("  Resaving as mp3")
                 sub_audio.export(tempf.name, format="mp3")
-                whi(f"Slowed down {file} and stored to {tempf.name}")
                 self.to_split[i] = tempf.name
         else:
             self.spf = 1
