@@ -316,8 +316,8 @@ class AudioSplitter:
         return transcript
 
     def trim_silences(self, audio, db_threshold=None, dbfs_threshold=-50, depth=0):
-        if depth > 3:
-            red("Recursion limit of self.trim_silnces reached, not trimming this split.")
+        if depth >= 5:
+            red("Recursion limit of self.trim_silences reached, not trimming this split.")
             return audio
         # pydub's default DBFs default is -50
         whi(f"Audio length before trimming silence: {len(audio)}ms")
@@ -327,10 +327,10 @@ class AudioSplitter:
         assert dbfs_threshold is not None
         threshold = dbfs_threshold
         trimmed = audio[detect_leading_silence(audio, threshold):-detect_leading_silence(audio.reverse(), threshold)]
-        whi(f"Audio length after trimming silence: {len(trimmed)}ms")
-        if len(trimmed) <= 2000 or len(audio) / len(trimmed) >= 2:
+        whi(f"Audio length after trimming silence: {len(trimmed)}ms (depth={depth})")
+        if len(trimmed) <= 2000 or len(audio) / len(trimmed) >= 3:
             red("Trimming silence of audio would be too harsh so reducing threshold")
-            return self.trim_silences(audio, dbfs_threshold=threshold - 10, depth=depth + 1)
+            return self.trim_silences(audio, dbfs_threshold=threshold - 5, depth=depth + 1)
         else:
             return trimmed
 
