@@ -203,7 +203,7 @@ class AudioSplitter:
                     red(f"Split too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                     continue
                 whi(f"Saving sliced to {out_file}")
-                sliced.speedup(1/self.spf).export(out_file, format="mp3")
+                sliced.export(out_file, format="mp3")
 
                 # TODO fix metadata setting
                 # for each file, keep the relevant transcript
