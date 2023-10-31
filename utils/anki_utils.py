@@ -1,3 +1,4 @@
+import re
 import threading
 import shutil
 import tempfile
@@ -153,8 +154,8 @@ def audio_to_anki(audio_mp3, queue):
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
 def look_for_card(cloz):
-    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ")
-    print(cloz)
+    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "")
+    cloz = re.sub("{{c\d+::", "", cloz)
     state = _call_anki(
             action="findCards",
             query=f"added:2 {cloz}"
