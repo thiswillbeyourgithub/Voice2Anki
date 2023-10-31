@@ -91,6 +91,9 @@ class AudioSplitter:
             y2 = pyrb.time_stretch(y, sr, self.spf)
             whi("Saving streched wav")
             sf.write(tempf.name, y2, sr, format='wav')
+            sub_audio = AudioSegment.from_wav(tempf.name)
+            whi("Resaving as mp3")
+            sub_audio.export(tempf.name, format="mp3")
             whi(f"Slowed down {file} and stored to {tempf.name}")
             self.to_split[i] = tempf.name
 
@@ -106,7 +109,7 @@ class AudioSplitter:
                 shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
                 continue
 
-            audio = AudioSegment.from_wav(file)
+            audio = AudioSegment.from_mp3(file)
 
             whi("\nChecking if some splits are too long")
             alterations = {}
@@ -132,6 +135,8 @@ class AudioSplitter:
                     whi("Saving as wav")
                     sf.write(tempf.name, y2, sr, format='wav')
                     sub_audio = AudioSegment.from_wav(tempf.name)
+                    whi("Resaving as mp3")
+                    sub_audio.export(tempf.name, format="mp3")
                     transcript = self.run_whisperx(tempf.name)
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
                     new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
