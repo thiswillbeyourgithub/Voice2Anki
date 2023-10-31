@@ -8,7 +8,7 @@ from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing
+from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, get_img_source
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -133,20 +133,29 @@ with gr.Blocks(
     txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
 
     # image
-    img_btn.click(
+    paste_image_event = img_btn.click(
             fn=get_image,
             inputs=[gallery],
             outputs=[gallery],
-            queue=True)
+            queue=True).then(
+                    fn=get_img_source,
+                    inputs=[gallery],
+                    queue=True,
+                    )
     rst_img_btn.click(
             fn=reset_image,
             outputs=[gallery],
             queue=True,
+            cancels=[paste_image_event],
             ).then(
                     fn=get_image,
                     inputs=[gallery],
                     outputs=[gallery],
-                    queue=True)
+                    queue=True).then(
+                            fn=get_img_source,
+                            inputs=[gallery],
+                            queue=True,
+                            )
 
     # audio
 

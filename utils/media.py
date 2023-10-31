@@ -1,3 +1,4 @@
+import queue
 import time
 from scipy.io.wavfile import write
 import pickle
@@ -73,7 +74,7 @@ def check_source(source):
 
 
 @trace
-def get_img_source(gallery, queue):
+def get_img_source(gallery, queue=queue.Queue()):
     whi("Getting source from image")
     try:
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
