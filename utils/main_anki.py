@@ -666,9 +666,6 @@ def to_anki(
     # add the latest generated cards to the message bugger
     message_buffer["question"].append(txt_audio)
     message_buffer["answer"].append(txt_chatgpt_cloz)
-    buffer_limit = 2
-    message_buffer["question"] = message_buffer["question"][-buffer_limit:]
-    message_buffer["answer"] = message_buffer["answer"][-buffer_limit:]
 
     gather_threads(threads)
     return
