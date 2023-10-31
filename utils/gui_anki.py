@@ -60,7 +60,7 @@ with gr.Blocks(
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
             gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[2], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
-            rst_img_btn = gr.Button(value="Clear then add", variant="secondary", size="sm")
+            rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", size="sm")
             img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
