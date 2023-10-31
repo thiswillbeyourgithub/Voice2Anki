@@ -241,11 +241,11 @@ with gr.Blocks(
                 postprocess=False,
                 queue=True))
 
-    audio_mp3_1.clear(cancels=[aud_cache_event[0]])
-    audio_mp3_2.clear(cancels=[aud_cache_event[1]])
-    audio_mp3_3.clear(cancels=[aud_cache_event[2]])
-    audio_mp3_4.clear(cancels=[aud_cache_event[3]])
-    audio_mp3_5.clear(cancels=[aud_cache_event[4]])
+    # audio_mp3_1.clear(cancels=[aud_cache_event[0]])
+    # audio_mp3_2.clear(cancels=[aud_cache_event[1]])
+    # audio_mp3_3.clear(cancels=[aud_cache_event[2]])
+    # audio_mp3_4.clear(cancels=[aud_cache_event[3]])
+    # audio_mp3_5.clear(cancels=[aud_cache_event[4]])
 
     rst_audio_btn.click(
             fn=reset_audio,
