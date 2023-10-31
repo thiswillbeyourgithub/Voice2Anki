@@ -409,7 +409,7 @@ def whisperx_splitter(audio_path, audio_hash, prompt, language):
                 "language": language,
                 "temperature": 0,
                 "initial_prompt": prompt,
-                "condition_on_previous_text": True,
+                "condition_on_previous_text": False,
                 "word_timestamps": True,
                 "no_speech_threshold": 1,
                 },
