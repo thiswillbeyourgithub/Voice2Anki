@@ -131,9 +131,11 @@ class AudioSplitter:
                     # re analyse it
                     sub_audio = audio[t0 * 1000:t1 * 1000]
                     tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
-                    whi(f"Saving segment to {tempf.name} as wav")
+
+                    # sf and pyrb way:
                     # we need to use sf and pyrb because
                     # pydub is buggingly slow to change the speedup
+                    whi(f"Saving segment to {tempf.name} as wav")
                     sub_audio.export(tempf.name, format="wav")
                     whi("Stretching time")
                     y, sr = sf.read(tempf.name)
@@ -143,6 +145,12 @@ class AudioSplitter:
                     sub_audio = AudioSegment.from_wav(tempf.name)
                     whi("Resaving as mp3")
                     sub_audio.export(tempf.name, format="mp3")
+
+                    # # pydub way:
+                    # whi(f"Saving segment to {tempf.name} as mp3")
+                    # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
+                    # whi("Saved")
+
                     transcript = self.run_whisperx(tempf.name)
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
                     new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
