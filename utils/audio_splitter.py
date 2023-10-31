@@ -81,7 +81,7 @@ class AudioSplitter:
         self.spf = 0.9  # speed factor
         for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
             audio = AudioSegment.from_mp3(file)
-            tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem)
+            tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
             whi(f"Saving slowed down {file} to {tempf.name} as wav")
             # we need to use sf and pyrb because
             # pydub is buggingly slow to change the speedup
@@ -124,7 +124,7 @@ class AudioSplitter:
                     # take the suspicious segment, slow it down and
                     # re analyse it
                     sub_audio = audio[t0 * 1000:t1 * 1000]
-                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem)
+                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
                     whi(f"Saving segment to {tempf.name} as wav")
                     # we need to use sf and pyrb because
                     # pydub is buggingly slow to change the speedup
