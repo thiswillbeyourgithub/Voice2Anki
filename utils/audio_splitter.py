@@ -108,7 +108,7 @@ class AudioSplitter:
             whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
             times_to_keep, text_segments = self.split_one_transcript(transcript)
-            fileo = self.to_split_original[i]
+            fileo = self.to_split_original[ii]
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {fileo} as there is no cutting to do")
