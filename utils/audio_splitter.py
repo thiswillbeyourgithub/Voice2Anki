@@ -345,10 +345,10 @@ class AudioSplitter:
         whi(f"Audio length before trimming silence: {len(audio)}ms")
 
         # trim only the beginning
-        trimmed = audio[detect_leading_silence(audio, dbfs_threshold):]
+        trimmed = audio[detect_leading_silence(audio, dbfs_threshold + 5):]
 
         # trim the end
-        # trimmed = trimmed[:-detect_leading_silence(trimmed.reverse(), dbfs_threshold)]
+        trimmed = trimmed[:-detect_leading_silence(trimmed.reverse(), dbfs_threshold - 5)]
 
         whi(f"Audio length after trimming silence: {len(trimmed)}ms (depth={depth})")
         if len(trimmed) <= 2000 or len(audio) / len(trimmed) >= 3:
