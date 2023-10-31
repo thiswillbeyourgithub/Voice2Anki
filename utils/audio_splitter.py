@@ -337,7 +337,7 @@ class AudioSplitter:
 
         return transcript
 
-    def trim_silences(self, audio, db_threshold=None, dbfs_threshold=-70, depth=0):
+    def trim_silences(self, audio, db_threshold=None, dbfs_threshold=-50, depth=0):
         if depth >= 5:
             red("Recursion limit of self.trim_silences reached, not trimming this split.")
             return audio
