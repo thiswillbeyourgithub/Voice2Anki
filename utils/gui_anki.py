@@ -106,10 +106,13 @@ with gr.Blocks(
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
-    txt_card_done.blur(
+    txt_chatgpt_cloz.change(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[txt_card_done],
+            preprocess=False,
+            postprocess=False,
+            queue=True,
             )
 
 

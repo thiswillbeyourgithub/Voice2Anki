@@ -501,15 +501,21 @@ def wait_for_queue(q, source, t=1):
     return data
 
 
-@trace
+# @trace
 def get_card_status(txt_chatgpt_cloz):
     """return True or False depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
-    state = look_for_card(txt_chatgpt_cloz)
+    if not txt_chatgpt_cloz.strip():
+        return "Empty"
+    try:
+        state = look_for_card(txt_chatgpt_cloz.strip())
+    except Exception as err:
+        red(f"Error when searching card: '{err}'")
+        return err
     if state:
-        return "Present"
+        return "Done"
     else:
-        return "Absent"
+        return "TODO"
 
 
 @trace
