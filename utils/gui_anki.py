@@ -85,12 +85,11 @@ with gr.Blocks(
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size", show_label=True, container=True, min_width=50)
             with gr.Row():
-                with gr.Column(scale=10):
-                    txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
-                with gr.Column(scale=1):
-                     dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
-                     sync_btn = gr.Button(value="Sync anki", variant="primary")
-                     txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
+                 sync_btn = gr.Button(value="Sync anki", variant="primary")
+                 txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
+            with gr.Row():
+                 txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
+                 dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
             txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
             txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
             with gr.Row():
