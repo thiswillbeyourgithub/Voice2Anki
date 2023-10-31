@@ -72,6 +72,7 @@ class AudioSplitter:
                     assert "unsilenced_" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
+        # splitting the long audio
         for file in tqdm(self.to_split, unit="file"):
             whi(f"Splitting file {file}")
             transcript = self.run_whisperx(file)
@@ -84,14 +85,14 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(file)
 
-            whi("\nChecking if some audio are too long")
+            whi("\nChecking if some splits are too long")
             alterations = {}
             spf = 0.7  # speed factor
             n = len(times_to_keep)
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 if dur > 45:
-                    red(f"Audio #{i}/{n} has too long duration: {dur}s.")
+                    red(f"Split #{i}/{n} has too long duration: {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
 
                     # take the suspicious segment, slow it down and
@@ -114,12 +115,12 @@ class AudioSplitter:
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
                     new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
                     alterations[i] = [new_times, sub_ts]
-                    assert new_times[-1][-1] <= t1, "unexpected audio timeline"
+                    assert new_times[-1][-1] <= t1, "unexpected split timeline"
                     # Path(tempf.name).unlink()
 
             red(f"Found {len(alterations)} segments that needed slower analysis")
             offset = 0
-            for i, vals in tqdm(alterations.items(), desc="Fixing previously long audio"):
+            for i, vals in tqdm(alterations.items(), desc="Fixing previously long split"):
                 new_times = vals[0]
                 sub_ts = vals[1]
                 old_len = len(times_to_keep)
@@ -127,7 +128,7 @@ class AudioSplitter:
 
                 old_times = times_to_keep[i-1+offset]
                 if len(new_times) == 1:
-                    whi(f"The slowed down audio #{i} is not split "
+                    whi(f"The slowed down split #{i} is not split "
                         "differently than the original so keeping the "
                         f"original: {old_times} vs {new_times}")
                     assert abs(1 - new_times[0][1] / old_times[1]) <= 0.1
@@ -135,7 +136,7 @@ class AudioSplitter:
                         assert abs(1 - new_times[0][0] / old_times[0]) <= 0.1
                     continue
                 else:
-                    whi(f"Found {len(new_times)} new splits inside audio {i}/{n}")
+                    whi(f"Found {len(new_times)} new splits inside split #{i}/{n}")
 
                 times_to_keep[i+offset:i+1+offset] = new_times
                 text_segments[i+offset:i+1+offset] = sub_ts
@@ -147,12 +148,12 @@ class AudioSplitter:
             prev_t0 = -1
             prev_t1 = -1
             n = len(times_to_keep)
-            whi("\nChecking if some audio are still too long")
+            whi("\nChecking if some splits are still too long")
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
-                assert t0 > prev_t0 and t1 >= prev_t1, "overlapping audio!"
+                assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
-                    red(f"Audio #{i}/{n} has too long duration even after correction! {dur}s.")
+                    red(f"Split #{i}/{n} has too long duration even after correction! {dur}s.")
                     red(f"Text content: {text_segments[i]}\n")
                 prev_t0 = t0
                 prev_t1 = t1
@@ -164,7 +165,7 @@ class AudioSplitter:
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
                 if len(sliced) < 1000:
-                    red(f"Audio too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
+                    red(f"Split too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
                     continue
                 sliced.export(out_file, format="mp3")
                 whi(f"Saved sliced to {out_file}")
@@ -231,7 +232,7 @@ class AudioSplitter:
                     times_to_keep[-1][1] = duration
 
         n = len(text_segments)
-        whi(f"Found {n} audio segments")
+        whi(f"Found {n} splits")
 
         # remove too short
         for i, (start, end) in enumerate(times_to_keep):
@@ -244,7 +245,7 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments when removing <1s")
+        whi(f"Kept {n} splits when removing <1s")
 
         # remove almost no words
         for i, te in enumerate(text_segments):
@@ -254,7 +255,7 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} audio segments with > 4 words")
+        whi(f"Kept {n} splits with > 4 words")
 
         text_segments = [t.strip() for t in text_segments]
 
