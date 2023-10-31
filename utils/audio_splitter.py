@@ -264,11 +264,18 @@ class AudioSplitter:
         whi(f"Found {n} splits")
 
         # remove too short
+        latest_kept_i = 0
         for i, (start, end) in enumerate(times_to_keep):
+            assert end - start > 0
             if end - start < 1:
+
+                assert times_to_keep[latest_kept_i][1] <= end
+                times_to_keep[latest_kept_i][1] = end
+
                 times_to_keep[i] = None
                 text_segments[i] = None
             else:
+                latest_kept_i = i
                 while "  " in text_segments[i]:
                     text_segments[i] = text_segments[i].replace("  ", " ").strip()
         text_segments = [t for t in text_segments if t is not None]
