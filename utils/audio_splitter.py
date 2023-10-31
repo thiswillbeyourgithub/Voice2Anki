@@ -40,6 +40,7 @@ class AudioSplitter:
             done_dir="./user_directory/done",
             remove_silence=False,
             trim_splitted_silence=True,
+            slow_down_all=False,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
@@ -59,6 +60,7 @@ class AudioSplitter:
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
+        self.slow_down_all = slow_down_all
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -78,24 +80,27 @@ class AudioSplitter:
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
-        self.spf = 0.9  # speed factor
-        for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
-            audio = AudioSegment.from_mp3(file)
-            tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
-            whi(f"Saving slowed down {file} to {tempf.name} as wav")
-            # we need to use sf and pyrb because
-            # pydub is buggingly slow to change the speedup
-            audio.export(tempf.name, format="wav")
-            whi("Stretching time of wav")
-            y, sr = sf.read(tempf.name)
-            y2 = pyrb.time_stretch(y, sr, self.spf)
-            whi("Saving streched wav")
-            sf.write(tempf.name, y2, sr, format='wav')
-            sub_audio = AudioSegment.from_wav(tempf.name)
-            whi("Resaving as mp3")
-            sub_audio.export(tempf.name, format="mp3")
-            whi(f"Slowed down {file} and stored to {tempf.name}")
-            self.to_split[i] = tempf.name
+        if self.slow_down_all:
+            self.spf = 0.9  # speed factor
+            for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
+                audio = AudioSegment.from_mp3(file)
+                tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
+                whi(f"Saving slowed down {file} to {tempf.name} as wav")
+                # we need to use sf and pyrb because
+                # pydub is buggingly slow to change the speedup
+                audio.export(tempf.name, format="wav")
+                whi("Stretching time of wav")
+                y, sr = sf.read(tempf.name)
+                y2 = pyrb.time_stretch(y, sr, self.spf)
+                whi("Saving streched wav")
+                sf.write(tempf.name, y2, sr, format='wav')
+                sub_audio = AudioSegment.from_wav(tempf.name)
+                whi("Resaving as mp3")
+                sub_audio.export(tempf.name, format="mp3")
+                whi(f"Slowed down {file} and stored to {tempf.name}")
+                self.to_split[i] = tempf.name
+        else:
+            self.spf = 1
 
         # splitting the long audio
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
