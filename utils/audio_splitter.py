@@ -40,7 +40,7 @@ class AudioSplitter:
             done_dir="./user_directory/done",
             remove_silence=False,
             trim_splitted_silence=True,
-            slow_down_all=False,
+            slow_down_all=True,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
@@ -82,7 +82,6 @@ class AudioSplitter:
         # slow down a bit each audio
         if self.slow_down_all:
             self.spf = 0.9  # speed factor
-            raise NotImplementedError("slowing down the whole audio is buggy at the moment")
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
                 audio = AudioSegment.from_mp3(file)
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
@@ -202,6 +201,7 @@ class AudioSplitter:
                 prev_t1 = t1
 
             audio_o = AudioSegment.from_mp3(fileo)
+            assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.1
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{i+1:03d}.mp3"
