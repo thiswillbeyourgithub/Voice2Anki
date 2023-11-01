@@ -223,9 +223,13 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
     exit_while = False
     cnt = 0
-    while not exit_while and timesorted_pr:
+    while (not exit_while) and timesorted_pr:
         category_count = 0
         cnt += 1
+        if cnt > 100:
+            whi("Exited while loop after 100 iterations")
+            exit_while = True
+            break
         for prio in prio_vals:
             category_size = 0
             if exit_while:
@@ -236,10 +240,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
                 if pr["priority"] == prio:
                     category_size += 1
 
-                    if cnt > 10:
-                        whi("Exited while loop after 10 iterations")
-                        exit_while = True
-                        break
                     if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
                         # will exit while at the end of this loop but not
                         # before
