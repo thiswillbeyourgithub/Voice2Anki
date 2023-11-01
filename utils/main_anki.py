@@ -49,10 +49,16 @@ assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.tx
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 global pv
-assert Path("profiles/anki/latest_profile.pickle").exists(), "latest_profile not found, it should be created by gui_anki before!"
-whi("Reloading previous profile.")
-with open("profiles/anki/latest_profile.pickle", "rb") as f:
-    pv = ValueStorage(pickle.load(f))
+Path("profiles").mkdir(exist_ok=True)
+Path("profiles/anki").mkdir(exist_ok=True)
+if not Path("profiles/anki/latest_profile.pickle").exists():
+    red("Loading default profile")
+    pv = ValueStorage("default")
+else:
+    whi("Reloading previous profile.")
+    with open("profiles/anki/latest_profile.pickle", "rb") as f:
+        pv = ValueStorage(pickle.load(f))
+        red("Loading default profile")
 
 message_buffer = {
         "question": [],

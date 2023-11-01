@@ -29,15 +29,9 @@ document.querySelector('body').classList.add('dark');
 }"""
 
 # load default profile
-Path("profiles").mkdir(exist_ok=True)
-Path("profiles/anki").mkdir(exist_ok=True)
-if Path("profiles/anki/latest_profile.pickle").exists():
-    whi("Reloading previous profile.")
-    with open("profiles/anki/latest_profile.pickle", "rb") as f:
-        pv = ValueStorage(pickle.load(f))
-else:
-    red("Loading default profile")
-    pv = ValueStorage("default")
+whi("Reloading previous profile.")
+with open("profiles/anki/latest_profile.pickle", "rb") as f:
+    pv = ValueStorage(pickle.load(f))
 
 with gr.Blocks(
         analytics_enabled=False,
