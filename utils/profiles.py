@@ -32,6 +32,8 @@ md_path = profile_path / "markdown"
 profile_path.mkdir(exist_ok=True)
 anki_path.mkdir(exist_ok=True)
 md_path.mkdir(exist_ok=True)
+(anki_path / "default").mkdir(exist_ok=True)
+(md_path / "default").mkdir(exist_ok=True)
 
 class ValueStorage:
     @trace
