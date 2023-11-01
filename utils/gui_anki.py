@@ -209,19 +209,19 @@ with gr.Blocks(
     #             # postprocess=False,
     #             # queue=True))
     #             )
-    aud_cache_event.append(
-        audio_mp3_2.change(
-            fn=transcribe_cache_async,
-            inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            preprocess=False,
-            postprocess=False,
-            queue=True)# .then(
-                # fn=asv.n2,
-                # inputs=[txt_profile, audio_mp3_2],
-                # preprocess=False,
-                # postprocess=False,
-                # queue=True))
-                )
+    # aud_cache_event.append(
+    #     audio_mp3_2.change(
+    #         fn=transcribe_cache_async,
+    #         inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+    #         preprocess=False,
+    #         postprocess=False,
+    #         queue=True)# .then(
+    #             # fn=asv.n2,
+    #             # inputs=[txt_profile, audio_mp3_2],
+    #             # preprocess=False,
+    #             # postprocess=False,
+    #             # queue=True))
+    #             )
     # aud_cache_event.append(
     #     audio_mp3_3.change(
     #         fn=transcribe_cache_async,
