@@ -46,16 +46,18 @@ with gr.Blocks(
 
     with gr.Row():
         with gr.Column(scale=1, min_width=50):
-            rst_audio_btn = gr.Button(value="Clear audio", variant="primary")
-            dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary")
+            with gr.Row():
+                rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
+                dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
             audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None, container=False)
             audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None, container=False)
             audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
             gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[2], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
-            rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", size="sm")
-            img_btn = gr.Button(value="Add image from clipboard", variant="primary", size="sm")
+            with gr.Row():
+                rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
+                img_btn = gr.Button(value="Add image from clipboard", variant="primary", min_width=50)
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=20, placeholder="The anki flashcard will appear here", container=False)
@@ -73,7 +75,7 @@ with gr.Blocks(
                 auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
             with gr.Row():
-                sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
+                sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.")
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
             with gr.Row():
@@ -86,14 +88,14 @@ with gr.Blocks(
                  txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
                  dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
             txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
-            txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=1, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
+            txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
             with gr.Row():
                 with gr.Column(scale=1, min_width=50):
                     txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
                 with gr.Column(scale=5):
                     with gr.Row():
-                        txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], label="SpeechToText context", placeholder="context for whisper", container=False)
-                        txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], label="LLM context", placeholder="context for ChatGPT", container=False)
+                        txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper", container=False)
+                        txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT", container=False)
 
     # output
     output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
