@@ -163,39 +163,52 @@ with gr.Blocks(
     # just trigger caching
 
     # semi auto mode
+    # aud_cache_event.append(
+    #     audio_mp3_1.change(
+    #         fn=transcribe,
+    #         inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+    #         outputs=[txt_audio],
+    #         preprocess=False,
+    #         postprocess=False,
+    #         queue=True,
+    #         ).then(
+    #             fn=alfred,
+    #             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+    #             outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+    #             preprocess=False,
+    #             postprocess=False,
+    #             queue=True,
+    #             ).then(
+    #                 fn=to_anki,
+    #                 inputs=[
+    #                     audio_mp3_1,
+    #                     txt_audio,
+    #                     txt_chatgpt_cloz,
+    #                     txt_chatgpt_context,
+    #                     txt_chatgpt_tkncost,
+    #                     txt_deck,
+    #                     txt_tags,
+    #                     txt_profile,
+    #                     gallery,
+    #                     ],
+    #                 preprocess=False,
+    #                 postprocess=False,
+    #                 queue=True,
+    #                 )
+    #                 )
     aud_cache_event.append(
         audio_mp3_1.change(
-            fn=transcribe,
+            fn=transcribe_cache_async,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-            outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            queue=True,
-            ).then(
-                fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
-                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                preprocess=False,
-                postprocess=False,
-                queue=True,
-                ).then(
-                    fn=to_anki,
-                    inputs=[
-                        audio_mp3_1,
-                        txt_audio,
-                        txt_chatgpt_cloz,
-                        txt_chatgpt_context,
-                        txt_chatgpt_tkncost,
-                        txt_deck,
-                        txt_tags,
-                        txt_profile,
-                        gallery,
-                        ],
-                    preprocess=False,
-                    postprocess=False,
-                    queue=True,
-                    )
-                    )
+            queue=True)# .then(
+                # fn=asv.n1,
+                # inputs=[txt_profile, audio_mp3_1],
+                # preprocess=False,
+                # postprocess=False,
+                # queue=True))
+                )
     aud_cache_event.append(
         audio_mp3_2.change(
             fn=transcribe_cache_async,
