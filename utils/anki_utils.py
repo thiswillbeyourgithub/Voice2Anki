@@ -164,7 +164,7 @@ def look_for_card(cloz):
         else:
             return False
 
-    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "")
+    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "").replace(",", " ").replace(":", " ").replace(";", " ")
     cloz = re.sub("{{c\d+::", "", cloz)
     state = _call_anki(
             action="findCards",
