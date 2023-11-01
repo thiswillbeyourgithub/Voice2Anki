@@ -13,7 +13,7 @@ from scipy.io.wavfile import write
 from torchaudio import load, save
 
 from .logger import red, whi, trace
-from .misc import format_audio_component
+from .misc import format_audio_component, backend_config
 
 try:
     from .author_cloze_editor import cloze_editor
@@ -177,11 +177,16 @@ def threaded_sync_anki():
     thread.start()
 
 # load anki profile using ankipandas just to get the media folder
-try:
-    db_path = akp.find_db(user="Main")
-except Exception as err:
-    red(f"Exception when trying to find anki collection: '{err}'")
-    db_path = akp.Collection().path
+if backend_config.media_folder:
+    db_path = Path(backend_config.media_folder)
+    red(f"Using anki db_path found in argument: {db_path}")
+else:
+    try:
+        db_path = akp.find_db(user="Main")
+    except Exception as err:
+        red(f"Exception when trying to find anki collection: '{err}'")
+        db_path = akp.Collection().path
+
 red(f"WhisperToAnki will use anki collection found at {db_path}")
 
 # check that akp will not go in trash

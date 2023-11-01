@@ -20,6 +20,7 @@ def start_voice2formattedtext(
         do_auth=False,
         localnetworkonly=False,
         use_ssl=False,
+        media_folder=None,
         *args,
         **kwargs
         ):
@@ -44,6 +45,8 @@ def start_voice2formattedtext(
         restrict access to the local network only
     use_ssl: bool, default False
         if True, will use the ssl configuration specified in __init__.py
+    media_folder: str, default None
+        optional anki media database location
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -94,6 +97,7 @@ def start_voice2formattedtext(
 
     if backend == "anki":
         backend_config.backend = "anki"
+        backend_config.media_folder = media_folder
         from utils.gui_anki import demo_anki as demo
     elif backend == "markdown":
         backend_config.backend = "markdown"

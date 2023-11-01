@@ -31,6 +31,7 @@ class backend_config_class:
     VERSION = 0.1
     def __init__(self):
         self.backend = "not yet initialized"
+        self.media_folder = None
 global backend_config
 backend_config = backend_config_class()
 
