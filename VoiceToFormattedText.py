@@ -10,6 +10,7 @@ from utils.misc import backend_config
 Path("./cache").mkdir(exist_ok=True)
 
 os.environ["PYTHONTRACEMALLOC"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 def start_voice2formattedtext(
         backend="",
