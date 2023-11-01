@@ -474,7 +474,6 @@ def load_splitted_audio(checkbox, a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whis
     while output[0] is None:
         output.append(output.pop(0))
 
-    # wait for at least the first transcription to finish
     if new_threads:
         if len(sounds_to_load) == len(output):
             # loaded all the slots, so waiting for the first transcription to
