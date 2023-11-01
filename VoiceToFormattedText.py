@@ -109,7 +109,7 @@ def start_voice2formattedtext(
         from utils.gui_markdown import demo_markdown as demo
     else:
         raise ValueError(backend)
-    backend.disable_embeddings = disable_embeddings
+    backend_config.disable_embeddings = disable_embeddings
 
     if use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
