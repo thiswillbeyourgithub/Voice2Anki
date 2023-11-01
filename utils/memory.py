@@ -223,7 +223,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
     exit_while = False
     cnt = 0
-    while not exit_while:
+    while not exit_while and timesorted_pr:
         category_count = 0
         cnt += 1
         for prio in prio_vals:
