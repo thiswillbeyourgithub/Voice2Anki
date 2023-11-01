@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck, save_buffer
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, load_splitted_audio, get_card_status
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, get_card_status
 from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
@@ -281,7 +281,7 @@ with gr.Blocks(
                         postprocess=False,
                         queue=True,
                         ).then(
-                                fn=load_splitted_audio,
+                                fn=dirload_splitted,
                                 inputs=[
                                     roll_dirload_check,
                                     audio_mp3_1,
@@ -342,7 +342,7 @@ with gr.Blocks(
                             postprocess=False,
                             queue=True,
                             ).then(
-                                    fn=load_splitted_audio,
+                                    fn=dirload_splitted,
                                     inputs=[
                                         roll_dirload_check,
                                         audio_mp3_1,
@@ -370,7 +370,7 @@ with gr.Blocks(
     # images. This allow to use V2FT on the computer but record the audio
     # on another distance device
     dir_load_btn.click(
-            fn=load_splitted_audio,
+            fn=dirload_splitted,
             inputs=[
                 roll_dirload_check,
                 audio_mp3_1,
