@@ -208,6 +208,7 @@ with gr.Blocks(
                 # preprocess=False,
                 # postprocess=False,
                 # queue=True))
+                )
     aud_cache_event.append(
         audio_mp3_3.change(
             fn=transcribe_cache_async,
@@ -220,6 +221,7 @@ with gr.Blocks(
                 # preprocess=False,
                 # postprocess=False,
                 # queue=True))
+                )
     aud_cache_event.append(
         audio_mp3_4.change(
             fn=transcribe_cache_async,
@@ -232,6 +234,7 @@ with gr.Blocks(
                 # preprocess=False,
                 # postprocess=False,
                 # queue=True))
+                )
     aud_cache_event.append(
         audio_mp3_5.change(
             fn=transcribe_cache_async,
@@ -244,6 +247,7 @@ with gr.Blocks(
                 # preprocess=False,
                 # postprocess=False,
                 # queue=True))
+                )
 
     # audio_mp3_1.clear(cancels=[aud_cache_event[0]])
     # audio_mp3_2.clear(cancels=[aud_cache_event[1]])
