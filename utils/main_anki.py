@@ -473,7 +473,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
 
     # wait for at least the first transcription to finish
     if new_threads:
-        if len(sounds_to_load) == len(filled_slots):
+        if len(sounds_to_load) == len(output):
             # loaded all the slots, so waiting for the first transcription to
             # finish
             gather_threads([new_threads[0]], "Transcribing first file")
