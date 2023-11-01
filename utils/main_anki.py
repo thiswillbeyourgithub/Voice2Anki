@@ -456,13 +456,12 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_l
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
 
-        sounds_to_load.append(str(to_temp))
-        # try:  # preprocess sound
-        #     to_temp = sound_preprocessing_cached(to_temp)
-        # except Exception as err:
-        #     red(f"Error when preprocessing sound {to_temp}: '{err}'")
+        try:  # preprocess sound
+            to_temp = sound_preprocessing_cached(to_temp)
+        except Exception as err:
+            red(f"Error when preprocessing sound {to_temp}: '{err}'")
 
-        # sounds_to_load.append(str(to_temp))
+        sounds_to_load.append(str(to_temp))
         # if txt_whisp_prompt and txt_whisp_lang:
         #     new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang, txt_profile))
 
