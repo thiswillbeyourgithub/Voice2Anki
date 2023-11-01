@@ -432,7 +432,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
     # count the number of mp3 files in the splitted dir
     splitteds = [p for p in splitted_dir.rglob("*.mp3")]
     if not splitteds:
-        red("splitted subdir contains no mp3")
+        red("Splitted subdir contains no mp3")
         return a1, a2, a3, a4, a5
 
     # sort by oldest
