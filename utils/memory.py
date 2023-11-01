@@ -202,7 +202,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     assert len(syspr) == 1, "Number of system prompts != 1"
 
     if backend_config.disable_embeddings:
-        dist_check = [1 for 1 in timesorted_pr]
+        dist_check = [1 for i in timesorted_pr]
     else:
         whi("Computing embeddings")
         embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
