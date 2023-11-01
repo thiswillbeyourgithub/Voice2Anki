@@ -155,6 +155,15 @@ def audio_to_anki(audio_mp3, queue):
 
 
 def look_for_card(cloz):
+    cloz = cloz.strip()
+    if "#####" in cloz:  # multiple cards
+        splits = cloz.split("#####")
+        states = [bool(look_for_card(sp)) for sp in splits if sp.strip()]
+        if [s for s in states if s]:
+            return True
+        else:
+            return False
+
     cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "")
     cloz = re.sub("{{c\d+::", "", cloz)
     state = _call_anki(
