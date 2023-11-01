@@ -427,7 +427,7 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
         whi("No mp3 files in doing")
     else:
         for p in doings[:sound_slots]:
-            whi(f"Refilling so moving files from doing to done: {p}")
+            yel(f"Refilling so moving files from doing to done: {p}")
             shutil.move(p, done_dir / p.name)
 
     # count the number of mp3 files in the splitted dir
