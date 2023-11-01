@@ -153,6 +153,7 @@ def audio_to_anki(audio_mp3, queue):
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
+
 def look_for_card(cloz):
     cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "")
     cloz = re.sub("{{c\d+::", "", cloz)
@@ -162,6 +163,7 @@ def look_for_card(cloz):
             )
     return state
 
+
 @trace
 def sync_anki():
     "trigger anki synchronization"
@@ -170,11 +172,13 @@ def sync_anki():
         f"Error during sync?: '{sync_output}'")
     # time.sleep(1)  # wait for sync to finish, just in case
 
+
 @trace
 def threaded_sync_anki():
     # trigger anki sync
     thread = threading.Thread(target=sync_anki)
     thread.start()
+
 
 # load anki profile using ankipandas just to get the media folder
 if backend_config.media_folder:
