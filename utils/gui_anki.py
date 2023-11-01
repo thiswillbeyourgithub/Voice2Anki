@@ -79,11 +79,12 @@ with gr.Blocks(
                 auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
 
             with gr.Row():
-                improve_btn = gr.Button(value="Feed prompt back to LLM", variant="primary")
-                sld_improve = gr.Slider(minimum=0, maximum=10, value=None, step=1, label="Feedback priority")
                 sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM maxhistory token size.")
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
-                sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size", show_label=True, container=True, min_width=50)
+                sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
+            with gr.Row():
+                sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
+                improve_btn = gr.Button(value="LLM Feedback", variant="primary")
             with gr.Row():
                  sync_btn = gr.Button(value="Sync anki", variant="primary")
                  txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
