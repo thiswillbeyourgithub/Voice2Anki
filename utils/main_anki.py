@@ -32,17 +32,20 @@ doing_dir = Path("./user_directory/doing")
 unsplitted_dir = Path("./user_directory/unsplitted")
 tmp_dir = Path("/tmp/gradio")
 
-assert Path("user_directory").exists(), "No 'user_directory' found"
-assert splitted_dir.exists(), "No 'splitted' subdir found"
-assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
-assert done_dir.exists(), "No 'done' subdir found"
-assert doing_dir.exists(), "No 'doing' subdir found"
 
-# move any file in doing to todos
-doings = sorted([p for p in doing_dir.rglob("*.mp3")])
-for p in doings:
-    whi(f"Starting up so moved files from doing to splitted: {p}")
-    shutil.move(p, splitted_dir / p.name)
+if not Path("user_directory").exists():
+    red("No 'user_directory' found")
+else:
+    assert splitted_dir.exists(), "No 'splitted' subdir found"
+    assert unsplitted_dir.exists(), "No 'unsplitted' subdir found"
+    assert done_dir.exists(), "No 'done' subdir found"
+    assert doing_dir.exists(), "No 'doing' subdir found"
+
+    # move any file in doing to todos
+    doings = sorted([p for p in doing_dir.rglob("*.mp3")])
+    for p in doings:
+        whi(f"Starting up so moved files from doing to splitted: {p}")
+        shutil.move(p, splitted_dir / p.name)
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
