@@ -164,7 +164,7 @@ with gr.Blocks(
 
     # semi auto mode
     aud_cache_event.append(
-        audio_mp3_1.stop_recording(
+        audio_mp3_1.change(
             fn=transcribe,
             inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
@@ -196,54 +196,54 @@ with gr.Blocks(
                     queue=True,
                     )
                     )
-    # aud_cache_event.append(
-    #     audio_mp3_2.stop_recording(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True).then(
-    #             fn=asv.n2,
-    #             inputs=[txt_profile, audio_mp3_2],
-    #             preprocess=False,
-    #             postprocess=False,
-    #             queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_3.stop_recording(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True).then(
-    #             fn=asv.n3,
-    #             inputs=[txt_profile, audio_mp3_3],
-    #             preprocess=False,
-    #             postprocess=False,
-    #             queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_4.stop_recording(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True).then(
-    #             fn=asv.n4,
-    #             inputs=[txt_profile, audio_mp3_4],
-    #             preprocess=False,
-    #             postprocess=False,
-    #             queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_5.stop_recording(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True).then(
-    #             fn=asv.n5,
-    #             inputs=[txt_profile, audio_mp3_5],
-    #             preprocess=False,
-    #             postprocess=False,
-    #             queue=True))
+    aud_cache_event.append(
+        audio_mp3_2.change(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            preprocess=False,
+            postprocess=False,
+            queue=True)# .then(
+                # fn=asv.n2,
+                # inputs=[txt_profile, audio_mp3_2],
+                # preprocess=False,
+                # postprocess=False,
+                # queue=True))
+    aud_cache_event.append(
+        audio_mp3_3.change(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            preprocess=False,
+            postprocess=False,
+            queue=True)# .then(
+                # fn=asv.n3,
+                # inputs=[txt_profile, audio_mp3_3],
+                # preprocess=False,
+                # postprocess=False,
+                # queue=True))
+    aud_cache_event.append(
+        audio_mp3_4.change(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            preprocess=False,
+            postprocess=False,
+            queue=True) # .then(
+                # fn=asv.n4,
+                # inputs=[txt_profile, audio_mp3_4],
+                # preprocess=False,
+                # postprocess=False,
+                # queue=True))
+    aud_cache_event.append(
+        audio_mp3_5.change(
+            fn=transcribe_cache_async,
+            inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            preprocess=False,
+            postprocess=False,
+            queue=True) #.then(
+                # fn=asv.n5,
+                # inputs=[txt_profile, audio_mp3_5],
+                # preprocess=False,
+                # postprocess=False,
+                # queue=True))
 
     # audio_mp3_1.clear(cancels=[aud_cache_event[0]])
     # audio_mp3_2.clear(cancels=[aud_cache_event[1]])
