@@ -6,6 +6,7 @@ scipy>=1.8.0
 opencv-python>=4.7.0.72
 python-Levenshtein>=0.21.0
 Levenshtein>=0.21.0
+sentence-transformers>=2.2.2
 
 # ocr mode
 joblib>=1.2.0
