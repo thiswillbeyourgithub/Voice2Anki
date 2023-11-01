@@ -64,7 +64,7 @@ with gr.Blocks(
             with gr.Row():
                 rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=3)
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=3)
-                roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
+                roll_dirload_check = gr.Checkbox(value=True, interactive=False, label="From Dirload?", show_label=True, scale=0)
 
             with gr.Row():
                 transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
@@ -297,30 +297,30 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         queue=True,
-                        ).then(
-                                fn=dirload_splitted,
-                                inputs=[
-                                    roll_dirload_check,
-                                    audio_mp3_1,
-                                    audio_mp3_2,
-                                    audio_mp3_3,
-                                    audio_mp3_4,
-                                    audio_mp3_5,
-                                    txt_whisp_prompt,
-                                    txt_whisp_lang,
-                                    txt_profile,
-                                    ],
-                                outputs=[
-                                    audio_mp3_1,
-                                    audio_mp3_2,
-                                    audio_mp3_3,
-                                    audio_mp3_4,
-                                    audio_mp3_5,
-                                    ],
-                                # preprocess=False,
-                                # postprocess=False,
-                                queue=True,
-                                )
+                        )# .then(
+                         #        fn=dirload_splitted,
+                         #        inputs=[
+                         #            roll_dirload_check,
+                         #            audio_mp3_1,
+                         #            audio_mp3_2,
+                         #            audio_mp3_3,
+                         #            audio_mp3_4,
+                         #            audio_mp3_5,
+                         #            txt_whisp_prompt,
+                         #            txt_whisp_lang,
+                         #            txt_profile,
+                         #            ],
+                         #        outputs=[
+                         #            audio_mp3_1,
+                         #            audio_mp3_2,
+                         #            audio_mp3_3,
+                         #            audio_mp3_4,
+                         #            audio_mp3_5,
+                         #            ],
+                         #        # preprocess=False,
+                         #        # postprocess=False,
+                         #        queue=True,
+                         #        )
     rollaudio2_btn.click(
             fn=asv.roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
@@ -358,30 +358,30 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            ).then(
-                                    fn=dirload_splitted,
-                                    inputs=[
-                                        roll_dirload_check,
-                                        audio_mp3_1,
-                                        audio_mp3_2,
-                                        audio_mp3_3,
-                                        audio_mp3_4,
-                                        audio_mp3_5,
-                                        txt_whisp_prompt,
-                                        txt_whisp_lang,
-                                        txt_profile,
-                                        ],
-                                    outputs=[
-                                        audio_mp3_1,
-                                        audio_mp3_2,
-                                        audio_mp3_3,
-                                        audio_mp3_4,
-                                        audio_mp3_5,
-                                        ],
-                                    # preprocess=False,
-                                    # postprocess=False,
-                                    queue=True,
-                                    )
+                            )# .then(
+                             #        fn=dirload_splitted,
+                             #        inputs=[
+                             #            roll_dirload_check,
+                             #            audio_mp3_1,
+                             #            audio_mp3_2,
+                             #            audio_mp3_3,
+                             #            audio_mp3_4,
+                             #            audio_mp3_5,
+                             #            txt_whisp_prompt,
+                             #            txt_whisp_lang,
+                             #            txt_profile,
+                             #            ],
+                             #        outputs=[
+                             #            audio_mp3_1,
+                             #            audio_mp3_2,
+                             #            audio_mp3_3,
+                             #            audio_mp3_4,
+                             #            audio_mp3_5,
+                             #            ],
+                             #        # preprocess=False,
+                             #        # postprocess=False,
+                             #        queue=True,
+                             #        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
