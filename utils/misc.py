@@ -32,6 +32,7 @@ class backend_config_class:
     def __init__(self):
         self.backend = "not yet initialized"
         self.media_folder = None
+        self.disable_embeddings = False
 global backend_config
 backend_config = backend_config_class()
 

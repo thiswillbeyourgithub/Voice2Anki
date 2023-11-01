@@ -201,14 +201,17 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
     assert len(syspr) == 1, "Number of system prompts != 1"
 
-    whi("Computing embeddings")
-    embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
+    if backend_config.disable_embeddings:
+        dist_check = [1 for 1 in timesorted_pr]
+    else:
+        whi("Computing embeddings")
+        embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
 
-    whi("Computing cosine distance")
-    distances = [float(util.cos_sim(new_prompt_vec, e)) for e in embeddings]
+        whi("Computing cosine distance")
+        distances = [float(util.cos_sim(new_prompt_vec, e)) for e in embeddings]
 
-    percentile = float(np.percentile(distances, 25))
-    dist_check = [1 if d >= percentile else 0 for d in distances]
+        percentile = float(np.percentile(distances, 25))
+        dist_check = [1 if d >= percentile else 0 for d in distances]
     assert len(dist_check) == len(timesorted_pr), "unexpected length"
 
     # add by decreasing priority and timestamp

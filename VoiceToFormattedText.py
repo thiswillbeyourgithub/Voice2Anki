@@ -22,6 +22,7 @@ def start_voice2formattedtext(
         localnetworkonly=False,
         use_ssl=False,
         media_folder=None,
+        disable_embeddings=False,
         *args,
         **kwargs
         ):
@@ -48,6 +49,9 @@ def start_voice2formattedtext(
         if True, will use the ssl configuration specified in __init__.py
     media_folder: str, default None
         optional anki media database location
+    disable_embeddings: bool, default False
+        if True, will not use embeddings to improve the memory filtering.
+        Meant to be used for low end device.
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -105,6 +109,7 @@ def start_voice2formattedtext(
         from utils.gui_markdown import demo_markdown as demo
     else:
         raise ValueError(backend)
+    backend.disable_embeddings = disable_embeddings
 
     if use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
