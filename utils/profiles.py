@@ -99,11 +99,11 @@ class ValueStorage:
         else:
             whi(f"No {kf} stored in profile dir, using appropriate default value")
             if key == "sld_max_tkn":
-                default = 2000
+                default = 3500
             if key == "sld_buffer":
                 default = 3
             if key == "temperature":
-                default = 0.3
+                default = 0.2
             if key == "txt_whisp_lang":
                 default = "fr"
             if key == "total_llm_cost":
