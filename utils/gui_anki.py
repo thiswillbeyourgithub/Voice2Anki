@@ -59,8 +59,8 @@ with gr.Blocks(
                 rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
                 img_btn = gr.Button(value="Add image from clipboard", variant="primary", min_width=50)
         with gr.Column(scale=3):
-            txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=20, placeholder="The transcript of the audio recording will appear here", container=False)
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=20, placeholder="The anki flashcard will appear here", container=False)
+            txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False)
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=100, placeholder="The anki flashcard will appear here", container=False)
             with gr.Row():
                 rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=3)
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=3)
