@@ -412,14 +412,6 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
-    # move any file in doing to done
-    doings = [p for p in doing_dir.rglob("*.mp3")]
-    if not doings:
-        whi("No mp3 files in doing")
-    for p in doings:
-        whi(f"Refilling so moving files from doing to done: {p}")
-        shutil.move(p, done_dir / p.name)
-
     # check how many audio are needed
     sound_slots = 0
     for sound in [a5, a4, a3, a2, a1]:
@@ -428,6 +420,15 @@ def load_splitted_audio(a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, tx
         else:
             break
     whi(f"Number of empty sound slots: {sound_slots}")
+
+    # move any file in doing to done
+    doings = sorted([p for p in doing_dir.rglob("*.mp3")])
+    if not doings:
+        whi("No mp3 files in doing")
+    else:
+        for p in doings[:sound_slots]:
+            whi(f"Refilling so moving files from doing to done: {p}")
+            shutil.move(p, done_dir / p.name)
 
     # count the number of mp3 files in the splitted dir
     splitteds = [p for p in splitted_dir.rglob("*.mp3")]
