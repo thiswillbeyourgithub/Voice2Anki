@@ -64,7 +64,7 @@ with gr.Blocks(
             with gr.Row():
                 rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=3)
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=3)
-                roll_dirload_check = gr.Checkbox(value=True, label="From Dirload?", show_label=True, scale=0)
+                roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
 
             with gr.Row():
                 transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
