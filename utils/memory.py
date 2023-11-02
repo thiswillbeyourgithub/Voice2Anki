@@ -275,6 +275,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
         sig -= sig * 0.1
         plimit -= 10
+        sig = max(sig, 0)
+        plimit = max(plimit, 0)
         percentile = float(np.percentile(distances, plimit))
         dist_check = [1 if d >= percentile else 0 for d in distances]
 
