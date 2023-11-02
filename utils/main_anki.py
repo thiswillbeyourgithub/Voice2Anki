@@ -75,10 +75,7 @@ running_tasks = {
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
-soundpreprocess_cache = joblib.Memory("sound_preprocessing_cache", verbose=0)
-sound_preprocessing_cached = soundpreprocess_cache.cache(sound_preprocessing)
-
-stt_cache = joblib.Memory("transcript_cache", verbose=0)
+stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
@@ -457,7 +454,7 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_l
                 not path.exists()), "unexpected sound location"
 
         try:  # preprocess sound
-            to_temp = sound_preprocessing_cached(to_temp)
+            to_temp = sound_preprocessing(to_temp)
         except Exception as err:
             red(f"Error when preprocessing sound {to_temp}: '{err}'")
 

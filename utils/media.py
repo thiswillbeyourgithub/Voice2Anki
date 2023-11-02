@@ -9,12 +9,15 @@ import pyclip
 import hashlib
 import torchaudio
 
+from joblib import Memory
+
 from .logger import whi, red, trace
 from .anki_utils import anki_media
 from .ocr import get_text
 from .profiles import ValueStorage
 from .misc import rgb_to_bgr
 
+soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
 
 @trace
 def get_image(gallery):
@@ -142,6 +145,7 @@ def roll_audio(
 
 
 @trace
+@sound_preprocessing.cache
 def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Cleaning {audio_mp3_n} with torchaudio")
