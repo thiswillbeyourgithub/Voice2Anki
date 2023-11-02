@@ -383,23 +383,23 @@ with gr.Blocks(
                                 postprocess=False,
                                 queue=True,
                                 )
-                                )# .then(
-                                 #    fn=to_anki,
-                                 #    inputs=[
-                                 #        audio_mp3_1,
-                                 #        txt_audio,
-                                 #        txt_chatgpt_cloz,
-                                 #        txt_chatgpt_context,
-                                 #        txt_chatgpt_tkncost,
-                                 #        txt_deck,
-                                 #        txt_tags,
-                                 #        txt_profile,
-                                 #        gallery,
-                                 #        ],
-                                 #    preprocess=False,
-                                 #    postprocess=False,
-                                 #    queue=True,
-                                 #    )
+                                # ).then(
+                                #    fn=to_anki,
+                                #    inputs=[
+                                #        audio_mp3_1,
+                                #        txt_audio,
+                                #        txt_chatgpt_cloz,
+                                #        txt_chatgpt_context,
+                                #        txt_chatgpt_tkncost,
+                                #        txt_deck,
+                                #        txt_tags,
+                                #        txt_profile,
+                                #        gallery,
+                                #        ],
+                                #    preprocess=False,
+                                #    postprocess=False,
+                                #    queue=True,
+                                #    )
 
     # send to whisper
     transcript_btn.click(
