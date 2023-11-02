@@ -62,9 +62,9 @@ with gr.Blocks(
             txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False)
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=100, placeholder="The anki flashcard will appear here", container=False)
             with gr.Row():
-                rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=3)
-                rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=3)
                 roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
+                rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=4)
+                rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=4)
 
             with gr.Row():
                 transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
