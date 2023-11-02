@@ -214,7 +214,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         for i in range(len(timesorted_pr)):
             content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
             answer_dist = float(util.cos_sim(new_prompt_vec, embeddings_answer[i]))
-            score = content_dist * 1 + answer_dist * 5
+            score = content_dist * 1 + answer_dist * 1
             distances.append(score)
 
         percentile = float(np.percentile(distances, 25))
