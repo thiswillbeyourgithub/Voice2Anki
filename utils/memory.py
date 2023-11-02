@@ -280,10 +280,12 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
     # make it so that highest priority prompts are last in the discussion:
     output_pr.reverse()
+    # or sort by timestamp:
+    output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
     # or sort by priority:
     # output_pr = sorted(output_pr, key=lambda x: x["priority"])
     # or by distance:
-    output_pr = sorted(output_pr, key=lambda x: distances[output_pr.index(x)])
+    # output_pr = sorted(output_pr, key=lambda x: distances[output_pr.index(x)])
     # make sure the system prompt is first
     for i, p in enumerate(output_pr):
         if p["role"] == "system":
