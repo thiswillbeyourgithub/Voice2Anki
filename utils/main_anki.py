@@ -116,7 +116,7 @@ def whisper_cached(
         return red(f"Error when cache transcribing audio: '{err}'")
 
 @trace
-def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -145,10 +145,10 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
 
 @trace
-def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     thread = threading.Thread(
             target=transcribe_cache,
-            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile)
+            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang)
             )
     thread.start()
     return thread
