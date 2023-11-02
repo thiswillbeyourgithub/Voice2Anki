@@ -189,8 +189,8 @@ def sound_preprocessing(audio_mp3_n):
             ["highpass", "-2", "50"],
             ["lowpass", "-2", "5000"],
 
-            # # max silence should be 1s
-            # ["silence", "-l", "1", "0.1", "5%", "-1", "1.0", "5%"],
+            # # max silence should be 2s
+            ["silence", "-l", "1", "2.0", "5%", "-1", "2.0", "5%"],
 
             # # remove leading silence
             ["vad"],
