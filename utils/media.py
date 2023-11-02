@@ -155,8 +155,8 @@ def sound_preprocessing(audio_mp3_n):
         whi("Not cleaning sound because received None")
         return None
 
-    # # load from file
-    # waveform, sample_rate = torchaudio.load(audio_mp3_n)
+    # load from file
+    waveform, sample_rate = torchaudio.load(audio_mp3_n)
 
     # # voice activity detector (i.e. trims the beginning of the sound until you speak)
     # waveform = torchaudio.functional.vad(
@@ -208,8 +208,9 @@ def sound_preprocessing(audio_mp3_n):
             # max silence should be 2s
             # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
             ]
-    torchaudio.sox_effects.apply_effects_file(
-            audio_mp3_n,
+    torchaudio.sox_effects.apply_effects_tensor(
+            waveform,
+            sample_rate,
             sox_effects,
             )
 
