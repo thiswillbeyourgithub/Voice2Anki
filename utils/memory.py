@@ -235,8 +235,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     while (not exit_while) and timesorted_pr:
         category_count = 0
         cnt += 1
-        if cnt > 100:
-            whi("Exited while loop after 100 iterations")
+        if cnt > 20:
+            red(f"Exited filtering loop after {cnt} iterations, have you added enough memories?")
             exit_while = True
             break
         for prio in prio_vals:
