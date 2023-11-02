@@ -18,6 +18,7 @@ from .profiles import ValueStorage
 from .misc import rgb_to_bgr
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
+soundpreprocess_cache.clear()  # clear the cache on startup
 
 @trace
 def get_image(gallery):
