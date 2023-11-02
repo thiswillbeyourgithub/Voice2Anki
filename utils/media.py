@@ -190,13 +190,13 @@ def sound_preprocessing(audio_mp3_n):
             ["highpass", "-2", "50"],
             ["lowpass", "-2", "5000"],
 
-            # # max silence should be 2s
-            # ["silence", "-l", "1", "2.0", "5%", "-1", "2.0", "5%"],
-
             # # remove leading silence
             ["vad"],
 
-            # # and ending silence
+            # # max silence should be 2s
+            # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
+
+            # and ending silence, this might be unecessary for splitted audio
             ["reverse"],
             ["vad"],
             ["reverse"],
