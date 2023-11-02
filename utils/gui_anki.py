@@ -8,7 +8,7 @@ from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, get_img_source
+from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, get_img_source, roll_audio
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -154,9 +154,6 @@ with gr.Blocks(
 
     # audio
 
-    # auto save audio
-    asv = audio_saver(pv.profile_name)
-
     # trigger whisper in advance, this way the output will be cached
     aud_cache_event = []
     # the first slot will directly trigger 1+2 while the other slots will
@@ -202,65 +199,35 @@ with gr.Blocks(
     #         inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         preprocess=False,
     #         postprocess=False,
-    #         queue=True)# .then(
-    #             # fn=asv.n1,
-    #             # inputs=[txt_profile, audio_mp3_1],
-    #             # preprocess=False,
-    #             # postprocess=False,
-    #             # queue=True))
-    #             )
+    #         queue=True)
     # aud_cache_event.append(
     #     audio_mp3_2.change(
     #         fn=transcribe_cache_async,
     #         inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         preprocess=False,
     #         postprocess=False,
-    #         queue=True)# .then(
-    #             # fn=asv.n2,
-    #             # inputs=[txt_profile, audio_mp3_2],
-    #             # preprocess=False,
-    #             # postprocess=False,
-    #             # queue=True))
-    #             )
+    #         queue=True)
     # aud_cache_event.append(
     #     audio_mp3_3.change(
     #         fn=transcribe_cache_async,
     #         inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         preprocess=False,
     #         postprocess=False,
-    #         queue=True)# .then(
-    #             # fn=asv.n3,
-    #             # inputs=[txt_profile, audio_mp3_3],
-    #             # preprocess=False,
-    #             # postprocess=False,
-    #             # queue=True))
-    #             )
+    #         queue=True)
     # aud_cache_event.append(
     #     audio_mp3_4.change(
     #         fn=transcribe_cache_async,
     #         inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         preprocess=False,
     #         postprocess=False,
-    #         queue=True) # .then(
-    #             # fn=asv.n4,
-    #             # inputs=[txt_profile, audio_mp3_4],
-    #             # preprocess=False,
-    #             # postprocess=False,
-    #             # queue=True))
-    #             )
+    #         queue=True)
     # aud_cache_event.append(
     #     audio_mp3_5.change(
     #         fn=transcribe_cache_async,
     #         inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         preprocess=False,
     #         postprocess=False,
-    #         queue=True) #.then(
-    #             # fn=asv.n5,
-    #             # inputs=[txt_profile, audio_mp3_5],
-    #             # preprocess=False,
-    #             # postprocess=False,
-    #             # queue=True))
-    #             )
+    #         queue=True)
 
     # audio_mp3_1.clear(cancels=[aud_cache_event[0]])
     # audio_mp3_2.clear(cancels=[aud_cache_event[1]])
@@ -277,7 +244,7 @@ with gr.Blocks(
             )
 
     rollaudio_btn.click(
-            fn=asv.roll_audio,
+            fn=roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             preprocess=False,
@@ -322,7 +289,7 @@ with gr.Blocks(
                          #        queue=True,
                          #        )
     rollaudio2_btn.click(
-            fn=asv.roll_audio,
+            fn=roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
             preprocess=False,

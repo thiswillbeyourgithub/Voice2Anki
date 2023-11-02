@@ -9,11 +9,6 @@ from .logger import whi, red, trace
 from .misc import rgb_to_bgr, backend_config
 
 approved_keys_all = [
-        "audio_mp3_1",
-        "audio_mp3_2",
-        "audio_mp3_3",
-        "audio_mp3_4",
-        "audio_mp3_5",
         "sld_max_tkn",
         "sld_buffer",
         "temperature",
@@ -225,7 +220,7 @@ def switch_profile(profile):
                 pv["txt_whisp_prompt"],
                 pv["txt_whisp_lang"],
                 pv["gallery"],
-                pv["audio_mp3_1"],
+                None,
                 None,
                 None,
                 profile,
@@ -236,7 +231,7 @@ def switch_profile(profile):
                 pv["txt_chatgpt_context"],
                 pv["txt_whisp_prompt"],
                 pv["txt_whisp_lang"],
-                pv["audio_mp3_1"],
+                None,
                 None,
                 None,
                 profile,
