@@ -145,7 +145,7 @@ def roll_audio(
 
 
 @trace
-@sound_preprocessing.cache
+@soundpreprocess_cache.cache
 def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Cleaning {audio_mp3_n} with torchaudio")
