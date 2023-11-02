@@ -181,7 +181,7 @@ purp = coloured_log("purple")
 
 indent = -2
 
-def trace(func):
+def trace(func, limit=0.5):
     """simple wrapper to use as decorator to print when a function is used
     and for how long"""
     def wrapper(*args, **kwargs):
@@ -192,7 +192,7 @@ def trace(func):
         t = time.time()
         result = func(*args, **kwargs)
         tt = time.time() - t
-        if tt > 0.5:
+        if tt > limit:
             red(f"{spacer}   Exiting {func} after {tt:.1f}s")
         else:
             purp(f"{spacer}   Exiting {func} after {tt:.1f}s")
