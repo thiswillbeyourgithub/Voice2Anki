@@ -451,10 +451,7 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
         assert (moved.exists() and (to_temp).exists()) and (
                 not path.exists()), "unexpected sound location"
 
-        try:  # preprocess sound
-            to_temp = sound_preprocessing(to_temp)
-        except Exception as err:
-            red(f"Error when preprocessing sound {to_temp}: '{err}'")
+        to_temp = sound_preprocessing(to_temp)
 
         whi(f"Will load sound {to_temp}")
         sounds_to_load.append(str(to_temp))
