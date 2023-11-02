@@ -11,7 +11,7 @@ import torchaudio
 
 from joblib import Memory
 
-from .logger import whi, red, trace
+from .logger import whi, red, trace, timeout
 from .anki_utils import anki_media
 from .ocr import get_text
 from .profiles import ValueStorage
@@ -19,6 +19,7 @@ from .misc import rgb_to_bgr
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
 soundpreprocess_cache.clear()  # clear the cache on startup
+
 
 @trace
 def get_image(gallery):
@@ -78,6 +79,7 @@ def check_source(source):
 
 
 @trace
+@timeout(limit=120)
 def get_img_source(gallery, queue=queue.Queue()):
     whi("Getting source from image")
     try:
