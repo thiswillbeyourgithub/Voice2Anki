@@ -362,9 +362,6 @@ with gr.Blocks(
                 audio_mp3_3,
                 audio_mp3_4,
                 audio_mp3_5,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-                txt_profile,
                 ],
             outputs=[
                 audio_mp3_1,

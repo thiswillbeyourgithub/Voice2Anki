@@ -404,7 +404,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 
 @trace
-def dirload_splitted(checkbox, a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -459,8 +459,6 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5, txt_whisp_prompt, txt_whisp_l
             red(f"Error when preprocessing sound {to_temp}: '{err}'")
 
         sounds_to_load.append(str(to_temp))
-        # if txt_whisp_prompt and txt_whisp_lang:
-        #     new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang, txt_profile))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     filled_slots = [a1, a2, a3, a4, a5]
