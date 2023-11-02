@@ -100,6 +100,11 @@ def whisper_cached(
                         file=audio_file,
                         prompt=txt_whisp_prompt,
                         language=txt_whisp_lang)
+
+                global pv
+                pv["txt_whisp_prompt"] = txt_whisp_prompt
+                pv["txt_whisp_lang"] = txt_whisp_lang
+
                 return transcript
             except RateLimitError as err:
                 if cnt >= 5:
@@ -122,12 +127,6 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
     if txt_whisp_lang is None:
         return
-
-    global pv
-    if pv.profile_name != txt_profile:
-        pv = ValueStorage(txt_profile)
-    pv["txt_whisp_prompt"] = txt_whisp_prompt
-    pv["txt_whisp_lang"] = txt_whisp_lang
 
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
