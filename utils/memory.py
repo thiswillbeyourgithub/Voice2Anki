@@ -206,8 +206,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         dist_check = [1 for i in timesorted_pr]
     else:
         whi("Computing embeddings")
-        embeddings_content = embedder([pr["content"] for pr in timesorted_pr]).tolist()
-        embeddings_answer = embedder([pr["answer"] for pr in timesorted_pr]).tolist()
+        embeddings_content = [embedder([pr["content"]]).tolist() for pr in timesorted_pr]
+        embeddings_answer = [embedder([pr["answer"]]).tolist() for pr in timesorted_pr]
 
         whi("Computing cosine distance")
         distances = []
