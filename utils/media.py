@@ -155,63 +155,63 @@ def sound_preprocessing(audio_mp3_n):
         whi("Not cleaning sound because received None")
         return None
 
-    # load from file
-    waveform, sample_rate = torchaudio.load(audio_mp3_n)
+    # # load from file
+    # waveform, sample_rate = torchaudio.load(audio_mp3_n)
 
-    # voice activity detector (i.e. trims the beginning of the sound until you speak)
-    waveform = torchaudio.functional.vad(
-            waveform=waveform,
-            sample_rate=sample_rate,
+    # # voice activity detector (i.e. trims the beginning of the sound until you speak)
+    # waveform = torchaudio.functional.vad(
+    #         waveform=waveform,
+    #         sample_rate=sample_rate,
 
-            trigger_level=5.0,  # default 7
-            trigger_time=0.25,  # to help ignore bursts of audio 0.25
-            search_time=1.0,  # default 1
-            allowed_gap=0.25,  # default 0.25
-            pre_trigger_time=0.0,  # default 0.0
-            boot_time=0.35,  # default 0.35
-            noise_up_time=0.1,  # 0.1
-            noise_down_time=0.01,  # 0.01
-            noise_reduction_amount=1.5,  # 1.35
-            measure_freq=20.0,  # 20
-            measure_smooth_time=0.4,  # 0.4
+    #         trigger_level=4.0,  # default 7
+    #         trigger_time=0.25,  # to help ignore bursts of audio 0.25
+    #         search_time=1.0,  # default 1
+    #         allowed_gap=0.25,  # default 0.25
+    #         pre_trigger_time=0.0,  # default 0.0
+    #         boot_time=0.35,  # default 0.35
+    #         noise_up_time=0.1,  # 0.1
+    #         noise_down_time=0.01,  # 0.01
+    #         noise_reduction_amount=1.5,  # 1.35
+    #         measure_freq=20.0,  # 20
+    #         measure_smooth_time=0.4,  # 0.4
 
-            # default values
-            hp_filter_freq=50.0,
-            lp_filter_freq=6000.0,
-            hp_lifter_freq=150.0,
-            lp_lifter_freq=2000.0,
-            )
+    #         # default values
+    #         hp_filter_freq=50.0,
+    #         lp_filter_freq=6000.0,
+    #         hp_lifter_freq=150.0,
+    #         lp_lifter_freq=2000.0,
+    #         )
 
-    # write to file
-    write(audio_mp3_n, sample_rate, waveform.numpy().T)
+    # # write to file
+    # write(audio_mp3_n, sample_rate, waveform.numpy().T)
 
     # alternative vad using torchaudio sox:
-    # sox_effects = [
-    #         # ["norm"],  # normalize audio
+    sox_effects = [
+            # ["norm"],  # normalize audio
 
-    #         # # isolate voice frequency
-    #         # # -2 is for a steeper filtering
-    #         # ["highpass", "-1", "100"],
-    #         # ["lowpass", "-1", "3000"],
-    #         # # removes high frequency and very low ones
-    #         # ["highpass", "-2", "50"],
-    #         # ["lowpass", "-2", "5000"],
+            # # isolate voice frequency
+            # # -2 is for a steeper filtering
+            # ["highpass", "-1", "100"],
+            # ["lowpass", "-1", "3000"],
+            # # removes high frequency and very low ones
+            # ["highpass", "-2", "50"],
+            # ["lowpass", "-2", "5000"],
 
-    #         # # remove leading silence
-    #         ["vad"],
+            # # remove leading silence
+            ["vad"],
 
-    #         # and ending silence, this might be unecessary for splitted audio
-    #         ["reverse"],
-    #         ["vad"],
-    #         ["reverse"],
+            # # and ending silence, this might be unecessary for splitted audio
+            # ["reverse"],
+            # ["vad"],
+            # ["reverse"],
 
-    #         # max silence should be 2s
-    #         # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
-    #         ]
-    # torchaudio.sox_effects.apply_effects_file(
-    #         audio_mp3_n,
-    #         sox_effects,
-    #         )
+            # max silence should be 2s
+            # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
+            ]
+    torchaudio.sox_effects.apply_effects_file(
+            audio_mp3_n,
+            sox_effects,
+            )
 
     whi("Done preprocessing audio")
     return audio_mp3_n
