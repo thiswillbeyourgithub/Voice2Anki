@@ -179,6 +179,8 @@ def sound_preprocessing(audio_mp3_n):
     #         lp_lifter_freq=2000.0,
     #         )
 
+    # write(audio_mp3_n, sample_rate, waveform.numpy().T)
+
     sox_effects = [
             # ["norm"],  # normalize audio
 
@@ -201,13 +203,10 @@ def sound_preprocessing(audio_mp3_n):
             # max silence should be 2s
             # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
             ]
-    waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
-            waveform,
-            sample_rate,
+    torchaudio.sox_effects.apply_effects_file(
+            audio_mp3_n,
             sox_effects,
             )
-
-    write(audio_mp3_n, sample_rate, waveform.numpy().T)
 
     whi("Done preprocessing audio")
     return audio_mp3_n
