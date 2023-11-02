@@ -193,13 +193,13 @@ def sound_preprocessing(audio_mp3_n):
             # # remove leading silence
             ["vad"],
 
-            # # max silence should be 2s
-            # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
-
             # and ending silence, this might be unecessary for splitted audio
             ["reverse"],
             ["vad"],
             ["reverse"],
+
+            # # max silence should be 2s
+            # ["silence", "-l", "1", "2.0", "1%", "-1", "2.0", "1%"],
             ]
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
             waveform,
