@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck, save_buffer
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, get_card_status
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, get_card_status
 from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
@@ -264,30 +264,18 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         queue=True,
-                        )# .then(
-                         #        fn=dirload_splitted,
-                         #        inputs=[
-                         #            roll_dirload_check,
-                         #            audio_mp3_1,
-                         #            audio_mp3_2,
-                         #            audio_mp3_3,
-                         #            audio_mp3_4,
-                         #            audio_mp3_5,
-                         #            txt_whisp_prompt,
-                         #            txt_whisp_lang,
-                         #            txt_profile,
-                         #            ],
-                         #        outputs=[
-                         #            audio_mp3_1,
-                         #            audio_mp3_2,
-                         #            audio_mp3_3,
-                         #            audio_mp3_4,
-                         #            audio_mp3_5,
-                         #            ],
-                         #        # preprocess=False,
-                         #        # postprocess=False,
-                         #        queue=True,
-                         #        )
+                        ).then(
+                                fn=dirload_splitted_last,
+                                inputs=[
+                                    roll_dirload_check,
+                                    ],
+                                outputs=[
+                                    audio_mp3_5,
+                                    ],
+                                preprocess=False,
+                                postprocess=False,
+                                queue=True,
+                                )
     rollaudio2_btn.click(
             fn=roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
@@ -325,30 +313,18 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            )# .then(
-                             #        fn=dirload_splitted,
-                             #        inputs=[
-                             #            roll_dirload_check,
-                             #            audio_mp3_1,
-                             #            audio_mp3_2,
-                             #            audio_mp3_3,
-                             #            audio_mp3_4,
-                             #            audio_mp3_5,
-                             #            txt_whisp_prompt,
-                             #            txt_whisp_lang,
-                             #            txt_profile,
-                             #            ],
-                             #        outputs=[
-                             #            audio_mp3_1,
-                             #            audio_mp3_2,
-                             #            audio_mp3_3,
-                             #            audio_mp3_4,
-                             #            audio_mp3_5,
-                             #            ],
-                             #        # preprocess=False,
-                             #        # postprocess=False,
-                             #        queue=True,
-                             #        )
+                            ).then(
+                                fn=dirload_splitted_last,
+                                inputs=[
+                                    roll_dirload_check,
+                                    ],
+                                outputs=[
+                                    audio_mp3_5,
+                                    ],
+                                preprocess=False,
+                                postprocess=False,
+                                queue=True,
+                                )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio

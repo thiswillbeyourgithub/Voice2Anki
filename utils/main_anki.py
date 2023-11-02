@@ -483,6 +483,22 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
     return output
 
 @trace
+def dirload_splitted_last(checkbox):
+    """wrapper for dirload_splitted to only load the last slot. This is faster
+    because gradio does not have to send all 5 sounds if I just rolled"""
+    if not checkbox:
+        return None
+    out = dirload_splitted(
+            checkbox,
+            a1=True,
+            a2=True,
+            a3=True,
+            a4=True,
+            a5=None,
+            )
+    return out[5]
+
+@trace
 def gather_threads(threads, source="to_anki"):
     n = len([t for t in threads if t.is_alive()])
     i = 0
