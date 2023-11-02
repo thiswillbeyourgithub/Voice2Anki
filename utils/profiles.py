@@ -101,7 +101,7 @@ class ValueStorage:
             if key == "sld_max_tkn":
                 default = 3500
             if key == "sld_buffer":
-                default = 3
+                default = 7
             if key == "temperature":
                 default = 0.2
             if key == "txt_whisp_lang":
