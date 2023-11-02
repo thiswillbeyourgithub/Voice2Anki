@@ -59,7 +59,6 @@ embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
 embed_model = SentenceTransformer(embedding_model_name)
 
 
-@trace
 @embeddings_cache.cache
 def embedder(*args, **kwargs):
     red("Computing embedding of 1 memory")
