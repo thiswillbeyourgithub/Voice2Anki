@@ -168,7 +168,7 @@ def look_for_card(cloz):
     cloz = re.sub("{{c\d+::", "", cloz)
     state = _call_anki(
             action="findCards",
-            query=f"added:2 {cloz}"
+            query=f"added:1 {cloz}"
             )
     return state
 
