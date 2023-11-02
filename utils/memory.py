@@ -218,7 +218,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
             # score += answer_dist * 1
             distances.append(score)
 
-        percentile = float(np.percentile(distances, 25))
+        plimit = 90
+        percentile = float(np.percentile(distances, plimit))
         dist_check = [1 if d >= percentile else 0 for d in distances]
     assert len(dist_check) == len(timesorted_pr), "unexpected length"
 
@@ -271,9 +272,11 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
             whi(f"* {cnt} Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
             category_count = len(output_pr)
 
-        if len(output_pr) < 5:
-            red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
-            sig -= sig * 0.1
+        red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
+        sig -= sig * 0.1
+        plimit -= 10
+        percentile = float(np.percentile(distances, plimit))
+        dist_check = [1 if d >= percentile else 0 for d in distances]
 
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
