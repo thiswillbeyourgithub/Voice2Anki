@@ -271,6 +271,11 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
                         dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
             whi(f"* {cnt} Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
             category_count = len(output_pr)
+
+        if len(output_pr) < 5:
+            red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
+            sig -= sig * 0.1
+
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
