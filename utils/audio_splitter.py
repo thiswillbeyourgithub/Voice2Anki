@@ -39,7 +39,7 @@ class AudioSplitter:
             splitted_dir="./user_directory/splitted",
             done_dir="./user_directory/done",
             remove_silence=False,
-            trim_splitted_silence=True,
+            trim_splitted_silence=False,
             slow_down_all=True,
             silence_method="sox",
             ):
