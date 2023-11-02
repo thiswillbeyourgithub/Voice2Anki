@@ -275,7 +275,14 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                )
+                                ).then(
+                                        fn=get_card_status,
+                                        inputs=[txt_chatgpt_cloz],
+                                        outputs=[txt_card_done],
+                                        preprocess=False,
+                                        postprocess=False,
+                                        queue=True,
+                                        )
     rollaudio2_btn.click(
             fn=roll_audio,
             inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
@@ -324,7 +331,14 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                )
+                                ).then(
+                                        fn=get_card_status,
+                                        inputs=[txt_chatgpt_cloz],
+                                        outputs=[txt_card_done],
+                                        preprocess=False,
+                                        postprocess=False,
+                                        queue=True,
+                                        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -361,23 +375,31 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         queue=True,
-                        )# .then(
-                         #    fn=to_anki,
-                         #    inputs=[
-                         #        audio_mp3_1,
-                         #        txt_audio,
-                         #        txt_chatgpt_cloz,
-                         #        txt_chatgpt_context,
-                         #        txt_chatgpt_tkncost,
-                         #        txt_deck,
-                         #        txt_tags,
-                         #        txt_profile,
-                         #        gallery,
-                         #        ],
-                         #    preprocess=False,
-                         #    postprocess=False,
-                         #    queue=True,
-                         #    )
+                        ).then(
+                                fn=get_card_status,
+                                inputs=[txt_chatgpt_cloz],
+                                outputs=[txt_card_done],
+                                preprocess=False,
+                                postprocess=False,
+                                queue=True,
+                                )
+                                )# .then(
+                                 #    fn=to_anki,
+                                 #    inputs=[
+                                 #        audio_mp3_1,
+                                 #        txt_audio,
+                                 #        txt_chatgpt_cloz,
+                                 #        txt_chatgpt_context,
+                                 #        txt_chatgpt_tkncost,
+                                 #        txt_deck,
+                                 #        txt_tags,
+                                 #        txt_profile,
+                                 #        gallery,
+                                 #        ],
+                                 #    preprocess=False,
+                                 #    postprocess=False,
+                                 #    queue=True,
+                                 #    )
 
     # send to whisper
     transcript_btn.click(
