@@ -397,7 +397,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         pv["temperature"] = temperature
         pv["txt_chatgpt_context"] = txt_chatgpt_context
 
-
         return cloz, tkn_cost
     except Exception as err:
         return red(f"Error with ChatGPT: '{err}'"), [0, 0]
@@ -458,6 +457,7 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
         except Exception as err:
             red(f"Error when preprocessing sound {to_temp}: '{err}'")
 
+        whi(f"Will load sound {to_temp}")
         sounds_to_load.append(str(to_temp))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
