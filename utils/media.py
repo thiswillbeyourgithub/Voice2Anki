@@ -194,11 +194,11 @@ def sound_preprocessing(audio_mp3_n):
             # ["silence", "-l", "1", "2.0", "5%", "-1", "2.0", "5%"],
 
             # # remove leading silence
-            ["vad"],
+            ["vad", "-T", "0.6", "-t", "5", "-s", "5"],
 
             # # and ending silence
             ["reverse"],
-            ["vad"],
+            ["vad", "-T", "0.6", "-t", "5", "-s", "5"],
             ["reverse"],
             ]
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
