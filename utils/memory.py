@@ -61,6 +61,7 @@ embed_model = SentenceTransformer(embedding_model_name)
 @trace
 @embeddings_cache.cache
 def embedder(*args, **kwargs):
+    red("Computing embedding of 1 memory")
     return embed_model.encode(*args, **kwargs)
 
 def hasher(text):
