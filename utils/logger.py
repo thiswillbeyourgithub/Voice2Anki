@@ -1,3 +1,4 @@
+import signal
 import time
 import sqlite3
 import zlib
@@ -198,4 +199,18 @@ def trace(func, limit=0.5):
             purp(f"{spacer}   Exiting {func} after {tt:.1f}s")
         indent -= 2
         return result
+    return wrapper
+
+def timeout_reached(signum, frame):
+    "function called if timeout is reached"
+    raise Exception(f"Reached timeout: {signum} in {frame}")
+
+def timeout(func, limit=60):
+    "simple wrapper to add a timeout that raises an exception if taking too long"
+    def wrapper(*args, **kwargs):
+        signal.signal(signal.SIGALRM, timeout_reached)
+        signal.alarm(limit)
+        out = func(*args, **kwargs)
+        signal.alarm(0)
+        return out
     return wrapper
