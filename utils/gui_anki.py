@@ -8,7 +8,7 @@ from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, audio_saver, sound_preprocessing, get_img_source, roll_audio
+from .media import get_image, reset_audio, reset_image, sound_preprocessing, get_img_source, roll_audio
 
 theme = gr.themes.Soft(
         primary_hue="violet",
