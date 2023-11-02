@@ -19,7 +19,7 @@ from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, look_for_card
 from .misc import tokenize, transcript_template, backend_config, format_audio_component
-from .logger import red, whi, yel, store_to_db, trace
+from .logger import red, whi, yel, store_to_db, trace, timeout
 from .memory import prompt_filter, load_prev_prompts, embedder
 from .media import sound_preprocessing, get_img_source
 from .profiles import ValueStorage
@@ -218,6 +218,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
 
 @trace
+@timeout
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
