@@ -476,7 +476,14 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    )
+                    ).then(
+                            fn=get_card_status,
+                            inputs=[txt_chatgpt_cloz],
+                            outputs=[txt_card_done],
+                            preprocess=False,
+                            postprocess=False,
+                            queue=True,
+                            )
 
     # 1+2+3
     auto_btn.click(
@@ -509,7 +516,14 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    )
+                    ).then(
+                            fn=get_card_status,
+                            inputs=[txt_chatgpt_cloz],
+                            outputs=[txt_card_done],
+                            preprocess=False,
+                            postprocess=False,
+                            queue=True,
+                            )
 
     improve_btn.click(
             fn=recur_improv,
