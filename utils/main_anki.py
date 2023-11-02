@@ -227,7 +227,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if not txt_chatgpt_context:
         return "No txt_chatgpt_context found.", [0, 0]
 
-    if "fred" in txt_audio.lower() and "image" in txt_audio.lower() and len(txt_audio) < 40:
+    if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         message_buffer["question"] = []
         message_buffer["answer"] = []
         whi(f"Image change detected: '{txt_audio}', resetting the message buffer")
