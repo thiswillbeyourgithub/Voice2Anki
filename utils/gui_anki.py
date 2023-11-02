@@ -436,7 +436,14 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            )
+            ).then(
+                    fn=get_card_status,
+                    inputs=[txt_chatgpt_cloz],
+                    outputs=[txt_card_done],
+                    preprocess=False,
+                    postprocess=False,
+                    queue=True,
+                    )
 
     # 1+2
     semiauto_btn.click(
