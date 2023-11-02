@@ -202,13 +202,20 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     assert len(syspr) == 1, "Number of system prompts != 1"
 
     if backend_config.disable_embeddings:
+        whi("Not using embeddings")
         dist_check = [1 for i in timesorted_pr]
     else:
         whi("Computing embeddings")
-        embeddings = embedder([pr["content"] for pr in timesorted_pr]).tolist()
+        embeddings_content = embedder([pr["content"] for pr in timesorted_pr]).tolist()
+        embeddings_answer = embedder([pr["answer"] for pr in timesorted_pr]).tolist()
 
         whi("Computing cosine distance")
-        distances = [float(util.cos_sim(new_prompt_vec, e)) for e in embeddings]
+        distances = []
+        for i in range(len(timesorted_pr)):
+            content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
+            answer_dist = float(util.cos_sim(new_prompt_vec, embeddings_answer[i]))
+            score = content_dist * 1 + answer_dist * 5
+            distances.append(score)
 
         percentile = float(np.percentile(distances, 25))
         dist_check = [1 if d >= percentile else 0 for d in distances]
