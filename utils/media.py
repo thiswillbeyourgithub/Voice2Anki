@@ -14,7 +14,7 @@ from joblib import Memory
 
 from .logger import whi, red, trace, timeout
 from .ocr import get_text
-from .misc import backend_config
+from .shared_module import shared
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
 soundpreprocess_cache.clear()  # clear the cache on startup
@@ -91,7 +91,7 @@ def get_img_source(gallery, queue=queue.Queue()):
         for img in gallery:
             decoded = cv2.imread(img["name"], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
-            new = backend_config.anki_media / f"{img_hash}.png"
+            new = shared.anki_media / f"{img_hash}.png"
             if not new.exists():
                 cv2.imwrite(str(new), decoded)
 

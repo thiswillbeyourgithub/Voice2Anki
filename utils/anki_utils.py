@@ -9,7 +9,7 @@ import urllib.request
 import json
 
 from .logger import red, whi, trace, timeout
-from .misc import backend_config
+from .shared_module import shared
 from .media import format_audio_component
 
 try:
@@ -189,8 +189,8 @@ def threaded_sync_anki():
 
 
 # load anki profile using ankipandas just to get the media folder
-if backend_config.media_folder:
-    db_path = Path(backend_config.media_folder)
+if shared.media_folder:
+    db_path = Path(shared.media_folder)
     red(f"Using anki db_path found in argument: {db_path}")
 else:
     try:
@@ -211,7 +211,7 @@ if "trash" in str(db_path).lower():
     time.sleep(1)
 anki_media = Path(db_path).parent / "collection.media"
 assert anki_media.exists(), "Media folder not found!"
-backend_config.anki_media = anki_media
+shared.anki_media = anki_media
 
 
 if __name__ == "__main__":

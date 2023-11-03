@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from utils.logger import whi, yel, red, print_db
-from utils.misc import backend_config
+from utils.shared_module import shared
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)
@@ -100,16 +100,16 @@ def start_voice2formattedtext(
     else:
         server = None
 
-    backend_config.VERSION = 0.2
-    backend_config.disable_embeddings = disable_embeddings
-    backend_config.media_folder = media_folder
-    backend_config.debug = debug
+    shared.VERSION = 0.2
+    shared.disable_embeddings = disable_embeddings
+    shared.media_folder = media_folder
+    shared.debug = debug
 
     if backend == "anki":
-        backend_config.backend = "anki"
+        shared.backend = "anki"
         from utils.gui_anki import demo_anki as demo
     elif backend == "markdown":
-        backend_config.backend = "markdown"
+        shared.backend = "markdown"
         from utils.gui_markdown import demo_markdown as demo
     else:
         raise ValueError(backend)

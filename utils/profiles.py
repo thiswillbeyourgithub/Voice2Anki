@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from .logger import whi, red, trace
-from .misc import backend_config
+from .shared_module import shared
 from .media import rgb_to_bgr
 
 approved_keys_all = [
@@ -37,16 +37,16 @@ class ValueStorage:
     def __init__(self, profile="latest"):
 
         # determine the backend to know where to look for the profile
-        if backend_config.backend == "anki":
+        if shared.backend == "anki":
             self.backend = "anki"
             self.approved_keys = approved_keys_anki
             self.backend_dir = anki_path
-        elif backend_config.backend == "markdown":
+        elif shared.backend == "markdown":
             self.backend = "markdown"
             self.approved_keys = approved_keys_md
             self.backend_dir = md_path
         else:
-            raise Exception(backend_config.backend)
+            raise Exception(shared.backend)
 
         if profile == "latest":
             try:
@@ -171,9 +171,9 @@ class ValueStorage:
 @trace
 def get_profiles():
     profiles = [str(p.name) for p in profile_path.iterdir()]
-    if backend_config.backend == "anki":
+    if shared.backend == "anki":
         profiles = [str(p.name) for p in anki_path.iterdir()]
-    elif backend_config.backend == "markdown":
+    elif shared.backend == "markdown":
         profiles = [str(p.name) for p in md_path.iterdir()]
     assert profiles, "Empty list of profiles"
     return profiles
@@ -199,12 +199,12 @@ def switch_profile(profile):
     profile = profile.lower()
 
     if profile not in get_profiles():
-        if backend_config.backend == "anki":
+        if shared.backend == "anki":
             (anki_path / profile).mkdir(exist_ok=False)
-        elif backend_config.backend == "markdown":
+        elif shared.backend == "markdown":
             (md_path / profile).mkdir(exist_ok=False)
         else:
-            raise Exception(backend_config.backend)
+            raise Exception(shared.backend)
         red(f"created {profile}.")
         return [
                 None,

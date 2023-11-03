@@ -11,7 +11,7 @@ from sentence_transformers import SentenceTransformer, util
 import tiktoken
 
 from .logger import whi, red, yel, trace, timeout
-from .misc import backend_config
+from .shared_module import shared
 
 # string at the end of the prompt
 prompt_finish = "\n\n###\n\n"
@@ -58,14 +58,14 @@ default_system_prompt_anki = {
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
 
-if backend_config.backend == "anki":
+if shared.backend == "anki":
     default_system_prompt = default_system_prompt_anki
     backend = "anki"
-elif backend_config.backend == "markdown":
+elif shared.backend == "markdown":
     default_system_prompt = default_system_prompt_md
     backend = "markdown"
 else:
-    raise Exception(backend_config.backend)
+    raise Exception(shared.backend)
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
@@ -219,7 +219,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
     assert len(syspr) == 1, "Number of system prompts != 1"
 
-    if backend_config.disable_embeddings:
+    if shared.disable_embeddings:
         whi("Not using embeddings")
         dist_check = [1 for i in timesorted_pr]
     else:
@@ -292,7 +292,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
         sig -= sig * 0.1
         sig = max(sig, 0)
-        if not backend_config.disable_embeddings:
+        if not shared.disable_embeddings:
             plimit -= 10
             plimit = max(plimit, 0)
             percentile = float(np.percentile(distances, plimit))

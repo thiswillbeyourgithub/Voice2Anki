@@ -17,7 +17,7 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, look_for_card
-from .misc import backend_config
+from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, timeout
 from .memory import prompt_filter, load_prev_prompts, embedder, tokenize, transcript_template
 from .media import sound_preprocessing, get_img_source, format_audio_component
@@ -195,7 +195,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         "transcribed_input": txt_audio,
                         "model_name": f"OpenAI {modelname}",
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
-                        "V2FT_version": backend_config.VERSION,
+                        "V2FT_version": shared.VERSION,
                         },
                     "db_name": "anki_whisper"
                     })
@@ -266,7 +266,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             max_token,
             temperature,
             new_prompt_len=prompt_len_already,
-            new_prompt_vec=None if backend_config.disable_embeddings else embedder([new_prompt["content"]]),
+            new_prompt_vec=None if shared.disable_embeddings else embedder([new_prompt["content"]]),
             favor_list=True if " list" in txt_audio.lower() else False
             )
 
@@ -377,7 +377,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                         "nb_of_message_in_conversation": len(formatted_messages),
                         "system_prompt": formatted_messages[0],
                         "cloze": cloz,
-                        "V2FT_version": backend_config.VERSION,
+                        "V2FT_version": shared.VERSION,
                         },
                     "db_name": "anki_llm"})
         thread.start()
@@ -639,7 +639,7 @@ def to_anki(
                 "transcripted_text": txt_audio,
                 "chatgpt_context": txt_chatgpt_context,
                 "model": "chatgpt",
-                "version": backend_config.VERSION,
+                "version": shared.VERSION,
                 "chatgpt_tkn_cost": txt_chatgpt_tkncost,
                 "chatgpt_dollars_cost": tkn_cost_dol,
                 "timestamp": time.time(),
