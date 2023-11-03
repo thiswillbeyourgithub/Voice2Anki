@@ -40,7 +40,7 @@ class AudioSplitter:
             done_dir="./user_directory/done",
             remove_silence=False,
             trim_splitted_silence=False,
-            global_slowdown_factor=1.0,
+            global_slowdown_factor=0.9,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
