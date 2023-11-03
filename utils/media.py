@@ -14,7 +14,7 @@ from joblib import Memory
 
 from .logger import whi, red, trace, timeout
 from .ocr import get_text
-from .misc import rgb_to_bgr, backend_config
+from .misc import backend_config
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
 soundpreprocess_cache.clear()  # clear the cache on startup
@@ -246,3 +246,10 @@ def format_audio_component(audio):
     else:
         raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))
     return audio
+
+def rgb_to_bgr(image):
+    """gradio is turning cv2's BGR colorspace into RGB, so
+    I need to convert it again"""
+    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+

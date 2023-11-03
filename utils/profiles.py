@@ -6,7 +6,8 @@ import numpy as np
 import cv2
 
 from .logger import whi, red, trace
-from .misc import rgb_to_bgr, backend_config
+from .misc import backend_config
+from .media import rgb_to_bgr
 
 approved_keys_all = [
         "sld_max_tkn",
