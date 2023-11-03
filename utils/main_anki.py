@@ -16,7 +16,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from .anki_utils import add_to_anki, audio_to_anki, look_for_card
+from .anki_utils import add_to_anki, audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, timeout
 from .memory import prompt_filter, load_prev_prompts, embedder, tokenize, transcript_template
