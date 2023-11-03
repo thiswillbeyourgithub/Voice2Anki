@@ -206,6 +206,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     if backend_config.disable_embeddings:
         whi("Not using embeddings")
         dist_check = [1 for i in timesorted_pr]
+        plimit = 100
     else:
         embeddings_content = [embedder([pr["content"]]).tolist() for pr in tqdm(timesorted_pr, desc="computing embeddings")]
         # embeddings_answer = [embedder([pr["answer"]]).tolist() for pr in timesorted_pr]
