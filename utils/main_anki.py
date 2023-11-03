@@ -218,7 +218,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
 
 @trace
-# @timeout
+@timeout
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:

@@ -1,4 +1,4 @@
-import signal
+import threading
 import time
 import sqlite3
 import zlib
@@ -201,16 +201,24 @@ def trace(func, limit=0.5):
         return result
     return wrapper
 
-def timeout_reached(signum, frame):
-    "function called if timeout is reached"
-    raise Exception(f"Reached timeout: {signum} in {frame}")
 
-def timeout(func, limit=60):
+def timeout(limit=60):
     "simple wrapper to add a timeout that raises an exception if taking too long"
-    def wrapper(*args, **kwargs):
-        signal.signal(signal.SIGALRM, timeout_reached)
-        signal.alarm(limit)
-        out = func(*args, **kwargs)
-        signal.alarm(0)
-        return out
-    return wrapper
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            result = []
+            def appender(*args, **kwargs):
+                result.append(func(*args, **kwargs))
+                return
+            thread = threading.Thread(
+                    target=appender,
+                    args=args,
+                    kwargs=kwargs)
+            thread.start()
+            thread.join(timeout=limit)
+            if thread.is_alive():
+                raise Exception(f"Reached timeout for {func} after {limit}s")
+            else:
+                return result[0]
+        return wrapper
+    return decorator
