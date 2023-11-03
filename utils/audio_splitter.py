@@ -97,6 +97,9 @@ class AudioSplitter:
                 whi("  Saving streched wav")
                 sf.write(tempf.name, y2, sr, format='wav')
                 sub_audio = AudioSegment.from_wav(tempf.name)
+                speed_ratio = len(sub_audio) / len(audio)
+                assert abs(1 - speed_ratio / self.spf) <= 0.0001, (
+                    f"The slowdown factor is different than asked: '{speed_ratio}'")
                 whi("  Resaving as mp3")
                 sub_audio.export(tempf.name, format="mp3")
                 self.to_split[i] = tempf.name
