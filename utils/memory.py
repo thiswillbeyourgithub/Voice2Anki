@@ -27,7 +27,6 @@ transcript_template = """
 Context: 'CONTEXT'
 Transcript: 'TRANSCRIPT'
 """.strip()
-global prev_prompts
 
 default_system_prompt_md = {
              "role": "system",
