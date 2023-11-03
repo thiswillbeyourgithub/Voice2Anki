@@ -36,31 +36,33 @@ assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "ma
 class ValueStorage:
     @trace
     def __init__(self, profile="latest"):
+
+        # determine the backend to know where to look for the profile
+        if backend_config.backend == "anki":
+            self.backend = "anki"
+            self.approved_keys = approved_keys_anki
+            self.backend_dir = anki_path
+        elif backend_config.backend == "markdown":
+            self.backend = "markdown"
+            self.approved_keys = approved_keys_md
+            self.backend_dir = md_path
+        else:
+            raise Exception(backend_config.backend)
+
         if profile == "latest":
             try:
-                with open(str(profile_path / "latest_profile.txt"), "r") as f:
+                with open(str(self.backend_dir / "latest_profile.txt"), "r") as f:
                     profile = f.read()
             except Exception as err:
                 red(f"Error when loading profile '{profile}': '{err}'")
                 profile = "default"
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
+        self.p = self.backend_dir / profile
 
         # stored latest used profile
-        with open(str(profile_path / "latest_profile.txt"), "w") as f:
+        with open(str(self.backend_dir / "latest_profile.txt"), "w") as f:
             f.write(profile)
-
-        if backend_config.backend == "anki":
-            self.backend = "anki"
-            self.approved_keys = approved_keys_anki
-            self.p = anki_path / profile
-        elif backend_config.backend == "markdown":
-            self.backend = "markdown"
-            self.approved_keys = approved_keys_md
-            self.p = md_path / profile
-        else:
-            raise Exception(backend_config.backend)
-
 
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
