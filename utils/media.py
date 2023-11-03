@@ -14,7 +14,6 @@ from joblib import Memory
 
 from .logger import whi, red, trace, timeout
 from .ocr import get_text
-from .profiles import ValueStorage
 from .misc import rgb_to_bgr, backend_config
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
