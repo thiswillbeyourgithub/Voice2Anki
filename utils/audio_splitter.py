@@ -40,7 +40,7 @@ class AudioSplitter:
             done_dir="./user_directory/done",
             remove_silence=False,
             trim_splitted_silence=False,
-            slow_down_all=False,
+            global_slowdown_factor=1.0,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
@@ -60,7 +60,9 @@ class AudioSplitter:
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
-        self.slow_down_all = slow_down_all
+        assert global_slowdown_factor <= 1 and global_slowdown_factor >= 0, (
+                "invalid value for global_slowdown_factor")
+        self.spf = global_slowdown_factor
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -80,8 +82,8 @@ class AudioSplitter:
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
-        if self.slow_down_all:
-            self.spf = 0.9  # speed factor
+        if self.spf != 1.0:
+            red(f"Global slowdown factor is '{self.spf}' so will slow down each audio file")
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
                 audio = AudioSegment.from_mp3(file)
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
