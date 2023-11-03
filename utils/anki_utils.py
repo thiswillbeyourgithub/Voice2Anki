@@ -155,7 +155,7 @@ def audio_to_anki(audio_mp3, queue):
 
 
 @trace
-@timeout
+@timeout(limit=10)
 def look_for_card(cloz):
     cloz = cloz.strip()
     if "#####" in cloz:  # multiple cards
