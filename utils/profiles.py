@@ -30,13 +30,25 @@ md_path.mkdir(exist_ok=True)
 (anki_path / "default").mkdir(exist_ok=True)
 (md_path / "default").mkdir(exist_ok=True)
 
+assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
+    "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
+
 class ValueStorage:
     @trace
-    def __init__(self, profile="default"):
-        assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
-            "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
+    def __init__(self, profile="latest"):
+        if profile == "latest":
+            try:
+                with open(str(profile_path / "latest_profile.txt"), "r") as f:
+                    profile = f.read()
+            except Exception as err:
+                red(f"Error when loading profile '{profile}': '{err}'")
+                profile = "default"
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
+
+        # stored latest used profile
+        with open(str(profile_path / "latest_profile.txt"), "w") as f:
+            f.write(profile)
 
         if backend_config.backend == "anki":
             self.backend = "anki"
@@ -48,8 +60,7 @@ class ValueStorage:
             self.p = md_path / profile
         else:
             raise Exception(backend_config.backend)
-        with open(str(md_path / "latest_profile.pickle"), "wb") as f:
-            pickle.dump(profile, f)
+
 
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
@@ -137,7 +148,6 @@ class ValueStorage:
                     kwargs={"key": key, "item": item})
             thread.start()
             self.running_tasks[key] = thread
-
 
     def __setitem__async(self, key, item):
         kp = key + ".pickle"
