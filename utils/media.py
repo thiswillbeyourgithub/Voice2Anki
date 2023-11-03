@@ -1,3 +1,4 @@
+import gradio as gr
 import queue
 import time
 from scipy.io.wavfile import write
@@ -12,10 +13,9 @@ import torchaudio
 from joblib import Memory
 
 from .logger import whi, red, trace, timeout
-from .anki_utils import anki_media
 from .ocr import get_text
 from .profiles import ValueStorage
-from .misc import rgb_to_bgr
+from .misc import rgb_to_bgr, backend_config
 
 soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
 soundpreprocess_cache.clear()  # clear the cache on startup
@@ -92,7 +92,7 @@ def get_img_source(gallery, queue=queue.Queue()):
         for img in gallery:
             decoded = cv2.imread(img["name"], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
-            new = anki_media / f"{img_hash}.png"
+            new = backend_config.anki_media / f"{img_hash}.png"
             if not new.exists():
                 cv2.imwrite(str(new), decoded)
 
@@ -218,3 +218,32 @@ def sound_preprocessing(audio_mp3_n):
 
     whi("Done preprocessing audio")
     return audio_mp3_n
+
+# create dummy button to use the preprocessing code if needed
+dummy_btn = gr.Audio(
+        source="microphone",
+        type="filepath",
+        label="dummy_audio",
+        format="mp3",
+        value=None,
+        container=False)
+
+@trace
+def format_audio_component(audio):
+    """to make the whole UI faster and avoid sending multiple slightly
+    differently processed audio to whisper: preprocessing and postprocessing
+    are disabled but this sometimes make the audio component output a dict
+    instead of the mp3 audio path. This fixes it while still keeping the cache
+    working."""
+    if isinstance(audio, dict):
+        if "is_file" in audio:
+            audio = audio["name"]
+        else:
+            new_audio = dummy_btn.preprocess(audio)
+            red(f"Unexpected dict instead of audio for '{audio['name']}' -> '{new_audio}'")
+            audio = new_audio
+    elif isinstance(audio, (str, type(Path()))):
+        whi(f"Not audio formating needed for '{audio}'")
+    else:
+        raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))
+    return audio

@@ -18,10 +18,10 @@ from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, look_for_card
-from .misc import tokenize, transcript_template, backend_config, format_audio_component
+from .misc import tokenize, transcript_template, backend_config
 from .logger import red, whi, yel, store_to_db, trace, timeout
 from .memory import prompt_filter, load_prev_prompts, embedder
-from .media import sound_preprocessing, get_img_source
+from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
 user_identifier = str(uuid.uuid4())

@@ -13,7 +13,8 @@ from scipy.io.wavfile import write
 from torchaudio import load, save
 
 from .logger import red, whi, trace, timeout
-from .misc import format_audio_component, backend_config
+from .misc import backend_config
+from .media import format_audio_component
 
 try:
     from .author_cloze_editor import cloze_editor
@@ -214,6 +215,7 @@ if "trash" in str(db_path).lower():
     time.sleep(1)
 anki_media = Path(db_path).parent / "collection.media"
 assert anki_media.exists(), "Media folder not found!"
+backend_config.anki_media = anki_media
 
 
 if __name__ == "__main__":
