@@ -1,14 +1,13 @@
 import pytesseract
 import ftfy
 import numpy as np
-from tqdm import tqdm
 import cv2
 from bs4 import BeautifulSoup
 import re
 from textwrap import dedent
 from joblib import Memory
 
-from .logger import red, yel, trace
+from .logger import yel, trace
 
 memory = Memory(".cache/ocr_cache", verbose=0)
 

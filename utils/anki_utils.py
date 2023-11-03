@@ -1,16 +1,12 @@
 import re
 import threading
 import shutil
-import tempfile
 import hashlib
 from pathlib import Path
 import ankipandas as akp
 import time
 import urllib.request
 import json
-
-from scipy.io.wavfile import write
-from torchaudio import load, save
 
 from .logger import red, whi, trace, timeout
 from .misc import backend_config
