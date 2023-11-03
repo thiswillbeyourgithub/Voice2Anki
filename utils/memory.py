@@ -226,14 +226,19 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         embeddings_content = [embedder([pr["content"]]).tolist() for pr in tqdm(timesorted_pr, desc="computing embeddings")]
         # embeddings_answer = [embedder([pr["answer"]]).tolist() for pr in timesorted_pr]
 
-        whi("Computing cosine distance")
+        whi("Computing cosine similarity")
         distances = []
+        max_sim = [0, None]
         for i in range(len(timesorted_pr)):
             content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
             # answer_dist = float(util.cos_sim(new_prompt_vec, embeddings_answer[i]))
             score = content_dist * 1
             # score += answer_dist * 1
             distances.append(score)
+            if score > max_sim[0]:
+                max_sim[0] = score
+                max_sim[1] = timesorted_pr[i]
+        red(f"Memory with highest similarity is: '{max_sim}'")
 
         plimit = 90
         percentile = float(np.percentile(distances, plimit))
