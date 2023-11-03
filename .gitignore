@@ -4,7 +4,7 @@
 */*.pyc
 */*/*.pyc
 utils/__pycache__/*
-*.wav
+__pycache__/*
 
 
 *API_KEY.txt
