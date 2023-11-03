@@ -100,10 +100,11 @@ def start_voice2formattedtext(
     else:
         server = None
 
-    backend_config.VERSION = 0.1
+    backend_config.VERSION = 0.2
     backend_config.disable_embeddings = disable_embeddings
     backend_config.media_folder = media_folder
     backend_config.debug = debug
+
     if backend == "anki":
         backend_config.backend = "anki"
         from utils.gui_anki import demo_anki as demo
