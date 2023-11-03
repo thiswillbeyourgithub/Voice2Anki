@@ -10,7 +10,7 @@ from joblib import Memory
 
 from .logger import red, yel, trace
 
-memory = Memory(".ocr_cache", verbose=0)
+memory = Memory(".cache/ocr_cache", verbose=0)
 
 # pre compiled regex
 bbox_regex = re.compile(r'bbox\s(\d+)\s(\d+)\s(\d+)\s(\d+)')
