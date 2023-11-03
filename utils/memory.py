@@ -206,7 +206,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     if backend_config.disable_embeddings:
         whi("Not using embeddings")
         dist_check = [1 for i in timesorted_pr]
-        plimit = 100
     else:
         embeddings_content = [embedder([pr["content"]]).tolist() for pr in tqdm(timesorted_pr, desc="computing embeddings")]
         # embeddings_answer = [embedder([pr["answer"]]).tolist() for pr in timesorted_pr]
@@ -276,11 +275,12 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
         red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
         sig -= sig * 0.1
-        plimit -= 10
         sig = max(sig, 0)
-        plimit = max(plimit, 0)
-        percentile = float(np.percentile(distances, plimit))
-        dist_check = [1 if d >= percentile else 0 for d in distances]
+        if not backend_config.disable_embeddings:
+            plimit -= 10
+            plimit = max(plimit, 0)
+            percentile = float(np.percentile(distances, plimit))
+            dist_check = [1 if d >= percentile else 0 for d in distances]
 
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
