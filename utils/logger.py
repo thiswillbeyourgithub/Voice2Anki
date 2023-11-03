@@ -209,7 +209,6 @@ def timeout(limit=60):
             result = []
             def appender(*args, **kwargs):
                 result.append(func(*args, **kwargs))
-                return
             thread = threading.Thread(
                     target=appender,
                     args=args,
