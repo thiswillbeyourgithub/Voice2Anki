@@ -8,10 +8,25 @@ import json
 import hashlib
 from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
+import tiktoken
 
 from .logger import whi, red, yel, trace, timeout
-from .misc import tokenize, transcript_template, backend_config
+from .misc import backend_config
 
+# string at the end of the prompt
+prompt_finish = "\n\n###\n\n"
+
+# string at the end of the completion
+completion_finish = "\n END"
+
+# used to count the number of tokens for chatgpt
+tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
+tokenize = tokenizer.encode
+
+transcript_template = """
+Context: 'CONTEXT'
+Transcript: 'TRANSCRIPT'
+""".strip()
 global prev_prompts
 
 default_system_prompt_md = {

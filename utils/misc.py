@@ -1,22 +1,3 @@
-import tiktoken
-
-
-# string at the end of the prompt
-prompt_finish = "\n\n###\n\n"
-
-# string at the end of the completion
-completion_finish = "\n END"
-
-# used to count the number of tokens for chatgpt
-tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
-tokenize = tokenizer.encode
-
-transcript_template = """
-Context: 'CONTEXT'
-Transcript: 'TRANSCRIPT'
-""".strip()
-
-
 # to know if the backend chosen by the user is anki or markdown
 class backend_config_class:
     "module used to store information from VoiceToFormattedText.py to the main .py files"
