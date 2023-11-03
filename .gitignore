@@ -7,7 +7,7 @@ utils/__pycache__/*
 *.wav
 
 
-API_KEY.txt
+*API_KEY.txt
 utils/ssl/*pem
 utils/logs
 profiles/
