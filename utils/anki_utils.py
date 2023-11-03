@@ -12,7 +12,7 @@ import json
 from scipy.io.wavfile import write
 from torchaudio import load, save
 
-from .logger import red, whi, trace
+from .logger import red, whi, trace, timeout
 from .misc import format_audio_component, backend_config
 
 try:
@@ -154,6 +154,8 @@ def audio_to_anki(audio_mp3, queue):
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
 
+@trace
+@timeout
 def look_for_card(cloz):
     cloz = cloz.strip()
     if "#####" in cloz:  # multiple cards
