@@ -165,7 +165,8 @@ def get_card_status(txt_chatgpt_cloz):
 
     if "#####" in cloz:  # multiple cards
         splits = cloz.split("#####")
-        vals = [get_card_status(sp) for sp in splits if sp.strip()]
+        vals = [_call_anki(action="findCards", query=f"added:1 {sp}")
+                for sp in splits if sp.strip()]
 
         if all(vals):
             return "<b>DONE</b>"
