@@ -1,14 +1,12 @@
 import gradio as gr
-from pathlib import Path
-import pickle
 
-from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck, save_buffer
+from .profiles import get_profiles, switch_profile, save_tags, save_deck, save_buffer
 from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, get_card_status, pv
 from .anki_utils import threaded_sync_anki
 
-from .logger import get_log, whi, red
+from .logger import get_log
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, sound_preprocessing, get_img_source, roll_audio
+from .media import get_image, reset_audio, reset_image, get_img_source, roll_audio
 
 theme = gr.themes.Soft(
         primary_hue="violet",

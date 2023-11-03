@@ -1,6 +1,6 @@
+from pathlib import Path
 import gradio as gr
 import queue
-import time
 from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
@@ -251,5 +251,3 @@ def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-

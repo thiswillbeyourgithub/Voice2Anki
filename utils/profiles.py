@@ -1,9 +1,7 @@
 import threading
-import time
 import pickle
 from pathlib import Path
 import numpy as np
-import cv2
 
 from .logger import whi, red, trace
 from .misc import backend_config

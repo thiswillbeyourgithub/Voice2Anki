@@ -3,7 +3,6 @@ import Levenshtein as lev
 import shutil
 import queue
 import threading
-import pickle
 import hashlib
 import base64
 import joblib
