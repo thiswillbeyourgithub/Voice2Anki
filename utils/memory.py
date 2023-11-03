@@ -363,7 +363,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         prev_prompts = check_prompts(prev_prompts)
 
         with open(f"profiles/{backend}/{txt_profile}/memories.json", "w") as f:
-            json.dump(prev_prompts, f, indent=4)
+            json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
         return
@@ -381,6 +381,6 @@ def load_prev_prompts(profile):
         red(f"No memories in profile {profile} found, creating it")
         prev_prompts = check_prompts([default_system_prompt.copy()])
         with open(f"profiles/{backend}/{profile}/memories.json", "w") as f:
-            json.dump(prev_prompts, f, indent=4)
+            json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
 
     return prev_prompts
