@@ -58,7 +58,7 @@ else:
     whi("Reloading previous profile.")
     with open("profiles/anki/latest_profile.pickle", "rb") as f:
         pv = ValueStorage(pickle.load(f))
-        red("Loading default profile")
+        red("Loading previous profile")
 
 message_buffer = {
         "question": [],
