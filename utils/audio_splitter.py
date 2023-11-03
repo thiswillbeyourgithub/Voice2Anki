@@ -60,7 +60,7 @@ class AudioSplitter:
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
-        assert global_slowdown_factor <= 1 and global_slowdown_factor >= 0, (
+        assert global_slowdown_factor <= 1 and global_slowdown_factor > 0, (
                 "invalid value for global_slowdown_factor")
         self.spf = global_slowdown_factor
         self.stop_list = [
