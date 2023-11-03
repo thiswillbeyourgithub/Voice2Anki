@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .profiles import get_profiles, switch_profile, ValueStorage, save_tags, save_deck, save_buffer
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, get_card_status
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, get_card_status, pv
 from .anki_utils import threaded_sync_anki
 
 from .logger import get_log, whi, red
@@ -27,16 +27,6 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
-
-# load default profile
-whi("Reloading previous profile.")
-try:
-    latest = "profiles/anki/latest_profile.pickle"
-    with open(latest, "rb") as f:
-        pv = ValueStorage(pickle.load(f))
-except Exception as err:
-    red(f"Error when loading {latest}: '{err}'")
-    pv = ValueStorage("default")
 
 
 with gr.Blocks(
