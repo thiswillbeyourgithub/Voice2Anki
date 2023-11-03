@@ -30,8 +30,14 @@ document.querySelector('body').classList.add('dark');
 
 # load default profile
 whi("Reloading previous profile.")
-with open("profiles/anki/latest_profile.pickle", "rb") as f:
-    pv = ValueStorage(pickle.load(f))
+try:
+    latest = "profiles/anki/latest_profile.pickle"
+    with open(latest, "rb") as f:
+        pv = ValueStorage(pickle.load(f))
+except Exception as err:
+    red(f"Error when loading {latest}: '{err}'")
+    pv = ValueStorage("default")
+
 
 with gr.Blocks(
         analytics_enabled=False,
