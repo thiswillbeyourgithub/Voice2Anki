@@ -100,16 +100,18 @@ def start_voice2formattedtext(
     else:
         server = None
 
+    backend_config.VERSION = 0.1
+    backend_config.disable_embeddings = disable_embeddings
+    backend_config.media_folder = media_folder
+    backend_config.debug = debug
     if backend == "anki":
         backend_config.backend = "anki"
-        backend_config.media_folder = media_folder
         from utils.gui_anki import demo_anki as demo
     elif backend == "markdown":
         backend_config.backend = "markdown"
         from utils.gui_markdown import demo_markdown as demo
     else:
         raise ValueError(backend)
-    backend_config.disable_embeddings = disable_embeddings
 
     if use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {

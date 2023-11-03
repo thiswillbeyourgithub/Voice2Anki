@@ -27,11 +27,9 @@ def rgb_to_bgr(image):
 
 # to know if the backend chosen by the user is anki or markdown
 class backend_config_class:
-    VERSION = 0.1
+    "module used to store information from VoiceToFormattedText.py to the main .py files"
     def __init__(self):
-        self.backend = "not yet initialized"
-        self.media_folder = None
-        self.disable_embeddings = False
+        pass
 global backend_config
 backend_config = backend_config_class()
 
