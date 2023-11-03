@@ -153,23 +153,36 @@ def audio_to_anki(audio_mp3, queue):
 
 @trace
 @timeout(limit=10)
-def look_for_card(cloz):
-    cloz = cloz.strip()
+def get_card_status(txt_chatgpt_cloz):
+    """return True or False depending on if the card written in
+    txt_chatgpt_cloz is already in anki or not"""
+
+    cloz = cloze_editor(txt_chatgpt_cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "").replace(",", " ").replace(":", " ").replace(";", " ")
+    cloz = re.sub("{{c\d+::", "", cloz).strip()
+
+    if not cloz:
+        return "EMPTY"
+
     if "#####" in cloz:  # multiple cards
         splits = cloz.split("#####")
-        states = [bool(look_for_card(sp)) for sp in splits if sp.strip()]
-        if [s for s in states if s]:
-            return True
-        else:
-            return False
+        vals = [get_card_status(sp) for sp in splits if sp.strip()]
 
-    cloz = cloze_editor(cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "").replace(",", " ").replace(":", " ").replace(";", " ")
-    cloz = re.sub("{{c\d+::", "", cloz)
-    state = _call_anki(
-            action="findCards",
-            query=f"added:1 {cloz}"
-            )
-    return state
+        if all(vals):
+            return "<b>DONE</b>"
+        else:
+            s = sum([bool(b) for b in vals])
+            n = len(vals)
+            return f"<b><span style=\"color: red;\">MISSING {n-s}/{n}</span></b>"
+
+    else:
+        state = _call_anki(
+                action="findCards",
+                query=f"added:1 {cloz}"
+                )
+        if state:
+            return "<b>DONE</b>"
+        else:
+            return f"<b><span style=\"color: red;\">MISSING</span></b>"
 
 
 @trace

@@ -1,8 +1,8 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, save_tags, save_deck, save_buffer
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, get_card_status, pv
-from .anki_utils import threaded_sync_anki
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, pv
+from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
 from .memory import recur_improv
@@ -78,7 +78,7 @@ with gr.Blocks(
                 improve_btn = gr.Button(value="LLM Feedback", variant="primary")
             with gr.Row():
                  sync_btn = gr.Button(value="Sync anki", variant="primary")
-                 txt_card_done = gr.Textbox(value="", label="Card status", placeholder="Wether the card was already created", interactive=True, container=False)
+                 txt_card_done = gr.HTML(value="<b>NONE</<b>", label="Card status", placeholder="Wether the card was already created")
             with gr.Row():
                  txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
                  dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
