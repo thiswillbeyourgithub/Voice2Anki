@@ -20,7 +20,6 @@ Context: 'CONTEXT'
 Transcript: 'TRANSCRIPT'
 """.strip()
 
-@trace
 def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
