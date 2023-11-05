@@ -34,7 +34,8 @@ with gr.Blocks(
         ) as demo_anki:
 
     with gr.Row():
-        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False)
+        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False, scale=5)
+        dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
@@ -82,7 +83,6 @@ with gr.Blocks(
                 sync_btn = gr.Button(value="Sync anki", variant="primary")
             with gr.Row():
                 txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
-                dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
             with gr.Row():
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
                 txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
