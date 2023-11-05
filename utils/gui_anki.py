@@ -60,7 +60,6 @@ with gr.Blocks(
             txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False)
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=100, placeholder="The anki flashcard will appear here", container=False)
             with gr.Row():
-                roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
                 rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=4)
                 rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=4)
 
@@ -80,6 +79,7 @@ with gr.Blocks(
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
 
             with gr.Accordion(label="Settings", open=True if pv.profile_name == "default" else False):
+                roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
                 with gr.Row():
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
