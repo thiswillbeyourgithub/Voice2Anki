@@ -79,7 +79,7 @@ with gr.Blocks(
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
 
             with gr.Accordion(label="Settings", open=True if pv.profile_name == "default" else False):
-                roll_dirload_check = gr.Checkbox(value=True, interactive=True, label="From Dirload?", show_label=True, scale=0)
+                roll_dirload_check = gr.Checkbox(value=pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
                 with gr.Row():
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")

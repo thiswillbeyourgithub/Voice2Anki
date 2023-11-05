@@ -15,6 +15,7 @@ approved_keys_all = [
         "txt_whisp_lang",
         "txt_whisp_prompt",
         "total_llm_cost",
+        "dirload_check",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -115,6 +116,8 @@ class ValueStorage:
                 default = "fr"
             if key == "total_llm_cost":
                 default = 0
+            if key == "dirload_check":
+                default = False
             else:
                 default = None
             self.cache_values[key] = default
