@@ -128,25 +128,6 @@ def reset_audio():
     return None, None, None, None, None
 
 @trace
-def roll_audio(
-        txt_profile,
-        audio_mp3_1,
-        audio_mp3_2,
-        audio_mp3_3,
-        audio_mp3_4,
-        audio_mp3_5):
-    # if 2-5 are None, keep the 1
-    if audio_mp3_2 is None and audio_mp3_3 is None and audio_mp3_4 is None and audio_mp3_5 is None:
-        return audio_mp3_1, None, None, None, None
-
-    audio_mp3_1 = None
-    while audio_mp3_1 is None:  # roll
-        audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5 = audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5, None
-
-    return audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5
-
-
-@trace
 @soundpreprocess_cache.cache
 def sound_preprocessing(audio_mp3_n):
     "removing silence, maybe try to enhance audio, apply filters etc"

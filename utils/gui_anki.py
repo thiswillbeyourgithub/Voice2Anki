@@ -6,7 +6,7 @@ from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
 from .memory import recur_improv
-from .media import get_image, reset_audio, reset_image, get_img_source, roll_audio
+from .media import get_image, reset_audio, reset_image, get_img_source
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -25,6 +25,20 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
+
+def roll_audio(*slots):
+    assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
+    slots = list(slots)
+    if all((slot is None for slot in slots)):
+           return slots
+    if all((slot is None for slot in slots[1:])):
+           return slots
+    slots[0] = None
+    while slots[0] is None:
+        slots.pop(0)
+        audio_mp3 = gr.Audio(source="microphone", type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+        slots.append(audio_mp3)
+    return slots
 
 
 with gr.Blocks(
@@ -48,11 +62,11 @@ with gr.Blocks(
             with gr.Column(scale=1, min_width=50):
 
                 # audio
-                audio_mp3_1 = gr.Audio(source="microphone", type="filepath", label="Audio1", format="mp3", value=None, container=False)
-                audio_mp3_2 = gr.Audio(source="microphone", type="filepath", label="Audio2", format="mp3", value=None, container=False)
-                audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
-                audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
-                audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
+                audio_number = 5
+                audio_slots = []
+                for i in range(audio_number):
+                    audio_mp3 = gr.Audio(source="microphone", type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+                    audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
                     dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
@@ -136,11 +150,11 @@ with gr.Blocks(
     txt_profile.submit(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_mp3_1, txt_audio, txt_chatgpt_cloz, txt_profile])
+            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
     # txt_profile.blur(
     #         fn=switch_profile,
     #         inputs=[txt_profile],
-    #         outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_mp3_1, txt_audio, txt_chatgpt_cloz, txt_profile])
+    #         outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
     txt_tags.submit(fn=save_tags, inputs=[txt_profile, txt_tags])
     txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
 
@@ -178,9 +192,9 @@ with gr.Blocks(
 
     # semi auto mode
     # aud_cache_event.append(
-    #     audio_mp3_1.change(
+    #     audio_slots[0].change(
     #         fn=transcribe,
-    #         inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+    #         inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
     #         outputs=[txt_audio],
     #         preprocess=False,
     #         postprocess=False,
@@ -195,7 +209,7 @@ with gr.Blocks(
     #             ).then(
     #                 fn=to_anki,
     #                 inputs=[
-    #                     audio_mp3_1,
+    #                     audio_slots[0],
     #                     txt_audio,
     #                     txt_chatgpt_cloz,
     #                     txt_chatgpt_context,
@@ -211,50 +225,24 @@ with gr.Blocks(
     #                 )
     #                 )
     # aud_cache_event.append(
-    #     audio_mp3_1.change(
+    #     audio_slots[0].change(
     #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang],
+    #         inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
     #         preprocess=False,
     #         postprocess=False,
     #         queue=True)
-    aud_cache_event.append(
-        audio_mp3_2.change(
-            fn=transcribe_cache_async,
-            inputs=[audio_mp3_2, txt_whisp_prompt, txt_whisp_lang],
-            preprocess=False,
-            postprocess=False,
-            queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_3.change(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_3, txt_whisp_prompt, txt_whisp_lang],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_4.change(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_4, txt_whisp_prompt, txt_whisp_lang],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True))
-    # aud_cache_event.append(
-    #     audio_mp3_5.change(
-    #         fn=transcribe_cache_async,
-    #         inputs=[audio_mp3_5, txt_whisp_prompt, txt_whisp_lang],
-    #         preprocess=False,
-    #         postprocess=False,
-    #         queue=True))
-
-    # audio_mp3_1.clear(cancels=[aud_cache_event[0]])
-    # audio_mp3_2.clear(cancels=[aud_cache_event[1]])
-    # audio_mp3_3.clear(cancels=[aud_cache_event[2]])
-    # audio_mp3_4.clear(cancels=[aud_cache_event[3]])
-    # audio_mp3_5.clear(cancels=[aud_cache_event[4]])
+    for audio_slot in audio_slots:
+        aud_cache_event.append(
+            audio_slot.change(
+                fn=transcribe_cache_async,
+                inputs=[audio_slot, txt_whisp_prompt, txt_whisp_lang],
+                preprocess=False,
+                postprocess=False,
+                queue=True))
 
     rst_audio_btn.click(
             fn=reset_audio,
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            outputs=audio_slots,
             preprocess=False,
             postprocess=False,
             queue=True,
@@ -262,14 +250,14 @@ with gr.Blocks(
 
     rollaudio_btn.click(
             fn=roll_audio,
-            inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            inputs=audio_slots,
+            outputs=audio_slots,
             preprocess=False,
             postprocess=False,
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -286,9 +274,7 @@ with gr.Blocks(
                                 inputs=[
                                     roll_dirload_check,
                                     ],
-                                outputs=[
-                                    audio_mp3_5,
-                                    ],
+                                outputs=[audio_slots[-1]],
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
@@ -302,14 +288,14 @@ with gr.Blocks(
                                         )
     rollaudio2_btn.click(
             fn=roll_audio,
-            inputs=[txt_profile, audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
-            outputs=[audio_mp3_1, audio_mp3_2, audio_mp3_3, audio_mp3_4, audio_mp3_5],
+            inputs=audio_slots,
+            outputs=audio_slots,
             preprocess=False,
             postprocess=False,
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -324,7 +310,7 @@ with gr.Blocks(
                         ).then(
                             fn=to_anki,
                             inputs=[
-                                audio_mp3_1,
+                                audio_slots[0],
                                 txt_audio,
                                 txt_chatgpt_cloz,
                                 txt_chatgpt_context,
@@ -342,9 +328,7 @@ with gr.Blocks(
                                 inputs=[
                                     roll_dirload_check,
                                     ],
-                                outputs=[
-                                    audio_mp3_5,
-                                    ],
+                                outputs=[audio_slots[-1]],
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
@@ -362,25 +346,12 @@ with gr.Blocks(
     # on another distance device
     dir_load_btn.click(
             fn=dirload_splitted,
-            inputs=[
-                roll_dirload_check,
-                audio_mp3_1,
-                audio_mp3_2,
-                audio_mp3_3,
-                audio_mp3_4,
-                audio_mp3_5,
-                ],
-            outputs=[
-                audio_mp3_1,
-                audio_mp3_2,
-                audio_mp3_3,
-                audio_mp3_4,
-                audio_mp3_5,
-                ],
+            inputs=[roll_dirload_check] + audio_slots,
+            outputs=audio_slots,
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -403,7 +374,7 @@ with gr.Blocks(
                                 # ).then(
                                 #    fn=to_anki,
                                 #    inputs=[
-                                #        audio_mp3_1,
+                                #        audio_slots[0],
                                 #        txt_audio,
                                 #        txt_chatgpt_cloz,
                                 #        txt_chatgpt_context,
@@ -421,7 +392,7 @@ with gr.Blocks(
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
-            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -440,7 +411,7 @@ with gr.Blocks(
     anki_btn.click(
             fn=to_anki,
             inputs=[
-                audio_mp3_1,
+                audio_slots[0],
                 txt_audio,
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
@@ -465,7 +436,7 @@ with gr.Blocks(
     # 1+2
     semiauto_btn.click(
             fn=transcribe,
-            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -480,7 +451,7 @@ with gr.Blocks(
                 ).then(
                     fn=to_anki,
                     inputs=[
-                        audio_mp3_1,
+                        audio_slots[0],
                         txt_audio,
                         txt_chatgpt_cloz,
                         txt_chatgpt_context,
@@ -505,7 +476,7 @@ with gr.Blocks(
     # 1+2+3
     auto_btn.click(
             fn=transcribe,
-            inputs=[audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -520,7 +491,7 @@ with gr.Blocks(
                 ).then(
                     fn=to_anki,
                     inputs=[
-                        audio_mp3_1,
+                        audio_slots[0],
                         txt_audio,
                         txt_chatgpt_cloz,
                         txt_chatgpt_context,
