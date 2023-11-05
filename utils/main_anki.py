@@ -91,6 +91,7 @@ def whisper_cached(
                         prompt=txt_whisp_prompt,
                         language=txt_whisp_lang,
                         temperature=0,
+                        response_format="verbose_json",
                         )
 
                 global pv
@@ -195,6 +196,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         "whisper_context": txt_whisp_prompt,
                         "V2FT_profile": txt_profile,
                         "transcribed_input": txt_audio,
+                        "full_whisper_output": transcript,
                         "model_name": f"OpenAI {modelname}",
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "V2FT_version": shared.VERSION,
