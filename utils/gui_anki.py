@@ -79,7 +79,7 @@ with gr.Blocks(
                 improve_btn = gr.Button(value="LLM Feedback", variant="primary")
             with gr.Row():
                  sync_btn = gr.Button(value="Sync anki", variant="primary")
-                 txt_card_done = gr.HTML(value="<b>NONE</<b>", label="Card status", placeholder="Wether the card was already created")
+                 txt_card_done = gr.HTML(value="", label="Card status", placeholder="Wether the card was already created", container=False)
             with gr.Row():
                  txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
                  dark_mode_btn = gr.Button("Dark Mode", variant="secondary")

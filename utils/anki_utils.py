@@ -169,11 +169,11 @@ def get_card_status(txt_chatgpt_cloz):
                 for sp in splits if sp.strip()]
 
         if all(vals):
-            return "<b>DONE</b>"
+            return "<div style=\"text-align: center !important; font-weight:bold;\">DONE</div>"
         else:
             s = sum([bool(b) for b in vals])
             n = len(vals)
-            return f"<b><span style=\"color: red;\">MISSING {n-s}/{n}</span></b>"
+            return f"<div style=\"color: red; text-align:center !important; font-weight: bold;\">MISSING {n-s}/{n}</div>"
 
     else:
         state = _call_anki(
@@ -181,9 +181,9 @@ def get_card_status(txt_chatgpt_cloz):
                 query=f"added:1 {cloz}"
                 )
         if state:
-            return "<b>DONE</b>"
+            return "<div style=\"text-align: center !important; font-weight:bold;\">DONE</div>"
         else:
-            return f"<b><span style=\"color: red;\">MISSING</span></b>"
+            return "<div style=\"color: red; text-align: center !important; font-weight:bold;\">MISSING</div>"
 
 
 @trace
