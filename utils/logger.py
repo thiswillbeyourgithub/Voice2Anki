@@ -182,7 +182,7 @@ purp = coloured_log("purple")
 
 indent = -2
 
-def trace(func, limit=0.5):
+def trace(func):
     """simple wrapper to use as decorator to print when a function is used
     and for how long"""
     def wrapper(*args, **kwargs):
@@ -193,7 +193,7 @@ def trace(func, limit=0.5):
         t = time.time()
         result = func(*args, **kwargs)
         tt = time.time() - t
-        if tt > limit:
+        if tt > 0.5:
             red(f"{spacer}   Exiting {func} after {tt:.1f}s")
         else:
             purp(f"{spacer}   Exiting {func} after {tt:.1f}s")
@@ -202,16 +202,16 @@ def trace(func, limit=0.5):
     return wrapper
 
 
-def timeout(limit=60):
+def timeout(limit):
     "simple wrapper to add a timeout that raises an exception if taking too long"
     def decorator(func):
         def wrapper(*args, **kwargs):
             result = []
-            def appender(*args, **kwargs):
+            def appender(func, *args, **kwargs):
                 result.append(func(*args, **kwargs))
             thread = threading.Thread(
                     target=appender,
-                    args=args,
+                    args=[func] + list(args),
                     kwargs=kwargs)
             thread.start()
             thread.join(timeout=limit)
@@ -221,3 +221,6 @@ def timeout(limit=60):
                 return result[0]
         return wrapper
     return decorator
+
+timeout_60 = timeout(limit=60)
+timeout_120 = timeout(limit=120)
