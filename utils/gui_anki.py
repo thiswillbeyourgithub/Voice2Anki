@@ -33,7 +33,8 @@ with gr.Blocks(
         theme=theme,
         ) as demo_anki:
 
-    gr.Markdown("VoiceToFormattedText - Anki")
+    with gr.Row():
+        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False)
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
