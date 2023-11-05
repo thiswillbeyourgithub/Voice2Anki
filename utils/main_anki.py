@@ -89,7 +89,9 @@ def whisper_cached(
                         model=modelname,
                         file=audio_file,
                         prompt=txt_whisp_prompt,
-                        language=txt_whisp_lang)
+                        language=txt_whisp_lang,
+                        temperature=0,
+                        )
 
                 global pv
                 pv["txt_whisp_prompt"] = txt_whisp_prompt
