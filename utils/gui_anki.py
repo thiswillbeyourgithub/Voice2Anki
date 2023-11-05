@@ -84,14 +84,14 @@ with gr.Blocks(
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
                 with gr.Row():
-                    txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
+                    txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
                 with gr.Row():
-                    txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
-                    txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
-                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
+                    txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
+                    txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
                 with gr.Row():
-                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper", container=False)
-                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT", container=False)
+                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
+                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
 
     # output
     with gr.Accordion(label="Logging", open=False):
