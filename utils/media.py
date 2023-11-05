@@ -220,7 +220,7 @@ def format_audio_component(audio):
             audio = audio["name"]
         else:
             new_audio = dummy_btn.preprocess(audio)
-            red(f"Unexpected dict instead of audio for '{audio['name']}' -> '{new_audio}'")
+            whi(f"Preprocessed audio manually: '{audio['name']}' -> '{new_audio}'")
             audio = new_audio
     elif isinstance(audio, (str, type(Path()))):
         whi(f"Not audio formating needed for '{audio}'")
