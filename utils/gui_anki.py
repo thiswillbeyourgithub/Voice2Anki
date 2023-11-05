@@ -542,3 +542,6 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             )
+
+    if pv.profile_name == "default":
+        gr.Warning("Enter a profile then press enter.")
