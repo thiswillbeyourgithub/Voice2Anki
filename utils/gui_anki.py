@@ -65,6 +65,7 @@ with gr.Blocks(
                 transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
                 chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
                 anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+                txt_card_done = gr.HTML(value="", label="Card status", placeholder="Wether the card was already created", container=False)
 
             with gr.Row():
                 semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
@@ -76,13 +77,12 @@ with gr.Blocks(
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
             with gr.Row():
                 sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
-                improve_btn = gr.Button(value="LLM Feedback", variant="primary")
+                improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
             with gr.Row():
-                 sync_btn = gr.Button(value="Sync anki", variant="primary")
-                 txt_card_done = gr.HTML(value="", label="Card status", placeholder="Wether the card was already created", container=False)
+                sync_btn = gr.Button(value="Sync anki", variant="primary")
             with gr.Row():
-                 txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
-                 dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
+                txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
+                dark_mode_btn = gr.Button("Dark Mode", variant="secondary")
             with gr.Row():
                 txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
                 txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
