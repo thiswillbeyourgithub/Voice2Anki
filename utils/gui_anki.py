@@ -36,6 +36,7 @@ with gr.Blocks(
     with gr.Row():
         gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False, scale=5)
         dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
+        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
@@ -50,10 +51,11 @@ with gr.Blocks(
             audio_mp3_3 = gr.Audio(source="microphone", type="filepath", label="Audio3", format="mp3", value=None, container=False)
             audio_mp3_4 = gr.Audio(source="microphone", type="filepath", label="Audio4", format="mp3", value=None, container=False)
             audio_mp3_5 = gr.Audio(source="microphone", type="filepath", label="Audio5", format="mp3", value=None, container=False)
-            gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
-            with gr.Row():
-                rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
-                img_btn = gr.Button(value="Add image from clipboard", variant="primary", min_width=50)
+            with gr.Accordion(label="Images", open=True if pv["gallery"] else False):
+                gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
+                with gr.Row():
+                    rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
+                    img_btn = gr.Button(value="Add image from clipboard", variant="primary", min_width=50)
         with gr.Column(scale=3):
             txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False)
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=100, placeholder="The anki flashcard will appear here", container=False)
@@ -76,23 +78,34 @@ with gr.Blocks(
                 sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.")
                 sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
                 sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
-            with gr.Row():
-                sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
-                improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
-            with gr.Row():
-                sync_btn = gr.Button(value="Sync anki", variant="primary")
-            with gr.Row():
-                txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
-            with gr.Row():
-                txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
-                txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
-            txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
-            with gr.Row():
-                txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper", container=False)
-                txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT", container=False)
+
+            with gr.Accordion(label="Settings", open=True if pv.profile_name == "default" else False):
+                with gr.Row():
+                    sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
+                    improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
+                with gr.Row():
+                    txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile", container=False)
+                with gr.Row():
+                    txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons", container=False)
+                    txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr", container=False)
+                txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01", container=False)
+                with gr.Row():
+                    txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper", container=False)
+                    txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT", container=False)
 
     # output
-    output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
+    with gr.Accordion(label="Logging", open=False):
+        output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=100, every=1, interactive=False, placeholder="this string should never appear")
+
+    # events
+
+    # darkmode
+    dark_mode_btn.click(fn=None, _js=darkmode_js)
+
+    # sync anki
+    sync_btn.click(fn=threaded_sync_anki, queue=True)
+
+    # display card status
     txt_chatgpt_cloz.change(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
@@ -102,12 +115,7 @@ with gr.Blocks(
             queue=True,
             )
 
-
-    # events
-    # darkmode
-    dark_mode_btn.click(fn=None, _js=darkmode_js)
-    sync_btn.click(fn=threaded_sync_anki, queue=True)
-
+    # change message buffer size
     sld_buffer.change(fn=save_buffer, inputs=[txt_profile, sld_buffer])
 
     # change profile and load previous data
