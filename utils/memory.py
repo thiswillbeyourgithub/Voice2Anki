@@ -229,6 +229,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         whi("Computing cosine similarity")
         distances = []
         max_sim = [0, None]
+        min_sim = [1, None]
         for i in range(len(timesorted_pr)):
             content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
             # answer_dist = float(util.cos_sim(new_prompt_vec, embeddings_answer[i]))
@@ -238,6 +239,10 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
             if score > max_sim[0]:
                 max_sim[0] = score
                 max_sim[1] = timesorted_pr[i]
+            if score < min_sim[0]:
+                min_sim[0] = score
+                min_sim[1] = timesorted_pr[i]
+        red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
 
         plimit = 90
