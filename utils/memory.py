@@ -407,3 +407,12 @@ def display_price(sld_max_tkn, check_gpt4):
     message = f"Price if all tokens used: ${price_per_request:.5f}"
     message += f"\nRequests per $1: {price_per_dol:.1f} req"
     return message
+
+def show_memories(profile):
+    memories = load_prev_prompts(profile)
+    output = [""]
+    for memory in memories:
+        for k, v in memory.items():
+            output[-1] += f"{k.upper()}: {v}\n"
+        output.append("")
+    return "\n\n".join(output[:-1])

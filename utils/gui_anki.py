@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirl
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
-from .memory import recur_improv, display_price
+from .memory import recur_improv, display_price, show_memories
 from .media import get_image, reset_audio, reset_image, get_img_source
 
 theme = gr.themes.Soft(
@@ -127,7 +127,21 @@ with gr.Blocks(
         # output
         output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
 
+    with gr.Tab(label="Memories") as tab_memories:
+        txt_memories = gr.Textbox(
+                value="",
+                label="Saved memories",
+                lines=1000,
+                max_lines=1000,
+                interactive=False,
+                placeholder="this string should never appear")
+
     # events
+    tab_memories.select(
+            fn=show_memories,
+            inputs=[txt_profile],
+            outputs=[txt_memories],
+            )
 
     # darkmode
     dark_mode_btn.click(fn=None, _js=darkmode_js)
