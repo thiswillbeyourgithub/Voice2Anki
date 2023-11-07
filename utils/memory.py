@@ -394,3 +394,16 @@ def load_prev_prompts(profile):
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
 
     return prev_prompts
+
+
+def display_price(sld_max_tkn, check_gpt4):
+    if check_gpt4:
+        price = [0.03, 0.06]
+    else:
+        price = [0.001, 0.002]
+    price_adj = price[0] * 0.9 + price[1] * 0.1
+    price_per_request = price_adj * sld_max_tkn / 1000
+    price_per_dol = round(1 / price_per_request, 0)
+    message = f"Price if all tokens used: ${price_per_request:.5f}"
+    message += f"\nRequests per $1: {price_per_dol:.1f} req"
+    return message

@@ -5,7 +5,7 @@ from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirl
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
-from .memory import recur_improv
+from .memory import recur_improv, display_price
 from .media import get_image, reset_audio, reset_image, get_img_source
 
 theme = gr.themes.Soft(
@@ -103,10 +103,11 @@ with gr.Blocks(
 
                 # quick settings
                 with gr.Row():
-                    sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.")
-                    sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
-                    sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
+                    sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.", scale=1)
+                    sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature", scale=1)
+                    sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=pv["gpt4_checkbox"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
+                txt_price = gr.Textbox(value="", show_label=False, interactive=False, max_lines=2, lines=2)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
@@ -142,6 +143,18 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            )
+
+    # display pricing
+    sld_max_tkn.change(
+            fn=display_price,
+            inputs=[sld_max_tkn, check_gpt4],
+            outputs=[txt_price],
+            )
+    check_gpt4.change(
+            fn=display_price,
+            inputs=[sld_max_tkn, check_gpt4],
+            outputs=[txt_price],
             )
 
     # change message buffer size
