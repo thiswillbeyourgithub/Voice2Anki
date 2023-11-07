@@ -13,7 +13,6 @@ import rtoml
 import time
 from datetime import datetime
 import openai
-from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki
@@ -99,7 +98,7 @@ def whisper_cached(
                 pv["txt_whisp_lang"] = txt_whisp_lang
 
                 return transcript
-            except RateLimitError as err:
+            except openai.RateLimitError as err:
                 if cnt >= 5:
                     return red(f"Cached whisper: RateLimitError >5: '{err}'")
                 else:
@@ -328,7 +327,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                         user=user_identifier,
                         )
                 break
-            except RateLimitError as err:
+            except openai.RateLimitError as err:
                 if cnt >= 5:
                     return red("ChatGPT: too many retries."), [0, 0]
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
