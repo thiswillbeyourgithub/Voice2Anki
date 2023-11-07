@@ -106,6 +106,7 @@ with gr.Blocks(
                     sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.")
                     sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature")
                     sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size")
+                    check_gpt4 = gr.Checkbox(value=pv["gpt4_checkbox"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
@@ -201,7 +202,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,
@@ -257,7 +258,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -295,7 +296,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -351,7 +352,7 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                         outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                         preprocess=False,
                         postprocess=False,
@@ -395,7 +396,7 @@ with gr.Blocks(
     # send to chatgpt
     chatgpt_btn.click(
             fn=alfred,
-            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
             outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
             queue=True,
             )
@@ -436,7 +437,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,
@@ -476,7 +477,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
                 outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
                 preprocess=False,
                 postprocess=False,

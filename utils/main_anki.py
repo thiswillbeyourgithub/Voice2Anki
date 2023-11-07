@@ -212,7 +212,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
 
 @trace
 @timeout_60
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         return "No transcribed audio found.", [0, 0]
@@ -303,8 +303,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             "with fewer tokens to make sure you have room for the answer")
         return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer)
 
-    model_to_use = "gpt-3.5-turbo-1106"
-    model_price = (0.001, 0.002)
+    if not check_gpt4:
+        model_to_use = "gpt-3.5-turbo-1106"
+        model_price = (0.001, 0.002)
+    else:
+        model_to_use = "gpt-4"
+        model_price = (0.03, 0.06)
+    whi(f"Will use model {model_to_use}")
 
     # print prompts used for the call:
     n = len(formatted_messages)

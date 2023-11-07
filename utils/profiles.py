@@ -16,6 +16,7 @@ approved_keys_all = [
         "txt_whisp_prompt",
         "total_llm_cost",
         "dirload_check",
+        "gpt4_checkbox",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -108,15 +109,17 @@ class ValueStorage:
             whi(f"No {kf} stored in profile dir, using appropriate default value")
             if key == "sld_max_tkn":
                 default = 3500
-            if key == "sld_buffer":
+            elif key == "sld_buffer":
                 default = 7
-            if key == "temperature":
+            elif key == "temperature":
                 default = 0.2
-            if key == "txt_whisp_lang":
+            elif key == "txt_whisp_lang":
                 default = "fr"
-            if key == "total_llm_cost":
+            elif key == "total_llm_cost":
                 default = 0
-            if key == "dirload_check":
+            elif key == "dirload_check":
+                default = False
+            elif key == "gpt4_checkbox":
                 default = False
             else:
                 default = None
