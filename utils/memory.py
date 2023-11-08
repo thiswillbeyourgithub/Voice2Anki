@@ -77,6 +77,9 @@ embed_model = SentenceTransformer(embedding_model_name)
 @embeddings_cache.cache
 def embedder(text):
     red("Computing embedding of 1 memory")
+    # remove the context before the transcript as well as the last '
+    text = text.split("Transcript: '")[1:][:-1]
+
     return embed_model.encode([text])
 
 def hasher(text):
