@@ -75,9 +75,9 @@ embed_model = SentenceTransformer(embedding_model_name)
 
 
 @embeddings_cache.cache
-def embedder(*args, **kwargs):
+def embedder(text):
     red("Computing embedding of 1 memory")
-    return embed_model.encode(*args, **kwargs)
+    return embed_model.encode([text])
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
@@ -223,8 +223,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         whi("Not using embeddings")
         dist_check = [1 for i in timesorted_pr]
     else:
-        embeddings_content = [embedder([pr["content"]]).tolist() for pr in tqdm(timesorted_pr, desc="computing embeddings")]
-        # embeddings_answer = [embedder([pr["answer"]]).tolist() for pr in timesorted_pr]
+        embeddings_content = [embedder(pr["content"]).tolist() for pr in tqdm(timesorted_pr, desc="computing embeddings")]
+        # embeddings_answer = [embedder(pr["answer"]).tolist() for pr in timesorted_pr]
 
         whi("Computing cosine similarity")
         distances = []
