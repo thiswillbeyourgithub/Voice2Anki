@@ -32,11 +32,12 @@ class AudioSplitter:
     def __init__(
             self,
             prompt,
+
             stop_list=["stop"],
             language="fr",
             n_todo=1,
 
-
+            stop_source="replicate",
 
             unsplitted_dir="./user_directory/unsplitted",
             splitted_dir="./user_directory/splitted",
@@ -62,6 +63,7 @@ class AudioSplitter:
         self.prompt = prompt
         self.n_todo = n_todo
         self.language = language
+        self.stop_source = stop_source
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
@@ -76,6 +78,8 @@ class AudioSplitter:
 
         # removing silences
         if self.remove_silence:
+            assert self.stop_source != "local_json", (
+                "can't use local_json stop source and remove_silence")
             for i, file in tqdm(enumerate(self.to_split), unit="file"):
                 if "unsilenced_" not in str(file):
                     new_filename = self.unsilence_audio(file)
@@ -89,6 +93,8 @@ class AudioSplitter:
         # slow down a bit each audio
         if self.spf != 1.0:
             red(f"Global slowdown factor is '{self.spf}' so will slow down each audio file")
+            assert self.stop_source != "local_json", (
+                "can't use local_json stop source and slowdown")
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
                 audio = AudioSegment.from_mp3(file)
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
@@ -114,8 +120,14 @@ class AudioSplitter:
         # splitting the long audio
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
-            transcript = self.run_whisperx(file)
-            times_to_keep, text_segments = self.split_one_transcript(transcript)
+            if self.stop_source == "replicate":
+                transcript = self.run_whisperx(file)
+                times_to_keep, text_segments = self.split_one_transcript(transcript)
+            elif self.stop_source == "local_json":
+                raise NotImplementedError
+            else:
+                raise ValueError(self.stop_source)
+
             fileo = self.to_split_original[ii]
 
             if len(times_to_keep) == 1:
