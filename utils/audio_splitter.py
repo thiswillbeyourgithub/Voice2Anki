@@ -35,12 +35,17 @@ class AudioSplitter:
             stop_list=["stop", "nouvelles? cartes?", "nouvelles? questions?"],
             language="fr",
             n_todo=1,
+
+
+
             unsplitted_dir="./user_directory/unsplitted",
             splitted_dir="./user_directory/splitted",
             done_dir="./user_directory/done",
-            remove_silence=False,
+
             trim_splitted_silence=False,
             global_slowdown_factor=1.0,
+
+            remove_silence=False,
             silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
