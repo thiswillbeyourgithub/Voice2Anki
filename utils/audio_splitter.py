@@ -352,6 +352,7 @@ class AudioSplitter:
                     audio_hash=audio_hash,
                     prompt=self.prompt,
                     language=self.language,
+                    model="medium",
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
@@ -433,15 +434,14 @@ class AudioSplitter:
 
 
 @stt_cache.cache(ignore=["audio_path"])
-def whisperx_splitter(audio_path, audio_hash, prompt, language):
+def whisperx_splitter(audio_path, audio_hash, prompt, language, model="large-v2"):
     whi("Starting replicate (meaning cache is not used)")
     start = time.time()
     transcript = replicate.run(
             "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
             input={
                 "audio": open(audio_path, "rb"),
-                "model": "large-v2",
-                #"model": "medium",
+                "model": model,
                 "language": language,
                 "temperature": 0,
                 "initial_prompt": prompt,
