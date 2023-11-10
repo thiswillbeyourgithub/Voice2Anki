@@ -169,7 +169,7 @@ def sound_preprocessing(audio_mp3_n):
 
     # alternative vad using torchaudio sox:
     sox_effects = [
-            # ["norm"],  # normalize audio
+            ["norm"],  # normalize audio
 
             # # isolate voice frequency
             # # -2 is for a steeper filtering
