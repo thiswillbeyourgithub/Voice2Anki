@@ -20,7 +20,7 @@ def start_voice2formattedtext(
         debug=False,
         do_auth=False,
         localnetworkonly=False,
-        use_ssl=False,
+        use_ssl=True,
         media_folder=None,
         disable_embeddings=False,
         *args,
@@ -45,7 +45,7 @@ def start_voice2formattedtext(
         if True, will use the login/password pairs specified in __init__.py
     localnetworkonly: bool, default False
         restrict access to the local network only
-    use_ssl: bool, default False
+    use_ssl: bool, default True
         if True, will use the ssl configuration specified in __init__.py
     media_folder: str, default None
         optional anki media database location
