@@ -345,7 +345,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
 
 @trace
-def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority):
+def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, check_gpt4):
     whi("Recursively improving")
     if not txt_audio:
         red("No audio transcripts found.")
@@ -374,7 +374,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
                 "timestamp": int(time.time()),
                 "priority": priority,
                 "answer": answer,
-                "llm_model": "gpt-3.5-turbo-4k_or_16k",
+                "llm_model": "gpt-3.5-turbo-1106" if not check_gpt4 else "gpt-4-turbo",
                 "tts_model": "whisper-api",
                 "tkn_len_in": tkn_len_in,
                 "tkn_len_out": tkn_len_out,

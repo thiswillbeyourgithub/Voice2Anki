@@ -514,6 +514,7 @@ with gr.Blocks(
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
                 sld_improve,
+                check_gpt4,
                 ],
             preprocess=False,
             postprocess=False,
