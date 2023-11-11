@@ -1,7 +1,8 @@
+from pydub import AudioSegment
+import soundfile as sf
 from pathlib import Path
 import gradio as gr
 import queue
-from scipy.io.wavfile import write
 import pickle
 from bs4 import BeautifulSoup
 import cv2
@@ -194,8 +195,10 @@ def sound_preprocessing(audio_mp3_n):
             sox_effects,
             )
 
-    # write to file
-    write(audio_mp3_n, sample_rate, waveform.numpy().T)
+    # write to file as wav
+    sf.write(audio_mp3_n, waveform, sample_rate, format='wav')
+    temp = AudioSegment.from_wav(audio_mp3_n)
+    temp.export(audio_mp3_n, format="mp3")
 
     whi("Done preprocessing audio")
     return audio_mp3_n
