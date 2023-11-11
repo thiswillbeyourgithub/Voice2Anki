@@ -1,4 +1,3 @@
-from scipy.io.wavfile import write
 import torchaudio
 import copy
 import soundfile as sf
@@ -435,9 +434,13 @@ class AudioSplitter:
                     sox_effects,
                     )
 
-            # write to file
-            write(new_filename, sample_rate, waveform.numpy().T)
+            # write to wav, then convert to mp3
+            sf.write(str(new_filename), waveform, sample_rate, format='wav')
+            temp = AudioSegment.from_wav(new_filename)
+            temp.export(new_filename, format="mp3")
+
             new_audio = AudioSegment.from_mp3(new_filename)
+
         else:
             raise ValueError(self.silence_method)
 
