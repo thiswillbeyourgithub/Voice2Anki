@@ -1,3 +1,4 @@
+import cv2
 import threading
 import pickle
 from pathlib import Path
@@ -112,7 +113,14 @@ class ValueStorage:
             if key == "gallery":
                 # when reloading gallery, the image has to be inverted again
                 for i, im in enumerate(new):
-                    new[i] = rgb_to_bgr(im)
+                    try:
+                        if isinstance(im, dict):
+                            new[i] = rgb_to_bgr(cv2.imread(im["name"], flags=1))
+                        else:
+                            new[i] = rgb_to_bgr(im)
+                    except Exception as err:
+                        red(f"Error when loading {i}th image from gallery: '{err}'")
+                        new[i] = None
             self.cache_values[key] = new
             return new
         else:
