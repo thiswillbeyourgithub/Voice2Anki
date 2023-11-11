@@ -218,7 +218,10 @@ def timeout(limit):
             if thread.is_alive():
                 raise Exception(f"Reached timeout for {func} after {limit}s")
             else:
-                return result[0]
+                if not result:
+                    raise Exception(f"No result from {func} with args {args} {kwargs}")
+                else:
+                    return result[0]
         return wrapper
     return decorator
 
