@@ -1,6 +1,5 @@
 import os
 import fire
-import sys
 from pathlib import Path
 
 from utils.logger import whi, yel, red, print_db
@@ -122,7 +121,7 @@ def start_voice2formattedtext(
                 "ssl_verify": False,  # allow self signed
                 }
     else:
-        red(f"Will not use SSL")
+        red("Will not use SSL")
         ssl_args = {}
 
     demo.queue(concurrency_count=10)
@@ -137,5 +136,6 @@ def start_voice2formattedtext(
             show_tips=True,
             **ssl_args,
             )
+
 if __name__ == "__main__":
     instance = fire.Fire(start_voice2formattedtext)
