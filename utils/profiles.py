@@ -235,29 +235,29 @@ def switch_profile(profile):
                 profile,
                 ]
 
-    pv = ValueStorage(profile)
+    shared.pv = ValueStorage(profile)
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")
-    if pv.backend == "anki":
+    if shared.pv.backend == "anki":
         return [
-                pv["txt_deck"],
-                pv["txt_tags"],
-                pv["txt_chatgpt_context"],
-                pv["txt_whisp_prompt"],
-                pv["txt_whisp_lang"],
-                pv["gallery"],
+                shared.pv["txt_deck"],
+                shared.pv["txt_tags"],
+                shared.pv["txt_chatgpt_context"],
+                shared.pv["txt_whisp_prompt"],
+                shared.pv["txt_whisp_lang"],
+                shared.pv["gallery"],
                 None,
                 None,
                 None,
                 profile,
                 ]
-    elif pv.backend == "markdown":
+    elif shared.pv.backend == "markdown":
         return [
-                pv["txt_mdpath"],
-                pv["txt_chatgpt_context"],
-                pv["txt_whisp_prompt"],
-                pv["txt_whisp_lang"],
+                shared.pv["txt_mdpath"],
+                shared.pv["txt_chatgpt_context"],
+                shared.pv["txt_whisp_prompt"],
+                shared.pv["txt_whisp_lang"],
                 None,
                 None,
                 None,

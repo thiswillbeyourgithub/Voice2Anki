@@ -1,12 +1,13 @@
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, pv
+from .profiles import get_profiles, switch_profile, ValueStorage
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
 from .media import get_image, reset_audio, reset_image, get_img_source
+from .shared_module import shared
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -72,8 +73,8 @@ with gr.Blocks(
                     dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
 
                 # image
-                with gr.Accordion(label="Images", open=True if pv["gallery"] else False):
-                    gallery = gr.Gallery(value=pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
+                with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
+                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
@@ -103,26 +104,26 @@ with gr.Blocks(
 
                 # quick settings
                 with gr.Row():
-                    sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.", scale=1)
-                    sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["sld_temp"], step=0.1, label="LLM temperature", scale=1)
-                    sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size", scale=1)
-                    check_gpt4 = gr.Checkbox(value=pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
+                    sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=500, label="LLM avail. tkn.", scale=1)
+                    sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temperature", scale=1)
+                    sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+                    check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                 txt_price = gr.Textbox(value="", show_label=False, interactive=False, max_lines=2, lines=2)
 
     with gr.Tab(label="Settings"):
-        roll_dirload_check = gr.Checkbox(value=pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
+        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
         with gr.Row():
             sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
             improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
         with gr.Row():
-            txt_profile = gr.Textbox(value=pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
+            txt_profile = gr.Textbox(value=shared.pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
         with gr.Row():
-            txt_deck = gr.Textbox(value=pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
-            txt_whisp_lang = gr.Textbox(value=pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
-        txt_tags = gr.Textbox(value=pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
+            txt_deck = gr.Textbox(value=shared.pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
+            txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
+        txt_tags = gr.Textbox(value=shared.pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
         with gr.Row():
-            txt_whisp_prompt = gr.Textbox(value=pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
-            txt_chatgpt_context = gr.Textbox(value=pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
+            txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
+            txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
 
         # output
         output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
@@ -165,7 +166,7 @@ with gr.Blocks(
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
             ).then(
-                    fn=pv.save_sld_max_tkn,
+                    fn=shared.pv.save_sld_max_tkn,
                     inputs=[sld_max_tkn],
                     )
     check_gpt4.change(
@@ -173,19 +174,19 @@ with gr.Blocks(
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
             ).then(
-                    fn=pv.save_check_gpt4,
+                    fn=shared.pv.save_check_gpt4,
                     inputs=[check_gpt4],
                     )
 
     # change some values to profile
-    sld_buffer.change(fn=pv.save_sld_buffer, inputs=[sld_buffer])
-    sld_temp.change(fn=pv.save_sld_temp, inputs=[sld_temp])
-    roll_dirload_check.change(fn=pv.save_dirload_check, inputs=[roll_dirload_check])
-    txt_tags.change(fn=pv.save_txt_tags, inputs=[txt_tags])
-    txt_deck.change(fn=pv.save_txt_deck, inputs=[txt_deck])
-    txt_chatgpt_context.change(fn=pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context])
-    txt_whisp_prompt.change(fn=pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt])
-    txt_whisp_lang.change(fn=pv.save_txt_whisp_lang, inputs=[txt_whisp_lang])
+    sld_buffer.change(fn=shared.pv.save_sld_buffer, inputs=[sld_buffer])
+    sld_temp.change(fn=shared.pv.save_sld_temp, inputs=[sld_temp])
+    roll_dirload_check.change(fn=shared.pv.save_dirload_check, inputs=[roll_dirload_check])
+    txt_tags.change(fn=shared.pv.save_txt_tags, inputs=[txt_tags])
+    txt_deck.change(fn=shared.pv.save_txt_deck, inputs=[txt_deck])
+    txt_chatgpt_context.change(fn=shared.pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context])
+    txt_whisp_prompt.change(fn=shared.pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt])
+    txt_whisp_lang.change(fn=shared.pv.save_txt_whisp_lang, inputs=[txt_whisp_lang])
 
     # change profile and load previous data
     txt_profile.submit(
@@ -207,7 +208,7 @@ with gr.Blocks(
                     inputs=[gallery],
                     queue=True,
                     ).then(
-                            fn=pv.save_gallery,
+                            fn=shared.pv.save_gallery,
                             inputs=[gallery],
                             )
     rst_img_btn.click(
@@ -224,7 +225,7 @@ with gr.Blocks(
                             inputs=[gallery],
                             queue=True,
                             ).then(
-                            fn=pv.save_gallery,
+                            fn=shared.pv.save_gallery,
                             inputs=[gallery],
                             )
 
@@ -261,7 +262,6 @@ with gr.Blocks(
                         txt_chatgpt_tkncost,
                         txt_deck,
                         txt_tags,
-                        txt_profile,
                         gallery,
                         ],
                     preprocess=False,
@@ -355,7 +355,6 @@ with gr.Blocks(
                                 txt_chatgpt_tkncost,
                                 txt_deck,
                                 txt_tags,
-                                txt_profile,
                                 gallery,
                                 ],
                             preprocess=False,
@@ -419,7 +418,6 @@ with gr.Blocks(
                                 #        txt_chatgpt_tkncost,
                                 #        txt_deck,
                                 #        txt_tags,
-                                #        txt_profile,
                                 #        gallery,
                                 #        ],
                                 #    preprocess=False,
@@ -456,7 +454,6 @@ with gr.Blocks(
                 txt_chatgpt_tkncost,
                 txt_deck,
                 txt_tags,
-                txt_profile,
                 gallery,
                 ],
             preprocess=False,
@@ -496,7 +493,6 @@ with gr.Blocks(
                         txt_chatgpt_tkncost,
                         txt_deck,
                         txt_tags,
-                        txt_profile,
                         gallery,
                         ],
                     preprocess=False,
@@ -536,7 +532,6 @@ with gr.Blocks(
                         txt_chatgpt_tkncost,
                         txt_deck,
                         txt_tags,
-                        txt_profile,
                         gallery,
                         ],
                     preprocess=False,
@@ -566,5 +561,5 @@ with gr.Blocks(
             queue=True,
             )
 
-    if pv.profile_name == "default":
+    if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")

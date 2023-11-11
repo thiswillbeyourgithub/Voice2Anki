@@ -47,8 +47,8 @@ for p in doings:
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
-global pv
-pv = ValueStorage()
+shared.pv = ValueStorage()
+pv = shared.pv
 
 message_buffer = {
         "question": [],
@@ -341,9 +341,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         tkn_cost = [input_tkn_cost, output_tkn_cost]
 
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-        global pv
-        if pv.profile_name != profile:
-            pv = ValueStorage(profile)
         pv["total_llm_cost"] += tkn_cost_dol
         cloz = response["choices"][0]["message"]["content"]
         cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
@@ -360,7 +357,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             running_tasks["saving_chatgpt"][-1].join()
         while running_tasks["saving_chatgpt"]:
             running_tasks["saving_chatgpt"].pop()
-        global pv
         thread = threading.Thread(
                 target=store_to_db,
                 name="saving_chatgpt",
@@ -371,7 +367,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                         "token_cost": tkn_cost,
                         "temperature": temperature,
                         "LLM_context": txt_chatgpt_context,
-                        "V2FT_profile": profile,
+                        "V2FT_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
                         "model_name": model_to_use,
                         "last_message_from_conversation": formatted_messages[-1],
@@ -525,7 +521,6 @@ def to_anki(
         txt_chatgpt_tkncost,
         txt_deck,
         txt_tags,
-        txt_profile,
         gallery,
         ):
     "function called to do wrap it up and send to anki"
@@ -541,9 +536,6 @@ def to_anki(
         return
     if not txt_tags:
         red("missing txt_tags")
-        return
-    if not txt_profile:
-        red("missing txt_profile")
         return
 
     # check that the tkn_cost is sound
@@ -590,10 +582,6 @@ def to_anki(
             )
     thread.start()
     threads.append(thread)
-
-    global pv
-    if pv.profile_name != txt_profile:
-        pv = ValueStorage(txt_profile)
 
     tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
 
