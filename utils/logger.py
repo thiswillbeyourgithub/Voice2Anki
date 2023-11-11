@@ -206,6 +206,7 @@ def timeout(limit):
     "simple wrapper to add a timeout that raises an exception if taking too long"
     def decorator(func):
         def wrapper(*args, **kwargs):
+            # return func(*args, **kwargs)  # for debugging
             result = []
             def appender(func, *args, **kwargs):
                 result.append(func(*args, **kwargs))
