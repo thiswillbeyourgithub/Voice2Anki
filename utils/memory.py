@@ -331,21 +331,25 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
-    # make it so that highest priority prompts are last in the discussion:
-    output_pr.reverse()
-    # or sort by timestamp:
-    output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
-    # or sort by priority:
-    # output_pr = sorted(output_pr, key=lambda x: x["priority"])
-    # or by distance:
-    # output_pr = sorted(output_pr, key=lambda x: distances[output_pr.index(x)])
-    # make sure the system prompt is first
+    # # make it so that highest priority prompts are last in the discussion:
+    # output_pr.reverse()
+
+    if not shared.disable_embeddings:
+        # sort by distance:
+        output_pr = sorted(output_pr, key=lambda x: distances[output_pr.index(x)])
+    else:
+        # or by timestamp (most recent last):
+        output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
+        # or by priority:
+        # output_pr = sorted(output_pr, key=lambda x: x["priority"])
+
+    # regardless, make sure the system prompt is first
     for i, p in enumerate(output_pr):
         if p["role"] == "system":
             break
     output_pr.insert(0, output_pr.pop(i))
-
     assert output_pr[0]["role"] == "system", "the first prompt is not system"
+
     return output_pr
 
 
