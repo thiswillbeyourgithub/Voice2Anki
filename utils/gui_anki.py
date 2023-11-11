@@ -160,7 +160,7 @@ with gr.Blocks(
             queue=True,
             )
 
-    # display pricing
+    # display pricing then save values
     sld_max_tkn.change(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
@@ -193,12 +193,8 @@ with gr.Blocks(
             fn=switch_profile,
             inputs=[txt_profile],
             outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
-    # txt_profile.blur(
-    #         fn=switch_profile,
-    #         inputs=[txt_profile],
-    #         outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
 
-    # image
+    # load image then OCR it then save it to profile
     paste_image_event = img_btn.click(
             fn=get_image,
             inputs=[gallery],
