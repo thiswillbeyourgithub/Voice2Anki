@@ -390,11 +390,12 @@ class AudioSplitter:
     def unsilence_audio(self, file):
         whi(f"Removing silence from {file}")
 
+        audio = AudioSegment.from_mp3(file)
         new_filename = file.parent / ("unsilenced_" + file.name)
+        previous_len = len(audio) // 1000
 
         # pydub's way (very slow)
         if self.silence_method == "pydub":
-            audio = AudioSegment.from_mp3(file)
             splitted = split_on_silence(
                     audio,
                     min_silence_len=500,
@@ -405,7 +406,7 @@ class AudioSplitter:
             new_audio = splitted[0]
             for chunk in splitted[1:]:
                 new_audio += chunk
-            new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
+            new_audio.export(new_filename, format="mp3")
 
         elif self.silence_method == "sox":
             # sox way, fast but needs linux
@@ -436,10 +437,10 @@ class AudioSplitter:
 
             # write to file
             write(new_filename, sample_rate, waveform.numpy().T)
+            new_audio = AudioSegment.from_mp3(new_filename)
         else:
             raise ValueError(self.silence_method)
 
-        previous_len = len(audio) // 1000
         new_len = len(new_audio) // 1000
         red(f"Removed silence of {file} from {previous_len}s to {new_len}s")
 
