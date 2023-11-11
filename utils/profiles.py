@@ -129,7 +129,7 @@ class ValueStorage:
             if key == "sld_max_tkn":
                 default = 3500
             elif key == "sld_buffer":
-                default = 7
+                default = 0
             elif key == "sld_temp":
                 default = 0.2
             elif key == "txt_whisp_lang":
