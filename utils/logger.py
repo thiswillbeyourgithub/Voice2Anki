@@ -226,5 +226,5 @@ def timeout(limit):
         return wrapper
     return decorator
 
-timeout_60 = timeout(limit=60)
+timeout_30 = timeout(limit=30)
 timeout_120 = timeout(limit=120)
