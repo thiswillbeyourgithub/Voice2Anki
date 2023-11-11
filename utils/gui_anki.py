@@ -110,11 +110,12 @@ with gr.Blocks(
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                 txt_price = gr.Textbox(value="", show_label=False, interactive=False, max_lines=2, lines=2)
 
+                with gr.Row():
+                    sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
+                    improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
+
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
-        with gr.Row():
-            sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
-            improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
         with gr.Row():
             txt_profile = gr.Textbox(value=shared.pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
         with gr.Row():
