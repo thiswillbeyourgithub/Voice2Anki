@@ -11,7 +11,11 @@ from logging import handlers
 import rtoml
 import json
 
-from .shared_module import shared
+try:
+    from .shared_module import shared
+except:
+    # needed when calling audio_splitter instead of Voice2FormattedText
+    from shared_module import shared
 
 Path("utils/logs").mkdir(exist_ok=True)
 log_file = Path("utils/logs/logs.txt")
