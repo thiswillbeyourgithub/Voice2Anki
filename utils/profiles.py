@@ -18,6 +18,7 @@ approved_keys_all = [
         "total_llm_cost",
         "dirload_check",
         "check_gpt4",
+        "sld_whisp_temp",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -139,6 +140,8 @@ class ValueStorage:
                 default = False
             elif key == "check_gpt4":
                 default = False
+            elif key == "sld_whisp_temp":
+                default = 0
             else:
                 raise Exception(key)
             self.cache_values[key] = default

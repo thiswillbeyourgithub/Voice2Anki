@@ -73,7 +73,9 @@ def whisper_cached(
         audio_hash,
         modelname,
         txt_whisp_prompt,
-        txt_whisp_lang):
+        txt_whisp_lang,
+        sld_whisp_temp,
+        ):
     """this is a call to openai's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
@@ -90,7 +92,7 @@ def whisper_cached(
                         file=audio_file,
                         prompt=txt_whisp_prompt,
                         language=txt_whisp_lang,
-                        temperature=0,
+                        temperature=sld_whisp_temp,
                         response_format="verbose_json",
                         )
 
@@ -105,7 +107,7 @@ def whisper_cached(
         return red(f"Error when cache transcribing audio: '{err}'")
 
 @trace
-def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -130,22 +132,24 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
             audio_hash,
             modelname,
             txt_whisp_prompt,
-            txt_whisp_lang)
+            txt_whisp_lang,
+            sld_whisp_temp,
+            )
     return None
 
 
 @trace
-def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
+def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     thread = threading.Thread(
             target=transcribe_cache,
-            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang)
+            args=(audio_mp3, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp)
             )
     thread.start()
     return thread
 
 
 @trace
-def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang):
+def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
@@ -172,7 +176,9 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang):
                 audio_hash,
                 modelname,
                 txt_whisp_prompt,
-                txt_whisp_lang)
+                txt_whisp_lang,
+                sld_whisp_temp
+                )
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
         txt_audio = transcript["text"]
@@ -191,6 +197,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang):
                         "timestamp": time.time(),
                         "whisper_language": txt_whisp_lang,
                         "whisper_context": txt_whisp_prompt,
+                        "whisper_temperature": sld_whisp_temp,
                         "V2FT_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript,
