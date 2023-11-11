@@ -18,6 +18,7 @@ from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
 
 from logger import whi, yel, red
+from shared_module import shared
 
 # replicate has to be imported after the api is loader
 assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file REPLICATE8API_KEY.txt and paste your openai API key inside"
@@ -420,18 +421,15 @@ class AudioSplitter:
 
         elif self.silence_method == "torchaudio":
             # load from file
-            waveform, sample_rate = torchaudio.load(file)
+            shutil.copy2(file, new_filename)
 
-            # alternative vad using torchaudio sox:
-            sox_effects = [
-                    # max silence should be 2s
-                    ["silence", "-l", "1", "0.1", "0.01%", "-1", "1.0", "0.01%"],
-                    ]
+            # reuse the same code form media
+            waveform, sample_rate = torchaudio.load(new_filename)
 
             waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
                     waveform,
                     sample_rate,
-                    sox_effects,
+                    shared.sox_effects,
                     )
 
             # write to wav, then convert to mp3
