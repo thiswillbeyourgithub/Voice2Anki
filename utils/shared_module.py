@@ -18,13 +18,14 @@ class SharedModule:
 
             ["norm"],  # normalize audio
 
-            # # remove leading silence
-            ["vad"],
+            # remove leading silence
+            # ["vad"],
 
-            # and ending silence, this might be unecessary for splitted audio
-            ["reverse"],
-            ["vad"],
-            ["reverse"],
+            # # and ending silence, this might be unecessary for splitted audio
+            # ["reverse"],
+            # ["vad"],
+            # ["reverse"],
+
             ]
 
 
