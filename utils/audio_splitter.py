@@ -224,7 +224,7 @@ class AudioSplitter:
                 prev_t1 = t1
 
             audio_o = AudioSegment.from_mp3(fileo)
-            assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.1
+            assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.01
             for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{i+1:03d}.mp3"
