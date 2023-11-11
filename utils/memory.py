@@ -272,6 +272,11 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     dis_tkns = 0
     output_pr = [syspr[0]]  # add system prompt
 
+    # add automatically the highest similarity
+    if not shared.disable_embeddings:
+        output_pr.append(max_sim[1])
+        tkns += max_sim[1]["tkn_len_in"]
+
     exit_while = False
     cnt = 0
     while (not exit_while) and timesorted_pr:
