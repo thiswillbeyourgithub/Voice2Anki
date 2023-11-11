@@ -1,3 +1,5 @@
+from scipy.io.wavfile import write
+import torchaudio
 import copy
 import soundfile as sf
 import tempfile
@@ -52,7 +54,7 @@ class AudioSplitter:
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
-        assert silence_method in ["sox", "pydub"], "invalid silence_method"
+        assert silence_method in ["sox", "pydub", "torchaudio"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
@@ -387,13 +389,12 @@ class AudioSplitter:
 
     def unsilence_audio(self, file):
         whi(f"Removing silence from {file}")
-        audio = AudioSegment.from_mp3(file)
-        previous_len = len(audio) // 1000
 
         new_filename = file.parent / ("unsilenced_" + file.name)
 
         # pydub's way (very slow)
         if self.silence_method == "pydub":
+            audio = AudioSegment.from_mp3(file)
             splitted = split_on_silence(
                     audio,
                     min_silence_len=500,
@@ -405,6 +406,7 @@ class AudioSplitter:
             for chunk in splitted[1:]:
                 new_audio += chunk
             new_audio.export(file.parent / ("unsilenced_" + file.name), format="mp3")
+
         elif self.silence_method == "sox":
             # sox way, fast but needs linux
             f1 = "\"" + str(file.name) + "\""
@@ -415,9 +417,29 @@ class AudioSplitter:
             self.exec(sox_cmd)
             assert new_filename.exists(), f"new file not found: '{new_filename}'"
             new_audio = AudioSegment.from_mp3(new_filename)
+
+        elif self.silence_method == "torchaudio":
+            # load from file
+            waveform, sample_rate = torchaudio.load(file)
+
+            # alternative vad using torchaudio sox:
+            sox_effects = [
+                    # max silence should be 2s
+                    ["silence", "-l", "1", "0.1", "0.01%", "-1", "1.0", "0.01%"],
+                    ]
+
+            waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
+                    waveform,
+                    sample_rate,
+                    sox_effects,
+                    )
+
+            # write to file
+            write(new_filename, sample_rate, waveform.numpy().T)
         else:
             raise ValueError(self.silence_method)
 
+        previous_len = len(audio) // 1000
         new_len = len(new_audio) // 1000
         red(f"Removed silence of {file} from {previous_len}s to {new_len}s")
 
