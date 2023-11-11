@@ -130,16 +130,16 @@ def reset_audio():
 
 @trace
 @soundpreprocess_cache.cache
-def sound_preprocessing(audio_mp3_n):
+def sound_preprocessing(audio_mp3_path):
     "removing silence, maybe try to enhance audio, apply filters etc"
-    whi(f"Preprocessing {audio_mp3_n}")
+    whi(f"Preprocessing {audio_mp3_path}")
 
-    if audio_mp3_n is None:
+    if audio_mp3_path is None:
         whi("Not cleaning sound because received None")
         return None
 
     # load from file
-    waveform, sample_rate = torchaudio.load(audio_mp3_n)
+    waveform, sample_rate = torchaudio.load(audio_mp3_path)
 
     # alternative vad using torchaudio sox:
     sox_effects = [
@@ -172,12 +172,12 @@ def sound_preprocessing(audio_mp3_n):
             )
 
     # write to file as wav
-    sf.write(audio_mp3_n, waveform, sample_rate, format='wav')
-    temp = AudioSegment.from_wav(audio_mp3_n)
-    temp.export(audio_mp3_n, format="mp3")
+    sf.write(str(audio_mp3_path), waveform.numpy().T, sample_rate, format='wav')
+    temp = AudioSegment.from_wav(audio_mp3_path)
+    temp.export(audio_mp3_path, format="mp3")
 
     whi("Done preprocessing audio")
-    return audio_mp3_n
+    return audio_mp3_path
 
 # create dummy button to use the preprocessing code if needed
 dummy_btn = gr.Audio(
