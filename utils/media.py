@@ -185,7 +185,7 @@ def sound_preprocessing(audio_mp3_n):
             ["reverse"],
 
             # max silence should be 2s
-            ["silence", "-l", "1", "0.1", "0.05%", "-1", "1.0", "0.05%"],
+            ["silence", "-l", "1", "0.1", "0.01%", "-1", "1.0", "0.01%"],
             ]
 
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
