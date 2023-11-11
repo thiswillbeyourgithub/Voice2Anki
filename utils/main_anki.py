@@ -120,6 +120,7 @@ def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
     audio_mp3 = format_audio_component(audio_mp3)
+    shared.latest_stt_used = modelname
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -307,6 +308,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         model_to_use = "gpt-4"
         model_price = (0.03, 0.06)
     whi(f"Will use model {model_to_use}")
+
+    # in case recur improv is called
+    shared.latest_llm_used = model_to_use
 
     # print prompts used for the call:
     n = len(formatted_messages)
