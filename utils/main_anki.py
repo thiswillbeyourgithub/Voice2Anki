@@ -515,6 +515,14 @@ def wait_for_queue(q, source, t=1):
             data = None
     return data
 
+@trace
+def kill_threads():
+    """the threads in timeout are stored in the shared module, if they
+    get replaced by None the threads will be ignored."""
+    with threading.Lock():
+        n = sum([t.is_alive() for t in shared.threads])
+        red(f"Killing {n} running threads")
+        shared.threads = []
 
 @trace
 def to_anki(

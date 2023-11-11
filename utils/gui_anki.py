@@ -1,7 +1,7 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, ValueStorage
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, kill_threads
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
@@ -52,6 +52,7 @@ with gr.Blocks(
         gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False, scale=5)
         dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
         sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
+        kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     # hidden, to store the request answer from chatgpt
     txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
@@ -150,6 +151,9 @@ with gr.Blocks(
 
     # sync anki
     sync_btn.click(fn=threaded_sync_anki, queue=True)
+
+    # kill threads before timeout
+    kill_threads_btn.click(fn=kill_threads)
 
     # display card status
     txt_chatgpt_cloz.change(

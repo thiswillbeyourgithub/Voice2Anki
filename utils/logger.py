@@ -11,6 +11,8 @@ from logging import handlers
 import rtoml
 import json
 
+from .shared_module import shared
+
 Path("utils/logs").mkdir(exist_ok=True)
 log_file = Path("utils/logs/logs.txt")
 log_file.touch(exist_ok=True)
@@ -215,15 +217,27 @@ def Timeout(limit):
             thread = threading.Thread(
                     target=appender,
                     args=[func] + list(args),
-                    kwargs=kwargs)
+                    kwargs=kwargs,
+                    daemon=True,
+                    )
             thread.start()
-            thread.join(timeout=limit)
-            if thread.is_alive():
-                raise Exception(f"Reached timeout for {func} after {limit}s")
+
+            # add the thread in the shared module, this way we can empty
+            # the list to cut the timeout short
+            with threading.Lock():
+                shared.threads.append(thread)
+
+            start = time.time()
+            while shared.threads and thread.is_alive():
+                time.sleep(0.1)
+                if time.time() - start > limit:
+                    raise Exception(f"Reached timeout for {func} after {limit}s")
+            if not shared.threads:
+                raise Exception(f"Thread of func {func} was killer")
+
+            if not result:  # meaning an exception occured in the function
+                raise Exception(f"No result from {func} with args {args} {kwargs}")
             else:
-                if not result:
-                    raise Exception(f"No result from {func} with args {args} {kwargs}")
-                else:
-                    return result[0]
+                return result[0]
         return wrapper
     return decorator
