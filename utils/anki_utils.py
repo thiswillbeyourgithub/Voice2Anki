@@ -157,8 +157,9 @@ def get_card_status(txt_chatgpt_cloz):
     """return True or False depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
 
-    cloz = cloze_editor(txt_chatgpt_cloz).replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", "").replace(",", " ").replace(":", " ").replace(";", " ")
-    cloz = re.sub("{{c\d+::", "", cloz).strip()
+    cloz = cloze_editor(txt_chatgpt_cloz)
+    cloz = re.sub(r"{{c\d+::", " ", cloz).strip()
+    cloz = cloz.replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", " ").replace(",", " ").replace(":", " ").replace(";", " ")
 
     if not cloz:
         return "EMPTY"
