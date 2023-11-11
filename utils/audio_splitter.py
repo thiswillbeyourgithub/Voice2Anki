@@ -435,7 +435,7 @@ class AudioSplitter:
                     )
 
             # write to wav, then convert to mp3
-            sf.write(str(new_filename), waveform, sample_rate, format='wav')
+            sf.write(str(new_filename), waveform.numpy().T, sample_rate, format='wav')
             temp = AudioSegment.from_wav(new_filename)
             temp.export(new_filename, format="mp3")
 
