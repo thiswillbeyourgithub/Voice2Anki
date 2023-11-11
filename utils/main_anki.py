@@ -480,8 +480,7 @@ def dirload_splitted_last(checkbox):
             a4=True,
             a5=None,
             )
-    assert len(out) == 5, f"unexpected lenght: {len(out)}"
-    return out[4]
+    return out[-1]
 
 @trace
 def gather_threads(threads, source="to_anki"):
