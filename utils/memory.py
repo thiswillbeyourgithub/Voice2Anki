@@ -10,7 +10,7 @@ from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 import tiktoken
 
-from .logger import whi, red, yel, trace, timeout_60
+from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
 
 # string at the end of the prompt
@@ -205,7 +205,7 @@ def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prom
 
 
 @trace
-@timeout_60
+@Timeout().t30
 def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, favor_list):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum

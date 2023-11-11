@@ -8,7 +8,7 @@ import time
 import urllib.request
 import json
 
-from .logger import red, whi, trace, timeout
+from .logger import red, whi, trace, Timeout
 from .shared_module import shared
 from .media import format_audio_component
 
@@ -152,7 +152,7 @@ def audio_to_anki(audio_mp3, queue):
 
 
 @trace
-@timeout(limit=10)
+@Timeout().t10
 def get_card_status(txt_chatgpt_cloz):
     """return True or False depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""

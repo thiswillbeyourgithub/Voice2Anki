@@ -202,29 +202,36 @@ def trace(func):
     return wrapper
 
 
-def timeout(limit):
-    "simple wrapper to add a timeout that raises an exception if taking too long"
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            # return func(*args, **kwargs)  # for debugging
-            result = []
-            def appender(func, *args, **kwargs):
-                result.append(func(*args, **kwargs))
-            thread = threading.Thread(
-                    target=appender,
-                    args=[func] + list(args),
-                    kwargs=kwargs)
-            thread.start()
-            thread.join(timeout=limit)
-            if thread.is_alive():
-                raise Exception(f"Reached timeout for {func} after {limit}s")
-            else:
-                if not result:
-                    raise Exception(f"No result from {func} with args {args} {kwargs}")
-                else:
-                    return result[0]
-        return wrapper
-    return decorator
+class Timeout:
+    """wrapper to add a timeout to function. I had to use threading because
+    signal could not be used outside of the main thread in gradio"""
+    def __init__(self):
+        # create methods like "t30"  to wrap with a 30s timeout
 
-timeout_30 = timeout(limit=30)
-timeout_120 = timeout(limit=120)
+        for limit in range(5, 281, 5):
+            method_name = f"t{limit}"
+
+            def create_method(method_name):
+                def decorator(func):
+                    def wrapper(*args, **kwargs):
+                        # return func(*args, **kwargs)  # for debugging
+                        result = []
+                        def appender(func, *args, **kwargs):
+                            result.append(func(*args, **kwargs))
+                        thread = threading.Thread(
+                                target=appender,
+                                args=[func] + list(args),
+                                kwargs=kwargs)
+                        thread.start()
+                        thread.join(timeout=limit)
+                        if thread.is_alive():
+                            raise Exception(f"Reached timeout for {func} after {limit}s")
+                        else:
+                            if not result:
+                                raise Exception(f"No result from {func} with args {args} {kwargs}")
+                            else:
+                                return result[0]
+                    return wrapper
+                return decorator
+
+            setattr(self, method_name, create_method(method_name))

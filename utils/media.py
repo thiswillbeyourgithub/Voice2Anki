@@ -12,7 +12,7 @@ import torchaudio
 
 from joblib import Memory
 
-from .logger import whi, red, trace, timeout_120
+from .logger import whi, red, trace, Timeout
 from .ocr import get_text
 from .shared_module import shared
 
@@ -78,7 +78,7 @@ def check_source(source):
 
 
 @trace
-@timeout_120
+@Timeout().t120
 def get_img_source(gallery, queue=queue.Queue()):
     whi("Getting source from image")
     try:
