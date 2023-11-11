@@ -10,13 +10,13 @@ from .media import rgb_to_bgr
 approved_keys_all = [
         "sld_max_tkn",
         "sld_buffer",
-        "temperature",
+        "sld_temp",
         "txt_chatgpt_context",
         "txt_whisp_lang",
         "txt_whisp_prompt",
         "total_llm_cost",
         "dirload_check",
-        "gpt4_checkbox",
+        "check_gpt4",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -72,6 +72,16 @@ class ValueStorage:
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
 
+        # create methods like "save_gallery" to save the gallery to the profile
+        for key in self.approved_keys:
+            def create_save_method(key):
+                @trace
+                def save_method(value):
+                    self.__setitem__(key, value)
+                return save_method
+
+            setattr(self, f"save_{key}", create_save_method(key))
+
     def __getitem__(self, key):
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
@@ -111,7 +121,7 @@ class ValueStorage:
                 default = 3500
             elif key == "sld_buffer":
                 default = 7
-            elif key == "temperature":
+            elif key == "sld_temp":
                 default = 0.2
             elif key == "txt_whisp_lang":
                 default = "fr"
@@ -119,7 +129,7 @@ class ValueStorage:
                 default = 0
             elif key == "dirload_check":
                 default = False
-            elif key == "gpt4_checkbox":
+            elif key == "check_gpt4":
                 default = False
             else:
                 raise Exception(key)
@@ -253,22 +263,6 @@ def switch_profile(profile):
                 None,
                 profile,
                 ]
-
-
-@trace
-def save_tags(txt_profile, txt_tags):
-    if txt_tags:
-        ValueStorage(txt_profile)["txt_tags"] = txt_tags
-
-
-@trace
-def save_deck(txt_profile, txt_deck):
-    if txt_deck:
-        ValueStorage(txt_profile)["txt_deck"] = txt_deck
-
-@trace
-def save_buffer(txt_profile, sld_buffer):
-    ValueStorage(txt_profile)["sld_buffer"] = sld_buffer
 
 
 @trace

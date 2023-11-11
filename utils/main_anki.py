@@ -94,10 +94,6 @@ def whisper_cached(
                         response_format="verbose_json",
                         )
 
-                global pv
-                pv["txt_whisp_prompt"] = txt_whisp_prompt
-                pv["txt_whisp_lang"] = txt_whisp_lang
-
                 return transcript
             except RateLimitError as err:
                 if cnt >= 5:
@@ -148,7 +144,7 @@ def transcribe_cache_async(audio_mp3, txt_whisp_prompt, txt_whisp_lang):
 
 
 @trace
-def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
+def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang):
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
@@ -194,7 +190,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, txt_profile):
                         "timestamp": time.time(),
                         "whisper_language": txt_whisp_lang,
                         "whisper_context": txt_whisp_prompt,
-                        "V2FT_profile": txt_profile,
+                        "V2FT_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript,
                         "model_name": f"OpenAI {modelname}",
@@ -364,6 +360,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             running_tasks["saving_chatgpt"][-1].join()
         while running_tasks["saving_chatgpt"]:
             running_tasks["saving_chatgpt"].pop()
+        global pv
         thread = threading.Thread(
                 target=store_to_db,
                 name="saving_chatgpt",
@@ -386,10 +383,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "db_name": "anki_llm"})
         thread.start()
         running_tasks["saving_whisper"].append(thread)
-
-        pv["sld_max_tkn"] = max_token
-        pv["temperature"] = temperature
-        pv["txt_chatgpt_context"] = txt_chatgpt_context
 
         return cloz, tkn_cost
     except Exception as err:
@@ -601,17 +594,6 @@ def to_anki(
     global pv
     if pv.profile_name != txt_profile:
         pv = ValueStorage(txt_profile)
-
-    # save state for next start
-    pv["txt_deck"] = txt_deck
-    pv["txt_tags"] = txt_tags
-    if gallery is not None:
-        saved_gallery = [
-                    cv2.imread(
-                        i["name"]
-                        ) for i in gallery
-                    ]
-        pv["gallery"] = saved_gallery
 
     tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
 

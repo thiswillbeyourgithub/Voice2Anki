@@ -1,6 +1,6 @@
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile, save_tags, save_deck, save_buffer
+from .profiles import get_profiles, switch_profile
 from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, pv
 from .anki_utils import threaded_sync_anki, get_card_status
 
@@ -104,9 +104,9 @@ with gr.Blocks(
                 # quick settings
                 with gr.Row():
                     sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=pv["sld_max_tkn"], step=500, label="LLM avail. tkn.", scale=1)
-                    sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["temperature"], step=0.1, label="LLM temperature", scale=1)
+                    sld_temp = gr.Slider(minimum=0, maximum=2, value=pv["sld_temp"], step=0.1, label="LLM temperature", scale=1)
                     sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=pv["sld_buffer"], label="Buffer size", scale=1)
-                    check_gpt4 = gr.Checkbox(value=pv["gpt4_checkbox"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
+                    check_gpt4 = gr.Checkbox(value=pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                 txt_price = gr.Textbox(value="", show_label=False, interactive=False, max_lines=2, lines=2)
 
     with gr.Tab(label="Settings"):
@@ -164,15 +164,28 @@ with gr.Blocks(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
-            )
+            ).then(
+                    fn=pv.save_sld_max_tkn,
+                    inputs=[sld_max_tkn],
+                    )
     check_gpt4.change(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
-            )
+            ).then(
+                    fn=pv.save_check_gpt4,
+                    inputs=[check_gpt4],
+                    )
 
-    # change message buffer size
-    sld_buffer.change(fn=save_buffer, inputs=[txt_profile, sld_buffer])
+    # change some values to profile
+    sld_buffer.change(fn=pv.save_sld_buffer, inputs=[sld_buffer])
+    sld_temp.change(fn=pv.save_sld_temp, inputs=[sld_temp])
+    roll_dirload_check.change(fn=pv.save_dirload_check, inputs=[roll_dirload_check])
+    txt_tags.change(fn=pv.save_txt_tags, inputs=[txt_tags])
+    txt_deck.change(fn=pv.save_txt_deck, inputs=[txt_deck])
+    txt_chatgpt_context.change(fn=pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context])
+    txt_whisp_prompt.change(fn=pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt])
+    txt_whisp_lang.change(fn=pv.save_txt_whisp_lang, inputs=[txt_whisp_lang])
 
     # change profile and load previous data
     txt_profile.submit(
@@ -183,8 +196,6 @@ with gr.Blocks(
     #         fn=switch_profile,
     #         inputs=[txt_profile],
     #         outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
-    txt_tags.submit(fn=save_tags, inputs=[txt_profile, txt_tags])
-    txt_deck.submit(fn=save_deck, inputs=[txt_profile, txt_deck])
 
     # image
     paste_image_event = img_btn.click(
@@ -195,7 +206,10 @@ with gr.Blocks(
                     fn=get_img_source,
                     inputs=[gallery],
                     queue=True,
-                    )
+                    ).then(
+                            fn=pv.save_gallery,
+                            inputs=[gallery],
+                            )
     rst_img_btn.click(
             fn=reset_image,
             outputs=[gallery],
@@ -209,6 +223,9 @@ with gr.Blocks(
                             fn=get_img_source,
                             inputs=[gallery],
                             queue=True,
+                            ).then(
+                            fn=pv.save_gallery,
+                            inputs=[gallery],
                             )
 
     # audio
@@ -222,7 +239,7 @@ with gr.Blocks(
     aud_cache_event.append(
         audio_slots[0].change(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -278,7 +295,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -316,7 +333,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -372,7 +389,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                     fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -413,7 +430,7 @@ with gr.Blocks(
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -457,7 +474,7 @@ with gr.Blocks(
     # 1+2
     semiauto_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -497,7 +514,7 @@ with gr.Blocks(
     # 1+2+3
     auto_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, txt_profile],
+            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
