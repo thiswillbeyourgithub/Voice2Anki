@@ -122,7 +122,7 @@ class ValueStorage:
             elif key == "gpt4_checkbox":
                 default = False
             else:
-                default = None
+                raise Exception(key)
             self.cache_values[key] = default
             return default
 
