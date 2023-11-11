@@ -233,7 +233,7 @@ def Timeout(limit):
                 if time.time() - start > limit:
                     raise Exception(f"Reached timeout for {func} after {limit}s")
             if not shared.threads:
-                raise Exception(f"Thread of func {func} was killer")
+                raise Exception(f"Thread of func {func} was killed")
 
             if not result:  # meaning an exception occured in the function
                 raise Exception(f"No result from {func} with args {args} {kwargs}")
