@@ -109,7 +109,7 @@ with gr.Blocks(
                     sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temperature", scale=1)
                     sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
-                txt_price = gr.Textbox(value="", show_label=False, interactive=False, max_lines=2, lines=2)
+                txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
