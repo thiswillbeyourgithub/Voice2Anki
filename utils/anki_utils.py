@@ -152,7 +152,7 @@ def audio_to_anki(audio_mp3, queue):
 
 
 @trace
-@Timeout().t10
+@Timeout(10)
 def get_card_status(txt_chatgpt_cloz):
     """return True or False depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
