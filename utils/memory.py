@@ -99,6 +99,8 @@ def check_prompts(prev_prompts):
 
         if mess["role"] == "user":
             assert "answer" in mess, "no answer key in message"
+            assert "{{c1::" in mess["answer"], f"No cloze found in {mess}"
+            assert "}}" in mess["answer"], f"No cloze found in {mess}"
         elif mess["role"] == "system":
             mess["content"] = default_system_prompt["content"]
             mess["priority"] = default_system_prompt["priority"]
