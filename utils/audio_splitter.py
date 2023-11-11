@@ -352,7 +352,7 @@ class AudioSplitter:
                     audio_hash=audio_hash,
                     prompt=self.prompt,
                     language=self.language,
-                    model="large-v2",
+                    model="medium",
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
