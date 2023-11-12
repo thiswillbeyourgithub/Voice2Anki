@@ -288,7 +288,23 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            )
+            ).then(
+                    fn=dirload_splitted_last,
+                    inputs=[
+                        roll_dirload_check,
+                        ],
+                    outputs=[audio_slots[-1]],
+                    preprocess=False,
+                    # postprocess=False,
+                    queue=True,
+                    ).then(
+                            fn=get_card_status,
+                            inputs=[txt_chatgpt_cloz],
+                            outputs=[txt_card_done],
+                            preprocess=False,
+                            postprocess=False,
+                            queue=True,
+                            )
     rollaudio2_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
