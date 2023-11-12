@@ -288,37 +288,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).then(
-                    fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                    outputs=[txt_audio],
-                    preprocess=False,
-                    postprocess=False,
-                    queue=True,
-                    ).then(
-                        fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-                        outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=True,
-                        ).then(
-                                fn=dirload_splitted_last,
-                                inputs=[
-                                    roll_dirload_check,
-                                    ],
-                                outputs=[audio_slots[-1]],
-                                preprocess=False,
-                                # postprocess=False,
-                                queue=True,
-                                ).then(
-                                        fn=get_card_status,
-                                        inputs=[txt_chatgpt_cloz],
-                                        outputs=[txt_card_done],
-                                        preprocess=False,
-                                        postprocess=False,
-                                        queue=True,
-                                        )
+            )
     rollaudio2_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -333,6 +303,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
+                    cancels=aud_cache_event,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
