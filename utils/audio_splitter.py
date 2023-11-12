@@ -35,7 +35,7 @@ class AudioSplitter:
             self,
             prompt,
 
-            stop_list=["stop"],
+            stop_list=[" stop", " top"],
             language="fr",
             n_todo=1,
 
