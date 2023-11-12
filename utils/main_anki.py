@@ -220,17 +220,21 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
-        return "No transcribed audio found.", [0, 0]
+        shared.latest_llm_cost = [0, 0]
+        return "No transcribed audio found."
     if txt_audio.strip().startswith("Error "):
-        return "Error when transcribing sound.", [0, 0]
+        shared.latest_llm_cost = [0, 0]
+        return "Error when transcribing sound."
     if not txt_chatgpt_context:
-        return "No txt_chatgpt_context found.", [0, 0]
+        shared.latest_llm_cost = [0, 0]
+        return "No txt_chatgpt_context found."
 
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         # message_buffer["question"] = []
         # message_buffer["answer"] = []
         # whi(f"Image change detected: '{txt_audio}', resetting the message buffer")
-        return f"Image change detected: '{txt_audio}'", [0, 0]
+        shared.latest_llm_cost = [0, 0]
+        return f"Image change detected: '{txt_audio}'"
 
     prev_prompts = load_prev_prompts(profile)
     new_prompt = {
@@ -342,7 +346,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                 break
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red("ChatGPT: too many retries."), [0, 0]
+                    shared.latest_llm_cost = [0, 0]
+                    return red("ChatGPT: too many retries.")
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
 
@@ -391,9 +396,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         thread.start()
         running_tasks["saving_whisper"].append(thread)
 
-        return cloz, tkn_cost
+        shared.latest_llm_cost = tkn_cost
+        return cloz
     except Exception as err:
-        return red(f"Error with ChatGPT: '{err}'"), [0, 0]
+        shared.latest_llm_cost = [0, 0]
+        return red(f"Error with ChatGPT: '{err}'")
 
 
 @trace
@@ -536,7 +543,6 @@ def to_anki(
         txt_audio,
         txt_chatgpt_cloz,
         txt_chatgpt_context,
-        txt_chatgpt_tkncost,
         txt_deck,
         txt_tags,
         gallery,
@@ -557,12 +563,12 @@ def to_anki(
         return
 
     # check that the tkn_cost is sound
-    if isinstance(txt_chatgpt_tkncost, str):
-        txt_chatgpt_tkncost = [int(x) for x in json.loads(txt_chatgpt_tkncost)]
-    if not txt_chatgpt_tkncost:
+    if isinstance(shared.latest_llm_cost, str):
+        shared.latest_llm_cost = [int(x) for x in json.loads(shared.latest_llm_cost)]
+    if not shared.latest_llm_cost:
         red("No token cost found, setting to 0")
-        txt_chatgpt_tkncost = [0, 0]
-    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in txt_chatgpt_tkncost:
+        shared.latest_llm_cost = [0, 0]
+    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in shared.latest_llm_cost:
         red(f"Error with chatgpt: '{txt_chatgpt_cloz}'")
         return
 
@@ -601,10 +607,10 @@ def to_anki(
     thread.start()
     threads.append(thread)
 
-    tkn_cost_dol = int(txt_chatgpt_tkncost[0]) / 1000 * 0.003 + int(txt_chatgpt_tkncost[1]) / 1000 * 0.004
+    tkn_cost_dol = int(shared.latest_llm_cost[0]) / 1000 * 0.003 + int(shared.latest_llm_cost[1]) / 1000 * 0.004
 
     # add cloze to output
-    whi(f"ChatGPT cost: {txt_chatgpt_tkncost} (${tkn_cost_dol:.3f}, not counting whisper)")
+    whi(f"ChatGPT cost: {shared.latest_llm_cost} (${tkn_cost_dol:.3f}, not counting whisper)")
     whi(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
 
     # send to anki
@@ -616,7 +622,7 @@ def to_anki(
                 "llm_used": shared.latest_llm_used,
                 "tts_used": shared.latest_stt_used,
                 "version": shared.VERSION,
-                "chatgpt_tkn_cost": txt_chatgpt_tkncost,
+                "chatgpt_tkn_cost": shared.latest_llm_cost,
                 "chatgpt_dollars_cost": tkn_cost_dol,
                 "timestamp": time.time(),
                 }, pretty=True)

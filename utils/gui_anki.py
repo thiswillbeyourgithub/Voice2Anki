@@ -54,9 +54,6 @@ with gr.Blocks(
         sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
         kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
-    # hidden, to store the request answer from chatgpt
-    txt_chatgpt_tkncost = gr.Textbox(value=None, visible=False, placeholder="this string should never appear")
-
     with gr.Tab(label="Main"):
 
         with gr.Row(label="Main"):
@@ -251,7 +248,7 @@ with gr.Blocks(
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
                 queue=True,
@@ -317,7 +314,7 @@ with gr.Blocks(
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-                        outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                        outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
                         queue=True,
@@ -328,7 +325,6 @@ with gr.Blocks(
                                 txt_audio,
                                 txt_chatgpt_cloz,
                                 txt_chatgpt_context,
-                                txt_chatgpt_tkncost,
                                 txt_deck,
                                 txt_tags,
                                 gallery,
@@ -385,7 +381,7 @@ with gr.Blocks(
     chatgpt_btn.click(
             fn=alfred,
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-            outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+            outputs=[txt_chatgpt_cloz],
             queue=True,
             )
 
@@ -397,7 +393,6 @@ with gr.Blocks(
                 txt_audio,
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
-                txt_chatgpt_tkncost,
                 txt_deck,
                 txt_tags,
                 gallery,
@@ -425,7 +420,7 @@ with gr.Blocks(
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
                 queue=True,
@@ -436,7 +431,6 @@ with gr.Blocks(
                         txt_audio,
                         txt_chatgpt_cloz,
                         txt_chatgpt_context,
-                        txt_chatgpt_tkncost,
                         txt_deck,
                         txt_tags,
                         gallery,
@@ -464,7 +458,7 @@ with gr.Blocks(
             ).then(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
-                outputs=[txt_chatgpt_cloz, txt_chatgpt_tkncost],
+                outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
                 queue=True,
@@ -475,7 +469,6 @@ with gr.Blocks(
                         txt_audio,
                         txt_chatgpt_cloz,
                         txt_chatgpt_context,
-                        txt_chatgpt_tkncost,
                         txt_deck,
                         txt_tags,
                         gallery,
