@@ -126,7 +126,7 @@ class ValueStorage:
             self.cache_values[key] = new
             return new
         else:
-            whi(f"No {kf} stored in profile dir, using appropriate default value")
+            whi(f"No {kf} stored in profile dir, using appropriate default value for key {key}")
             if key == "sld_max_tkn":
                 default = 3500
             elif key == "sld_buffer":
