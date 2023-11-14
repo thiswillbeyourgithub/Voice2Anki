@@ -19,6 +19,7 @@ approved_keys_all = [
         "dirload_check",
         "check_gpt4",
         "sld_whisp_temp",
+        "message_buffer",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -142,6 +143,8 @@ class ValueStorage:
                 default = False
             elif key == "sld_whisp_temp":
                 default = 0
+            elif key == "message_buffer":
+                default = {"question": [], "answer": []}
             else:
                 raise Exception(key)
             self.cache_values[key] = default

@@ -50,11 +50,7 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 shared.pv = ValueStorage()
 pv = shared.pv
 
-message_buffer = {
-        "question": [],
-        "answer": [],
-        }
-
+message_buffer = pv["message_buffer"]
 
 running_tasks = {
         "saving_chatgpt": [],
