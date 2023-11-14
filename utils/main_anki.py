@@ -230,9 +230,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         return "No txt_chatgpt_context found."
 
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
-        # message_buffer["question"] = []
-        # message_buffer["answer"] = []
-        # whi(f"Image change detected: '{txt_audio}', resetting the message buffer")
         shared.latest_llm_cost = [0, 0]
         return f"Image change detected: '{txt_audio}'"
 
