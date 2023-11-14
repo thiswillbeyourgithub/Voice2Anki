@@ -539,6 +539,7 @@ def to_anki(
         txt_deck,
         txt_tags,
         gallery,
+        check_marked,
         ):
     "function called to do wrap it up and send to anki"
     whi("Entering to_anki")
@@ -637,6 +638,8 @@ def to_anki(
 
     # anki tags
     new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
+    if check_marked:
+        new_tags += ["marked"]
     if "<img" not in txt_source:
         # if no image in source: add a tag to find them easily later on
         new_tags += ["WhisperToAnki::no_img_in_source"]

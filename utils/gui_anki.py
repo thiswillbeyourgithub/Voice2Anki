@@ -41,6 +41,8 @@ def roll_audio(*slots):
         slots.append(audio_mp3)
     return slots
 
+def reset_marked():
+    return False
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -107,6 +109,7 @@ with gr.Blocks(
                     sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
                     sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
@@ -328,6 +331,7 @@ with gr.Blocks(
                                 txt_deck,
                                 txt_tags,
                                 gallery,
+                                check_marked,
                                 ],
                             preprocess=False,
                             postprocess=False,
@@ -348,7 +352,7 @@ with gr.Blocks(
                                         preprocess=False,
                                         postprocess=False,
                                         queue=True,
-                                        )
+                                        ).then(fn=reset_marked, outputs=[check_marked])
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -396,6 +400,7 @@ with gr.Blocks(
                 txt_deck,
                 txt_tags,
                 gallery,
+                check_marked,
                 ],
             preprocess=False,
             postprocess=False,
@@ -407,7 +412,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    )
+                    ).then(fn=reset_marked, outputs=[check_marked])
 
     # 1+2
     semiauto_btn.click(
@@ -434,6 +439,7 @@ with gr.Blocks(
                         txt_deck,
                         txt_tags,
                         gallery,
+                        check_marked,
                         ],
                     preprocess=False,
                     postprocess=False,
@@ -445,7 +451,7 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            )
+                            ).then(fn=reset_marked, outputs=[check_marked])
 
     # 1+2+3
     auto_btn.click(
@@ -472,6 +478,7 @@ with gr.Blocks(
                         txt_deck,
                         txt_tags,
                         gallery,
+                        check_marked,
                         ],
                     preprocess=False,
                     postprocess=False,
@@ -483,7 +490,7 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            )
+                            ).then(fn=reset_marked, outputs=[check_marked])
 
     improve_btn.click(
             fn=recur_improv,
