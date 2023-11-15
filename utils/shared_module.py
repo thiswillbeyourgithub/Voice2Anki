@@ -28,5 +28,7 @@ class SharedModule:
 
             ]
 
+    max_message_buffer=50
+
 
 shared = SharedModule()

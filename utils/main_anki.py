@@ -676,8 +676,8 @@ def to_anki(
     message_buffer["answer"].append(txt_chatgpt_cloz)
 
     # cap the number of messages
-    message_buffer["question"] = message_buffer["question"][-50:]
-    message_buffer["answer"] = message_buffer["answer"][-50:]
+    message_buffer["question"] = message_buffer["question"][-shared.max_message_buffer:]
+    message_buffer["answer"] = message_buffer["answer"][-shared.max_message_buffer:]
 
     gather_threads(threads)
     return
