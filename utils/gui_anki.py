@@ -107,7 +107,7 @@ with gr.Blocks(
                     sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=500, label="LLM avail. tkn.", scale=1)
                     sld_whisp_temp = gr.Slider(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
                     sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
-                    sld_buffer = gr.Slider(minimum=0, maximum=10, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+                    sld_buffer = gr.Slider(minimum=0, maximum=50, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
