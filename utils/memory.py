@@ -159,43 +159,9 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def filter_out(pr, output_pr, max_token, temperature, keywords, new_prompt_len, sig, dist_check):
-    """apply a list of criteria to keep the most relevant previous memories
-    in the prompt"""
-    # semantic similarity check
-    if dist_check == 0:
-        # ignored because is in the cards with the lowest similarity
-        return False
-
-    # length check
-    if not abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
-        # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-        return False
-
-    # if keywords are present in the transcript but not in the candidate,
-    # ignore this candidate
-    for kw in keywords:
-        if not re.search(kw, pr["content"]):
-            return False
-
-    # stochastic check
-    if temperature > 0.3:
-        # if temperature of LLM is set high enough, some example filters
-        # will be randomly discarder to increase randomness. But only after
-        # the first few prompts were added
-        threshold = min(temperature / 3, 0.33)
-        if random.random() < threshold:
-            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
-            # no worse if temperature is higher than 1
-            return False
-
-    # passed all tests
-    return True
-
-
 @trace
 @Timeout(30)
-def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, keywords):
+def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keywords):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -204,136 +170,179 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
 
+    new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
+
 
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
 
     # get average and spread of tkns lengths to keep only the most similar
     lens = [p["tkn_len_in"] for p in prev_prompts]
-    llens = np.log(lens)
-    sig = np.std(llens)
 
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
     assert len(syspr) == 1, "Number of system prompts != 1"
     assert syspr[0] == timesorted_pr[-1], "System prompt is not the oldest memory!"
+    # remove the system prompt
+    timesorted_pr.pop(syspr[0])
 
-    if shared.memory_metric == "length":
-        dist_check = [1 for i in timesorted_pr[:-1]] + [0]
+    tkns = syspr[0]["tkn_len_in"]  # count the number of tokens added so far
+    tkns += new_prompt_len
+    all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in timesorted_pr])
 
-    elif shared.memory_metric == "embeddings":
-        # the system prompt is the oldest and is not embedder
-        embeddings_content = [embedder(pr["content"]) for pr in tqdm(timesorted_pr[:-1], desc="computing embeddings")] + [None]
+    # score based on priority. Closer to 1 means higher chances of being picked
+    max_prio = max([pr["priority"] for pr in timesorted_pr])
+    min_prio = min([pr["priority"] for pr in timesorted_pr])
+    for i, pr in enumerate(timesorted_pr):
+        timesorted_pr[i]["priority_score"] = (pr["priority"] - min_prio) / (max_prio - min_prio)
 
-        whi("Computing cosine similarity")
-        distances = []
+    # score based on keywords:
+    if keywords:
         max_sim = [0, None]
         min_sim = [1, None]
-        for i in range(len(timesorted_pr)):
-            if embeddings_content[i] is None:  # system_prompt
-                content_dist = 0
-            else:
-                content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
-            score = content_dist * 1
-            distances.append(score)
+        for i, pr in enumerate(timesorted_pr):
+            score = sum([1 if re.search(kw, pr["content"]) else 0 for kw in keywords])
+            timesorted_pr[i]["kw_score"] = score
             if score > max_sim[0]:
                 max_sim[0] = score
-                max_sim[1] = timesorted_pr[i]
+                max_sim[1] = pr["content"]
             if score < min_sim[0]:
                 min_sim[0] = score
-                min_sim[1] = timesorted_pr[i]
+                min_sim[1] = pr["content"]
+
+        # scale from 0 to 1
+        for i, pr in enumerate(timesorted_pr):
+            timesorted_pr[i]["kw_score"] = (timesorted_pr[i]["kw_score"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+    else:
+        for i, pr in enumerate(timesorted_pr):
+            timesorted_pr[i]["kw_score"] = 1
+
+    distances = []
+    if shared.memory_metric == "length":
+        for i, pr in enumerate(timesorted_pr):
+            tkn_len = pr["tkn_len_in"]
+            # mean of A/B and B/A is (A**2*B**2)(2AB)
+            dist = ((tkn_len ** 2) + (new_prompt_len ** 2)) / (2 * tkn_len * new_prompt_len)
+            # at this point: 1 means same length and anything other means
+            # should not be picked.
+            dist = abs(dist - 1)
+            # now: 0 means same length and anything above means should not
+            # be picked.
+            timesorted_pr[i]["length_dist"] = dist
+            distances.append(dist)
+
+        max_dist = max(distances)
+        min_dist = min(distances)
+
+        max_sim = [0, None]
+        min_sim = [1, None]
+        for i, pr in enumerate(timesorted_pr):
+            # make it so that the highest value is 1, lowest is 0 and
+            # high means high chances of being selected
+            timesorted_pr[i]["length_dist"] = 1 - ((timesorted_pr[i]["length_dist"] - min_dist) / (max_dist - min_dist))
+
+            if timesorted_pr[i]["length_dist"] > max_sim[0]:
+                max_sim[0] = timesorted_pr[i]["length_dist"]
+                max_sim[1] = pr["content"]
+            if timesorted_pr[i]["length_dist"] < min_sim[0]:
+                min_sim[0] = timesorted_pr[i]["length_dist"]
+                min_sim[1] = pr["content"]
         red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
+        assert len(timesorted_pr) == len(distances) + 1, "Unexpected list length"
 
-        plimit = 90
-        percentile = float(np.percentile(distances, plimit))
-        dist_check = [1 if d >= percentile else 0 for d in distances]
+        # store as a score
+        for i, pr in enumerate(timesorted_pr):
+            timesorted_pr[i]["pick_score"] = (pr["length_dist"] + pr["priority_score"] + pr["kw_score"]) / 3
+
+    elif shared.memory_metric == "embeddings":
+        whi("Computing cosine similarity")
+        max_sim = [0, None]
+        min_sim = [1, None]
+        new_prompt_vec = embedder(prompt_messages[-1]["content"])
+        for i, pr in enumerate(timesorted_pr):
+
+            embedding = embedder(pr["content"])
+            dist = float(util.cos_sim(new_prompt_vec, embedding))
+            if dist > max_sim[0]:
+                max_sim[0] = dist
+                max_sim[1] = pr["content"]
+            if dist < min_sim[0]:
+                min_sim[0] = dist
+                min_sim[1] = pr["content"]
+            timesorted_pr[i]["content_dist"] = dist
+            # timesorted_pr[i]["embedding"] = embeddings
+            distances.append(dist)
+
+        red(f"Memory with lowest similarity is: '{min_sim}'")
+        red(f"Memory with highest similarity is: '{max_sim}'")
+        assert len(timesorted_pr) == len(distances) + 1, "Unexpected list length"
+
+        # scale the distances
+        for i, pr in enumerate(timesorted_pr):
+            timesorted_pr[i]["content_dist"] = (pr["content_dist"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+
+        # store as a score
+        for i, pr in enumerate(timesorted_pr):
+            timesorted_pr[i]["pick_score"] = (pr["content_dist"] + pr["priority_score"] + pr["kw_score"]) / 3
 
     else:
         raise ValueError(shared.memory_metric)
-    assert len(dist_check) == len(timesorted_pr), "unexpected length"
 
-    # add by decreasing priority and timestamp
-    prio_vals = sorted(set([x["priority"] for x in prev_prompts if int(x["priority"]) != -1]), reverse=True)
-    tkns = syspr[0]["tkn_len_in"]
-    tkns += new_prompt_len
-    dis_tkns = 0
-    output_pr = [syspr[0]]  # add system prompt
+    # check values of the pick score
+    for pr in timesorted_pr:
+        score = pr["pick_score"]
+        assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
 
-    # add automatically the highest similarity
-    if shared.memory_metric == "embeddings":
-        output_pr.append(max_sim[1])
-        tkns += max_sim[1]["tkn_len_in"]
+    # add by decreasing pick score
+    picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
+
+    output_pr = [syspr[0]]  # each picked prompt will be added here
 
     exit_while = False
     cnt = 0
+    max_iter = 50
     while (not exit_while) and timesorted_pr:
-        category_count = 0
         cnt += 1
-        if cnt > 20:
+        if cnt >= max_iter:
             red(f"Exited filtering loop after {cnt} iterations, have you added enough memories?")
             exit_while = True
             break
-        for prio in prio_vals:
-            category_size = 0
-            if exit_while:
+
+        for pr_idx, pr in enumerate(picksorted):
+            if pr in output_pr:
+                continue
+
+            if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] >= max_token:
+                # will exit while at the end of this loop but not
+                # before
+                exit_while = True
                 break
-            for pr_idx, pr in enumerate(timesorted_pr):
-                if pr in output_pr:
-                    continue
-                if pr["priority"] == prio:
-                    category_size += 1
 
-                    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] >= max_token:
-                        # will exit while at the end of this loop but not
-                        # before
-                        exit_while = True
+            # as the temperature incrase, increase the randomness of the picking
+            if temperature <= 0.3:
+                threshold = 0.05
+            else:
+                threshold = temperature - 0.3
+            if random.random() >= pr["pick_score"] - threshold:
+                continue
 
-                    elif filter_out(
-                            pr,
-                            output_pr,
-                            max_token,
-                            temperature,
-                            keywords,
-                            new_prompt_len,
-                            sig,
-                            dist_check[pr_idx],
-                            ):
-                        tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
-                        output_pr.append(pr)
-                    else:
-                        dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
-            whi(f"* {cnt} Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
-            category_count = len(output_pr)
+            # keep the most relevant previous memories in the prompt
+
+            tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
+            output_pr.append(pr)
 
         if exit_while:
             break
 
-        red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
-        sig -= sig * 0.1
-        sig = max(sig, 0)
-        if keywords:
-            keywords.pop(-1)
-        if shared.memory_metric == "embeddings":
-            plimit -= 10
-            plimit = max(plimit, 0)
-            percentile = float(np.percentile(distances, plimit))
-            dist_check = [1 if d >= percentile else 0 for d in distances]
-
-    red(f"Tokens of the kept prompts: {tkns} (of all prompts: {tkns + dis_tkns} tokens)")
+    red(f"Tokens of the kept prompts: {tkns} (of all prompts: {all_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
-    # # make it so that highest priority prompts are last in the discussion:
-    # output_pr.reverse()
-
-    if not shared.disable_embeddings:
-        # sort by distance:
-        output_pr = sorted(output_pr, key=lambda x: distances[output_pr.index(x)])
-    else:
-        # or by timestamp (most recent last):
-        output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
-        # or by priority:
-        # output_pr = sorted(output_pr, key=lambda x: x["priority"])
+    output_pr = sorted(output_pr, key=lambda x: x["pick_score"])
+    # or by timestamp (most recent last):
+    # output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
+    # or by priority:
+    # output_pr = sorted(output_pr, key=lambda x: x["priority"])
 
     # regardless, make sure the system prompt is first
     for i, p in enumerate(output_pr):

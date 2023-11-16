@@ -270,22 +270,17 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     else:
         whi("Ignored message buffer")
 
-    prompt_len_already = len(tokenize(new_prompt["content"]))
-    for p in buffer_to_add:
-        prompt_len_already += len(tokenize(p["content"]))
     prev_prompts = prompt_filter(
             prev_prompts,
             max_token,
             temperature,
-            new_prompt_len=prompt_len_already,
-            new_prompt_vec=None if shared.memory_metric == "length" else embedder(new_prompt["content"]),
+            prompt_messages=buffer_to_add + [new_prompt],
             keywords=keywords,
             )
 
     # check the number of token is fine and format the previous
     # prompts in chatgpt format
     formatted_messages = []
-
     formatted_messages.extend(buffer_to_add)
     formatted_messages.append(new_prompt)
 
