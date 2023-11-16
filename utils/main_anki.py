@@ -281,8 +281,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # check the number of token is fine and format the previous
     # prompts in chatgpt format
     formatted_messages = []
-    formatted_messages.extend(buffer_to_add)
-    formatted_messages.append(new_prompt)
 
     tkns = 0
     for m in prev_prompts:
@@ -299,6 +297,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             formatted_messages.append({
                 "role": "assistant",
                 "content": m["answer"]})
+    formatted_messages.extend(buffer_to_add)
+    formatted_messages.append(new_prompt)
 
     tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
