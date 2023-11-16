@@ -251,10 +251,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         red(f"Memory with highest similarity is: '{max_sim}'")
         assert len(timesorted_pr) == len(distances) + 1, "Unexpected list length"
 
-        # store as a score
-        for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["pick_score"] = (pr["length_dist"] + pr["priority_score"] + pr["kw_score"]) / 3
-
     elif shared.memory_metric == "embeddings":
         whi("Computing cosine similarity")
         max_sim = [0, None]
@@ -286,17 +282,23 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         for i, pr in enumerate(timesorted_pr):
             timesorted_pr[i]["content_dist"] = (pr["content_dist"] - min_sim[0]) / (max_sim[0] - min_sim[0])
 
-        # store as a score
-        for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["pick_score"] = (pr["content_dist"] + pr["priority_score"] + pr["kw_score"]) / 3
-
     else:
         raise ValueError(shared.memory_metric)
+
+
+    # combine score
+    if shared.memory_metric == "embeddings"):
+        score_key = "content_dist"
+    elif shared.memory_metric == "length":
+        score_key = "length_dist"
+    for i, pr in enumerate(timesorted_pr):
+        score = (pr[score_key] + pr["priority_score"] + pr["kw_score"]) / 3
+        timesorted_pr[i]["pick_score"] = score
+        assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
 
     # check values of the pick score
     for pr in timesorted_pr:
         score = pr["pick_score"]
-        assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
 
     # add by decreasing pick score
     picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
