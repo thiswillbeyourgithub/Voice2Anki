@@ -159,10 +159,12 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def filter_out(pr, tkns, output_pr, max_token, temperature, keywords, new_prompt_len, sig, dist_check):
+def filter_out(pr, output_pr, max_token, temperature, keywords, new_prompt_len, sig, dist_check):
     """apply a list of criteria to keep the most relevant previous memories
     in the prompt"""
-    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+    # semantic similarity check
+    if dist_check == 0:
+        # ignored because is in the cards with the lowest similarity
         return False
 
     # length check
@@ -290,7 +292,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
 
                     if filter_out(
                             pr,
-                            tkns,
                             output_pr,
                             max_token,
                             temperature,
