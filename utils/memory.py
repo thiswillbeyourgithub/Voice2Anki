@@ -218,10 +218,10 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     assert len(syspr) == 1, "Number of system prompts != 1"
     assert syspr[0] == timesorted_pr[-1], "System prompt is not the oldest memory!"
 
-    if shared.disable_embeddings:
-        whi("Not using embeddings")
+    if shared.memory_metric == "length":
         dist_check = [1 for i in timesorted_pr[:-1]] + [0]
-    else:
+
+    elif shared.memory_metric == "embeddings":
         # the system prompt is the oldest and is not embedder
         embeddings_content = [embedder(pr["content"]) for pr in tqdm(timesorted_pr[:-1], desc="computing embeddings")] + [None]
         # embeddings_answer = [embedder(pr["answer"]) for pr in timesorted_pr[:-1]] + [None]
@@ -252,6 +252,9 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         plimit = 90
         percentile = float(np.percentile(distances, plimit))
         dist_check = [1 if d >= percentile else 0 for d in distances]
+
+    else:
+        raise ValueError(shared.memory_metric)
     assert len(dist_check) == len(timesorted_pr), "unexpected length"
 
     # add by decreasing priority and timestamp
@@ -262,7 +265,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     output_pr = [syspr[0]]  # add system prompt
 
     # add automatically the highest similarity
-    if not shared.disable_embeddings:
+    if shared.memory_metric == "embeddings":
         output_pr.append(max_sim[1])
         tkns += max_sim[1]["tkn_len_in"]
 
@@ -315,7 +318,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         sig = max(sig, 0)
         if keywords:
             keywords.pop(-1)
-        if not shared.disable_embeddings:
+        if shared.memory_metric == "embeddings":
             plimit -= 10
             plimit = max(plimit, 0)
             percentile = float(np.percentile(distances, plimit))

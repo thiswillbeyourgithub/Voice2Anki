@@ -21,7 +21,7 @@ def start_voice2formattedtext(
         localnetworkonly=False,
         use_ssl=True,
         media_folder=None,
-        disable_embeddings=False,
+        memory_metric="embeddings",
         *args,
         **kwargs
         ):
@@ -48,9 +48,9 @@ def start_voice2formattedtext(
         if True, will use the ssl configuration specified in __init__.py
     media_folder: str, default None
         optional anki media database location
-    disable_embeddings: bool, default False
-        if True, will not use embeddings to improve the memory filtering.
-        Meant to be used for low end device.
+    memory_metric: str, default "embeddings"
+        if "length", will not use embeddings to improve the memory filtering
+        but instead rely on finding memories with adequate length.
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -71,6 +71,7 @@ def start_voice2formattedtext(
     assert backend in ["anki", "markdown"], (
             "backend must be either 'anki' "
             "or 'markdown'")
+    assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
     whi("Starting VoiceToFormattedText\n")
     if args:
@@ -100,7 +101,7 @@ def start_voice2formattedtext(
         server = None
 
     shared.VERSION = 0.2
-    shared.disable_embeddings = disable_embeddings
+    shared.memory_metric = memory_metric
     shared.media_folder = media_folder
     shared.debug = debug
 

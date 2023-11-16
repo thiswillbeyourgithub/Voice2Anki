@@ -278,7 +278,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             max_token,
             temperature,
             new_prompt_len=prompt_len_already,
-            new_prompt_vec=None if shared.disable_embeddings else embedder(new_prompt["content"]),
+            new_prompt_vec=None if shared.memory_metric == "length" else embedder(new_prompt["content"]),
             keywords=keywords,
             )
 
