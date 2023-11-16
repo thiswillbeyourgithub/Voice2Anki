@@ -123,7 +123,7 @@ class AudioSplitter:
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
-                transcript = self.run_whisperx(file)
+                transcript = self.run_whisperx(file, "medium")
                 times_to_keep, text_segments = self.split_one_transcript(transcript)
             elif self.stop_source == "local_json":
                 raise NotImplementedError
@@ -173,7 +173,7 @@ class AudioSplitter:
                     # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                     # whi("Saved")
 
-                    transcript = self.run_whisperx(tempf.name)
+                    transcript = self.run_whisperx(tempf.name, "large-v2")
                     sub_ttk, sub_ts = self.split_one_transcript(transcript)
                     new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
                     alterations[i] = [new_times, sub_ts]
@@ -343,7 +343,7 @@ class AudioSplitter:
 
         return times_to_keep, text_segments
 
-    def run_whisperx(self, audio_path):
+    def run_whisperx(self, audio_path, model):
         whi(f"Running whisperx on {audio_path}")
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -354,7 +354,7 @@ class AudioSplitter:
                     audio_hash=audio_hash,
                     prompt=self.prompt,
                     language=self.language,
-                    model="medium",
+                    model=model,
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
