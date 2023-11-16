@@ -285,12 +285,12 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
                 if pr["priority"] == prio:
                     category_size += 1
 
-                    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
+                    if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] >= max_token:
                         # will exit while at the end of this loop but not
                         # before
                         exit_while = True
 
-                    if filter_out(
+                    elif filter_out(
                             pr,
                             output_pr,
                             max_token,
@@ -306,6 +306,9 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
                         dis_tkns += pr["tkn_len_in"] + pr["tkn_len_out"]
             whi(f"* {cnt} Keeping {len(output_pr) - category_count} previous prompts that have priority '{prio}' out of {category_size}")  # debug
             category_count = len(output_pr)
+
+        if exit_while:
+            break
 
         red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
         sig -= sig * 0.1
