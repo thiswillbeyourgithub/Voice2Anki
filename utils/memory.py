@@ -263,16 +263,20 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         for i, pr in enumerate(timesorted_pr):
 
             embedding = embedder(pr["content"])
-            dist = float(util.cos_sim(new_prompt_vec, embedding))
-            if dist > max_sim[0]:
-                max_sim[0] = dist
+            embedding2 = embedder(pr["answer"])
+            sim = float(util.cos_sim(new_prompt_vec, embedding))
+            sim2 = float(util.cos_sim(new_prompt_vec, embedding2))
+            w1 = 5
+            w2 = 1
+            sim = (sim * 1 + sim2 * w2) / (w1 + w2)
+            if sim > max_sim[0]:
+                max_sim[0] = sim
                 max_sim[1] = pr["content"]
-            if dist < min_sim[0]:
-                min_sim[0] = dist
+            if sim < min_sim[0]:
+                min_sim[0] = sim
                 min_sim[1] = pr["content"]
-            timesorted_pr[i]["content_dist"] = dist
-            # timesorted_pr[i]["embedding"] = embeddings
-            distances.append(dist)
+            timesorted_pr[i]["content_sim"] = sim
+            simances.append(sim)
 
         red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
