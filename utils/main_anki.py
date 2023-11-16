@@ -230,7 +230,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         shared.latest_llm_cost = [0, 0]
         return f"Image change detected: '{txt_audio}'"
 
-    if txt_keywords:
+    if "," in txt_keywords:
         keywords = [re.compile(kw.strip(), flags=re.DOTALL|re.MULTILINE|re.IGNORECASE) for kw in txt_keywords.split(",")]
         keywords = [kw for kw in keywords if re.search(kw, txt_audio)]
     else:
