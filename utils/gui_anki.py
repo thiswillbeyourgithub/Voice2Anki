@@ -110,6 +110,7 @@ with gr.Blocks(
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
+                    txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], line=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect. If not enough memories are found, the keywords are dropped one by one starting from the last one until enough tokens are gathered.")
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
@@ -194,6 +195,7 @@ with gr.Blocks(
     txt_chatgpt_context.change(fn=shared.pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context])
     txt_whisp_prompt.change(fn=shared.pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt])
     txt_whisp_lang.change(fn=shared.pv.save_txt_whisp_lang, inputs=[txt_whisp_lang])
+    txt_keywords.change(fn=shared.pv.save_txt_keywords, inputs=[txt_keywords])
 
     # change profile and load previous data
     txt_profile.submit(
@@ -250,7 +252,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
@@ -316,7 +318,7 @@ with gr.Blocks(
                     cancels=aud_cache_event,
                     ).then(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
@@ -384,7 +386,7 @@ with gr.Blocks(
     # send to chatgpt
     chatgpt_btn.click(
             fn=alfred,
-            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
+            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
             outputs=[txt_chatgpt_cloz],
             queue=True,
             )
@@ -424,7 +426,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
@@ -463,7 +465,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,

@@ -1,3 +1,4 @@
+import re
 from tqdm import tqdm
 import numpy as np
 import random
@@ -158,57 +159,41 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
-def filter_out(pr, tkns, output_pr, max_token, temperature, favor_list, new_prompt_len, sig, dist_check):
+def filter_out(pr, tkns, output_pr, max_token, temperature, keywords, new_prompt_len, sig, dist_check):
     """apply a list of criteria to keep the most relevant previous memories
     in the prompt"""
     if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] > max_token:
         return False
 
-    if not favor_list:  # the txt_audio does not ask for a list
-        if " list" in pr["content"].lower():
-            # exclude list cards if not asking for a list
+    # length check
+    if not abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
+        # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
+        return False
+
+    # if keywords are present in the transcript but not in the candidate,
+    # ignore this candidate
+    for kw in keywords:
+        if not re.search(kw, pr["content"]):
             return False
 
-        # semantic similarity check
-        if dist_check == 0:
-            # ignored because is in the cards with the lowest similarity
+    # stochastic check
+    if temperature > 0.3:
+        # if temperature of LLM is set high enough, some example filters
+        # will be randomly discarder to increase randomness. But only after
+        # the first few prompts were added
+        threshold = min(temperature / 3, 0.33)
+        if random.random() < threshold:
+            # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
+            # no worse if temperature is higher than 1
             return False
 
-        # length check
-        if not abs(np.log(pr["tkn_len_in"]) - np.log(new_prompt_len)) <= 2 * sig:
-            # whi(f"Rejected prompt: pl {new_prompt_len}, sig {np.exp(sig)}, tknlen {pr['tkn_len_in']}")
-            return False
-
-        # stochastic check
-        if temperature > 0.3:
-            # if temperature of LLM is set high enough, some example filters
-            # will be randomly discarder to increase randomness. But only after
-            # the first few prompts were added
-            threshold = min(temperature / 3, 0.33)
-            if random.random() < threshold:
-                # if temp is 1, then 1 in 3 chance of the prompt being ignored by chance
-                # no worse if temperature is higher than 1
-                return False
-
-        # passed all tests
-        return True
-
-    else:  # if favoring lists, don't use stochastic check
-        # candidate is not a list
-        if not "list" in pr["content"].lower():
-            return False
-
-        # semantic similarity check
-        if dist_check == 0:
-            # ignored because is in the cards with the lowest similarity
-            return False
-
-        return True
+    # passed all tests
+    return True
 
 
 @trace
 @Timeout(30)
-def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, favor_list):
+def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prompt_vec, keywords):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -309,7 +294,7 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
                             output_pr,
                             max_token,
                             temperature,
-                            favor_list,
+                            keywords,
                             new_prompt_len,
                             sig,
                             dist_check[pr_idx],
@@ -324,6 +309,8 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         red(f"Finished looping over all the memories with only {len(output_pr)} prompts selected, so relaxing the length limit")
         sig -= sig * 0.1
         sig = max(sig, 0)
+        if keywords:
+            keywords.pop(-1)
         if not shared.disable_embeddings:
             plimit -= 10
             plimit = max(plimit, 0)

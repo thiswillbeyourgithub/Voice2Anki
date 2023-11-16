@@ -1,3 +1,4 @@
+import re
 import uuid
 import Levenshtein as lev
 import shutil
@@ -213,7 +214,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 
 @trace
 @Timeout(30)
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         shared.latest_llm_cost = [0, 0]
@@ -228,6 +229,12 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         shared.latest_llm_cost = [0, 0]
         return f"Image change detected: '{txt_audio}'"
+
+    if txt_keywords:
+        keywords = [re.compile(kw.strip(), flags=re.DOTALL|re.MULTILINE|re.IGNORECASE) for kw in txt_keywords.split(",")]
+        keywords = [kw for kw in keywords if re.search(kw, txt_audio)]
+    else:
+        keywords = []
 
     prev_prompts = load_prev_prompts(profile)
     new_prompt = {
@@ -272,7 +279,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             temperature,
             new_prompt_len=prompt_len_already,
             new_prompt_vec=None if shared.disable_embeddings else embedder(new_prompt["content"]),
-            favor_list=True if " list" in txt_audio.lower() else False
+            keywords=keywords,
             )
 
     # check the number of token is fine and format the previous
@@ -303,7 +310,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer)
+        return alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords)
 
     if not check_gpt4:
         model_to_use = "gpt-3.5-turbo-1106"
