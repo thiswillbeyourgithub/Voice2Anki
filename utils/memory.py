@@ -224,7 +224,6 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
     elif shared.memory_metric == "embeddings":
         # the system prompt is the oldest and is not embedder
         embeddings_content = [embedder(pr["content"]) for pr in tqdm(timesorted_pr[:-1], desc="computing embeddings")] + [None]
-        # embeddings_answer = [embedder(pr["answer"]) for pr in timesorted_pr[:-1]] + [None]
 
         whi("Computing cosine similarity")
         distances = []
@@ -233,12 +232,9 @@ def prompt_filter(prev_prompts, max_token, temperature, new_prompt_len, new_prom
         for i in range(len(timesorted_pr)):
             if embeddings_content[i] is None:  # system_prompt
                 content_dist = 0
-                # answer_dist = 0
             else:
                 content_dist = float(util.cos_sim(new_prompt_vec, embeddings_content[i]))
-                # answer_dist = float(util.cos_sim(new_prompt_vec, embeddings_answer[i]))
             score = content_dist * 1
-            # score += answer_dist * 1
             distances.append(score)
             if score > max_sim[0]:
                 max_sim[0] = score
