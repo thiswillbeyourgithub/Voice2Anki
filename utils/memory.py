@@ -8,8 +8,9 @@ from textwrap import dedent
 import json
 import hashlib
 from joblib import Memory
-from sentence_transformers import SentenceTransformer, util
 import tiktoken
+import openai
+from openai.embeddings_utils import cosine_similarity as cos_sim
 
 from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
@@ -68,13 +69,35 @@ elif shared.backend == "markdown":
 else:
     raise Exception(shared.backend)
 
+assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
+openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
+
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
-embedding_model_name = "paraphrase-multilingual-MiniLM-L12-v2"
+# embeddings using sentence transformers:
+# from sentence_transformers import SentenceTransformer
+# from sentence_transformers.util import cosine_similarity as cos_sim
+# embedding_model_name = "paraphrase-multilingual-MiniLM-L12-v2"
+# embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
+# embed_model = SentenceTransformer(embedding_model_name)
+#
+# @embeddings_cache.cache
+# def embedder(text):
+#     red("Computing embedding of 1 memory")
+#     # remove the context before the transcript as well as the last '
+#     text = text.split("Transcript: '")
+#     if not len(text) == 2:
+#         raise Exception(text)
+#     text = text[1]
+#     if not text[-1] == "'":
+#         raise Exception(text)
+#     text = text[:-1]
+#
+#     return embed_model.encode([text], show_progress_bar=False).tolist()[0]
+
+# embeddings using ada2:
+embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
-embed_model = SentenceTransformer(embedding_model_name)
-
-
 @embeddings_cache.cache
 def embedder(text):
     red("Computing embedding of 1 memory")
@@ -87,7 +110,10 @@ def embedder(text):
         raise Exception(text)
     text = text[:-1]
 
-    return embed_model.encode([text], show_progress_bar=False).tolist()[0]
+    return openai.Embedding.create(
+            model=embedding_model_name,
+            input=text,
+            encoding_format="float")
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
@@ -260,8 +286,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
             embedding = embedder(pr["content"])
             embedding2 = embedder(pr["answer"])
-            sim = float(util.cos_sim(new_prompt_vec, embedding))
-            sim2 = float(util.cos_sim(new_prompt_vec, embedding2))
+            sim = float(cos_sim(new_prompt_vec, embedding))
+            sim2 = float(cos_sim(new_prompt_vec, embedding2))
             w1 = 5
             w2 = 1
             sim = (sim * 1 + sim2 * w2) / (w1 + w2)
