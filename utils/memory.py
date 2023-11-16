@@ -276,7 +276,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 min_sim[0] = sim
                 min_sim[1] = pr["content"]
             timesorted_pr[i]["content_sim"] = sim
-            simances.append(sim)
+            distances.append(sim)
 
         red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
