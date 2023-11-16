@@ -291,8 +291,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         score_key = "content_dist"
     elif shared.memory_metric == "length":
         score_key = "length_dist"
+    w = (1, 1, 2)
     for i, pr in enumerate(timesorted_pr):
-        score = (pr[score_key] + pr["priority_score"] + pr["kw_score"]) / 3
+        score = (pr[score_key] * w[0] + pr["priority_score"] * w[1] + pr["kw_score"] * w[2]) / sum(w)
         timesorted_pr[i]["pick_score"] = score
         assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
 
