@@ -114,14 +114,8 @@ def alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature):
             "with fewer tokens to make sure you have room for the answer")
         return alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token-500, temperature)
 
-    if tkns >= 3700:
-        red(f"More than 3700 token in question, using ChatGPT 16k")
-        model_to_use = "gpt-3.5-turbo-16k"
-        model_price = (0.003, 0.004)
-    else:
-        red(f"Using ChatGPT")
-        model_to_use = "gpt-3.5-turbo"
-        model_price = (0.0015, 0.002)
+    model_to_use = "gpt-3.5-turbo-1106"
+    model_price = (0.001, 0.002)
 
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
