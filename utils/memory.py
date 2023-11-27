@@ -313,7 +313,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
 
     # combine score
-    if shared.memory_metric == "embeddings"):
+    if shared.memory_metric == "embeddings":
         score_key = "content_dist"
     elif shared.memory_metric == "length":
         score_key = "length_dist"
