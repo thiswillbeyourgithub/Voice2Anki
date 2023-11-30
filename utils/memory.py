@@ -215,7 +215,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     assert len(syspr) == 1, "Number of system prompts != 1"
     assert syspr[0] == timesorted_pr[-1], "System prompt is not the oldest memory!"
     # remove the system prompt
-    timesorted_pr.pop(syspr[0])
+    timesorted_pr.remove(syspr[0])
 
     tkns = syspr[0]["tkn_len_in"]  # count the number of tokens added so far
     tkns += new_prompt_len
