@@ -76,7 +76,7 @@ with gr.Blocks(
                 with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
                     gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
                     with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear image then add", variant="secondary", min_width=50)
+                        rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
 
             with gr.Column(scale=3):
@@ -221,18 +221,7 @@ with gr.Blocks(
             outputs=[gallery],
             queue=True,
             cancels=[paste_image_event],
-            ).then(
-                    fn=get_image,
-                    inputs=[gallery],
-                    outputs=[gallery],
-                    queue=True).then(
-                            fn=get_img_source,
-                            inputs=[gallery],
-                            queue=True,
-                            ).then(
-                            fn=shared.pv.save_gallery,
-                            inputs=[gallery],
-                            )
+            )
 
     # audio
 
