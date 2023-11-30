@@ -8,7 +8,6 @@ import hashlib
 import base64
 import joblib
 import json
-import cv2
 from textwrap import dedent
 import rtoml
 import time
@@ -20,7 +19,7 @@ from pathlib import Path
 from .anki_utils import add_to_anki, audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout
-from .memory import prompt_filter, load_prev_prompts, embedder, tokenize, transcript_template
+from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
