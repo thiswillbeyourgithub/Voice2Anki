@@ -319,7 +319,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
         # scale the distances
         for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["content_dist"] = (pr["content_dist"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+            timesorted_pr[i]["content_sim"] = (pr["content_sim"] - min_sim[0]) / (max_sim[0] - min_sim[0])
 
     else:
         raise ValueError(shared.memory_metric)
@@ -327,7 +327,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
     # combine score
     if shared.memory_metric == "embeddings":
-        score_key = "content_dist"
+        score_key = "content_sim"
     elif shared.memory_metric == "length":
         score_key = "length_dist"
     w = (1, 1, 2)
