@@ -115,10 +115,11 @@ def embedder(text, format):
     else:
         raise ValueError(format)
 
-    return openai.Embedding.create(
+    vec = openai.Embedding.create(
             model=embedding_model_name,
             input=text,
             encoding_format="float")
+    return vec["data"][0]["embedding"]
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
