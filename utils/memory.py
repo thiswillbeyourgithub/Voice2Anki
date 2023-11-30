@@ -115,10 +115,17 @@ def embedder(text, format):
     else:
         raise ValueError(format)
 
-    vec = openai.Embedding.create(
-            model=embedding_model_name,
-            input=text,
-            encoding_format="float")
+    try:
+        vec = openai.Embedding.create(
+                model=embedding_model_name,
+                input=text,
+                encoding_format="float")
+    except:
+        time.sleep(1)
+        vec = openai.Embedding.create(
+                model=embedding_model_name,
+                input=text,
+                encoding_format="float")
     return vec["data"][0]["embedding"]
 
 def hasher(text):
