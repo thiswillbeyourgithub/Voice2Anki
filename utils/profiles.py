@@ -149,7 +149,7 @@ class ValueStorage:
             elif key == "txt_keywords":
                 default = None
             else:
-                raise Exception(key)
+                default = None
             self.cache_values[key] = default
             return default
 
