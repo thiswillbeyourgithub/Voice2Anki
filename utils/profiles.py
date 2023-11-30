@@ -113,7 +113,7 @@ class ValueStorage:
                 if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
-            if key == "gallery":
+            if key == "gallery" and new is not None:
                 new = [im.image.path for im in new.root]
             self.cache_values[key] = new
             return new
