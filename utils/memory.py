@@ -99,16 +99,21 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
 @embeddings_cache.cache
-def embedder(text):
+def embedder(text, format):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
-    text = text.split("Transcript: '")
-    if not len(text) == 2:
-        raise Exception(text)
-    text = text[1]
-    if not text[-1] == "'":
-        raise Exception(text)
-    text = text[:-1]
+    if format == "content":
+        text = text.split("Transcript: '")
+        if not len(text) == 2:
+            raise Exception(text)
+        text = text[1]
+        if not text[-1] == "'":
+            raise Exception(text)
+        text = text[:-1]
+    elif format == "answer":
+        pass
+    else:
+        raise ValueError(format)
 
     return openai.Embedding.create(
             model=embedding_model_name,
@@ -281,11 +286,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         whi("Computing cosine similarity")
         max_sim = [0, None]
         min_sim = [1, None]
-        new_prompt_vec = embedder(prompt_messages[-1]["content"])
+        new_prompt_vec = embedder(prompt_messages[-1]["content"], format="content")
         for i, pr in enumerate(timesorted_pr):
 
-            embedding = embedder(pr["content"])
-            embedding2 = embedder(pr["answer"])
+            embedding = embedder(pr["content"], format="answer")
+            embedding2 = embedder(pr["answer"], format="answer")
             sim = float(cos_sim(new_prompt_vec, embedding))
             sim2 = float(cos_sim(new_prompt_vec, embedding2))
             w1 = 5
