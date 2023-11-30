@@ -157,6 +157,7 @@ def sound_preprocessing(audio_mp3_path):
 
 # create dummy button to use the preprocessing code if needed
 dummy_btn = gr.Audio(
+        sources=["microphone"],
         type="filepath",
         label="dummy_audio",
         format="mp3",

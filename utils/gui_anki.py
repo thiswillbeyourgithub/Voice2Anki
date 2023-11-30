@@ -37,7 +37,7 @@ def roll_audio(*slots):
     slots[0] = None
     while slots[0] is None:
         slots.pop(0)
-        audio_mp3 = gr.Audio(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+        audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
         slots.append(audio_mp3)
     return slots
 
@@ -66,7 +66,7 @@ with gr.Blocks(
                 audio_number = 5
                 audio_slots = []
                 for i in range(audio_number):
-                    audio_mp3 = gr.Audio(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+                    audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
                     audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
