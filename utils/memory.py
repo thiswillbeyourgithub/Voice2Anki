@@ -288,7 +288,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 min_sim[1] = pr["content"]
         red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
-        assert len(timesorted_pr) == len(distances) + 1, "Unexpected list length"
+        assert len(timesorted_pr) == len(distances), "Unexpected list length"
 
     elif shared.memory_metric == "embeddings":
         whi("Computing cosine similarity")
@@ -315,7 +315,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
         red(f"Memory with lowest similarity is: '{min_sim}'")
         red(f"Memory with highest similarity is: '{max_sim}'")
-        assert len(timesorted_pr) == len(distances) + 1, "Unexpected list length"
+        assert len(timesorted_pr) == len(distances), "Unexpected list length"
 
         # scale the distances
         for i, pr in enumerate(timesorted_pr):
