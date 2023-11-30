@@ -172,6 +172,8 @@ def format_audio_component(audio):
     working."""
     if isinstance(audio, dict):
         new_audio = audio["path"]
+        if new_audio.startswith("http"):
+            new_audio = new_audio.split("file=")[1]
         whi(f"Preprocessed audio manually: '{audio}' -> '{new_audio}'")
         audio = new_audio
     elif isinstance(audio, (str, type(Path()))):
