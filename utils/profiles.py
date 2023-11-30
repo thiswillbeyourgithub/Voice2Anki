@@ -109,23 +109,12 @@ class ValueStorage:
                         new = pickle.load(f)
                 except Exception as err:
                     raise Exception(f"Error when getting {kf}: '{err}'")
-            if new is None:
-                return None
             if key.startswith("audio_mp3"):
                 if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
             if key == "gallery":
-                # when reloading gallery, the image has to be inverted again
-                for i, im in enumerate(new):
-                    try:
-                        if isinstance(im, dict):
-                            new[i] = rgb_to_bgr(cv2.imread(im["name"], flags=1))
-                        else:
-                            new[i] = rgb_to_bgr(im)
-                    except Exception as err:
-                        red(f"Error when loading {i}th image from gallery: '{err}'")
-                        new[i] = None
+                new = [im.image.path for im in new.root]
             self.cache_values[key] = new
             return new
         else:
