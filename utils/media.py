@@ -155,15 +155,6 @@ def sound_preprocessing(audio_mp3_path):
     whi("Done preprocessing audio")
     return audio_mp3_path
 
-# create dummy button to use the preprocessing code if needed
-dummy_btn = gr.Audio(
-        sources=["microphone"],
-        type="filepath",
-        label="dummy_audio",
-        format="mp3",
-        value=None,
-        container=False)
-
 @trace
 def format_audio_component(audio):
     """to make the whole UI faster and avoid sending multiple slightly
@@ -172,12 +163,9 @@ def format_audio_component(audio):
     instead of the mp3 audio path. This fixes it while still keeping the cache
     working."""
     if isinstance(audio, dict):
-        if "is_file" in audio:
-            audio = audio["name"]
-        else:
-            new_audio = dummy_btn.preprocess(audio)
-            whi(f"Preprocessed audio manually: '{audio['name']}' -> '{new_audio}'")
-            audio = new_audio
+        new_audio = audio["path"]
+        whi(f"Preprocessed audio manually: '{audio}' -> '{new_audio}'")
+        audio = new_audio
     elif isinstance(audio, (str, type(Path()))):
         whi(f"Not audio formating needed for '{audio}'")
     else:
