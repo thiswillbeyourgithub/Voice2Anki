@@ -37,13 +37,15 @@ def get_image(gallery):
         if gallery is None:
             return [decoded]
 
+        if hasattr(gallery, "root"):
+            gallery = gallery.root
         if isinstance(gallery, list):
             out = []
             for im in gallery:
                 out.append(
                         rgb_to_bgr(
                             cv2.imread(
-                                im["name"],
+                                im.image.path,
                                 flags=1)
                             )
                         )
@@ -83,14 +85,19 @@ def check_source(source):
 def get_img_source(gallery, queue=queue.Queue()):
     whi("Getting source from image")
     try:
+        if hasattr(gallery, "root"):
+            gallery = gallery.root
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
         if gallery is None:
             queue.put(red("No image in gallery."))
+            return
         if len(gallery) == 0:
             queue.put(red("0 image found in gallery."))
+            return
+
         source = ""
         for img in gallery:
-            decoded = cv2.imread(img["name"], flags=1)
+            decoded = cv2.imread(img.image.path, flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
             new = shared.anki_media / f"{img_hash}.png"
             if not new.exists():
