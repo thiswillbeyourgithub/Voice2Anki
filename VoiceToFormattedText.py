@@ -125,7 +125,6 @@ def start_voice2formattedtext(
         red("Will not use SSL")
         ssl_args = {}
 
-    demo.queue(concurrency_count=10)
     demo.launch(
             share=do_share,
             **auth_args,
@@ -134,7 +133,6 @@ def start_voice2formattedtext(
             show_error=True,
             server_name=server,
             server_port=7860,
-            show_tips=True,
             **ssl_args,
             )
 

@@ -37,7 +37,7 @@ def roll_audio(*slots):
     slots[0] = None
     while slots[0] is None:
         slots.pop(0)
-        audio_mp3 = gr.Audio(source="microphone", type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+        audio_mp3 = gr.Audio(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
         slots.append(audio_mp3)
     return slots
 
@@ -51,14 +51,14 @@ with gr.Blocks(
         ) as demo_anki:
 
     with gr.Row():
-        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>", container=False, scale=5)
+        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>")
         dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
         sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
         kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Main"):
 
-        with gr.Row(label="Main"):
+        with gr.Row():
 
             with gr.Column(scale=1, min_width=50):
 
@@ -66,7 +66,7 @@ with gr.Blocks(
                 audio_number = 5
                 audio_slots = []
                 for i in range(audio_number):
-                    audio_mp3 = gr.Audio(source="microphone", type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+                    audio_mp3 = gr.Audio(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
                     audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
@@ -95,7 +95,7 @@ with gr.Blocks(
                     transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
                     chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
                     anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
-                    txt_card_done = gr.HTML(value="", label="Card status", placeholder="Wether the card was already created", container=False)
+                    txt_card_done = gr.HTML(value="", label="Card status")
 
                 # 1+2 / 1+2+3
                 with gr.Row():
@@ -110,7 +110,7 @@ with gr.Blocks(
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
-                    txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], line=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
+                    txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
@@ -149,7 +149,7 @@ with gr.Blocks(
             )
 
     # darkmode
-    dark_mode_btn.click(fn=None, _js=darkmode_js)
+    dark_mode_btn.click(fn=None, js=darkmode_js)
 
     # sync anki
     sync_btn.click(fn=threaded_sync_anki, queue=True)
