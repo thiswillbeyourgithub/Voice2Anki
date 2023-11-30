@@ -218,7 +218,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if not txt_audio:
         shared.latest_llm_cost = [0, 0]
         return "No transcribed audio found."
-    if txt_audio.strip().startswith("Error "):
+    if txt_audio.strip().startswith("Error"):
         shared.latest_llm_cost = [0, 0]
         return "Error when transcribing sound."
     if not txt_chatgpt_context:
