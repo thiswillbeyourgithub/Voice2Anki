@@ -1,7 +1,7 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, ValueStorage
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, kill_threads
+from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
@@ -66,7 +66,7 @@ with gr.Blocks(
                 audio_number = shared.audio_slot_nb
                 audio_slots = []
                 for i in range(audio_number):
-                    audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+                    audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False, show_download_button=False)
                     audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
@@ -101,6 +101,7 @@ with gr.Blocks(
                 with gr.Row():
                     semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
                     auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
+                    audio_corrector = gr.Audio(sources=["microphone"], format="mp3", value=None, label="AudioEdit", show_share_button=False, type="filepath", show_download_button=False, min_length=1)
 
                 # quick settings
                 with gr.Row():
@@ -263,6 +264,12 @@ with gr.Blocks(
                 preprocess=False,
                 postprocess=False,
                 queue=True))
+
+    audio_corrector.stop_recording(
+            fn=audio_edit,
+            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
+            outputs=[txt_chatgpt_cloz, audio_corrector],
+            )
 
     rst_audio_btn.click(
             fn=reset_audio,

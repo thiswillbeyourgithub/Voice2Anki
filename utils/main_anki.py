@@ -462,6 +462,82 @@ def dirload_splitted(checkbox, *audios):
     return output
 
 @trace
+def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
+    """function called by a microphone. It will use whisper to transcribe
+    your voice. Then use the instructions in your voice to modify the
+    output from chatgpt."""
+
+    instructions = transcribe(
+            audio,
+            txt_whisp_prompt="Instruction: ",
+            txt_whisp_lang=txt_whisp_lang,
+            sld_whisp_temp=0,
+            )
+
+    prompt = f"""
+
+    Instructions: '{instructions}'
+
+    Audio used to create the flashcard:
+    '''
+    {txt_audio}
+    '''
+
+    Context of the session: '{txt_chatgpt_context}'
+
+    Flashcard:
+    '''
+    {txt_chatgpt_cloz}
+    '''
+    """.strip()
+    messages = [
+            {
+                "role": "system",
+                "content": """You receive an anki flashcard created from an
+                audio transcript. Your answer must be the same flashcard
+                after applying modifications mentionned in the instructions.
+                Don't answer anything else. Don't acknowledge those instructions.
+                """.strip()
+                },
+            {
+                "role": "user",
+                "content": prompt,
+                }
+            ]
+
+    # model_to_use = "gpt-3.5-turbo-1106"
+    # model_price = (0.001, 0.002)
+    model_to_use = "gpt-4-1106-preview"
+    model_price = (0.01, 0.03)
+    whi(f"Will use model {model_to_use}")
+
+    whi(f"Asking ChatGPT to correct: '{instructions}'")
+    response = openai.ChatCompletion.create(
+            model=model_to_use,
+            messages=messages,
+            stop="END",
+            temperature=0,
+            user=user_identifier,
+            )
+
+    input_tkn_cost = response["usage"]["prompt_tokens"]
+    output_tkn_cost = response["usage"]["completion_tokens"]
+
+    tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
+    pv["total_llm_cost"] += tkn_cost_dol
+    cloz = response["choices"][0]["message"]["content"]
+    cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+
+    yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
+    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+
+    reason = response["choices"][0]["finish_reason"]
+    if reason.lower() != "stop":
+        red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
+
+    return cloz, None
+
+@trace
 def dirload_splitted_last(checkbox):
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
