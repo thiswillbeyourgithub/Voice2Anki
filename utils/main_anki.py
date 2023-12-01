@@ -484,14 +484,8 @@ def dirload_splitted_last(checkbox):
     because gradio does not have to send all 5 sounds if I just rolled"""
     if not checkbox:
         return None
-    out = dirload_splitted(
-            checkbox,
-            a1=True,
-            a2=True,
-            a3=True,
-            a4=True,
-            a5=None,
-            )
+    audios = [True] * (shared.audio_slot_nb - 1) + [None]
+    out = dirload_splitted(checkbox, **audios)
     return out[-1]
 
 @trace

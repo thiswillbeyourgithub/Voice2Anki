@@ -30,5 +30,7 @@ class SharedModule:
 
     max_message_buffer=50
 
+    audio_slot_nb = 5
+
 
 shared = SharedModule()

@@ -63,7 +63,7 @@ with gr.Blocks(
             with gr.Column(scale=1, min_width=50):
 
                 # audio
-                audio_number = 5
+                audio_number = shared.audio_slot_nb
                 audio_slots = []
                 for i in range(audio_number):
                     audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
