@@ -27,7 +27,6 @@ user_identifier = str(uuid.uuid4())
 
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
-doing_dir = Path("./user_directory/doing")
 unsplitted_dir = Path("./user_directory/unsplitted")
 tmp_dir = Path("/tmp/gradio")
 
@@ -36,13 +35,6 @@ Path("user_directory").mkdir(exist_ok=True)
 splitted_dir.mkdir(exist_ok=True)
 unsplitted_dir.mkdir(exist_ok=True)
 done_dir.mkdir(exist_ok=True)
-doing_dir.mkdir(exist_ok=True)
-
-# move any file in doing to todos
-doings = sorted([p for p in doing_dir.rglob("*.mp3")])
-for p in doings:
-    whi(f"Starting up so moved files from doing to splitted: {p}")
-    shutil.move(p, splitted_dir / p.name)
 
 assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
 openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
@@ -402,68 +394,56 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 
 @trace
-def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
+def dirload_splitted(checkbox, *audios)
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
-        return a1, a2, a3, a4, a5
+        return audio
+
     # check how many audio are needed
-    sound_slots = 0
-    for sound in [a5, a4, a3, a2, a1]:
-        if sound is None:
-            sound_slots += 1
-        else:
-            break
-    whi(f"Number of empty sound slots: {sound_slots}")
-
-    # move any file in doing to done
-    doings = sorted([p for p in doing_dir.rglob("*.mp3")])
-    if not doings:
-        whi("No mp3 files in doing")
-    else:
-        for p in doings[:sound_slots]:
-            yel(f"Refilling so moving files from doing to done: {p}")
-            shutil.move(p, done_dir / p.name)
-
-    # count the number of mp3 files in the splitted dir
-    splitteds = [p for p in splitted_dir.rglob("*.mp3")]
-    if not splitteds:
-        red("Splitted subdir contains no mp3")
-        return a1, a2, a3, a4, a5
+    audios = [a for a in audios if a is not None]
+    empty_slots = len(audios) - shared.audio_slot_nb
+    whi(f"Number of empty sound slots: {empty_slots}")
+    if not empty_slots:
+        red(f"No empty audio slots!")
+        return audios
 
     # sort by oldest
-    #splitteds = sorted(splitteds, key=lambda x: x.stat().st_ctime)
+    # shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: x.stat().st_ctime)
     # sort by name
-    splitteds = sorted(splitteds, key=lambda x: str(x))
+    shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x))
+
+    if not shared.dirload_queue:
+        red("No mp3 files in shared.dirload_queue")
+        return audios
+
+    if len(shared.dirload_queue) > 1 and 
 
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
     new_threads = []
-    for path in splitteds[:sound_slots]:
-        moved = doing_dir / path.name
-        shutil.move(path, moved)
-        to_temp = tmp_dir / moved.name
-        shutil.copy2(moved, to_temp)
-        assert (moved.exists() and (to_temp).exists()) and (
-                not path.exists()), "unexpected sound location"
+    for path in shared.dirload_queue[:empty_slots]:
+        to_temp = tmp_dir / path.name
+        shutil.copy2(path, to_temp)
+        assert (path.exists() and (to_temp).exists()), "unexpected sound location"
 
         to_temp = sound_preprocessing(to_temp)
 
         whi(f"Will load sound {to_temp}")
-        sounds_to_load.append(str(to_temp))
+        sounds_to_load.append(to_temp)
+        shared.dirload_doing.append(path)
+
+    # remove the doing from the queue
+    [shared.dirload_queue.remove(p) for p in shared.dirload_doing]
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
-    filled_slots = [a1, a2, a3, a4, a5]
+    filled_slots = audios
     output = filled_slots[:-len(sounds_to_load)] + sounds_to_load
     assert len(filled_slots) == len(output), f"invalid output length: {len(filled_slots)} vs {len(output)}"
-
-    # auto roll over if leading None present
-    while output[0] is None:
-        output.append(output.pop(0))
 
     if new_threads:
         if len(sounds_to_load) == len(output):
@@ -475,6 +455,11 @@ def dirload_splitted(checkbox, a1, a2, a3, a4, a5):
             # the sound in the first slot was not loaded by this function so
             # not waiting for the transcription
             running_tasks["transcribing_audio"].extend(new_threads)
+
+    while len(shared.dirload_doing) > shared.audio_slot_nb:
+        p = shared.dirload_doing.pop(0)
+        red(f"Moving {p} to done_dir")
+        shutil.move(p, done_dir / p.name)
 
     return output
 

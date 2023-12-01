@@ -28,7 +28,10 @@ class SharedModule:
 
             ]
 
-    max_message_buffer=50
+    max_message_buffer = 50
+
+    dirload_queue = []
+    drload_doing = []
 
     audio_slot_nb = 5
 
