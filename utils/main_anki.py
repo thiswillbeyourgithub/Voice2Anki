@@ -405,10 +405,10 @@ def dirload_splitted(checkbox, *audios):
 
     # check how many audio are needed
     audios = [a for a in audios if a is not None]
-    empty_slots = len(audios) - shared.audio_slot_nb
+    empty_slots = shared.audio_slot_nb - len(audios)
     whi(f"Number of empty sound slots: {empty_slots}")
     if not empty_slots:
-        red(f"No empty audio slots!")
+        red("No empty audio slots!")
         return audios
 
     # sort by oldest
@@ -439,9 +439,7 @@ def dirload_splitted(checkbox, *audios):
     [shared.dirload_queue.remove(p) for p in shared.dirload_doing]
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
-    filled_slots = audios
-    output = filled_slots[:-len(sounds_to_load)] + sounds_to_load
-    assert len(filled_slots) == len(output), f"invalid output length: {len(filled_slots)} vs {len(output)}"
+    output = audios[:-len(sounds_to_load)] + sounds_to_load
 
     if new_threads:
         if len(sounds_to_load) == len(output):
