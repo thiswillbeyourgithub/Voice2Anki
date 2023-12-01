@@ -394,7 +394,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 
 @trace
-def dirload_splitted(checkbox, *audios)
+def dirload_splitted(checkbox, *audios):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
