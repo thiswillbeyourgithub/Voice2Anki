@@ -496,7 +496,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
                 "content": """You receive an anki flashcard created from an
                 audio transcript. Your answer must be the same flashcard
                 after applying modifications mentionned in the instructions.
-                Don't answer anything else. Don't acknowledge those instructions.
+                Don't answer anything else. Don't acknowledge those instructions. Don't use symbols to wrap your answer, just answer the modified flashcard.
                 """.strip()
                 },
             {
