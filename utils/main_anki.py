@@ -401,7 +401,7 @@ def dirload_splitted(checkbox, *audios):
     """
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
-        return audio
+        return audios
 
     # check how many audio are needed
     audios = [a for a in audios if a is not None]
