@@ -420,8 +420,6 @@ def dirload_splitted(checkbox, *audios):
         red("No mp3 files in shared.dirload_queue")
         return audios
 
-    if len(shared.dirload_queue) > 1 and 
-
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
