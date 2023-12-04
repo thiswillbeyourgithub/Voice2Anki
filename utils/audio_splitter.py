@@ -49,7 +49,7 @@ class AudioSplitter:
             global_slowdown_factor=1.0,
 
             remove_silence=True,
-            silence_method="torchaudio",
+            silence_method="sox",
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
