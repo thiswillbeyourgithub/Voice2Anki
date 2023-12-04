@@ -414,7 +414,7 @@ class AudioSplitter:
             f2 = "\"" + str(new_filename.name) + "\""
             d = "\"" + str(file.parent.absolute()) + "\""
 
-            sox_cmd = f"cd {d} && rm tmpoutput*.mp3 ; sox {f1} tmpoutput.mp3 silence 1 3 1.0% 1 3 1.0% : newfile : restart && cat tmpoutput*.mp3 > {f2} && rm -v tmpout*.mp3"
+            sox_cmd = f"cd {d} && rm tmpoutput*.mp3 ; sox {f1} tmpoutput.mp3 silence -l 1 3 0.1% 1 3 0.1% : newfile : restart && cat tmpoutput*.mp3 > {f2} && rm -v tmpout*.mp3"
             self.exec(sox_cmd)
             assert new_filename.exists(), f"new file not found: '{new_filename}'"
             new_audio = AudioSegment.from_mp3(new_filename)
