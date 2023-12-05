@@ -417,6 +417,9 @@ def dirload_splitted(checkbox, *audios):
     # sort by name
     shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x))
 
+    # remove the doing from the queue
+    [shared.dirload_queue.remove(p) for p in shared.dirload_doing]
+
     if not shared.dirload_queue:
         gr.Error(red("No mp3 files in shared.dirload_queue"))
         return audios
@@ -435,9 +438,6 @@ def dirload_splitted(checkbox, *audios):
         whi(f"Will load sound {to_temp}")
         sounds_to_load.append(to_temp)
         shared.dirload_doing.append(path)
-
-    # remove the doing from the queue
-    [shared.dirload_queue.remove(p) for p in shared.dirload_doing]
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     output = audios[:-len(sounds_to_load)] + sounds_to_load
