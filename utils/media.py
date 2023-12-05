@@ -97,7 +97,10 @@ def get_img_source(gallery, queue=queue.Queue()):
 
         source = ""
         for img in gallery:
-            decoded = cv2.imread(img.image.path, flags=1)
+            try:
+                decoded = cv2.imread(img.image.path, flags=1)
+            except:
+                decoded = cv2.imread(img["image"]["path"], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
             new = shared.anki_media / f"{img_hash}.png"
             if not new.exists():
