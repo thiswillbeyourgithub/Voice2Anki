@@ -601,17 +601,13 @@ def to_anki(
     "function called to do wrap it up and send to anki"
     whi("Entering to_anki")
     if not txt_audio:
-        red("missing txt_audio")
-        return
+        raise Exception(red("missing txt_audio"))
     if not txt_chatgpt_cloz:
-        red("missing txt_chatgpt_cloz")
-        return
+        raise Exception(red("missing txt_chatgpt_cloz"))
     if not txt_deck:
-        red("missing txt_deck")
-        return
+        raise Exception(red("missing txt_deck"))
     if not txt_tags:
-        red("missing txt_tags")
-        return
+        raise Exception(red("missing txt_tags"))
 
     # check that the tkn_cost is sound
     if isinstance(shared.latest_llm_cost, str):
