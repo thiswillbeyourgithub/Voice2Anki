@@ -39,6 +39,43 @@ def roll_audio(*slots):
         slots.pop(0)
         audio_mp3 = gr.Audio(sources=["microphone"], type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
         slots.append(audio_mp3)
+
+    # update the event list
+    # global aud_cache_event
+    # while aud_cache_event:
+    #     aud_cache_event.pop()
+    # aud_cache_event.append(
+    #     slots[0].change(
+    #         fn=transcribe,
+    #         inputs=[slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+    #         outputs=[txt_audio],
+    #         preprocess=False,
+    #         postprocess=False,
+    #         queue=True,
+    #         ).then(
+    #             fn=alfred,
+    #             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+    #             outputs=[txt_chatgpt_cloz],
+    #             preprocess=False,
+    #             postprocess=False,
+    #             queue=True,
+    #             ).then(
+    #                     fn=get_card_status,
+    #                     inputs=[txt_chatgpt_cloz],
+    #                     outputs=[txt_card_done],
+    #                     preprocess=False,
+    #                     postprocess=False,
+    #                     queue=True,
+    #                     )
+    #                 )
+    # for audio_slot in slots[1:]:
+    #     aud_cache_event.append(
+    #         audio_slot.change(
+    #             fn=transcribe_cache_async,
+    #             inputs=[audio_slot, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+    #             preprocess=False,
+    #             postprocess=False,
+    #             queue=True))
     return slots
 
 def reset_marked():
@@ -227,43 +264,43 @@ with gr.Blocks(
     # audio
 
     # trigger whisper in advance, this way the output will be cached
-    aud_cache_event = []
+    #aud_cache_event = []
     # the first slot will directly trigger 1+2 while the other slots will
     # just trigger caching
 
     # semi auto mode
-    aud_cache_event.append(
-        audio_slots[0].change(
-            fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-            outputs=[txt_audio],
-            preprocess=False,
-            postprocess=False,
-            queue=True,
-            ).then(
-                fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
-                outputs=[txt_chatgpt_cloz],
-                preprocess=False,
-                postprocess=False,
-                queue=True,
-                ).then(
-                        fn=get_card_status,
-                        inputs=[txt_chatgpt_cloz],
-                        outputs=[txt_card_done],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=True,
-                        )
-                    )
-    for audio_slot in audio_slots[1:]:
-        aud_cache_event.append(
-            audio_slot.change(
-                fn=transcribe_cache_async,
-                inputs=[audio_slot, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                preprocess=False,
-                postprocess=False,
-                queue=True))
+    # aud_cache_event.append(
+    #     audio_slots[0].change(
+    #         fn=transcribe,
+    #         inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+    #         outputs=[txt_audio],
+    #         preprocess=False,
+    #         postprocess=False,
+    #         queue=True,
+    #         ).then(
+    #             fn=alfred,
+    #             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+    #             outputs=[txt_chatgpt_cloz],
+    #             preprocess=False,
+    #             postprocess=False,
+    #             queue=True,
+    #             ).then(
+    #                     fn=get_card_status,
+    #                     inputs=[txt_chatgpt_cloz],
+    #                     outputs=[txt_card_done],
+    #                     preprocess=False,
+    #                     postprocess=False,
+    #                     queue=True,
+    #                     )
+    #                 )
+    # for audio_slot in audio_slots[1:]:
+    #     aud_cache_event.append(
+    #         audio_slot.change(
+    #             fn=transcribe_cache_async,
+    #             inputs=[audio_slot, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+    #             preprocess=False,
+    #             postprocess=False,
+    #             queue=True))
 
     audio_corrector.stop_recording(
             fn=audio_edit,
@@ -286,6 +323,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            # cancels=aud_cache_event,
             ).then(
                     fn=dirload_splitted_last,
                     inputs=[
@@ -303,7 +341,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            cancels=aud_cache_event,
+            # cancels=aud_cache_event,
             ).then(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -311,7 +349,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    cancels=aud_cache_event,
+                    #cancels=aud_cache_event,
                     ).then(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
