@@ -429,7 +429,7 @@ class AudioSplitter:
             waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
                     waveform,
                     sample_rate,
-                    shared.sox_effects,
+                    shared.splitter_sox_effects,
                     )
 
             # write to wav, then convert to mp3

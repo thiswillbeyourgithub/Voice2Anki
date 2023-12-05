@@ -152,7 +152,7 @@ def sound_preprocessing(audio_mp3_path):
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
             waveform,
             sample_rate,
-            shared.sox_effects,
+            shared.preprocess_sox_effects,
             )
 
     # write to file as wav
