@@ -1,3 +1,4 @@
+import gradio as gr
 import re
 import uuid
 import Levenshtein as lev
@@ -87,12 +88,12 @@ def whisper_cached(
                 return transcript
             except RateLimitError as err:
                 if cnt >= 5:
-                    return red(f"Cached whisper: RateLimitError >5: '{err}'")
+                    raise Exception(red(f"Cached whisper: RateLimitError >5: '{err}'"))
                 else:
-                    red(f"Cached whisper: RateLimitError #{cnt}/5 from cached whisper: '{err}'")
+                    gr.Error(red(f"Cached whisper: RateLimitError #{cnt}/5 from cached whisper: '{err}'"))
                     time.sleep(2 * cnt)
     except Exception as err:
-        return red(f"Error when cache transcribing audio: '{err}'")
+        raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
 
 @trace
 def transcribe_cache(audio_mp3, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
@@ -142,13 +143,13 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     whi("Transcribing audio")
 
     if audio_mp3_1 is None:
-        return red("Error: None audio_mp3_1")
+        raise Exception(red("Error: None audio_mp3_1"))
 
     if txt_whisp_prompt is None:
-        return red("Error: None whisper prompt")
+        raise Exception(red("Error: None whisper prompt"))
 
     if txt_whisp_lang is None:
-        return red("Error: None whisper language")
+        raise Exception(red("Error: None whisper language"))
 
     modelname = "whisper-1"
     shared.latest_stt_used = modelname
@@ -201,7 +202,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 
         return txt_audio
     except Exception as err:
-        return red(f"Error when transcribing audio: '{err}'")
+        raise Exception(red(f"Error when transcribing audio: '{err}'"))
 
 
 @trace
@@ -210,17 +211,17 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         shared.latest_llm_cost = [0, 0]
-        return "No transcribed audio found."
+        raise Exception(red("No transcribed audio found."))
     if txt_audio.strip().startswith("Error"):
         shared.latest_llm_cost = [0, 0]
-        return "Error when transcribing sound."
+        raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
         shared.latest_llm_cost = [0, 0]
-        return "No txt_chatgpt_context found."
+        raise Exception(red("No txt_chatgpt_context found."))
 
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         shared.latest_llm_cost = [0, 0]
-        return f"Image change detected: '{txt_audio}'"
+        raise Exeption(red(f"Image change detected: '{txt_audio}'"))
 
     if "," in txt_keywords:
         keywords = [re.compile(kw.strip(), flags=re.DOTALL|re.MULTILINE|re.IGNORECASE) for kw in txt_keywords.split(",")]
@@ -337,7 +338,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             except RateLimitError as err:
                 if cnt >= 5:
                     shared.latest_llm_cost = [0, 0]
-                    return red("ChatGPT: too many retries.")
+                    raise Exception(red("ChatGPT: too many retries."))
                 red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
                 time.sleep(2 * cnt)
 
@@ -390,7 +391,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         return cloz
     except Exception as err:
         shared.latest_llm_cost = [0, 0]
-        return red(f"Error with ChatGPT: '{err}'")
+        raise Exception(red(f"Error with ChatGPT: '{err}'"))
 
 
 @trace
@@ -408,7 +409,7 @@ def dirload_splitted(checkbox, *audios):
     empty_slots = shared.audio_slot_nb - len(audios)
     whi(f"Number of empty sound slots: {empty_slots}")
     if not empty_slots:
-        red("No empty audio slots!")
+        gr.Error(red("No empty audio slots!"))
         return audios
 
     # sort by oldest
@@ -417,7 +418,7 @@ def dirload_splitted(checkbox, *audios):
     shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x))
 
     if not shared.dirload_queue:
-        red("No mp3 files in shared.dirload_queue")
+        gr.Error(red("No mp3 files in shared.dirload_queue"))
         return audios
 
     # iterate over each files from the dir. If images are found, load them
@@ -619,8 +620,7 @@ def to_anki(
         red("No token cost found, setting to 0")
         shared.latest_llm_cost = [0, 0]
     if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in shared.latest_llm_cost:
-        red(f"Error with chatgpt: '{txt_chatgpt_cloz}'")
-        return
+        raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
@@ -683,6 +683,7 @@ def to_anki(
     # sending sound file to anki media
     audio_html = wait_for_queue(audio_to_anki_queue, "audio_to_anki")
     if "Error" in audio_html:  # then out is an error message and not the source
+        gr.Error(f"Error in audio_html: '{audio_html}'")
         gather_threads(threads)
         return
 
