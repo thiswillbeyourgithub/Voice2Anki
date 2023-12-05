@@ -123,7 +123,7 @@ class AudioSplitter:
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
-                transcript = self.run_whisperx(file, "medium")
+                transcript = self.run_whisperx(file, "large-v2")
                 times_to_keep, text_segments = self.split_one_transcript(transcript)
             elif self.stop_source == "local_json":
                 raise NotImplementedError
