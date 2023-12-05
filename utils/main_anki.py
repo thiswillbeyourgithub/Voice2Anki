@@ -543,7 +543,7 @@ def dirload_splitted_last(checkbox):
     if not checkbox:
         return None
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
-    out = dirload_splitted(checkbox, **audios)
+    out = dirload_splitted(checkbox, *audios)
     return out[-1]
 
 @trace
