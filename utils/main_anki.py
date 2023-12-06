@@ -404,9 +404,13 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
         whi("Not running Dirload because checkbox is unchecked")
         return audios
 
-    # check how many audio are needed
+    # make sure to move any empty slot at the end
     audios = [a for a in audios if a is not None]
     empty_slots = shared.audio_slot_nb - len(audios)
+    while len(audios) < shared.audio_slot_nb:
+        audios += [None]
+
+    # check how many audio are needed
     whi(f"Number of empty sound slots: {empty_slots}")
     if empty_slots < 0:
         gr.Error(red("Invalid number of empty audio slots: {empty_slots}!"))
@@ -466,6 +470,7 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
         red(f"Moving {p} to done_dir")
         shutil.move(p, done_dir / p.name)
 
+    assert len(output) == shared.audio_slot_nb, "Invalid number of audio slots in output"
     return output
 
 @trace
