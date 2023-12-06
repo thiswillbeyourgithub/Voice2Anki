@@ -161,6 +161,13 @@ class ValueStorage:
                 if not self.__check_equality(a[i], b[i]):
                     return False
             return True
+        if isinstance(a, dict):
+            for k in b:
+                if k not in a:
+                    return False
+            for k, v in a.items():
+                if k not in b or self.__check_equality(b[k], v):
+                    return False
         try:
             return (a == b).all()
         except Exception:
