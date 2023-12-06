@@ -735,6 +735,7 @@ def to_anki(
     # cap the number of messages
     message_buffer["question"] = message_buffer["question"][-shared.max_message_buffer:]
     message_buffer["answer"] = message_buffer["answer"][-shared.max_message_buffer:]
+    pv["message_buffer"] = message_buffer
 
     gather_threads(threads)
     return
