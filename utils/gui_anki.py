@@ -88,8 +88,8 @@ with gr.Blocks(
 
                 # rolls
                 with gr.Row():
-                    rollaudio_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=4)
-                    rollaudio2_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=4)
+                    rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=4)
+                    rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=4)
 
                 # 1/2/3
                 with gr.Row():
@@ -242,7 +242,7 @@ with gr.Blocks(
             queue=True,
             )
 
-    rollaudio_btn.click(
+    rollaudio_12_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
             outputs=audio_slots,
@@ -271,7 +271,7 @@ with gr.Blocks(
                                 outputs=[txt_chatgpt_cloz],
                                 queue=True,
                                 )
-    rollaudio2_btn.click(
+    rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
             outputs=audio_slots,
