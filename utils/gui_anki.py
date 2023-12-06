@@ -52,14 +52,14 @@ def roll_audio(*slots):
     #         preprocess=False,
     #         postprocess=False,
     #         queue=True,
-    #         ).then(
+    #         ).success(
     #             fn=alfred,
     #             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
     #             outputs=[txt_chatgpt_cloz],
     #             preprocess=False,
     #             postprocess=False,
     #             queue=True,
-    #             ).then(
+    #             ).success(
     #                     fn=get_card_status,
     #                     inputs=[txt_chatgpt_cloz],
     #                     outputs=[txt_card_done],
@@ -210,7 +210,7 @@ with gr.Blocks(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
-            ).then(
+            ).success(
                     fn=shared.pv.save_sld_max_tkn,
                     inputs=[sld_max_tkn],
                     )
@@ -218,7 +218,7 @@ with gr.Blocks(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
-            ).then(
+            ).success(
                     fn=shared.pv.save_check_gpt4,
                     inputs=[check_gpt4],
                     )
@@ -246,11 +246,11 @@ with gr.Blocks(
             fn=get_image,
             inputs=[gallery],
             outputs=[gallery],
-            queue=True).then(
+            queue=True).success(
                     fn=get_img_source,
                     inputs=[gallery],
                     queue=True,
-                    ).then(
+                    ).success(
                             fn=shared.pv.save_gallery,
                             inputs=[gallery],
                             )
@@ -277,14 +277,14 @@ with gr.Blocks(
     #         preprocess=False,
     #         postprocess=False,
     #         queue=True,
-    #         ).then(
+    #         ).success(
     #             fn=alfred,
     #             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
     #             outputs=[txt_chatgpt_cloz],
     #             preprocess=False,
     #             postprocess=False,
     #             queue=True,
-    #             ).then(
+    #             ).success(
     #                     fn=get_card_status,
     #                     inputs=[txt_chatgpt_cloz],
     #                     outputs=[txt_card_done],
@@ -324,7 +324,7 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             # cancels=aud_cache_event,
-            ).then(
+            ).success(
                     fn=dirload_splitted_last,
                     inputs=[
                         roll_dirload_check,
@@ -342,7 +342,7 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             # cancels=aud_cache_event,
-            ).then(
+            ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                     outputs=[txt_audio],
@@ -350,14 +350,14 @@ with gr.Blocks(
                     postprocess=False,
                     queue=True,
                     #cancels=aud_cache_event,
-                    ).then(
+                    ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
                         queue=True,
-                        ).then(
+                        ).success(
                             fn=to_anki,
                             inputs=[
                                 audio_slots[0],
@@ -372,7 +372,7 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            ).then(
+                            ).success(
                                 fn=dirload_splitted_last,
                                 inputs=[
                                     roll_dirload_check,
@@ -381,14 +381,14 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                ).then(
+                                ).success(
                                         fn=get_card_status,
                                         inputs=[txt_chatgpt_cloz],
                                         outputs=[txt_card_done],
                                         preprocess=False,
                                         postprocess=False,
                                         queue=True,
-                                        ).then(fn=reset_marked, outputs=[check_marked])
+                                        ).success(fn=reset_marked, outputs=[check_marked])
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -398,7 +398,7 @@ with gr.Blocks(
             inputs=[roll_dirload_check] + audio_slots,
             outputs=audio_slots,
             queue=True,
-            ).then(
+            ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                     outputs=[txt_audio],
@@ -441,14 +441,14 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).then(
+            ).success(
                     fn=get_card_status,
                     inputs=[txt_chatgpt_cloz],
                     outputs=[txt_card_done],
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).then(fn=reset_marked, outputs=[check_marked])
+                    ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2
     semiauto_btn.click(
@@ -458,14 +458,14 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).then(
+            ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
                 queue=True,
-                ).then(
+                ).success(
                     fn=to_anki,
                     inputs=[
                         audio_slots[0],
@@ -480,14 +480,14 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).then(
+                    ).success(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
                             outputs=[txt_card_done],
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            ).then(fn=reset_marked, outputs=[check_marked])
+                            ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2+3
     auto_btn.click(
@@ -497,14 +497,14 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).then(
+            ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
                 queue=True,
-                ).then(
+                ).success(
                     fn=to_anki,
                     inputs=[
                         audio_slots[0],
@@ -519,7 +519,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).then(
+                    ).success(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
                             outputs=[txt_card_done],
