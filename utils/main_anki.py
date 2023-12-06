@@ -314,9 +314,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     # print prompts used for the call:
     n = len(formatted_messages)
-    whi("ChatGPT prompt :")
+    whi("ChatGPT prompt:")
     for i, p in enumerate(formatted_messages):
-        whi(f"    * {i+1}/{n}: {p['role']:>10}: {str(p['content'])[:200]}")
+        whi(f"    * {i+1}/{n}:\n{p['role']:>10}\n{str(p['content'])[:200]:>20}")
 
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
