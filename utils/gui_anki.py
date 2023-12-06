@@ -175,7 +175,7 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             every=1,
-            trigger_mode="once",
+            trigger_mode="always_last",
             )
 
     # display pricing then save values
