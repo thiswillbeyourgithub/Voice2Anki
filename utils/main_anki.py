@@ -9,7 +9,7 @@ import hashlib
 import base64
 import joblib
 import json
-from textwrap import dedent
+from textwrap import dedent, indent
 import rtoml
 import time
 from datetime import datetime
@@ -317,7 +317,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     n = len(formatted_messages)
     whi("ChatGPT prompt:")
     for i, p in enumerate(formatted_messages):
-        whi(f"    * {i+1}/{n}:\n{p['role']:>10}\n{str(p['content'])[:200]:>20}")
+        whi(f"* {i+1}/{n}: {p['role']}")
+        whi(indent(p['content'][:200], " " * 5))
 
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
     try:
