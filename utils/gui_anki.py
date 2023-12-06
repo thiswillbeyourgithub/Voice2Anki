@@ -249,7 +249,6 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            # cancels=aud_cache_event,
             ).success(
                     fn=dirload_splitted_last,
                     inputs=[
@@ -267,7 +266,6 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            # cancels=aud_cache_event,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -275,7 +273,6 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    #cancels=aud_cache_event,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
