@@ -12,21 +12,21 @@ class SharedModule:
             # # removes high frequency and very low ones
             # ["highpass", "-2", "50"],
             # ["lowpass", "-2", "5000"],
-
-            # max silence should be 2s
-            ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
-
-            ["norm"],  # normalize audio
+            # # max silence should be 2s
+            # ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
+            # # normalize audio
+            # ["norm"],
 
             # remove leading silence
-            ["vad"],
+            ["vad", "-p", "0.1", "-t", "5"],
 
-            # # and ending silence, this might be unecessary for splitted audio
+            # and ending silence, this might be unecessary for splitted audio
             ["reverse"],
-            ["vad"],
+            ["vad", "-p", "0.1", "-t", "5"],
             ["reverse"],
 
-            ["pad", "0.2@0"],  # add blank sound to help whisper
+            # add blank sound to help whisper
+            ["pad", "0.2@0"],
 
             ]
     # sox effects when splitting long audio
