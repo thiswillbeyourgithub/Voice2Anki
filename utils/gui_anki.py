@@ -167,6 +167,8 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            every=1,
+            trigger_mode="once",
             )
 
     # display pricing then save values
@@ -305,14 +307,7 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                ).success(
-                                        fn=get_card_status,
-                                        inputs=[txt_chatgpt_cloz],
-                                        outputs=[txt_card_done],
-                                        preprocess=False,
-                                        postprocess=False,
-                                        queue=True,
-                                        ).success(fn=reset_marked, outputs=[check_marked])
+                                ).success(fn=reset_marked, outputs=[check_marked])
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -334,14 +329,7 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
-                        ).success(
-                                fn=get_card_status,
-                                inputs=[txt_chatgpt_cloz],
-                                outputs=[txt_card_done],
-                                preprocess=False,
-                                postprocess=False,
-                                queue=True,
-                                )
+                        )
 
     # send to whisper
     transcript_btn.click(
@@ -377,14 +365,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).success(
-                    fn=get_card_status,
-                    inputs=[txt_chatgpt_cloz],
-                    outputs=[txt_card_done],
-                    preprocess=False,
-                    postprocess=False,
-                    queue=True,
-                    ).success(fn=reset_marked, outputs=[check_marked])
+            ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2
     semiauto_btn.click(
@@ -416,14 +397,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).success(
-                            fn=get_card_status,
-                            inputs=[txt_chatgpt_cloz],
-                            outputs=[txt_card_done],
-                            preprocess=False,
-                            postprocess=False,
-                            queue=True,
-                            ).success(fn=reset_marked, outputs=[check_marked])
+                    ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2+3
     auto_btn.click(
@@ -455,14 +429,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).success(
-                            fn=get_card_status,
-                            inputs=[txt_chatgpt_cloz],
-                            outputs=[txt_card_done],
-                            preprocess=False,
-                            postprocess=False,
-                            queue=True,
-                            ).then(fn=reset_marked, outputs=[check_marked])
+                    ).then(fn=reset_marked, outputs=[check_marked])
 
     improve_btn.click(
             fn=recur_improv,
