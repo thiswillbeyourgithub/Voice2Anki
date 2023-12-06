@@ -258,7 +258,19 @@ with gr.Blocks(
                     preprocess=False,
                     # postprocess=False,
                     queue=True,
-                    )
+                    ).success(
+                            fn=transcribe,
+                            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                            outputs=[txt_audio],
+                            preprocess=False,
+                            postprocess=False,
+                            queue=True,
+                            ).success(
+                                fn=alfred,
+                                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                                outputs=[txt_chatgpt_cloz],
+                                queue=True,
+                                )
     rollaudio2_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
