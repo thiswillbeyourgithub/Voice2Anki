@@ -330,7 +330,12 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         score_key = "content_sim"
     elif shared.memory_metric == "length":
         score_key = "length_dist"
-    w = (1, 1, 5)
+
+    w = [
+            shared.pv["sld_pick_weight"],
+            shared.pv["sld_prio_weight"],
+            shared.pv["sld_keywords_weight"],
+            ]
     for i, pr in enumerate(timesorted_pr):
         score = (pr[score_key] * w[0] + pr["priority_score"] * w[1] + pr["kw_score"] * w[2]) / sum(w)
         timesorted_pr[i]["pick_score"] = score

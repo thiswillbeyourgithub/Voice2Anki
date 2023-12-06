@@ -21,6 +21,9 @@ approved_keys_all = [
         "sld_whisp_temp",
         "message_buffer",
         "txt_keywords",
+        "sld_prio_weight",
+        "sld_keywords_weight",
+        "sld_pick_weight",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -139,6 +142,12 @@ class ValueStorage:
                 default = {"question": [], "answer": []}
             elif key == "txt_keywords":
                 default = None
+            elif key == "sld_prio_weight":
+                default = 1
+            elif key == "sld_pick_weight":
+                default = 1
+            elif key == "sld_keywords_weight":
+                default = 5
             else:
                 default = None
             self.cache_values[key] = default
