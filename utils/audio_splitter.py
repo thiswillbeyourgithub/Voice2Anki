@@ -54,7 +54,7 @@ class AudioSplitter:
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
-        assert silence_method in ["sox", "pydub", "torchaudio"], "invalid silence_method"
+        assert silence_method in ["sox_cli", "pydub", "torchaudio"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
@@ -408,7 +408,7 @@ class AudioSplitter:
                 new_audio += chunk
             new_audio.export(new_filename, format="mp3")
 
-        elif self.silence_method == "sox":
+        elif self.silence_method == "sox_cli":
             # sox way, fast but needs linux
             f1 = "\"" + str(file.name) + "\""
             f2 = "\"" + str(new_filename.name) + "\""
