@@ -37,7 +37,7 @@ def roll_audio(*slots):
     slots[0] = None
     while slots[0] is None:
         slots.pop(0)
-        audio_mp3 = gr.Microphone(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False)
+        audio_mp3 = gr.Microphone(type="filepath", label=f"Audio{i}", format="mp3", value=None, container=False, show_download_button=False)
         slots.append(audio_mp3)
 
     return slots
