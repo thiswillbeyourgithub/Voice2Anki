@@ -12,8 +12,8 @@ class SharedModule:
             # # removes high frequency and very low ones
             # ["highpass", "-2", "50"],
             # ["lowpass", "-2", "5000"],
-            # # max silence should be 2s
-            # ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
+            # max silence should be 1s
+            ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
             # # normalize audio
             # ["norm"],
 
