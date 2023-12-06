@@ -252,7 +252,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                         [
                             {
                                 "role": "user",
-                                "content": message_buffer["question"][-i]
+                                "content": f"Context: '{txt_chatgpt_context}'\nTranscript: '" + message_buffer["question"][-i] + "'"
                                 },
                             {
                                 "role": "assistant",
