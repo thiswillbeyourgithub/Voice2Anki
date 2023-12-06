@@ -14,7 +14,7 @@ class SharedModule:
             ["lowpass", "-2", "5000"],
 
             # max silence should be 2s
-            # ["silence", "-l", "1", "0.9", "0.05%", "-1", "2.0", "0.05%"],
+            ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
 
             ["norm"],  # normalize audio
 
@@ -37,10 +37,12 @@ class SharedModule:
             ["highpass", "-2", "50"],
             ["lowpass", "-2", "5000"],
 
-            # max silence should be 2s
-            ["silence", "-l", "1", "0.9", "0.05%", "-1", "2.0", "0.05%"],
-
             ["norm"],  # normalize audio
+
+            # max silence should be 3s
+            ["silence", "-l", "1", "0.1", "0.1%", "-1", "2.0", "0.1%"],
+
+            ["norm"],
 
             # remove leading silence
             # ["vad"],
