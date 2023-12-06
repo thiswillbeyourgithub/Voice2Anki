@@ -45,15 +45,6 @@ class SharedModule:
             ["silence", "-l", "1", "0.1", "0.1%", "-1", "2.0", "0.1%"],
 
             ["norm"],
-
-            # remove leading silence
-            # ["vad"],
-
-            # # and ending silence, this might be unecessary for splitted audio
-            # ["reverse"],
-            # ["vad"],
-            # ["reverse"],
-
             ]
 
     max_message_buffer = 50
