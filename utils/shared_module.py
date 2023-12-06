@@ -26,6 +26,8 @@ class SharedModule:
             ["vad"],
             ["reverse"],
 
+            ["pad", "0.2@0"],  # add blank sound to help whisper
+
             ]
     # sox effects when splitting long audio
     splitter_sox_effects = [
