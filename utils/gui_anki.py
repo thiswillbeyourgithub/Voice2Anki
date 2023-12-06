@@ -271,7 +271,7 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
-                        ).success(
+                        ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                                 outputs=[audio_slots[-1]],
@@ -315,7 +315,7 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
-                            ).success(
+                            ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
                                     roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp
