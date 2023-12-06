@@ -334,7 +334,14 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
-                        )
+                        ).success(
+                                fn=get_card_status,
+                                inputs=[txt_chatgpt_cloz],
+                                outputs=[txt_card_done],
+                                preprocess=False,
+                                postprocess=False,
+                                queue=True,
+                                )
 
     # send to whisper
     transcript_btn.click(
