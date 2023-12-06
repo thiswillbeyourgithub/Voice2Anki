@@ -397,7 +397,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 
 @trace
-def dirload_splitted(checkbox, *audios):
+def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -446,6 +446,8 @@ def dirload_splitted(checkbox, *audios):
         whi(f"Will load sound {to_temp}")
         sounds_to_load.append(to_temp)
         shared.dirload_doing.append(path)
+        if txt_whisp_prompt and txt_whisp_lang:
+            new_threads.append(transcribe_cache_async(to_temp, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp))
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     output = audios[:-len(sounds_to_load)] + sounds_to_load
@@ -547,14 +549,11 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     return cloz, None
 
 @trace
-def dirload_splitted_last(checkbox):
+def dirload_splitted_last(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
-    if not checkbox:
-        return None
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
-    out = dirload_splitted(checkbox, *audios)
-    return out[-1]
+    return dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios)[-1]
 
 @trace
 def gather_threads(threads, source="to_anki"):

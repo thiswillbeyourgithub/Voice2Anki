@@ -273,7 +273,7 @@ with gr.Blocks(
                         queue=True,
                         ).success(
                                 fn=dirload_splitted_last,
-                                inputs=[roll_dirload_check,],
+                                inputs=[roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                                 outputs=[audio_slots[-1]],
                                 preprocess=False,
                                 # postprocess=False,
@@ -318,7 +318,7 @@ with gr.Blocks(
                             ).success(
                                 fn=dirload_splitted_last,
                                 inputs=[
-                                    roll_dirload_check,
+                                    roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp
                                     ],
                                 outputs=[audio_slots[-1]],
                                 preprocess=False,
@@ -331,7 +331,7 @@ with gr.Blocks(
     # on another distance device
     dir_load_btn.click(
             fn=dirload_splitted,
-            inputs=[roll_dirload_check] + audio_slots,
+            inputs=[roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp] + audio_slots,
             outputs=audio_slots,
             queue=True,
             ).success(
