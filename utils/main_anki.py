@@ -428,7 +428,10 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
     shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x))
 
     # remove the doing from the queue
-    [shared.dirload_queue.remove(p) for p in shared.dirload_doing]
+    for doing in shared.dirload_doing:
+        assert doing == shared.dirload_queue[0]
+        shared.dirload_queue.pop(0)
+        assert doing not in shared.dirload_queue
 
     if not shared.dirload_queue:
         gr.Error(red("No mp3 files in shared.dirload_queue"))
