@@ -469,6 +469,13 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
     return output
 
 @trace
+def dirload_splitted_last(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
+    """wrapper for dirload_splitted to only load the last slot. This is faster
+    because gradio does not have to send all 5 sounds if I just rolled"""
+    audios = [True] * (shared.audio_slot_nb - 1) + [None]
+    return dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios)[-1]
+
+@trace
 def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context, check_gpt4):
     """function called by a microphone. It will use whisper to transcribe
     your voice. Then use the instructions in your voice to modify the
@@ -545,13 +552,6 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
         red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
 
     return cloz, None
-
-@trace
-def dirload_splitted_last(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
-    """wrapper for dirload_splitted to only load the last slot. This is faster
-    because gradio does not have to send all 5 sounds if I just rolled"""
-    audios = [True] * (shared.audio_slot_nb - 1) + [None]
-    return dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios)[-1]
 
 @trace
 def gather_threads(threads, source="to_anki"):
