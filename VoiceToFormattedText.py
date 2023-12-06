@@ -125,6 +125,7 @@ def start_voice2formattedtext(
         red("Will not use SSL")
         ssl_args = {}
 
+    demo.queue()
     demo.launch(
             share=do_share,
             **auth_args,
