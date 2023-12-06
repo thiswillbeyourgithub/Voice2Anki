@@ -26,7 +26,7 @@ class SharedModule:
             ["reverse"],
 
             # add blank sound to help whisper
-            # ["pad", "0.2@0"],
+            ["pad", "0.2@0"],
 
             ]
     # sox effects when splitting long audio
