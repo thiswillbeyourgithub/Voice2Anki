@@ -230,7 +230,7 @@ with gr.Blocks(
     # audio
     audio_corrector.stop_recording(
             fn=audio_edit,
-            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
+            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context, check_gpt4],
             outputs=[txt_chatgpt_cloz, audio_corrector],
             )
 
