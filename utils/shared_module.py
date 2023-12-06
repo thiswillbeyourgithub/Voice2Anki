@@ -5,13 +5,13 @@ class SharedModule:
 
     # sox effect when loading a sound
     preprocess_sox_effects = [
-            # isolate voice frequency
-            # -2 is for a steeper filtering
-            ["highpass", "-1", "100"],
-            ["lowpass", "-1", "3000"],
-            # removes high frequency and very low ones
-            ["highpass", "-2", "50"],
-            ["lowpass", "-2", "5000"],
+            # # isolate voice frequency
+            # # -2 is for a steeper filtering
+            # ["highpass", "-1", "100"],
+            # ["lowpass", "-1", "3000"],
+            # # removes high frequency and very low ones
+            # ["highpass", "-2", "50"],
+            # ["lowpass", "-2", "5000"],
 
             # max silence should be 2s
             ["silence", "-l", "1", "0.1", "0.1%", "-1", "1.0", "0.1%"],
