@@ -730,8 +730,9 @@ def to_anki(
     whi("\n\n ------------------------------------- \n\n")
 
     # add the latest generated cards to the message bugger
-    message_buffer["question"].append(txt_audio)
-    message_buffer["answer"].append(txt_chatgpt_cloz)
+    if txt_audio not in message_buffer["question"] and txt_chatgpt_cloz not in message_buffer["answer"]
+        message_buffer["question"].append(txt_audio)
+        message_buffer["answer"].append(txt_chatgpt_cloz)
 
     # cap the number of messages
     message_buffer["question"] = message_buffer["question"][-shared.max_message_buffer:]
