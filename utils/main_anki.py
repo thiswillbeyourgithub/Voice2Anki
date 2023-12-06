@@ -493,7 +493,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
             sld_whisp_temp=0,
             )
 
-    prompt = f"""
+    prompt = dedent(f"""
 
     Instructions: '{instructions}'
 
@@ -508,15 +508,13 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     '''
     {txt_chatgpt_cloz}
     '''
-    """.strip()
+    """.strip())
     messages = [
             {
                 "role": "system",
-                "content": """You receive an anki flashcard created from an
-                audio transcript. Your answer must be the same flashcard
-                after applying modifications mentionned in the instructions.
+                "content": dedent("""You receive an anki flashcard created from an audio transcript. Your answer must be the same flashcard after applying modifications mentionned in the instructions.
                 Don't answer anything else. Don't acknowledge those instructions. Don't use symbols to wrap your answer, just answer the modified flashcard.
-                """.strip()
+                """.strip())
                 },
             {
                 "role": "user",
@@ -532,7 +530,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
         model_price = (0.01, 0.03)
     whi(f"Will use model {model_to_use}")
 
-    whi(f"Asking ChatGPT to correct: '{instructions}'")
+    whi(f"Editing via ChatGPT: '{prompt}'")
     response = openai.ChatCompletion.create(
             model=model_to_use,
             messages=messages,
