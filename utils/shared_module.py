@@ -18,15 +18,15 @@ class SharedModule:
             # ["norm"],
 
             # remove leading silence
-            ["vad", "-p", "0.1", "-t", "5"],
+            ["vad", "-p", "0.2", "-t", "5"],
 
             # and ending silence, this might be unecessary for splitted audio
             ["reverse"],
-            ["vad", "-p", "0.1", "-t", "5"],
+            ["vad", "-p", "0.2", "-t", "5"],
             ["reverse"],
 
             # add blank sound to help whisper
-            ["pad", "0.2@0"],
+            # ["pad", "0.2@0"],
 
             ]
     # sox effects when splitting long audio
