@@ -242,8 +242,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     buffer_to_add = []
     if sld_buffer and message_buffer["question"]:
         whi(f"Length of message_buffer: {len(message_buffer['answer'])}")
-        message_buffer["question"].reverse()
-        message_buffer["answer"].reverse()
         for i in range(0, min(len(message_buffer["question"]), sld_buffer) + 1):
             if lev.ratio(
                     txt_audio.lower(),
@@ -262,8 +260,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                             ]
                         )
                 whi("Added message_buffer to the prompt.")
-        message_buffer["question"].reverse()
-        message_buffer["answer"].reverse()
     else:
         whi("Ignored message buffer")
 
