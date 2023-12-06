@@ -382,7 +382,12 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            ).success(fn=reset_marked, outputs=[check_marked])
+            ).then(
+                    fn=get_card_status,
+                    inputs=[txt_chatgpt_cloz],
+                    outputs=[txt_card_done],
+                    queue=False,
+                    ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2
     semiauto_btn.click(
@@ -414,7 +419,12 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).success(fn=reset_marked, outputs=[check_marked])
+                    ).then(
+                            fn=get_card_status,
+                            inputs=[txt_chatgpt_cloz],
+                            outputs=[txt_card_done],
+                            queue=False,
+                            ).success(fn=reset_marked, outputs=[check_marked])
 
     # 1+2+3
     auto_btn.click(
