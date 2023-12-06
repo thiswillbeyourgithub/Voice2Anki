@@ -256,7 +256,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                                 },
                             {
                                 "role": "assistant",
-                                "content": message_buffer["answer"][-i]
+                                "content": message_buffer["answer"][-i].replace("\n", "<br/>")
                                 }
                             ]
                         )
