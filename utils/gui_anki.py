@@ -250,25 +250,23 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             ).success(
-                    fn=dirload_splitted_last,
-                    inputs=[
-                        roll_dirload_check,
-                        ],
-                    outputs=[audio_slots[-1]],
+                    fn=transcribe,
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                    outputs=[txt_audio],
                     preprocess=False,
-                    # postprocess=False,
+                    postprocess=False,
                     queue=True,
                     ).success(
-                            fn=transcribe,
-                            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                            outputs=[txt_audio],
-                            preprocess=False,
-                            postprocess=False,
-                            queue=True,
-                            ).success(
-                                fn=alfred,
-                                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
-                                outputs=[txt_chatgpt_cloz],
+                        fn=alfred,
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                        outputs=[txt_chatgpt_cloz],
+                        queue=True,
+                        ).success(
+                                fn=dirload_splitted_last,
+                                inputs=[roll_dirload_check,],
+                                outputs=[audio_slots[-1]],
+                                preprocess=False,
+                                # postprocess=False,
                                 queue=True,
                                 )
     rollaudio_123_btn.click(
