@@ -410,6 +410,12 @@ def dirload_splitted(checkbox, *audios):
     audios = [a for a in audios if a is not None]
     empty_slots = shared.audio_slot_nb - len(audios)
     whi(f"Number of empty sound slots: {empty_slots}")
+    if empty_slots < 0:
+        gr.Error(red("Invalid number of empty audio slots: {empty_slots}!"))
+        return audios
+    if len(audios) > shared.audio_slot_nb:
+        gr.Error(red("Invalid number of audio slots: {empty_slots}!"))
+        return audios
     if not empty_slots:
         gr.Error(red("No empty audio slots!"))
         return audios
