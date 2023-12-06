@@ -730,7 +730,7 @@ def to_anki(
     whi("\n\n ------------------------------------- \n\n")
 
     # add the latest generated cards to the message bugger
-    if txt_audio not in message_buffer["question"] and txt_chatgpt_cloz not in message_buffer["answer"]
+    if txt_audio not in message_buffer["question"] and txt_chatgpt_cloz not in message_buffer["answer"]:
         message_buffer["question"].append(txt_audio)
         message_buffer["answer"].append(txt_chatgpt_cloz)
 
