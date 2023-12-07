@@ -244,7 +244,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     buffer_to_add = []
     if sld_buffer and message_buffer["question"]:
         whi(f"Length of message_buffer: {len(message_buffer['answer'])}")
-        for i in range(0, min(len(message_buffer["question"]), sld_buffer) + 1):
+        for i in range(0, len(message_buffer["question"]) + 1):
+            if i > sld_buffer:
+                break
             if lev.ratio(
                     txt_audio.lower(),
                     message_buffer["question"][-i].lower(),
