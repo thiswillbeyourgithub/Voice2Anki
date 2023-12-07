@@ -180,11 +180,11 @@ def check_prompts(prev_prompts):
         assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
         assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
         assert mess["tkn_len_out"] > 0 or mess["role"] == "system", "tkn_len_out under 0 !"
-        if mess["tkn_len_in"] + mess["tkn_len_out"] > 500:
+        if mess["tkn_len_in"] + mess["tkn_len_out"] > 1000:
             if mess["priority"] > 5:
-                red(f"high priority prompt with more than 500 token: '{mess}'")
+                red(f"high priority prompt with more than 1000 token: '{mess}'")
             else:
-                whi(f"low priority prompt with more than 500 token: '{mess}'")
+                whi(f"low priority prompt with more than 1000 token: '{mess}'")
 
         # keep only the expected keys
         keys = [k for k in mess.keys() if k in expected_mess_keys]
