@@ -79,7 +79,7 @@ with gr.Blocks(
                         rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
 
-            with gr.Column(scale=3):
+            with gr.Column(scale=5):
 
                 # whisper and chatgpt text output
                 txt_audio = gr.Textbox(label="Transcript", lines=10, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False)
