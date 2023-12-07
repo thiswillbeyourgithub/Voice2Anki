@@ -469,8 +469,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
     red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
-    shared.latest_llm_cost = [0, 0]
-    raise Exception(red(f"Error with ChatGPT: '{err}'"))
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
@@ -503,6 +501,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                 "db_name": "anki_llm"})
     thread.start()
     running_tasks["saving_whisper"].append(thread)
+    shared.latest_llm_cost = tkn_cost
+    return cloz
 
 
 @trace
