@@ -87,8 +87,8 @@ with gr.Blocks(
 
                 # rolls
                 with gr.Row():
-                    rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="secondary", scale=4)
-                    rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="secondary", scale=4)
+                    rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary")
+                    rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary")
 
                 # 1/2/3
                 with gr.Row():
@@ -99,9 +99,9 @@ with gr.Blocks(
 
                 # 1+2 / 1+2+3
                 with gr.Row():
-                    semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
-                    auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
-                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2)
+                    semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
+                    auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
+                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False)
 
                 # quick settings
                 with gr.Row():
