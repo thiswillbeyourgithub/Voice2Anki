@@ -438,77 +438,71 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # in case recur improv is called
     shared.latest_llm_used = model_to_use
 
-    try:
-        cnt = 0
-        while True:
-            try:
-                whi("Asking ChatGPT")
-                cnt += 1
-                response = openai.ChatCompletion.create(
-                        model=model_to_use,
-                        messages=formatted_messages,
-                        stop="END",
-                        temperature=temperature,
-                        user=user_identifier,
-                        )
-                break
-            except RateLimitError as err:
-                if cnt >= 5:
-                    shared.latest_llm_cost = [0, 0]
-                    raise Exception(red("ChatGPT: too many retries."))
-                red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
-                time.sleep(2 * cnt)
+    cnt = 0
+    while True:
+        try:
+            whi("Asking ChatGPT")
+            cnt += 1
+            response = openai.ChatCompletion.create(
+                    model=model_to_use,
+                    messages=formatted_messages,
+                    stop="END",
+                    temperature=temperature,
+                    user=user_identifier,
+                    )
+            break
+        except RateLimitError as err:
+            if cnt >= 5:
+                shared.latest_llm_cost = [0, 0]
+                raise Exception(red("ChatGPT: too many retries."))
+            red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
+            time.sleep(2 * cnt)
 
+    input_tkn_cost = response["usage"]["prompt_tokens"]
+    output_tkn_cost = response["usage"]["completion_tokens"]
+    tkn_cost = [input_tkn_cost, output_tkn_cost]
 
-        input_tkn_cost = response["usage"]["prompt_tokens"]
-        output_tkn_cost = response["usage"]["completion_tokens"]
-        tkn_cost = [input_tkn_cost, output_tkn_cost]
+    tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
+    pv["total_llm_cost"] += tkn_cost_dol
+    cloz = response["choices"][0]["message"]["content"]
+    cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
 
-        tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-        pv["total_llm_cost"] += tkn_cost_dol
-        cloz = response["choices"][0]["message"]["content"]
-        cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+    yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
+    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    shared.latest_llm_cost = [0, 0]
+    raise Exception(red(f"Error with ChatGPT: '{err}'"))
 
-        yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
-        red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    reason = response["choices"][0]["finish_reason"]
+    if reason.lower() != "stop":
+        red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
 
-        reason = response["choices"][0]["finish_reason"]
-        if reason.lower() != "stop":
-            red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
-
-        # add to db to create LORA fine tunes later
-        if running_tasks["saving_chatgpt"]:
-            running_tasks["saving_chatgpt"][-1].join()
-        while running_tasks["saving_chatgpt"]:
-            running_tasks["saving_chatgpt"].pop()
-        thread = threading.Thread(
-                target=store_to_db,
-                name="saving_chatgpt",
-                kwargs={
-                    "dictionnary": {
-                        "type": "anki_card",
-                        "timestamp": time.time(),
-                        "token_cost": tkn_cost,
-                        "temperature": temperature,
-                        "LLM_context": txt_chatgpt_context,
-                        "V2FT_profile": pv.profile_name,
-                        "transcribed_input": txt_audio,
-                        "model_name": model_to_use,
-                        "last_message_from_conversation": formatted_messages[-1],
-                        "nb_of_message_in_conversation": len(formatted_messages),
-                        "system_prompt": formatted_messages[0],
-                        "cloze": cloz,
-                        "V2FT_version": shared.VERSION,
-                        },
-                    "db_name": "anki_llm"})
-        thread.start()
-        running_tasks["saving_whisper"].append(thread)
-
-        shared.latest_llm_cost = tkn_cost
-        return cloz
-    except Exception as err:
-        shared.latest_llm_cost = [0, 0]
-        raise Exception(red(f"Error with ChatGPT: '{err}'"))
+    # add to db to create LORA fine tunes later
+    if running_tasks["saving_chatgpt"]:
+        running_tasks["saving_chatgpt"][-1].join()
+    while running_tasks["saving_chatgpt"]:
+        running_tasks["saving_chatgpt"].pop()
+    thread = threading.Thread(
+            target=store_to_db,
+            name="saving_chatgpt",
+            kwargs={
+                "dictionnary": {
+                    "type": "anki_card",
+                    "timestamp": time.time(),
+                    "token_cost": tkn_cost,
+                    "temperature": temperature,
+                    "LLM_context": txt_chatgpt_context,
+                    "V2FT_profile": pv.profile_name,
+                    "transcribed_input": txt_audio,
+                    "model_name": model_to_use,
+                    "last_message_from_conversation": formatted_messages[-1],
+                    "nb_of_message_in_conversation": len(formatted_messages),
+                    "system_prompt": formatted_messages[0],
+                    "cloze": cloz,
+                    "V2FT_version": shared.VERSION,
+                    },
+                "db_name": "anki_llm"})
+    thread.start()
+    running_tasks["saving_whisper"].append(thread)
 
 
 @trace
