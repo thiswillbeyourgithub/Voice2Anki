@@ -253,11 +253,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                         [
                             {
                                 "role": "user",
-                                "content": f"Context: '{txt_chatgpt_context}'\nTranscript: '" + message_buffer["question"][-i] + "'"
+                                "content": message_buffer["question"][-i]
                                 },
                             {
                                 "role": "assistant",
-                                "content": message_buffer["answer"][-i].replace("\n", "<br/>")
+                                "content": message_buffer["answer"][-i]
                                 }
                             ]
                         )
@@ -751,8 +751,8 @@ def to_anki(
 
     # add the latest generated cards to the message bugger
     if txt_audio not in message_buffer["question"] and txt_chatgpt_cloz not in message_buffer["answer"]:
-        message_buffer["question"].append(txt_audio)
-        message_buffer["answer"].append(txt_chatgpt_cloz)
+        message_buffer["question"].append(f"Context: '{txt_chatgpt_context}'\nTranscript: '" + txt_audio + "'")
+        message_buffer["answer"].append(txt_chatgpt_cloz).replace("\n", "<br/>")
 
     # cap the number of messages
     message_buffer["question"] = message_buffer["question"][-shared.max_message_buffer:]
