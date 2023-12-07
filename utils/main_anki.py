@@ -300,6 +300,14 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     tkns += len(tokenize(formatted_messages[-1]["content"]))
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
+    # try a better formatting
+    for i, m in enumerate(formatted_messages):
+        if m["role"] == "user":
+            assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
+            m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
+            if m["content"][-1] == "'":
+                m["content"] = m["content"][:-1]
+
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
@@ -315,15 +323,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     # in case recur improv is called
     shared.latest_llm_used = model_to_use
-
-    # try a better formatting
-    for i, m in enumerate(formatted_messages):
-        if m["role"] == "user":
-            assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
-            m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
-            if m["content"][-1] == "'":
-                m["content"] = m["content"][:-1]
-
     # print prompts used for the call:
     n = len(formatted_messages)
     whi("ChatGPT prompt:")
