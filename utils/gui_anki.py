@@ -42,9 +42,6 @@ def roll_audio(*slots):
 
     return slots
 
-def reset_marked():
-    return False
-
 with gr.Blocks(
         analytics_enabled=False,
         title="VoiceToFormattedText - Anki",
@@ -322,7 +319,7 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                ).success(fn=reset_marked, outputs=[check_marked])
+                                ).success(fn=lambda: False, outputs=[check_marked])
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -385,7 +382,7 @@ with gr.Blocks(
                     inputs=[txt_chatgpt_cloz],
                     outputs=[txt_card_done],
                     queue=False,
-                    ).success(fn=reset_marked, outputs=[check_marked])
+                    ).success(fn=lambda: False, outputs=[check_marked])
 
     # 1+2
     semiauto_btn.click(
@@ -422,7 +419,7 @@ with gr.Blocks(
                             inputs=[txt_chatgpt_cloz],
                             outputs=[txt_card_done],
                             queue=False,
-                            ).success(fn=reset_marked, outputs=[check_marked])
+                            ).success(fn=lambda: False, outputs=[check_marked])
 
     # 1+2+3
     auto_btn.click(
@@ -454,7 +451,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).then(fn=reset_marked, outputs=[check_marked])
+                    ).then(fn=lambda: False, outputs=[check_marked])
 
     improve_btn.click(
             fn=recur_improv,
