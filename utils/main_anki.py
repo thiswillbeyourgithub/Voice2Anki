@@ -314,6 +314,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # in case recur improv is called
     shared.latest_llm_used = model_to_use
 
+    # try a better formatting
+    for i, m in enumerate(formatted_messages):
+        if m["role"] != "system":
+            m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").replace("'\n", "\n").strip()[:-1]
+
     # print prompts used for the call:
     n = len(formatted_messages)
     whi("ChatGPT prompt:")
