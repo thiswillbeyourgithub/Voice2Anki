@@ -27,6 +27,8 @@ document.querySelector('body').classList.add('dark');
 }
 }"""
 
+def create_audio_compo():
+    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False})
 
 def roll_audio(*slots):
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
@@ -38,7 +40,7 @@ def roll_audio(*slots):
     slots[0] = None
     while slots[0] is None:
         slots.pop(0)
-        audio_mp3 = gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_download_button=False)
+        audio_mp3 = create_audio_compo()
         slots.append(audio_mp3)
 
     return slots
@@ -66,7 +68,7 @@ with gr.Blocks(
                 audio_number = shared.audio_slot_nb
                 audio_slots = []
                 for i in range(audio_number):
-                    audio_mp3 = gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_download_button=False)
+                    audio_mp3 = create_audio_compo()
                     audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
@@ -101,7 +103,7 @@ with gr.Blocks(
                 with gr.Row():
                     semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
                     auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
-                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False)
+                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True)
 
                 # quick settings
                 with gr.Row():
