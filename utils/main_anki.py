@@ -249,7 +249,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                 break
             ratio = lev.ratio(
                     txt_audio.lower(),
-                    message_buffer["question"][-i].lower(),
+                    message_buffer["question"][-i].lower())
             if ratio < 0.95:
                 buffer_to_add.extend(
                         [
