@@ -27,13 +27,14 @@ document.querySelector('body').classList.add('dark');
 }
 }"""
 
+
 def roll_audio(*slots):
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
     slots = list(slots)
     if all((slot is None for slot in slots)):
-           return slots
+        return slots
     if all((slot is None for slot in slots[1:])):
-           return slots
+        return slots
     slots[0] = None
     while slots[0] is None:
         slots.pop(0)
@@ -41,6 +42,7 @@ def roll_audio(*slots):
         slots.append(audio_mp3)
 
     return slots
+
 
 with gr.Blocks(
         analytics_enabled=False,
