@@ -343,9 +343,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         timesorted_pr[i]["pick_score"] = score
         assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
 
-    # check values of the pick score
-    for pr in timesorted_pr:
-        score = pr["pick_score"]
 
     # add by decreasing pick score
     picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
