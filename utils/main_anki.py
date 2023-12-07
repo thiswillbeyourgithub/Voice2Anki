@@ -403,7 +403,7 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
     """
     if not hasattr(shared, "prog_total"):
         shared.prog_total = len(list(Path("user_directory/splitted").rglob("*mp3")))
-    pbar = prog.tqdm([True] * shared.prog_total, decs="MP3s")
+    pbar = prog.tqdm([True] * shared.prog_total, desc="MP3s")
 
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
