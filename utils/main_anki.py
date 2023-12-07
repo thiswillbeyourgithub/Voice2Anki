@@ -513,29 +513,66 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
             sld_whisp_temp=0,
             )
 
+    sys_prompt = dedent("""
+    You receive an anki flashcard created from an audio transcript. Your answer must be the same flashcard after applying modifications mentionned in the instructions.
+    Don't answer anything else.
+    Don't acknowledge those instructions.
+    Don't use symbols to wrap your answer, just answer the modified flashcard.
+    Always answer the full flashcard, never answer only the question or answer or something that is not a complete flashcard.
+    If there are several flashcard in the same message, they will be separated by '#####'.
+    """)
+    prompt_example = dedent("""
+    Context:
+    '''
+    Dictée vocale de cours sur la maladie de Parkinson
+    '''
+    Original audio transcript:
+    '''
+    Les traitements dans la maladie de Parkinson survenant après 65-70 ans est du L-Dopa avec inhibiteur de la dopa des carboxylases, éventuellement associé à un IMAOP, et prescription de Domperidone.
+    '''
+    Flashcard you have to modify:
+    '''
+    Quels sont les traitements recommandés dans la maladie de Parkinson survenant après 65-70 ans ?<br/>{{c1::L-Dopa avec inhibiteur de la dopa des carboxylases, éventuellement associé à un IMAO-B, et prescription de Domperidone}}.
+    '''
+    Instructions:
+    '''
+    Commence la réponse par la question.
+    '''
+    """)
+    answer_example = dedent("""
+    Quels sont les traitements recommandés dans la maladie de Parkinson survenant après 65-70 ans ?<br/>{{c1::Les traitements recommandés dans la maladie de Parkinson survenant après 65-70 and sont le L-Dopa avec inhibiteur de la dopa des carboxylases, éventuellement associé à un IMAO-B, et prescription de Domperidone}}.
+    """)
+    cloze = txt_chatgpt_cloz.replace("\n", "<br/>")
     prompt = dedent(f"""
-
-    Context of the session: '{txt_chatgpt_context}'
-    Audio transcript used to create the flashcard:
+    Context:
+    '''
+    {txt_chatgpt_context}
+    '''
+    Original audio transcript:
     '''
     {txt_audio}
     '''
-
     Flashcard you have to modify:
     '''
-    {txt_chatgpt_cloz}
+    {cloze}
     '''
-    Please modify the flashcard following those instructions: '{instructions}'
-    """.strip())
+    Instructions:
+    '''
+    {instructions}
+    '''
+    """)
     messages = [
             {
                 "role": "system",
-                "content": dedent("""You receive an anki flashcard created from an audio transcript. Your answer must be the same flashcard after applying modifications mentionned in the instructions.
-                Don't answer anything else.
-                Don't acknowledge those instructions.
-                Don't use symbols to wrap your answer, just answer the modified flashcard.
-                Always answer the full flashcard, never answer only the question or answer or something that is not a complete flashcard.
-                """.strip())
+                "content": sys_prompt,
+                },
+            {
+                "role": "user",
+                "content": prompt_example,
+                },
+            {
+                "role": "assistant",
+                "content": answer_example,
                 },
             {
                 "role": "user",
