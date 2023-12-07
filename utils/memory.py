@@ -338,11 +338,14 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             shared.pv["sld_prio_weight"],
             shared.pv["sld_keywords_weight"],
             ]
+    pm_contents = [pr["content"] for pr in prompt_messages]
     for i, pr in enumerate(timesorted_pr):
         score = (pr[score_key] * w[0] + pr["priority_score"] * w[1] + pr["kw_score"] * w[2]) / sum(w)
         timesorted_pr[i]["pick_score"] = score
         assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
-
+        if pr["content"] in pm_contents:
+            timesorted_pr[i] = None
+    timesorted_pr = [pr for pr in timesorted_pr if pr]
 
     # add by decreasing pick score
     picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
