@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import gradio as gr
 import re
 import uuid
@@ -395,11 +396,15 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 
 @trace
-def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios):
+def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios, prog=gr.Progress()):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
+    if not hasattr(shared, "prog_total"):
+        shared.prog_total = len(list(Path("user_directory/splitted").rglob("*mp3")))
+    pbar = prog.tqdm([True] * shared.prog_total, decs="MP3s")
+
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
         return audios
@@ -442,6 +447,7 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
     sounds_to_load = []
     new_threads = []
     for path in shared.dirload_queue[:empty_slots]:
+        pbar.update(1)
         to_temp = tmp_dir / path.name
         shutil.copy2(path, to_temp)
         assert (path.exists() and (to_temp).exists()), "unexpected sound location"
@@ -474,6 +480,7 @@ def dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp,
         shutil.move(p, done_dir / p.name)
 
     assert len(output) == shared.audio_slot_nb, "Invalid number of audio slots in output"
+
     return output
 
 @trace
