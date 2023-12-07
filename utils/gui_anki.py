@@ -101,7 +101,7 @@ with gr.Blocks(
                 with gr.Row():
                     semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="primary")
                     auto_btn = gr.Button(value="1+2+3. Autopilot", variant="primary")
-                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit", show_share_button=False, type="filepath", show_download_button=False, min_length=1)
+                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2)
 
                 # quick settings
                 with gr.Row():
@@ -237,7 +237,7 @@ with gr.Blocks(
     # audio
     audio_corrector.stop_recording(
             fn=audio_edit,
-            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context, check_gpt4],
+            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
             outputs=[txt_chatgpt_cloz, audio_corrector],
             )
 

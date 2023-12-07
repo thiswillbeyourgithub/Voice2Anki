@@ -496,7 +496,7 @@ def dirload_splitted_last(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_
     return dirload_splitted(checkbox, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp, *audios)[-1]
 
 @trace
-def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context, check_gpt4):
+def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
     """function called by a microphone. It will use whisper to transcribe
     your voice. Then use the instructions in your voice to modify the
     output from chatgpt."""
@@ -538,13 +538,11 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
                 }
             ]
 
-    if not check_gpt4:
-        model_to_use = "gpt-3.5-turbo-1106"
-        model_price = (0.001, 0.002)
-    else:
-        model_to_use = "gpt-4-1106-preview"
-        model_price = (0.01, 0.03)
-    whi(f"Will use model {model_to_use}")
+    # model_to_use = "gpt-3.5-turbo-1106"
+    # model_price = (0.001, 0.002)
+    model_to_use = "gpt-4-1106-preview"
+    model_price = (0.01, 0.03)
+    # whi(f"Will use model {model_to_use}")
 
     whi("Editing via ChatGPT:")
     whi(prompt)
