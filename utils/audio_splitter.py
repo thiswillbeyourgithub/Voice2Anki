@@ -123,7 +123,7 @@ class AudioSplitter:
         for ii, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
-                transcript = self.run_whisperx(file, "large-v2")
+                transcript = self.run_whisperx(file, "medium")
                 times_to_keep, text_segments = self.split_one_transcript(transcript)
             elif self.stop_source == "local_json":
                 raise NotImplementedError
@@ -139,24 +139,23 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(file)
 
-            whi("\nChecking if some splits are too long")
+            whi("\nDouble checking all audios")
             alterations = {}
-            spf = 0.7  # speed factor
+            spf = 1.0  # speed factor
             n = len(times_to_keep)
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
-                if dur > 45:
-                    red(f"Split #{i}/{n} has too long duration: {dur}s.")
-                    red(f"Text content: {text_segments[i]}\n")
+                red(f"Text content: {text_segments[i]}\n")
 
-                    # take the suspicious segment, slow it down and
-                    # re analyse it
-                    sub_audio = audio[t0 * 1000:t1 * 1000]
-                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
+                # take the suspicious segment, slow it down and
+                # re analyse it
+                sub_audio = audio[t0 * 1000:t1 * 1000]
+                tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
 
-                    # sf and pyrb way:
-                    # we need to use sf and pyrb because
-                    # pydub is buggingly slow to change the speedup
+                # sf and pyrb way:
+                # we need to use sf and pyrb because
+                # pydub is buggingly slow to change the speedup
+                if spf != 1.0:
                     whi(f"Saving segment to {tempf.name} as wav")
                     sub_audio.export(tempf.name, format="wav")
                     whi("Stretching time")
@@ -165,23 +164,23 @@ class AudioSplitter:
                     whi("Saving as wav")
                     sf.write(tempf.name, y2, sr, format='wav')
                     sub_audio = AudioSegment.from_wav(tempf.name)
-                    whi("Resaving as mp3")
-                    sub_audio.export(tempf.name, format="mp3")
+                whi("Resaving as mp3")
+                sub_audio.export(tempf.name, format="mp3")
 
-                    # # pydub way:
-                    # whi(f"Saving segment to {tempf.name} as mp3")
-                    # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
-                    # whi("Saved")
+                # # pydub way:
+                # whi(f"Saving segment to {tempf.name} as mp3")
+                # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
+                # whi("Saved")
 
-                    transcript = self.run_whisperx(tempf.name, "large-v2")
-                    sub_ttk, sub_ts = self.split_one_transcript(transcript)
-                    new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
-                    alterations[i] = [new_times, sub_ts]
-                    assert new_times[-1][-1] <= t1, "unexpected split timeline"
-                    # Path(tempf.name).unlink()
+                transcript = self.run_whisperx(tempf.name, "large-v2")
+                sub_ttk, sub_ts = self.split_one_transcript(transcript)
+                new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
+                alterations[i] = [new_times, sub_ts]
+                assert new_times[-1][-1] <= t1, "unexpected split timeline"
+                Path(tempf.name).unlink()
 
-            red(f"Found {len(alterations)} segments that needed slower analysis")
-            for i, vals in tqdm(alterations.items(), desc="Fixing previously long split"):
+            red("Resplitting after second run")
+            for i, vals in tqdm(alterations.items(), desc="Resplitting"):
                 new_times = vals[0]
                 sub_ts = vals[1]
 
@@ -199,8 +198,8 @@ class AudioSplitter:
                 assert abs(old_vals[0] - new_times[0][0]) <= 0.1, "start time are different!"
 
                 if len(new_times) == 1:
-                    whi(f"The slowed down split #{i} is not split "
-                        "differently than the original so keeping the "
+                    whi(f"The split #{i} is not split "
+                        "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times}")
                     assert abs(1 - old_vals[1] / new_times[0][1]) <= 0.05, "end times are different!"
                 else:
@@ -209,13 +208,14 @@ class AudioSplitter:
                     times_to_keep[j:j+1] = new_times
                     text_segments[j:j+1] = sub_ts
                     assert old_len + len(new_times) - 1 == len(times_to_keep), (
-                        "Unexpected new length when altering audio")
+                        "Unexpected new length when resplitting audio")
                     assert len(times_to_keep) == len(text_segments), "unexpected length"
 
+            # check values
             prev_t0 = -1
             prev_t1 = -1
             n = len(times_to_keep)
-            whi("\nChecking if some splits are still too long")
+            whi("\nChecking if some splits are too long")
             for i, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
