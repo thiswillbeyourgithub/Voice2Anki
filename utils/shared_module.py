@@ -54,5 +54,7 @@ class SharedModule:
 
     audio_slot_nb = 5
 
+    llm_cache = {}
+
 
 shared = SharedModule()

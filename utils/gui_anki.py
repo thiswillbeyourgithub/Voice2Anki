@@ -272,7 +272,20 @@ with gr.Blocks(
                         queue=True,
                         ).then(
                                 fn=dirload_splitted_last,
-                                inputs=[roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                                inputs=[
+                                    roll_dirload_check,
+                                    txt_whisp_prompt,
+                                    txt_whisp_lang,
+                                    sld_whisp_temp,
+
+                                    txt_chatgpt_context,
+                                    txt_profile,
+                                    sld_max_tkn,
+                                    sld_temp,
+                                    sld_buffer,
+                                    check_gpt4,
+                                    txt_keywords,
+                                    ],
                                 outputs=[audio_slots[-1]],
                                 preprocess=False,
                                 # postprocess=False,
@@ -317,7 +330,18 @@ with gr.Blocks(
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
-                                    roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp
+                                    roll_dirload_check,
+                                    txt_whisp_prompt,
+                                    txt_whisp_lang,
+                                    sld_whisp_temp,
+
+                                    txt_chatgpt_context,
+                                    txt_profile,
+                                    sld_max_tkn,
+                                    sld_temp,
+                                    sld_buffer,
+                                    check_gpt4,
+                                    txt_keywords,
                                     ],
                                 outputs=[audio_slots[-1]],
                                 preprocess=False,
@@ -330,7 +354,20 @@ with gr.Blocks(
     # on another distance device
     dir_load_btn.click(
             fn=dirload_splitted,
-            inputs=[roll_dirload_check, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp] + audio_slots,
+            inputs=[
+                roll_dirload_check,
+                txt_whisp_prompt,
+                txt_whisp_lang,
+                sld_whisp_temp,
+
+                txt_chatgpt_context,
+                txt_profile,
+                sld_max_tkn,
+                sld_temp,
+                sld_buffer,
+                check_gpt4,
+                txt_keywords,
+                ] + audio_slots,
             outputs=audio_slots,
             queue=True,
             ).success(
