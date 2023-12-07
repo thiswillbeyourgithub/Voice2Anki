@@ -318,8 +318,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     # try a better formatting
     for i, m in enumerate(formatted_messages):
-        if m["role"] != "system":
-            m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").replace("'\n", "\n").strip()[:-1]
+        if m["role"] == "user":
+            assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
+            m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
+            if m["content"][-1] == "'":
+                m["content"] = m["content"][:-1]
 
     # print prompts used for the call:
     n = len(formatted_messages)
