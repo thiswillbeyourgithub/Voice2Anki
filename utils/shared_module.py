@@ -56,5 +56,7 @@ class SharedModule:
 
     llm_cache = {}
 
+    llm_to_db_buffer = {}
+
 
 shared = SharedModule()

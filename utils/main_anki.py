@@ -480,33 +480,26 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if reason.lower() != "stop":
         red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
 
-    # add to db to create LORA fine tunes later
-    if running_tasks["saving_chatgpt"]:
-        [t.join() for t in running_tasks["saving_chatgpt"]]
-    while running_tasks["saving_chatgpt"]:
-        running_tasks["saving_chatgpt"].pop()
-    thread = threading.Thread(
-            target=store_to_db,
-            name="saving_chatgpt",
-            kwargs={
-                "dictionnary": {
-                    "type": "anki_card",
-                    "timestamp": time.time(),
-                    "token_cost": tkn_cost,
-                    "temperature": temperature,
-                    "LLM_context": txt_chatgpt_context,
-                    "V2FT_profile": pv.profile_name,
-                    "transcribed_input": txt_audio,
-                    "model_name": model_to_use,
-                    "last_message_from_conversation": formatted_messages[-1],
-                    "nb_of_message_in_conversation": len(formatted_messages),
-                    "system_prompt": formatted_messages[0],
-                    "cloze": cloz,
-                    "V2FT_version": shared.VERSION,
-                    },
-                "db_name": "anki_llm"})
-    thread.start()
-    running_tasks["saving_whisper"].append(thread)
+    # add to the shared module the infonrmation of this card creation.
+    # if a card is created then this will be added to the db to
+    # create LORA fine tunes later on.
+    shared.llm_to_db_buffer[cloz] = json.dumps(
+            {
+                "type": "anki_card",
+                "timestamp": time.time(),
+                "token_cost": tkn_cost,
+                "temperature": temperature,
+                "LLM_context": txt_chatgpt_context,
+                "V2FT_profile": pv.profile_name,
+                "transcribed_input": txt_audio,
+                "model_name": model_to_use,
+                "last_message_from_conversation": formatted_messages[-1],
+                "nb_of_message_in_conversation": len(formatted_messages),
+                "system_prompt": formatted_messages[0],
+                "cloze": cloz,
+                "V2FT_version": shared.VERSION,
+                })
+
     shared.latest_llm_cost = tkn_cost
     return cloz
 
@@ -972,6 +965,22 @@ def to_anki(
     # cap the number of messages
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
     pv["message_buffer"] = shared.message_buffer
+
+    # if anki card created, add to db
+    if txt_chatgpt_cloz in shared.llm_to_db_buffer:
+        if running_tasks["saving_chatgpt"]:
+            [t.join() for t in running_tasks["saving_chatgpt"]]
+        while running_tasks["saving_chatgpt"]:
+            running_tasks["saving_chatgpt"].pop()
+        thread = threading.Thread(
+                target=store_to_db,
+                name="saving_chatgpt",
+                kwargs={
+                    "dictionnary": json.loads(shared.llm_to_db_buffer[txt_chatgpt_cloz]),
+                    "db_name": "anki_llm"})
+        thread.start()
+        running_tasks["saving_whisper"].append(thread)
+        del shared.llm_to_db_buffer[txt_chatgpt_cloz]
 
     gather_threads(threads)
     return
