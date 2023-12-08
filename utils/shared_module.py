@@ -55,6 +55,7 @@ class SharedModule:
     audio_slot_nb = 5
 
     llm_to_db_buffer = {}
+    latest_stt_used = None
 
 
 shared = SharedModule()
