@@ -80,6 +80,7 @@ with gr.Blocks(
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
 
             with gr.Column(scale=5):
 
@@ -209,6 +210,7 @@ with gr.Blocks(
     sld_pick_weight.change(fn=shared.pv.save_sld_pick_weight, inputs=[sld_pick_weight])
     sld_prio_weight.change(fn=shared.pv.save_sld_prio_weight, inputs=[sld_prio_weight])
     sld_keywords_weight.change(fn=shared.pv.save_sld_keywords_weight, inputs=[sld_keywords_weight])
+    txt_extra_source.change(fn=shared.pv.save_txt_extra_source, inputs=[txt_extra_source])
 
     # change profile and load previous data
     txt_profile.submit(
@@ -323,6 +325,7 @@ with gr.Blocks(
                                 txt_tags,
                                 gallery,
                                 check_marked,
+                                txt_extra_source,
                                 ],
                             preprocess=False,
                             postprocess=False,
@@ -414,6 +417,7 @@ with gr.Blocks(
                 txt_tags,
                 gallery,
                 check_marked,
+                txt_extra_source,
                 ],
             preprocess=False,
             postprocess=False,
@@ -451,6 +455,7 @@ with gr.Blocks(
                         txt_tags,
                         gallery,
                         check_marked,
+                        txt_extra_source,
                         ],
                     preprocess=False,
                     postprocess=False,
@@ -488,6 +493,7 @@ with gr.Blocks(
                         txt_tags,
                         gallery,
                         check_marked,
+                        txt_extra_source,
                         ],
                     preprocess=False,
                     postprocess=False,

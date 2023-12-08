@@ -24,6 +24,7 @@ approved_keys_all = [
         "sld_prio_weight",
         "sld_keywords_weight",
         "sld_pick_weight",
+        "txt_extra_source",
         ]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
@@ -148,6 +149,8 @@ class ValueStorage:
                 default = 1
             elif key == "sld_keywords_weight":
                 default = 5
+            elif key == "txt_extra_source":
+                default = None
             else:
                 default = None
             self.cache_values[key] = default
