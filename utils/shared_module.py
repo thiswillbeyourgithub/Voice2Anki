@@ -54,8 +54,6 @@ class SharedModule:
 
     audio_slot_nb = 5
 
-    llm_cache = {}
-
     llm_to_db_buffer = {}
 
 
