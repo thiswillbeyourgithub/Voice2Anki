@@ -624,6 +624,27 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     answer_example = dedent("""
     Quels sont les traitements recommandés dans la maladie de Parkinson survenant après 65-70 ans ?<br/>{{c1::Les traitements recommandés dans la maladie de Parkinson survenant après 65-70 and sont le L-Dopa avec inhibiteur de la dopa des carboxylases, éventuellement associé à un IMAO-B, et prescription de Domperidone}}.
     """)
+    prompt_example2 = dedent("""
+    Context:
+    '''
+    Dictée vocale de cours sur la sclérose en plaque
+    '''
+    Original audio transcript:
+    '''
+    Le nom des critères diagnostiques de la dissémination spatiale et temporelle dans la sclérose en plaque est les critères de McDonald 2017.
+    '''
+    Flashcard you have to modify:
+    '''
+    Quel est le nom des critères diagnostiques de la dissémination spatiale et temporelle dans la sclérose en plaque ?<br/>{{c1::Les critères de McDonald 2017.}}
+    '''
+    Instructions:
+    '''
+    Réformule la réponse pour qu'elle commence comme la question, c'est plus naturel.
+    '''
+    """)
+    answer_example2 = dedent("""
+    Quel est le nom des critères diagnostiques de la dissémination spatiale et temporelle dans la sclérose en plaque ?<br/>{{c1::Le nom des critères diagnostiques de la dissémination spatiale et temporelle dans la sclérose en plaque est les critères de McDonald 2017.}}
+    """)
     cloze = txt_chatgpt_cloz.replace("\n", "<br/>")
     prompt = dedent(f"""
     Context:
@@ -655,6 +676,14 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
             {
                 "role": "assistant",
                 "content": answer_example,
+                },
+            {
+                "role": "user",
+                "content": prompt_example2,
+                },
+            {
+                "role": "assistant",
+                "content": answer_example2,
                 },
             {
                 "role": "user",
