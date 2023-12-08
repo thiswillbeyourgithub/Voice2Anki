@@ -333,9 +333,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
         raise Exception(red("No txt_chatgpt_context found."))
-    if not cache_mode and (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
-        gr.Error(red(f"Image change detected: '{txt_audio}'"))
-        return
+    if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
+        if cache_mode:
+            red(f"Image change detected: '{txt_audio}'")
+            return
+        else:
+            gr.Error(red(f"Image change detected: '{txt_audio}'"))
+            return
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
