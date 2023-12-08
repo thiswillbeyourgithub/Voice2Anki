@@ -143,7 +143,7 @@ def transcribe_cache(
     _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
 
 @trace
-def transcribe_cache_async(
+def thread_whisp_then_llm(
         audio_mp3,
         txt_whisp_prompt,
         txt_whisp_lang,
@@ -530,7 +530,7 @@ def dirload_splitted(
         shared.dirload_doing.append(path)
         if txt_whisp_prompt and txt_whisp_lang:
             new_threads.append(
-                    transcribe_cache_async(
+                    thread_whisp_then_llm(
                         to_temp,
                         txt_whisp_prompt,
                         txt_whisp_lang,
