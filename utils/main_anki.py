@@ -98,7 +98,7 @@ def whisper_cached(
         raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
 
 @trace
-def transcribe_cache(
+def thread_whisp_then_llm(
         audio_mp3,
         txt_whisp_prompt,
         txt_whisp_lang,
@@ -126,7 +126,8 @@ def transcribe_cache(
     whi("Transcribing audio for the cache")
     modelname = "whisper-1"
     audio_mp3 = format_audio_component(audio_mp3)
-    shared.latest_stt_used = modelname
+    if shared.latest_stt_used != modelname:
+        shared.latest_stt_used = modelname
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -141,41 +142,6 @@ def transcribe_cache(
             )
     txt_audio = transcript["text"]
     _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
-
-@trace
-def thread_whisp_then_llm(
-        audio_mp3,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-        sld_whisp_temp,
-
-        txt_chatgpt_context,
-        txt_profile,
-        max_token,
-        temperature,
-        sld_buffer,
-        check_gpt4,
-        txt_keywords,
-        ):
-    thread = threading.Thread(
-            target=transcribe_cache,
-            args=(
-                audio_mp3,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-                sld_whisp_temp,
-                txt_chatgpt_context,
-                txt_profile,
-                max_token,
-                temperature,
-                sld_buffer,
-                check_gpt4,
-                txt_keywords,
-                )
-            )
-    thread.start()
-    return thread
-
 
 @trace
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
@@ -252,6 +218,8 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     if cache_mode:
         whi = lambda x: None
         yel = lambda x: None
+    else:
+        from .logger import whi, yel
 
     if "," in txt_keywords:
         keywords = [re.compile(kw.strip(), flags=re.DOTALL|re.MULTILINE|re.IGNORECASE) for kw in txt_keywords.split(",")]
@@ -529,8 +497,9 @@ def dirload_splitted(
         sounds_to_load.append(to_temp)
         shared.dirload_doing.append(path)
         if txt_whisp_prompt and txt_whisp_lang:
-            new_threads.append(
-                    thread_whisp_then_llm(
+            thread = threading.Thread(
+                target=thread_whisp_then_llm,
+                args=(
                         to_temp,
                         txt_whisp_prompt,
                         txt_whisp_lang,
@@ -543,7 +512,10 @@ def dirload_splitted(
                         sld_buffer,
                         check_gpt4,
                         txt_keywords,
-                        ))
+                        ),
+                )
+            thread.start()
+            new_threads.append(thread)
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     output = audios[:-len(sounds_to_load)] + sounds_to_load
