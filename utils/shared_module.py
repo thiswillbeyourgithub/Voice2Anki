@@ -56,6 +56,7 @@ class SharedModule:
 
     llm_to_db_buffer = {}
     latest_stt_used = None
+    latest_llm_used = None
 
 
 shared = SharedModule()
