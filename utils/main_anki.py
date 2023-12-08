@@ -713,7 +713,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     pv["total_llm_cost"] += tkn_cost_dol
     cloz = response["choices"][0]["message"]["content"]
-    cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+    cloz = cloz.replace("<br/>", "\n").strip()  # for cosmetic purposes in the textbox
 
     yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
     red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
