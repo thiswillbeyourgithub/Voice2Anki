@@ -216,6 +216,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     function to make it callable by the cached function too."""
     # don't print when using cache
     if cache_mode:
+        red(f"Using cache_mode for text {txt_audio}")
         whi = lambda x: None
         yel = lambda x: None
     else:
