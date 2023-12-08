@@ -321,7 +321,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
         for mb in shared.message_buffer[::-1]:
             if len(buffer_to_add) > sld_buffer:
                 break
-            if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
+            if txt_audio in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
                 continue
             buffer_to_add.extend(
                     [
@@ -336,6 +336,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                         ]
                     )
             whi("Added message_buffer to the prompt.")
+        buffer_to_add.reverse()
     else:
         whi("Ignored message buffer")
 
