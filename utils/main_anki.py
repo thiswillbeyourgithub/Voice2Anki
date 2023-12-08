@@ -97,52 +97,6 @@ def whisper_cached(
     except Exception as err:
         raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
 
-@llm_cache.cache
-def llm_cached(txt_audio,
-               txt_chatgpt_context,
-               txt_profile,
-               max_token,
-               temperature,
-               sld_buffer,
-               check_gpt4,
-               txt_keywords,
-        ):
-    """this is a call to chatgpt that is cached. It is called after
-    transcribe_cache to try to speed up batch card creation."""
-    red("Calling LLM because not in cache")
-    try:
-        formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords)
-
-        if not check_gpt4:
-            model_to_use = "gpt-3.5-turbo-1106"
-            model_price = (0.001, 0.002)
-        else:
-            model_to_use = "gpt-4-1106-preview"
-            model_price = (0.01, 0.03)
-        whi(f"Will use model {model_to_use}")
-
-        whi("Asking ChatGPT")
-        response = openai.ChatCompletion.create(
-                model=model_to_use,
-                messages=formatted_messages,
-                stop="END",
-                temperature=temperature,
-                user=user_identifier,
-                )
-
-        input_tkn_cost = response["usage"]["prompt_tokens"]
-        output_tkn_cost = response["usage"]["completion_tokens"]
-        # tkn_cost = [input_tkn_cost, output_tkn_cost]
-
-        tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-        pv["total_llm_cost"] += tkn_cost_dol
-        cloz = response["choices"][0]["message"]["content"]
-        cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
-
-    except Exception as err:
-        raise Exception(red(f"Error when cache calling LLM: '{err}'"))
-
-
 @trace
 def transcribe_cache(
         audio_mp3,
@@ -185,10 +139,11 @@ def transcribe_cache(
             txt_whisp_lang,
             sld_whisp_temp,
             )
-    # llm_output = llm_cached(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords)
-    # cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
-    # with threading.Lock():
-    #     shared.llm_cache[cache_key] = llm_output
+    llm_cached = llm_cache.cache(alfred)
+    llm_output = llm_cached(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
+    with threading.Lock():
+        shared.llm_cache[cache_key] = llm_output
     return None
 
 
@@ -399,7 +354,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
 @trace
 @Timeout(30)
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
         shared.latest_llm_cost = [0, 0]
@@ -410,7 +365,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if not txt_chatgpt_context:
         shared.latest_llm_cost = [0, 0]
         raise Exception(red("No txt_chatgpt_context found."))
-    if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
+    if not cache_mode and (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         shared.latest_llm_cost = [0, 0]
         gr.Error(red(f"Image change detected: '{txt_audio}'"))
         return
@@ -418,6 +373,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # check to see if it was cached
     cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
     if cache_key in shared.llm_cache:
+        assert not cache_mode, "Alfred cache calling itself?"
         red(f"Reusing cache for {cache_key}")
         answer = shared.llm_cache[cache_key]
         del shared.llm_cache[cache_key]
