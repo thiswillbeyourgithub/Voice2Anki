@@ -131,7 +131,7 @@ def transcribe_cache(
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-    txt_audio = whisper_cached(
+    transcript = whisper_cached(
             audio_mp3,
             audio_hash,
             modelname,
@@ -139,8 +139,8 @@ def transcribe_cache(
             txt_whisp_lang,
             sld_whisp_temp,
             )
-    llm_cached = llm_cache.cache(alfred)
-    llm_output = llm_cached(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    txt_audio = transcript["text"]
+    llm_output = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
     cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
     with threading.Lock():
         shared.llm_cache[cache_key] = llm_output
@@ -354,6 +354,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
 @trace
 @Timeout(30)
+@llm_cache.cache
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
     if not txt_audio:
