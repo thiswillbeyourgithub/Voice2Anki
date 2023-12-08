@@ -355,8 +355,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     whi(f"Will use model {model_to_use}")
 
     # in case recur improv is called
-    with threading.Lock():
-        shared.latest_llm_used = model_to_use
+    if model_to_use != shared.latest_llm_used:
+        with threading.Lock():
+            shared.latest_llm_used = model_to_use
 
     cnt = 0
     while True:
@@ -397,25 +398,23 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # add to the shared module the infonrmation of this card creation.
     # if a card is created then this will be added to the db to
     # create LORA fine tunes later on.
-    shared.llm_to_db_buffer[cloz] = json.dumps(
-            {
-                "type": "anki_card",
-                "timestamp": time.time(),
-                "token_cost": tkn_cost,
-                "temperature": temperature,
-                "LLM_context": txt_chatgpt_context,
-                "V2FT_profile": pv.profile_name,
-                "transcribed_input": txt_audio,
-                "model_name": model_to_use,
-                "last_message_from_conversation": formatted_messages[-1],
-                "nb_of_message_in_conversation": len(formatted_messages),
-                "system_prompt": formatted_messages[0],
-                "cloze": cloz,
-                "V2FT_version": shared.VERSION,
-                })
-
     with threading.Lock():
-        shared.latest_llm_cost = tkn_cost
+        shared.llm_to_db_buffer[cloz] = json.dumps(
+                {
+                    "type": "anki_card",
+                    "timestamp": time.time(),
+                    "token_cost": tkn_cost,
+                    "temperature": temperature,
+                    "LLM_context": txt_chatgpt_context,
+                    "V2FT_profile": pv.profile_name,
+                    "transcribed_input": txt_audio,
+                    "model_name": model_to_use,
+                    "last_message_from_conversation": formatted_messages[-1],
+                    "nb_of_message_in_conversation": len(formatted_messages),
+                    "system_prompt": formatted_messages[0],
+                    "cloze": cloz,
+                    "V2FT_version": shared.VERSION,
+                    })
 
     whi(f"ChatGPT cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
     whi(f"ChatGPT answer:\n{cloz}")
