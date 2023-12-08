@@ -44,7 +44,7 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 shared.pv = ValueStorage()
 pv = shared.pv
 
-message_buffer = pv["message_buffer"]
+shared.message_buffer = pv["message_buffer"]
 
 running_tasks = {
         "saving_chatgpt": [],
@@ -315,29 +315,27 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     # the last few transcript/answer pair is always saved in message_buffer
     # even if it will not be saved to memory.
     buffer_to_add = []
-    if sld_buffer and message_buffer["question"]:
-        whi(f"Length of message_buffer: {len(message_buffer['answer'])}")
-        for i in range(0, len(message_buffer["question"]) + 1):
-            if i > sld_buffer:
+    if sld_buffer and shared.message_buffer:
+        whi(f"Length of message_buffer: {len(shared.message_buffer)}")
+
+        for mb in shared.message_buffer[::-1]:
+            if len(buffer_to_add) > sld_buffer:
                 break
-            ratio = lev.ratio(
-                    txt_audio.lower(),
-                    message_buffer["question"][-i].lower())
-            if ratio < 0.95:
-                buffer_to_add.extend(
-                        [
-                            {
-                                "role": "user",
-                                "content": message_buffer["question"][-i]
-                                },
-                            {
-                                "role": "assistant",
-                                "content": message_buffer["answer"][-i]
-                                }
-                            ]
-                        )
-                whi("Added message_buffer to the prompt.")
-        buffer_to_add.reverse()
+            if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
+                continue
+            buffer_to_add.extend(
+                    [
+                        {
+                            "role": "user",
+                            "content": mb["question"],
+                            },
+                        {
+                            "role": "assistant",
+                            "content": mb["answer"],
+                            }
+                        ]
+                    )
+            whi("Added message_buffer to the prompt.")
     else:
         whi("Ignored message buffer")
 
@@ -950,14 +948,19 @@ def to_anki(
     whi("\n\n ------------------------------------- \n\n")
 
     # add the latest generated cards to the message bugger
-    if txt_audio not in message_buffer["question"] and txt_chatgpt_cloz not in message_buffer["answer"]:
-        message_buffer["question"].append(transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio))
-        message_buffer["answer"].append(txt_chatgpt_cloz.replace("\n", "<br/>"))
+    if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and txt_chatgpt_cloz not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
+        shared.message_buffer.append(
+                {
+                    "unformatted_txt_audio": txt_audio,
+                    "unformatted_txt_chatgpt_cloz": txt_chatgpt_cloz,
+                    "question": transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio),
+                    "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
+                    }
+                )
 
     # cap the number of messages
-    message_buffer["question"] = message_buffer["question"][-shared.max_message_buffer:]
-    message_buffer["answer"] = message_buffer["answer"][-shared.max_message_buffer:]
-    pv["message_buffer"] = message_buffer
+    shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
+    pv["message_buffer"] = shared.message_buffer
 
     gather_threads(threads)
     return

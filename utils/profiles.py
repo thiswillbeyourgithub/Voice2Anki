@@ -139,7 +139,7 @@ class ValueStorage:
             elif key == "sld_whisp_temp":
                 default = 0
             elif key == "message_buffer":
-                default = {"question": [], "answer": []}
+                default = []
             elif key == "txt_keywords":
                 default = None
             elif key == "sld_prio_weight":
