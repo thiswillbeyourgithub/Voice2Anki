@@ -482,7 +482,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     # add to db to create LORA fine tunes later
     if running_tasks["saving_chatgpt"]:
-        running_tasks["saving_chatgpt"][-1].join()
+        [t.join() for t in running_tasks["saving_chatgpt"]]
     while running_tasks["saving_chatgpt"]:
         running_tasks["saving_chatgpt"].pop()
     thread = threading.Thread(
