@@ -358,7 +358,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     whi(f"Will use model {model_to_use}")
 
     # in case recur improv is called
-    shared.latest_llm_used = model_to_use
+    with threading.Lock():
+        shared.latest_llm_used = model_to_use
 
     cnt = 0
     while True:
@@ -375,7 +376,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             break
         except RateLimitError as err:
             if cnt >= 5:
-                shared.latest_llm_cost = [0, 0]
+                with threading.Lock():
+                    shared.latest_llm_cost = [0, 0]
                 raise Exception(red("ChatGPT: too many retries."))
             red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
             time.sleep(2 * cnt)
@@ -416,7 +418,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                 "V2FT_version": shared.VERSION,
                 })
 
-    shared.latest_llm_cost = tkn_cost
+    with threading.Lock():
+        shared.latest_llm_cost = tkn_cost
     return cloz
 
 
