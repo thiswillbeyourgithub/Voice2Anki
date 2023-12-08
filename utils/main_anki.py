@@ -328,16 +328,12 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     "send the previous prompt and transcribed speech to the LLM"
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
-        shared.latest_llm_cost = [0, 0]
         raise Exception(red("No transcribed audio found."))
     if txt_audio.strip().startswith("Error"):
-        shared.latest_llm_cost = [0, 0]
         raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
-        shared.latest_llm_cost = [0, 0]
         raise Exception(red("No txt_chatgpt_context found."))
     if not cache_mode and (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
-        shared.latest_llm_cost = [0, 0]
         gr.Error(red(f"Image change detected: '{txt_audio}'"))
         return
 
@@ -377,8 +373,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             break
         except RateLimitError as err:
             if cnt >= 5:
-                with threading.Lock():
-                    shared.latest_llm_cost = [0, 0]
                 raise Exception(red("ChatGPT: too many retries."))
             red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
             time.sleep(2 * cnt)
@@ -389,6 +383,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     pv["total_llm_cost"] += tkn_cost_dol
+
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
 
@@ -421,6 +416,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     with threading.Lock():
         shared.latest_llm_cost = tkn_cost
+
+    whi(f"ChatGPT cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
+    whi(f"ChatGPT answer:\n{cloz}")
+
     return cloz
 
 
@@ -757,13 +756,7 @@ def to_anki(
     if not txt_tags:
         raise Exception(red("missing txt_tags"))
 
-    # check that the tkn_cost is sound
-    if isinstance(shared.latest_llm_cost, str):
-        shared.latest_llm_cost = [int(x) for x in json.loads(shared.latest_llm_cost)]
-    if not shared.latest_llm_cost:
-        red("No token cost found, setting to 0")
-        shared.latest_llm_cost = [0, 0]
-    if txt_chatgpt_cloz.startswith("Error with ChatGPT") or 0 in shared.latest_llm_cost:
+    if txt_chatgpt_cloz.startswith("Error with ChatGPT"):
         raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
     # checks clozes validity
@@ -801,12 +794,6 @@ def to_anki(
     thread.start()
     threads.append(thread)
 
-    tkn_cost_dol = int(shared.latest_llm_cost[0]) / 1000 * 0.003 + int(shared.latest_llm_cost[1]) / 1000 * 0.004
-
-    # add cloze to output
-    whi(f"ChatGPT cost: {shared.latest_llm_cost} (${tkn_cost_dol:.3f}, not counting whisper)")
-    whi(f"ChatGPT answer:\n{txt_chatgpt_cloz}")
-
     # send to anki
     metadata = rtoml.dumps(
             {
@@ -816,8 +803,6 @@ def to_anki(
                 "llm_used": shared.latest_llm_used,
                 "tts_used": shared.latest_stt_used,
                 "version": shared.VERSION,
-                "chatgpt_tkn_cost": shared.latest_llm_cost,
-                "chatgpt_dollars_cost": tkn_cost_dol,
                 "timestamp": time.time(),
                 }, pretty=True)
     results = []
