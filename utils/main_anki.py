@@ -250,9 +250,14 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
         raise Exception(red(f"Error when transcribing audio: '{err}'"))
 
 @trace
-def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords):
+def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode):
     """used to prepare the prompts for alfred call. This is a distinct
     function to make it callable by the cached function too."""
+    # don't print when using cache
+    if cache_mode:
+        whi = lambda x: None
+        yel = lambda x: None
+
     if "," in txt_keywords:
         keywords = [re.compile(kw.strip(), flags=re.DOTALL|re.MULTILINE|re.IGNORECASE) for kw in txt_keywords.split(",")]
         keywords = [kw for kw in keywords if re.search(kw, txt_audio)]
@@ -339,7 +344,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, check_gpt4, txt_keywords)
+        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
 
     assert tkns <= 16000, f"Too many tokens! ({tkns})"
 
@@ -381,7 +386,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         shared.latest_llm_cost = [0, 0]
         return answer
 
-    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords)
+    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
