@@ -1,7 +1,7 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile
-from .main_anki import transcribe, alfred, to_anki, transcribe_cache_async, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit
+from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit
 from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
