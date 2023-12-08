@@ -322,11 +322,10 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
 @trace
 @Timeout(30)
-@llm_cache.cache
+@llm_cache.cache(ignore=["cache_mode"])
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
-    if cache_mode:
-        red(f"Using cache_mode for text {txt_audio}")
+    red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
         shared.latest_llm_cost = [0, 0]
         raise Exception(red("No transcribed audio found."))
