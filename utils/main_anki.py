@@ -368,7 +368,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             formatted_messages.append({
                 "role": "assistant",
                 "content": m["answer"]})
-    for mess in buffer_to_add + new_prompt:
+    for mess in buffer_to_add + [new_prompt]:
         tkns += len(tokenize(mess["content"]))
     formatted_messages.extend(buffer_to_add)
     formatted_messages.append(new_prompt)
