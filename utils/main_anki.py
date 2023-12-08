@@ -140,12 +140,7 @@ def transcribe_cache(
             sld_whisp_temp,
             )
     txt_audio = transcript["text"]
-    llm_output = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
-    cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
-    with threading.Lock():
-        shared.llm_cache[cache_key] = llm_output
-    return None
-
+    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
 
 @trace
 def transcribe_cache_async(
@@ -375,16 +370,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         shared.latest_llm_cost = [0, 0]
         gr.Error(red(f"Image change detected: '{txt_audio}'"))
         return
-
-    # check to see if it was cached
-    cache_key = json.dumps([txt_audio, txt_chatgpt_context, max_token, temperature, sld_buffer, check_gpt4, txt_keywords])
-    if cache_key in shared.llm_cache:
-        assert not cache_mode, "Alfred cache calling itself?"
-        red(f"Reusing cache for {cache_key}")
-        answer = shared.llm_cache[cache_key]
-        del shared.llm_cache[cache_key]
-        shared.latest_llm_cost = [0, 0]
-        return answer
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
