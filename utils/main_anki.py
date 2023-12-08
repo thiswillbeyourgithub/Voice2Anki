@@ -425,6 +425,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         return answer
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords)
+    for i, fm in enumerate(formatted_messages):
+        if i == 0:
+            assert fm["role"] == "system"
+        elif i % 2 == 0:
+            assert fm["role"] == "assistant"
+        elif i % 2 == 1:
+            assert fm["role"] == "user"
 
     if not check_gpt4:
         model_to_use = "gpt-3.5-turbo-1106"
