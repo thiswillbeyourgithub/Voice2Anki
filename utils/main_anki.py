@@ -887,20 +887,20 @@ def to_anki(
     pv["message_buffer"] = shared.message_buffer
 
     # if anki card created, add to db
-    if txt_chatgpt_cloz in shared.llm_to_db_buffer:
-        if running_tasks["saving_chatgpt"]:
-            [t.join() for t in running_tasks["saving_chatgpt"]]
-        while running_tasks["saving_chatgpt"]:
-            running_tasks["saving_chatgpt"].pop()
-        thread = threading.Thread(
-                target=store_to_db,
-                name="saving_chatgpt",
-                kwargs={
-                    "dictionnary": json.loads(shared.llm_to_db_buffer[txt_chatgpt_cloz]),
-                    "db_name": "anki_llm"})
-        thread.start()
-        running_tasks["saving_whisper"].append(thread)
-        del shared.llm_to_db_buffer[txt_chatgpt_cloz]
+    closest_buffer_key = sorted([k for k in shared.llm_to_db_buffer.keys()], key=lambda x: lev.ratio(txt_chatgpt_cloz, x))[-1]
+    if running_tasks["saving_chatgpt"]:
+        [t.join() for t in running_tasks["saving_chatgpt"]]
+    while running_tasks["saving_chatgpt"]:
+        running_tasks["saving_chatgpt"].pop()
+    thread = threading.Thread(
+            target=store_to_db,
+            name="saving_chatgpt",
+            kwargs={
+                "dictionnary": json.loads(shared.llm_to_db_buffer[closest_buffer_key]),
+                "db_name": "anki_llm"})
+    thread.start()
+    running_tasks["saving_whisper"].append(thread)
+    del shared.llm_to_db_buffer[closest_buffer_key]
 
     gather_threads(threads)
     return
