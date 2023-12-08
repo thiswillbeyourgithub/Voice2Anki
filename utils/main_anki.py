@@ -336,7 +336,6 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                         ]
                     )
             whi("Added message_buffer to the prompt.")
-        buffer_to_add.reverse()
     else:
         whi("Ignored message buffer")
 
