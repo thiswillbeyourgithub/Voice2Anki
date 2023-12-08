@@ -55,7 +55,7 @@ def store_to_db(dictionnary, db_name):
                       data TEXT)''')
 
     data = zlib.compress(
-            json.dumps(dictionnary).encode(),
+            json.dumps(dictionnary, ensure_ascii=False).encode(),
             level=9,  # 1: fast but large, 9 slow but small
             )
     cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
@@ -76,7 +76,7 @@ def print_db(db_filename):
     for row in rows:
         dictionary = json.loads(zlib.decompress(row[0]))
         dictionaries.append(dictionary)
-    return json.dumps(dictionaries, indent=4)
+    return json.dumps(dictionaries, ensure_ascii=False, indent=4)
 
 
 def coloured_log(color_asked):
