@@ -133,7 +133,7 @@ class AudioSplitter:
                     compressed_audio.export(file, format="mp3")
 
         # splitting the long audio
-        for iter_file, file in tqdm(enumerate(self.to_split), unit="file"):
+        for iter_file, file in enumerate(tqdm(self.to_split, unit="file")):
             whi(f"Splitting file {file}")
             try:
                 if self.stop_source == "replicate":
@@ -165,7 +165,7 @@ class AudioSplitter:
             alterations = {}
             spf = 1.0  # speed factor
             n = len(times_to_keep)
-            for iter_ttk, (t0, t1) in tqdm(enumerate(times_to_keep), desc="Second pass", unit="mp3"):
+            for iter_ttk, (t0, t1) in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
                 dur = t1 - t0
                 whi(f"Text content before double check: {text_segments[iter_ttk]}\n")
 
