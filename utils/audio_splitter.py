@@ -307,7 +307,8 @@ class AudioSplitter:
             ed = segment["end"]
 
             text = segment["text"]
-            whi(f"Text of segment: {text}")
+            if not second_pass:
+                whi(f"Text of segment: {text}")
 
             # impossibly short token
             if ed - st <= 0.05:
