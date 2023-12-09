@@ -236,8 +236,8 @@ class AudioSplitter:
                 else:
                     whi(f"Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
-                    times_to_keep[j:j+1] = new_times
-                    text_segments[j:j+1] = sub_ts
+                    times_to_keep[i_good_seg:i_good_seg+1] = new_times
+                    text_segments[i_good_seg:i_good_seg+1] = sub_ts
                     assert old_len_ttk + len(new_times) - 1 == len(times_to_keep), (
                         "Unexpected new length when resplitting audio")
                     assert len(times_to_keep) == len(text_segments), "unexpected length"
