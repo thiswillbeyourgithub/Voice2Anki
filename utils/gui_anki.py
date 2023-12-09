@@ -181,10 +181,10 @@ with gr.Blocks(
                             gr.Gallery(
                                 value=next(it),
                                 label=f"Gallery {fg}",
-                                columns=[2],
+                                columns=[3],
                                 rows=[1],
-                                object_fit="cover",
-                                #height="150",
+                                object_fit="scale-down",
+                                height=100,
                                 #min_width=50,
                                 container=True,
                                 show_download_button=False,
