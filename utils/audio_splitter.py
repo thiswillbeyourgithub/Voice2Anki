@@ -317,7 +317,7 @@ class AudioSplitter:
 
             # impossibly short token
             if ed - st <= 0.05:
-                red(f"Too short segment is ignored: {ed-st}s (text was {text})")
+                red(f"Too short segment is ignored: {ed-st}s (text was '{text}')")
                 continue
 
             # low speech probability
