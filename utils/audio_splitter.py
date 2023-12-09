@@ -285,10 +285,16 @@ class AudioSplitter:
         # verbose_json
         text_segments = [""]
         times_to_keep = [[0, duration]]
+        previous_start = -1
+        previous_end = -1
         for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
             st = segment["start"]
             ed = segment["end"]
             text = segment["text"]
+            assert st >= previous_start, "Output from whisperx contains overlapping segments"
+            assert ed >= previous_end, "Output from whisperx contains overlapping segments"
+            previous_start = st
+            previous_end = ed
 
             if not [re.search(stop, text) for stop in self.stop_list]:
                 # not stopping
