@@ -196,14 +196,14 @@ with gr.Blocks(
                     fn=get_image,
                     inputs=[gal_],
                     outputs=[gal_],
-                    queue=True).success(
-                fn=get_img_source,
-                inputs=[gal_],
-                queue=True,
-                ).success(
-                        fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
-                        inputs=[gal_],
-                        )
+                    queue=False).success(
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                            inputs=[gal_],
+                            ).success(
+                                    fn=get_img_source,
+                                    inputs=[gal_],
+                                    queue=True,
+                                    )
             # send image
             send_.click(
                     fn=lambda x: x,
@@ -211,14 +211,14 @@ with gr.Blocks(
                     outputs=[gallery],
                     preprocess=False,
                     postprocess=False,
-                    queue=True).success(
-                fn=get_img_source,
-                inputs=[gallery],
-                queue=True,
-                ).success(
-                        fn=shared.pv.save_gallery,
-                        inputs=[gallery],
-                        )
+                    queue=False).success(
+                            fn=shared.pv.save_gallery,
+                            inputs=[gallery]
+                            ).success(
+                                    fn=get_img_source,
+                                    inputs=[gallery],
+                                    queue=True,
+                                    )
             # reset image
             rst_.click(
                     fn=lambda: None,
@@ -307,12 +307,12 @@ with gr.Blocks(
             inputs=[gallery],
             outputs=[gallery],
             queue=True).success(
-                    fn=get_img_source,
+                    fn=shared.pv.save_gallery,
                     inputs=[gallery],
-                    queue=True,
                     ).success(
-                            fn=shared.pv.save_gallery,
+                            fn=get_img_source,
                             inputs=[gallery],
+                            queue=True,
                             )
     rst_img_btn.click(
             fn=reset_gallery,
