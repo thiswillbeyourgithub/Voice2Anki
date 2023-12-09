@@ -229,14 +229,14 @@ def Timeout(limit):
             # add the thread in the shared module, this way we can empty
             # the list to cut the timeout short
             with threading.Lock():
-                shared.threads.append(thread)
+                shared.running_threads["timeout"].append(thread)
 
             start = time.time()
-            while shared.threads and thread.is_alive():
+            while shared.running_threads["timeout"] and thread.is_alive():
                 time.sleep(0.1)
                 if time.time() - start > limit:
                     raise Exception(f"Reached timeout for {func} after {limit}s")
-            if not shared.threads:
+            if not shared.running_threads["timeout"]:
                 raise Exception(f"Thread of func {func} was killed")
 
             if not result:  # meaning an exception occured in the function
