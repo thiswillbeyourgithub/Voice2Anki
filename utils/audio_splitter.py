@@ -148,15 +148,14 @@ class AudioSplitter:
                 red(f"Error when transcribing: '{err}'")
                 continue
 
-
-            fileo = self.to_split_original[iter_file]
+            audio = AudioSegment.from_mp3(file)
+            fileo = self.to_split_original[iter_file]  # original file
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {fileo} as there is no cutting to do")
                 shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
                 continue
 
-            audio = AudioSegment.from_mp3(file)
 
             whi("\nSecond pass")
             alterations = {}
