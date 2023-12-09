@@ -170,13 +170,13 @@ class AudioSplitter:
                 if spf != 1.0:
                     whi(f"Saving segment to {tempf.name} as wav")
                     sub_audio.export(tempf.name, format="wav")
-                    whi("Stretching time")
+                    # Stretching time
                     y, sr = sf.read(tempf.name)
                     y2 = pyrb.time_stretch(y, sr, spf)
-                    whi("Saving as wav")
+                    # Saving as wav
                     sf.write(tempf.name, y2, sr, format='wav')
                     sub_audio = AudioSegment.from_wav(tempf.name)
-                whi("Resaving as mp3")
+                # Resaving as mp3
                 sub_audio.export(tempf.name, format="mp3")
 
                 # # pydub way:
