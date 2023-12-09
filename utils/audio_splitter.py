@@ -120,7 +120,7 @@ class AudioSplitter:
             self.spf = 1
 
         # splitting the long audio
-        for ii, file in tqdm(enumerate(self.to_split), unit="file"):
+        for iter_file, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
             try:
                 if self.stop_source == "replicate":
@@ -135,7 +135,7 @@ class AudioSplitter:
                 continue
 
 
-            fileo = self.to_split_original[ii]
+            fileo = self.to_split_original[iter_file]
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {fileo} as there is no cutting to do")
@@ -148,9 +148,9 @@ class AudioSplitter:
             alterations = {}
             spf = 1.0  # speed factor
             n = len(times_to_keep)
-            for i, (t0, t1) in enumerate(times_to_keep):
+            for iter_ttk, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
-                red(f"Text content: {text_segments[i]}\n")
+                red(f"Text content: {text_segments[iter_ttk]}\n")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
@@ -180,12 +180,12 @@ class AudioSplitter:
                 transcript = self.run_whisperx(tempf.name, "large-v2")
                 sub_ttk, sub_ts = self.split_one_transcript(transcript)
                 new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
-                alterations[i] = [new_times, sub_ts]
+                alterations[iter_ttk] = [new_times, sub_ts]
                 assert new_times[-1][-1] <= t1, "unexpected split timeline"
                 Path(tempf.name).unlink()
 
             red("Resplitting after second run")
-            for i, vals in tqdm(alterations.items(), desc="Resplitting"):
+            for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
                 new_times = vals[0]
                 sub_ts = vals[1]
 
@@ -203,12 +203,12 @@ class AudioSplitter:
                 assert abs(old_vals[0] - new_times[0][0]) <= 0.1, "start time are different!"
 
                 if len(new_times) == 1:
-                    whi(f"The split #{i} is not split "
+                    whi(f"The split #{iter_alt} is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times}")
                     assert abs(1 - old_vals[1] / new_times[0][1]) <= 0.05, "end times are different!"
                 else:
-                    whi(f"Found {len(new_times)} new splits inside split #{i}/{n}")
+                    whi(f"Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
                     times_to_keep[j:j+1] = new_times
                     text_segments[j:j+1] = sub_ts
@@ -221,20 +221,20 @@ class AudioSplitter:
             prev_t1 = -1
             n = len(times_to_keep)
             whi("\nChecking if some splits are too long")
-            for i, (t0, t1) in enumerate(times_to_keep):
+            for iter_ttk, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
-                    red(f"Split #{i}/{n} has too long duration even after correction! {dur}s.")
-                    red(f"Text content: {text_segments[i]}\n")
+                    red(f"Split #{iter_ttk}/{n} has too long duration even after correction! {dur}s.")
+                    red(f"Text content: {text_segments[iter_ttk]}\n")
                 prev_t0 = t0
                 prev_t1 = t1
 
             audio_o = AudioSegment.from_mp3(fileo)
             assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.01
-            for i, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
+            for iter_ttk, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
-                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{i+1:03d}.mp3"
+                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
