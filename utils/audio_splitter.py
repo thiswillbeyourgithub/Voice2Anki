@@ -197,7 +197,7 @@ class AudioSplitter:
                 transcript = self.run_whisperx(tempf.name, "large-v2")
                 sub_ttk, sub_ts = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_ts:
-                    red(f"Audio between {t0} and {t1} seems empty after second pass. Keeping results from the first pass")
+                    red(f"Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
                     continue
                 new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
                 alterations[iter_ttk] = [new_times, sub_ts]
