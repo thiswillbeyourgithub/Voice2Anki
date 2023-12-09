@@ -16,7 +16,7 @@ from pathlib import Path
 import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
-from pydub.effects import compress
+from pydub.effects import compress_dynamic_range
 
 from logger import whi, yel, red
 from shared_module import shared
