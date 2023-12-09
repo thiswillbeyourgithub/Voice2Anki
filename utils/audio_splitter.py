@@ -356,17 +356,20 @@ class AudioSplitter:
         text_segments = [t for t in text_segments if t is not None]
         times_to_keep = [t for t in times_to_keep if t is not None]
         n = len(text_segments)
-        whi(f"Kept {n} splits when removing <1s")
+        if not second_pass:
+            whi(f"Kept {n} splits when removing those <{time_limit}s")
 
-        # # remove almost no words
-        # for i, te in enumerate(text_segments):
-        #     if len(te.split(" ")) <= 4 and "alfred" not in te.lower() and "image" not in te.lower():
-        #         text_segments[i] = None
-        #         times_to_keep[i] = None
-        # text_segments = [t for t in text_segments if t is not None]
-        # times_to_keep = [t for t in times_to_keep if t is not None]
-        # n = len(text_segments)
-        # whi(f"Kept {n} splits with > 4 words")
+        # remove almost no words if large model was used
+        if second_pass:
+            word_limit = 3
+            for i, te in enumerate(text_segments):
+                if len(te.split(" ")) <= word_limit:
+                    text_segments[i] = None
+                    times_to_keep[i] = None
+            text_segments = [t for t in text_segments if t is not None]
+            times_to_keep = [t for t in times_to_keep if t is not None]
+            whi(f"Removed {len(text_segments)-n} splits with less than {word_limit} words")
+            n = len(text_segments)
 
         text_segments = [t.strip() for t in text_segments]
 
