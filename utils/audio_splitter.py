@@ -290,8 +290,8 @@ class AudioSplitter:
         for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
             st = segment["start"]
             ed = segment["end"]
+
             text = segment["text"]
-            nsprob = segment["no_speech_prob"]
             whi(f"Text of segment: {text}")
 
             # impossibly short token
@@ -299,6 +299,8 @@ class AudioSplitter:
                 red(f"Too short token is ignored: {ed-st}s")
                 continue
 
+            # low speech probability
+            nsprob = segment["no_speech_prob"]
             if nsprob <= 0.5:
                 red(f"Speech probability is {nsprob}%<50% so ignored.")
                 continue
