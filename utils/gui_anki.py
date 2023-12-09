@@ -230,6 +230,12 @@ with gr.Blocks(
                         )
             future_galleries.append([rst_, gal_, send_, add_])
 
+        clear_btn = gr.ClearButton(
+                components=[elem[1] for elem in future_galleries],
+                value="Clear all",
+                variant="primary",
+                )
+
     # events
     tab_memories.select(
             fn=show_memories,
