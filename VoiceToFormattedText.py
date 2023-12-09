@@ -41,11 +41,11 @@ def start_voice2formattedtext(
     debug: bool, default False
         increase verbosity
     do_auth: bool, default False
-        if True, will use the login/password pairs specified in __init__.py
+        if True, will use the login/password pairs specified in VoiceToFormattedText.py
     localnetworkonly: bool, default False
         restrict access to the local network only
     use_ssl: bool, default True
-        if True, will use the ssl configuration specified in __init__.py
+        if True, will use the ssl configuration specified in VoiceToFormattedText.py
     media_folder: str, default None
         optional anki media database location
     memory_metric: str, default "embeddings"
