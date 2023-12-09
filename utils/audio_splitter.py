@@ -256,7 +256,13 @@ class AudioSplitter:
                 prev_t0 = t0
                 prev_t1 = t1
 
-            assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.01
+            assert times_to_keep[-1][1] * 1000 * self.spf <= len(audio_o)
+            # # make sure to start at 0 and end at the end. Even though if
+            # # it was removed from times_to_keep means that it
+            # # contained no words
+            # times_to_keep[-1][1] = len(audio_o) / 1000 / self.spf
+            # times_to_keep[0][0] = 0
+
             for iter_ttk, (start_cut, end_cut) in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
