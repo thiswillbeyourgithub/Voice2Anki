@@ -6,7 +6,7 @@ from .anki_utils import threaded_sync_anki, get_card_status
 
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
-from .media import get_image, reset_audio, reset_image, get_img_source
+from .media import get_image, reset_audio, reset_gallery, get_img_source
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -239,7 +239,7 @@ with gr.Blocks(
                             inputs=[gallery],
                             )
     rst_img_btn.click(
-            fn=reset_image,
+            fn=reset_gallery,
             outputs=[gallery],
             queue=True,
             cancels=[paste_image_event],

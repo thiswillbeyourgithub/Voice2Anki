@@ -128,7 +128,7 @@ def get_img_source(gallery, queue=queue.Queue()):
 
 
 # @trace
-def reset_image():
+def reset_gallery():
     whi("Reset images.")
     shared.pv["gallery"] = None
     return None
