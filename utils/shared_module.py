@@ -53,6 +53,7 @@ class SharedModule:
     dirload_doing = []
 
     audio_slot_nb = 5
+    future_gallery_slot_nb = 50
 
     llm_to_db_buffer = {}
     latest_stt_used = None

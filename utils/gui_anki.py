@@ -159,6 +159,80 @@ with gr.Blocks(
                 interactive=False,
                 placeholder="this string should never appear")
 
+    with gr.Tab(label="Future galleries") as tab_galleries:
+        future_galleries = []
+        # load the saved images beforehand to reorder so that the empty
+        # galleries are moved at the end
+        saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
+        while None in saved_fg:
+            saved_fg.remove(None)
+        if len(saved_fg) < shared.future_gallery_slot_nb:
+            saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
+        assert len(saved_fg) == shared.future_gallery_slot_nb
+        it = iter(saved_fg)
+
+        for fg in range(1, shared.future_gallery_slot_nb + 1):
+            with gr.Group():
+                with gr.Row():
+                    row = [
+                            # reset
+                            gr.Button(value=f"Clear {fg}", variant="secondary", size="sm", scale=0),
+                            # gallery
+                            gr.Gallery(
+                                value=next(it),
+                                label=f"Gallery {fg}",
+                                columns=[2],
+                                rows=[1],
+                                object_fit="cover",
+                                #height="150",
+                                #min_width=50,
+                                container=True,
+                                show_download_button=False,
+                                scale=4,
+                                preview=False,
+                                ),
+                            # send to gallery
+                            gr.Button(value=f"Send {fg} to gallery", size="sm", scale=0),
+                            # add
+                            gr.Button(value=f"Add image from clipboard to {fg}", size="sm", scale=0),
+                            ]
+                # add image
+                row[3].click(
+                        fn=get_image,
+                        inputs=[row[1]],
+                        outputs=[row[1]],
+                        queue=True).success(
+                    fn=get_img_source,
+                    inputs=[row[1]],
+                    queue=True,
+                    ).success(
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                            inputs=[row[1]],
+                            )
+                # send image
+                row[2].click(
+                        fn=lambda x: x,
+                        inputs=[row[1]],
+                        outputs=[gallery],
+                        queue=True).success(
+                    fn=get_img_source,
+                    inputs=[gallery],
+                    queue=True,
+                    ).success(
+                            fn=shared.pv.save_gallery,
+                            inputs=[gallery],
+                            )
+
+                # reset image
+                row[0].click(
+                        fn=lambda: None,
+                        outputs=[row[1]],
+                        queue=True).success(
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                            inputs=[row[1]],
+                            )
+                future_galleries.append(row)
+
     # events
     tab_memories.select(
             fn=show_memories,

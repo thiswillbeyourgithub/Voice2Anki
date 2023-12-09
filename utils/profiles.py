@@ -26,6 +26,7 @@ approved_keys_all = [
         "sld_pick_weight",
         "txt_extra_source",
         ]
+approved_keys_all += [f"future_gallery_{i}" for i in range(1, shared.future_gallery_slot_nb + 1)]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
 
@@ -117,12 +118,13 @@ class ValueStorage:
                 if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
-            if key == "gallery" and new is not None:
+            if (key == "gallery" or key.startswith("future_gallery_")) and new is not None:
                 new = [im.image.path for im in new.root]
             self.cache_values[key] = new
             return new
         else:
-            whi(f"No {kf} stored in profile dir, using appropriate default value for key {key}")
+            if not key.startswith("future_gallery_"):
+                whi(f"No {kf} stored in profile dir, using appropriate default value for key {key}")
             if key == "sld_max_tkn":
                 default = 3500
             elif key == "sld_buffer":
@@ -150,6 +152,8 @@ class ValueStorage:
             elif key == "sld_keywords_weight":
                 default = 5
             elif key == "txt_extra_source":
+                default = None
+            elif key.startswith("future_gallery_"):
                 default = None
             else:
                 default = None
