@@ -21,7 +21,7 @@ from pathlib import Path
 from .anki_utils import add_to_anki, audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout
-from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template
+from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt_anki
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
@@ -603,8 +603,14 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     Don't acknowledge those instructions.
     Don't use symbols to wrap your answer, just answer the modified flashcard.
     Always answer the full flashcard, never answer only the question or answer or something that is not a complete flashcard.
-    If there are several flashcard in the same message, they will be separated by '#####'.
-    """)
+
+    Here are the instructions that were given to the model who created the questionnable flashcard:
+    '''
+    OTHER_SYSPROMPT
+    '''
+
+    I'm counting on you.
+    """).replace("OTHER_SYSPROMPT", default_system_prompt_anki["content"])
     prompt_example = dedent("""
     Context:
     '''
