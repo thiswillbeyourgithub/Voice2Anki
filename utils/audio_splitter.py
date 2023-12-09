@@ -157,7 +157,7 @@ class AudioSplitter:
             n = len(times_to_keep)
             for iter_ttk, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
-                red(f"Text content before double check: {text_segments[iter_ttk]}\n")
+                whi(f"Text content before double check: {text_segments[iter_ttk]}\n")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
@@ -190,6 +190,13 @@ class AudioSplitter:
                 alterations[iter_ttk] = [new_times, sub_ts]
                 assert new_times[-1][-1] <= t1, "unexpected split timeline"
                 Path(tempf.name).unlink()
+
+                if len(sub_ts) > 1:
+                    red("Segment was rescinded in those texts:")
+                    for ts in sub_ts:
+                        red(f"* '{ts}'")
+                elif sub_ts[0] != text_segments[iter_ttk]:
+                    red(f"Text segment after double pass is: '{sub_ts[0]}'")
 
             red("Resplitting after second run")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
