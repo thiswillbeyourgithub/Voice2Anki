@@ -52,11 +52,12 @@ with gr.Blocks(
         theme=theme,
         ) as demo_anki:
 
-    with gr.Row():
-        gr.HTML(value="<h1 style=\"text-align: center; color: purple;\">VoiceToFormattedText - Anki</h1>")
-        dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
-        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
-        kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
+    with gr.Group():
+        with gr.Row():
+            gr.HTML(value="<h1 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h1>")
+            dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
+            sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
+            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Main"):
 
@@ -67,19 +68,22 @@ with gr.Blocks(
                 # audio
                 audio_number = shared.audio_slot_nb
                 audio_slots = []
-                for i in range(audio_number):
-                    audio_mp3 = create_audio_compo()
-                    audio_slots.append(audio_mp3)
-                with gr.Row():
-                    rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
-                    dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
+                with gr.Group():
+                    for i in range(audio_number):
+                        audio_mp3 = create_audio_compo()
+                        audio_slots.append(audio_mp3)
+                with gr.Group():
+                    with gr.Row():
+                        rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
+                        dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
 
                 # image
                 with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
                     gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
-                    with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
-                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                    with gr.Group():
+                        with gr.Row():
+                            rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
+                            img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
 
             with gr.Column(scale=5):
@@ -89,22 +93,25 @@ with gr.Blocks(
                 txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=10, max_lines=100, placeholder="The anki flashcard will appear here", container=False)
 
                 # rolls
-                with gr.Row():
-                    rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary")
-                    rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary")
+                with gr.Group():
+                    with gr.Row():
+                        rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary")
+                        rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary")
 
                 # 1/2/3
-                with gr.Row():
-                    transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-                    chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-                    anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
-                    txt_card_done = gr.HTML(value="", label="Card status")
+                with gr.Group():
+                    with gr.Row():
+                        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
+                        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
+                        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+                        txt_card_done = gr.HTML(value="", label="Card status")
 
                 # 1+2 / 1+2+3
-                with gr.Row():
-                    semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
-                    auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
-                    audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True)
+                with gr.Group():
+                    with gr.Row():
+                        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
+                        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
+                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True)
 
                 # quick settings
                 with gr.Row():
