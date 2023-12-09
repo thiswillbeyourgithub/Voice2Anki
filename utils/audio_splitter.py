@@ -212,12 +212,13 @@ class AudioSplitter:
 
                 # find the corresponding segment: it's when the start
                 # time is very close
-                old_times = None
+                diffs = []
                 for j, old_vals in enumerate(times_to_keep):
-                    if abs(old_vals[0] - new_times[0][0]) <= 0.1:
-                        old_times = times_to_keep[j]
-                        break
-                assert old_times, "No closest segment found!"
+                    diffs.append(abs(old_vals[0] - new_times[0][0]))
+                min_diff = min(diffs)
+                i_good_seg = diffs.index(min_diff)
+                old_times = times_to_keep[i_good_seg]
+                assert min_diff <= 0.5, "Suspiciously big difference"
 
                 old_len = len(times_to_keep)
                 assert old_len == len(text_segments), "unexpected length"
