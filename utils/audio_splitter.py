@@ -157,7 +157,7 @@ class AudioSplitter:
             n = len(times_to_keep)
             for iter_ttk, (t0, t1) in enumerate(times_to_keep):
                 dur = t1 - t0
-                red(f"Text content: {text_segments[iter_ttk]}\n")
+                red(f"Text content before double check: {text_segments[iter_ttk]}\n")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
