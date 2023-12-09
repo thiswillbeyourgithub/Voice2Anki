@@ -42,6 +42,7 @@ def start_voice2formattedtext(
         increase verbosity
     do_auth: bool, default False
         if True, will use the login/password pairs specified in VoiceToFormattedText.py
+        This if forced to True if do_share is True
     localnetworkonly: bool, default False
         restrict access to the local network only
     use_ssl: bool, default True
@@ -89,8 +90,8 @@ def start_voice2formattedtext(
         whi("Not opening browser.")
     if debug:
         yel("Debug mode enabled")
-    if do_auth:
-        auth_args = {"auth": ("user", "password"), "auth_message": "Please login"}
+    if do_auth or do_share:
+        auth_args = {"auth": ("v2ft", "v2ft"), "auth_message": "Please login"}
         yel("Authentication enabled")
     else:
         auth_args = {}
