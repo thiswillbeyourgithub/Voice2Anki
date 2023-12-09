@@ -16,6 +16,7 @@ from pathlib import Path
 import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
+from pydub.effects import compress
 
 from logger import whi, yel, red
 from shared_module import shared
@@ -89,7 +90,7 @@ class AudioSplitter:
                     self.to_split[i] = new_filename
 
         # contains the original file path, while self.to_split will contain
-        # the path to the slowed down /tmp versions
+        # the path to the slowed down / compressed versions in /tmp
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
@@ -119,6 +120,15 @@ class AudioSplitter:
         else:
             self.spf = 1
 
+        # compressing if larger than 20mb
+        for i, file in tqdm(enumerate(self.to_split), unit="file"):
+            fsize = file.stat().st_size / 1024 / 1024
+            while fsize >= 20:
+                red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
+                audio = AudioSegment.from_mp3(file)
+                compressed_audio = compress(audio, threshold=-20, ratio=4.0, attack=5, release=50)
+                compressed_audio.export(file, format="mp3")
+
         # splitting the long audio
         for iter_file, file in tqdm(enumerate(self.to_split), unit="file"):
             whi(f"Splitting file {file}")
@@ -136,9 +146,6 @@ class AudioSplitter:
                     raise ValueError(self.stop_source)
             except Exception as err:
                 red(f"Error when transcribing: '{err}'")
-                fsize = file.stat().st_size / 1024 / 1024
-                if fsize >= 20:
-                    red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. This might be the problem.")
                 continue
 
 
