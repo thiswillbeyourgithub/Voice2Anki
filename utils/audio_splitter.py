@@ -126,7 +126,7 @@ class AudioSplitter:
             while fsize >= 20:
                 red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
                 audio = AudioSegment.from_mp3(file)
-                compressed_audio = compress(audio, threshold=-20, ratio=4.0, attack=5, release=50)
+                compressed_audio = compress_dynamic_range(audio, threshold=-20, ratio=4.0, attack=5, release=50)
                 compressed_audio.export(file, format="mp3")
 
         # splitting the long audio
@@ -158,7 +158,7 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(file)
 
-            whi("\nDouble checking all audios")
+            whi("\nSecond pass")
             alterations = {}
             spf = 1.0  # speed factor
             n = len(times_to_keep)
