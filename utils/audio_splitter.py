@@ -125,7 +125,7 @@ class AudioSplitter:
             try:
                 if self.stop_source == "replicate":
                     transcript = self.run_whisperx(file, "medium")
-                    times_to_keep, text_segments = self.split_one_transcript(transcript)
+                    times_to_keep, text_segments = self.split_one_transcript(transcript, False)
                     whi("Text segments found:")
                     for i, t in enumerate(text_segments):
                         whi(f"* {i:03d}: {t}")
@@ -185,7 +185,7 @@ class AudioSplitter:
                 # whi("Saved")
 
                 transcript = self.run_whisperx(tempf.name, "large-v2")
-                sub_ttk, sub_ts = self.split_one_transcript(transcript)
+                sub_ttk, sub_ts = self.split_one_transcript(transcript, True)
                 new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
                 alterations[iter_ttk] = [new_times, sub_ts]
                 assert new_times[-1][-1] <= t1, "unexpected split timeline"
@@ -273,21 +273,21 @@ class AudioSplitter:
 
         return to_split
 
-    def split_one_transcript(self, transcript):
+    def split_one_transcript(self, transcript, second_pass):
         duration = transcript["segments"][-1]["end"]
-        whi(f"Duration: {duration}")
-        # note: duration is not the total recording duration but rather the
-        # time of the end of the last pronounced word
-
         full_text = transcript["transcription"]
-        whi(f"Full text:\n'''\n{full_text}\n'''")
+        if not second_pass:
+            whi(f"Duration: {duration}")
+            # note: duration is not the total recording duration but rather the
+            # time of the end of the last pronounced word
+            whi(f"Full text:\n'''\n{full_text}\n'''")
 
         # verbose_json
         text_segments = [""]
         times_to_keep = [[0, duration]]
         previous_start = -1
         previous_end = -1
-        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if len(transcript["segments"]) <= 10 else False):
+        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False):
             st = segment["start"]
             ed = segment["end"]
 
@@ -334,15 +334,17 @@ class AudioSplitter:
                     times_to_keep[-1][1] = duration
 
         n = len(text_segments)
-        whi(f"Found {n} splits")
+        if not second_pass:
+            whi(f"Found {n} splits")
 
-        # remove too short
+        # remove too short audio
         latest_kept_i = 0
+        time_limit = 1
         for iter_ttk, (start, end) in enumerate(times_to_keep):
-            assert end - start >= 0
-            if end - start < 1:
+            assert end - start >= 0, "End before start"
+            if end - start < time_limit:
 
-                assert times_to_keep[latest_kept_i][1] <= end
+                assert times_to_keep[latest_kept_i][1] <= end, "overlapping audio"
                 times_to_keep[latest_kept_i][1] = end
 
                 times_to_keep[iter_ttk] = None
