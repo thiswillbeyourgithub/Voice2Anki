@@ -126,6 +126,10 @@ class AudioSplitter:
                 if self.stop_source == "replicate":
                     transcript = self.run_whisperx(file, "medium")
                     times_to_keep, text_segments = self.split_one_transcript(transcript)
+                    whi("Text segments found:")
+                    for i, t in enumerate(text_segments):
+                        whi(f"* {i:03d}: {t}")
+
                 elif self.stop_source == "local_json":
                     raise NotImplementedError
                 else:
@@ -342,10 +346,6 @@ class AudioSplitter:
         # whi(f"Kept {n} splits with > 4 words")
 
         text_segments = [t.strip() for t in text_segments]
-
-        whi("Text segments found:")
-        for i, t in enumerate(text_segments):
-            whi(f"* {i:03d}: {t}")
 
         assert len(times_to_keep) == len(text_segments), "invalid lengths"
 
