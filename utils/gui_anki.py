@@ -172,16 +172,13 @@ with gr.Blocks(
         it = iter(saved_fg)
 
         for fg in range(1, shared.future_gallery_slot_nb + 1):
-            #with gr.Group():
             with gr.Row(equal_height=False):
-                with gr.Column(scale=0):
-                    rst_ = gr.Button(value="Clear", variant="secondary", size="sm", min_width=25)
                 with gr.Column(scale=10):
                     gal_ = gr.Gallery(
                         value=next(it),
                         label=f"Gallery {fg}",
                         columns=[2],
-                        rows=[2],
+                        rows=[1],
                         object_fit="scale-down",
                         #height=100,
                         #min_width=50,
@@ -190,8 +187,9 @@ with gr.Blocks(
                         preview=False,
                         )
                 with gr.Column(scale=0):
-                    send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=25)
-                    add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=25)
+                    send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=50, scale=10)
+                    add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=50, scale=10)
+                    rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
 
             # add image
             add_.click(
