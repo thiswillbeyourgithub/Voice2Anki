@@ -291,6 +291,18 @@ class AudioSplitter:
             st = segment["start"]
             ed = segment["end"]
             text = segment["text"]
+            nsprob = segment["no_speech_prob"]
+            whi(f"Text of segment: {text}")
+
+            # impossibly short token
+            if ed - st <= 0.05:
+                red(f"Too short token is ignored: {ed-st}s")
+                continue
+
+            if nsprob <= 0.5:
+                red(f"Speech probability is {nsprob}%<50% so ignored.")
+                continue
+
             assert st >= previous_start, "Output from whisperx contains overlapping segments"
             assert ed >= previous_end, "Output from whisperx contains overlapping segments"
             assert ed >= previous_start, "Output from whisperx contains overlapping segments"
