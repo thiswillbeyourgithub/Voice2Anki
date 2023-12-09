@@ -85,7 +85,7 @@ class AudioSplitter:
         if self.remove_silence:
             assert self.stop_source != "local_json", (
                 "can't use local_json stop source and remove_silence")
-            for i, file in tqdm(enumerate(self.to_split), unit="file"):
+            for i, file in enumerate(tqdm(self.to_split, unit="file")):
                 if "_unsilenced" not in str(file):
                     new_filename = self.unsilence_audio(file)
                     assert "_unsilenced" in str(new_filename), "error"
@@ -124,7 +124,7 @@ class AudioSplitter:
 
         # compressing if larger than 20mb
         if self.compress_if_too_large:
-            for i, file in tqdm(enumerate(self.to_split), unit="file"):
+            for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Compressing")):
                 fsize = file.stat().st_size / 1024 / 1024
                 while fsize >= 20:
                     red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
@@ -133,7 +133,7 @@ class AudioSplitter:
                     compressed_audio.export(file, format="mp3")
 
         # splitting the long audio
-        for iter_file, file in enumerate(tqdm(self.to_split, unit="file")):
+        for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="First pass")):
             whi(f"Splitting file {file}")
             try:
                 if self.stop_source == "replicate":
@@ -259,7 +259,7 @@ class AudioSplitter:
                 prev_t1 = t1
 
             assert abs(1 - (times_to_keep[-1][1] * 1000 * self.spf) / len(audio_o)) <= 0.01
-            for iter_ttk, (start_cut, end_cut) in tqdm(enumerate(times_to_keep), unit="segment", desc="cutting"):
+            for iter_ttk, (start_cut, end_cut) in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
