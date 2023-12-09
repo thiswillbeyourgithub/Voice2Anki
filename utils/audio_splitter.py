@@ -51,6 +51,7 @@ class AudioSplitter:
 
             remove_silence=True,
             silence_method="torchaudio",
+            compress_if_too_large=True,
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
@@ -70,6 +71,7 @@ class AudioSplitter:
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
+        self.compress_if_too_large = compress_if_too_large
         assert global_slowdown_factor <= 1 and global_slowdown_factor > 0, (
                 "invalid value for global_slowdown_factor")
         self.spf = global_slowdown_factor
@@ -121,13 +123,14 @@ class AudioSplitter:
             self.spf = 1
 
         # compressing if larger than 20mb
-        for i, file in tqdm(enumerate(self.to_split), unit="file"):
-            fsize = file.stat().st_size / 1024 / 1024
-            while fsize >= 20:
-                red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
-                audio = AudioSegment.from_mp3(file)
-                compressed_audio = compress_dynamic_range(audio, threshold=-20, ratio=4.0, attack=5, release=50)
-                compressed_audio.export(file, format="mp3")
+        if self.compress_if_too_large:
+            for i, file in tqdm(enumerate(self.to_split), unit="file"):
+                fsize = file.stat().st_size / 1024 / 1024
+                while fsize >= 20:
+                    red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
+                    audio = AudioSegment.from_mp3(file)
+                    compressed_audio = compress_dynamic_range(audio, threshold=-20, ratio=4.0, attack=5, release=50)
+                    compressed_audio.export(file, format="mp3")
 
         # splitting the long audio
         for iter_file, file in tqdm(enumerate(self.to_split), unit="file"):
