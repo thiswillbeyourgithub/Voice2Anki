@@ -1,8 +1,6 @@
 class SharedModule:
     """module used to store information from VoiceToFormattedText.py to
     the main .py files"""
-    threads = []
-
     # sox effect when loading a sound
     preprocess_sox_effects = [
             # isolate voice frequency
@@ -58,6 +56,8 @@ class SharedModule:
     llm_to_db_buffer = {}
     latest_stt_used = None
     latest_llm_used = None
+
+    running_threads = {}
 
 
 shared = SharedModule()

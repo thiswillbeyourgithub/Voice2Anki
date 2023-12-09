@@ -46,11 +46,10 @@ pv = shared.pv
 
 shared.message_buffer = pv["message_buffer"]
 
-running_tasks = {
-        "saving_chatgpt": [],
-        "saving_whisper": [],
-        "transcribing_audio": [],
-        }
+shared.running_threads["saving_chatgpt"] = []
+shared.running_threads["saving_whisper"] = []
+shared.running_threads["transcribing_audio"] = []
+shared.running_threads["ocr"] = []
 
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
@@ -181,10 +180,10 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
         txt_audio = transcript["text"]
         yel(f"\nWhisper transcript: {txt_audio}")
 
-        if running_tasks["saving_whisper"]:
-            running_tasks["saving_whisper"][-1].join()
-        while running_tasks["saving_whisper"]:
-            running_tasks["saving_whisper"].pop()
+        if shared.running_threads["saving_whisper"]:
+            shared.running_threads["saving_whisper"][-1].join()
+        while shared.running_threads["saving_whisper"]:
+            shared.running_threads["saving_whisper"].pop()
         thread = threading.Thread(
                 target=store_to_db,
                 name="saving_whisper",
@@ -205,7 +204,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                     "db_name": "anki_whisper"
                     })
         thread.start()
-        running_tasks["saving_whisper"].append(thread)
+        shared.running_threads["saving_whisper"].append(thread)
 
         return txt_audio
     except Exception as err:
@@ -531,12 +530,14 @@ def dirload_splitted(
         if len(sounds_to_load) == len(output):
             # loaded all the slots, so waiting for the first transcription to
             # finish
-            gather_threads([new_threads[0]], "Transcribing first file")
-            running_tasks["transcribing_audio"].extend(new_threads[1:])
+            whi("Waiting for first transcription to finish")
+            new_threads[0].join()
+            whi("Finished first transcription.")
+            shared.running_threads["transcribing_audio"].extend(new_threads[1:])
         else:
             # the sound in the first slot was not loaded by this function so
             # not waiting for the transcription
-            running_tasks["transcribing_audio"].extend(new_threads)
+            shared.running_threads["transcribing_audio"].extend(new_threads)
 
     while len(shared.dirload_doing) > shared.audio_slot_nb:
         p = shared.dirload_doing.pop(0)
@@ -725,14 +726,17 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     return cloz, None
 
 @trace
-def gather_threads(threads, source="to_anki"):
-    n = len([t for t in threads if t.is_alive()])
+def gather_threads(thread_keys):
+    n_running = {k: sum([t.is_alive() for t in threads]) for k, threads in shared.running_threads.items() if k == thread_keys}
     i = 0
-    while n:
+    while sum(n_running.values()):
         i += 1
-        n = len([t for t in threads if t.is_alive()])
+        n_running = {k: sum([t.is_alive() for t in threads]) for k, threads in shared.running_threads.items() if k == thread_keys}
         if i % 10 == 0:
-            yel(f"Waiting for {n} threads to finish from {source}")
+            for k, n in n_running.items():
+                if n == 0:
+                    thread_keys.remove(k)
+            yel(f"Waiting for {sum(n_running.values())} threads to finish from {thread_keys}")
         time.sleep(0.1)
 
 @trace
@@ -761,9 +765,10 @@ def kill_threads():
     """the threads in timeout are stored in the shared module, if they
     get replaced by None the threads will be ignored."""
     with threading.Lock():
-        n = sum([t.is_alive() for t in shared.threads])
-        red(f"Killing {n} running threads")
-        shared.threads = []
+        for k in shared.running_threads:
+            n = sum([t.is_alive() for t in shared.running_threads[k]])
+            red(f"Killing the {n} alive threads of {k}")
+            shared.running_threads[k] = []
 
 @trace
 def to_anki(
@@ -801,8 +806,6 @@ def to_anki(
         red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
         return
 
-    threads = []
-
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
     txt_source = ""
@@ -815,7 +818,7 @@ def to_anki(
                 args=(gallery, txt_source_queue)
                 )
         thread.start()
-        threads.append(thread)
+        shared.running_threads["ocr"].append(thread)
 
     # send audio to anki
     audio_to_anki_queue = queue.Queue()
@@ -824,7 +827,7 @@ def to_anki(
             args=(audio_mp3_1, audio_to_anki_queue),
             )
     thread.start()
-    threads.append(thread)
+    shared.running_threads["audio_to_anki"].append(thread)
 
     # send to anki
     metadata = rtoml.dumps(
@@ -845,7 +848,7 @@ def to_anki(
     audio_html = wait_for_queue(audio_to_anki_queue, "audio_to_anki")
     if "Error" in audio_html:  # then out is an error message and not the source
         gr.Error(f"Error in audio_html: '{audio_html}'")
-        gather_threads(threads)
+        gather_threads(["audio_to_anki", "ocr"])
         return
 
     # gather text from the source image(s)
@@ -885,7 +888,7 @@ def to_anki(
 
     if not len(results) == len(clozes):
         red("Some flashcards were not added!"),
-        gather_threads(threads)
+        gather_threads(["audio_to_anki", "ocr"])
         return
 
     whi("Finished adding card.\n\n")
@@ -909,10 +912,10 @@ def to_anki(
 
     # if anki card created, add to db
     closest_buffer_key = sorted([k for k in shared.llm_to_db_buffer.keys()], key=lambda x: lev.ratio(txt_chatgpt_cloz, x))[-1]
-    if running_tasks["saving_chatgpt"]:
-        [t.join() for t in running_tasks["saving_chatgpt"]]
-    while running_tasks["saving_chatgpt"]:
-        running_tasks["saving_chatgpt"].pop()
+    if shared.running_threads["saving_chatgpt"]:
+        [t.join() for t in shared.running_threads["saving_chatgpt"]]
+    while shared.running_threads["saving_chatgpt"]:
+        shared.running_threads["saving_chatgpt"].pop()
     thread = threading.Thread(
             target=store_to_db,
             name="saving_chatgpt",
@@ -920,8 +923,8 @@ def to_anki(
                 "dictionnary": json.loads(shared.llm_to_db_buffer[closest_buffer_key]),
                 "db_name": "anki_llm"})
     thread.start()
-    running_tasks["saving_whisper"].append(thread)
+    shared.running_threads["saving_whisper"].append(thread)
     del shared.llm_to_db_buffer[closest_buffer_key]
 
-    gather_threads(threads)
+    gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
     return
