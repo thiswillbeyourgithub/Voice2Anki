@@ -301,8 +301,8 @@ class AudioSplitter:
 
             # low speech probability
             nsprob = segment["no_speech_prob"]
-            if nsprob <= 0.5:
-                red(f"Speech probability is {nsprob}%<50% so ignored.")
+            if nsprob >= 0.9:
+                red(f"No speech probability is {nsprob}%>90% so ignored.")
                 continue
 
             assert st >= previous_start, "Output from whisperx contains overlapping segments"
