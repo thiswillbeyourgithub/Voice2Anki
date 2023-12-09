@@ -80,8 +80,8 @@ def check_source(source):
     return source
 
 
+#@Timeout(120)
 @trace
-@Timeout(120)
 def get_img_source(gallery, queue=queue.Queue()):
     whi("Getting source from image")
     try:
