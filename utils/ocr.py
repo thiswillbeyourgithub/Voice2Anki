@@ -88,9 +88,13 @@ def get_text(img_path: str):
         for w in all_words_temp:
             confidence = get_w_conf(w)
             confidences.append(confidence)
-        med = np.median(confidences)
+        if confidences:
+            med = np.median(confidences)
+            mean = np.sum(confidences) / len(confidences)
+        else:
+            mean = 0
+            med = 0
         preprocessings[method]["median"] = med
-        mean = np.sum(confidences) / len(confidences)
         preprocessings[method]["mean"] = mean
         if med >= max_med and mean >= max_mean:
             max_med = med
