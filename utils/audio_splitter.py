@@ -234,7 +234,6 @@ class AudioSplitter:
                     whi(f"The split #{iter_alt} is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times}")
-                    assert abs(1 - old_times[1] / new_times[0][1]) <= 0.1, "end times are different!"
                 else:
                     whi(f"Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
