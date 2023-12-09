@@ -231,7 +231,7 @@ with gr.Blocks(
 
         clear_btn = gr.ClearButton(
                 components=[elem[1] for elem in future_galleries],
-                value="Clear all",
+                value="Empty all (not saved)",
                 variant="primary",
                 )
 
