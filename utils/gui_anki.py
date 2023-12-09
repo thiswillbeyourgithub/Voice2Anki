@@ -172,68 +172,63 @@ with gr.Blocks(
         it = iter(saved_fg)
 
         for fg in range(1, shared.future_gallery_slot_nb + 1):
-            with gr.Group():
-                with gr.Row():
-                    row = [
-                            # reset
-                            gr.Button(value=f"Clear {fg}", variant="secondary", size="sm", scale=0),
-                            # gallery
-                            gr.Gallery(
-                                value=next(it),
-                                label=f"Gallery {fg}",
-                                columns=[3],
-                                rows=[1],
-                                object_fit="scale-down",
-                                height=100,
-                                #min_width=50,
-                                container=True,
-                                show_download_button=False,
-                                scale=4,
-                                preview=False,
-                                ),
-                            # send to gallery
-                            gr.Button(value=f"Send {fg} to gallery", size="sm", scale=0),
-                            # add
-                            gr.Button(value=f"Add image from clipboard to {fg}", size="sm", scale=0),
-                            ]
-                # add image
-                row[3].click(
-                        fn=get_image,
-                        inputs=[row[1]],
-                        outputs=[row[1]],
-                        queue=True).success(
-                    fn=get_img_source,
-                    inputs=[row[1]],
-                    queue=True,
-                    ).success(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
-                            inputs=[row[1]],
-                            )
-                # send image
-                row[2].click(
-                        fn=lambda x: x,
-                        inputs=[row[1]],
-                        outputs=[gallery],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=True).success(
-                    fn=get_img_source,
-                    inputs=[gallery],
-                    queue=True,
-                    ).success(
-                            fn=shared.pv.save_gallery,
-                            inputs=[gallery],
-                            )
+            #with gr.Group():
+            with gr.Row(equal_height=False):
+                rst_ = gr.Button(value="Clear", variant="secondary", size="sm", scale=0)
+                gal_ = gr.Gallery(
+                    value=next(it),
+                    label=f"Gallery {fg}",
+                    columns=[2],
+                    rows=[2],
+                    object_fit="scale-down",
+                    #height=100,
+                    #min_width=50,
+                    container=True,
+                    show_download_button=True,
+                    scale=10,
+                    preview=False,
+                    )
+                with gr.Column():
+                    send_ = gr.Button(value="Send to gallery", size="sm", scale=0, variant="primary")
+                    add_ = gr.Button(value="Add image from clipboard", size="sm", scale=0)
 
-                # reset image
-                row[0].click(
-                        fn=lambda: None,
-                        outputs=[row[1]],
-                        queue=True).success(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
-                            inputs=[row[1]],
-                            )
-                future_galleries.append(row)
+            # add image
+            add_.click(
+                    fn=get_image,
+                    inputs=[gal_],
+                    outputs=[gal_],
+                    queue=True).success(
+                fn=get_img_source,
+                inputs=[gal_],
+                queue=True,
+                ).success(
+                        fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                        inputs=[gal_],
+                        )
+            # send image
+            send_.click(
+                    fn=lambda x: x,
+                    inputs=[gal_],
+                    outputs=[gallery],
+                    preprocess=False,
+                    postprocess=False,
+                    queue=True).success(
+                fn=get_img_source,
+                inputs=[gallery],
+                queue=True,
+                ).success(
+                        fn=shared.pv.save_gallery,
+                        inputs=[gallery],
+                        )
+            # reset image
+            rst_.click(
+                    fn=lambda: None,
+                    outputs=[gal_],
+                    queue=True).success(
+                        fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                        inputs=[gal_],
+                        )
+            future_galleries.append([rst_, gal_, send_, add_])
 
     # events
     tab_memories.select(
