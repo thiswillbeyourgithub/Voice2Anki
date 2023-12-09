@@ -287,7 +287,7 @@ class AudioSplitter:
         times_to_keep = [[0, duration]]
         previous_start = -1
         previous_end = -1
-        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing"):
+        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if len(transcript["segments"]) <= 10 else False):
             st = segment["start"]
             ed = segment["end"]
 
