@@ -323,7 +323,7 @@ class AudioSplitter:
                 times_to_keep[iter_ttk] = None
                 text_segments[iter_ttk] = None
             else:
-                latest_kept_i = i
+                latest_kept_i = iter_ttk
                 while "  " in text_segments[iter_ttk]:
                     text_segments[iter_ttk] = text_segments[iter_ttk].replace("  ", " ").strip()
         text_segments = [t for t in text_segments if t is not None]
