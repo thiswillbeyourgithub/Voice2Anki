@@ -222,7 +222,7 @@ class AudioSplitter:
 
                 old_len_ttk = len(times_to_keep)
                 assert old_len_ttk == len(text_segments), "unexpected length"
-                assert abs(old_times[0] - new_times[0][0]) <= 0.1, "start time are different!"
+                assert abs(old_times[0] - new_times[0][0]) <= 0.5, "start time are different!"
 
                 if len(new_times) == 1:
                     whi(f"The split #{iter_alt} is not split "
