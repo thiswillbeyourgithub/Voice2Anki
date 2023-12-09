@@ -132,6 +132,9 @@ class AudioSplitter:
                     raise ValueError(self.stop_source)
             except Exception as err:
                 red(f"Error when transcribing: '{err}'")
+                fsize = file.stat().st_size / 1024 / 1024
+                if fsize >= 20:
+                    red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. This might be the problem.")
                 continue
 
 
