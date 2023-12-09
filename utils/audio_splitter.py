@@ -293,6 +293,7 @@ class AudioSplitter:
             text = segment["text"]
             assert st >= previous_start, "Output from whisperx contains overlapping segments"
             assert ed >= previous_end, "Output from whisperx contains overlapping segments"
+            assert ed >= previous_start, "Output from whisperx contains overlapping segments"
             previous_start = st
             previous_end = ed
 
