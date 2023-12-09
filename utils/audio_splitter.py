@@ -341,15 +341,14 @@ class AudioSplitter:
         latest_kept_i = 0
         time_limit = 1
         for iter_ttk, (start, end) in enumerate(times_to_keep):
-            assert end - start >= 0, "End before start"
             if end - start < time_limit:
-
                 assert times_to_keep[latest_kept_i][1] <= end, "overlapping audio"
                 times_to_keep[latest_kept_i][1] = end
 
                 times_to_keep[iter_ttk] = None
                 text_segments[iter_ttk] = None
             else:
+                assert end - start >= 0, "End before start"
                 latest_kept_i = iter_ttk
                 while "  " in text_segments[iter_ttk]:
                     text_segments[iter_ttk] = text_segments[iter_ttk].replace("  ", " ").strip()
