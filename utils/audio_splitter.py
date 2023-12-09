@@ -205,7 +205,7 @@ class AudioSplitter:
                 elif sub_ts[0] != text_segments[iter_ttk]:
                     red(f"Text segment after double pass is: '{sub_ts[0]}'")
 
-            red("Resplitting after second run")
+            red("Resplitting after second pass")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
                 new_times = vals[0]
                 sub_ts = vals[1]
