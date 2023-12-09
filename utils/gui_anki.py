@@ -214,6 +214,8 @@ with gr.Blocks(
                         fn=lambda x: x,
                         inputs=[row[1]],
                         outputs=[gallery],
+                        preprocess=False,
+                        postprocess=False,
                         queue=True).success(
                     fn=get_img_source,
                     inputs=[gallery],
