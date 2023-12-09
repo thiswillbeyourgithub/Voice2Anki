@@ -167,7 +167,7 @@ class AudioSplitter:
             n = len(times_to_keep)
             for iter_ttk, (t0, t1) in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
                 dur = t1 - t0
-                whi(f"Text content before double check: {text_segments[iter_ttk]}\n")
+                whi(f"Text content before second pass: {text_segments[iter_ttk]}\n")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
@@ -206,7 +206,7 @@ class AudioSplitter:
                     for ts in sub_ts:
                         red(f"* '{ts}'")
                 elif sub_ts[0] != text_segments[iter_ttk]:
-                    red(f"Text segment after double pass is: '{sub_ts[0]}'")
+                    red(f"Text segment after second pass is: '{sub_ts[0]}'")
 
             red("Resplitting after second pass")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
