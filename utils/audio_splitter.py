@@ -382,7 +382,8 @@ class AudioSplitter:
                     times_to_keep[i] = None
             text_segments = [t for t in text_segments if t is not None]
             times_to_keep = [t for t in times_to_keep if t is not None]
-            whi(f"Removed {len(text_segments)-n} splits with less than {word_limit} words")
+            if len(text_segments)-n:
+                whi(f"Removed {len(text_segments)-n} splits with less than {word_limit} words")
             n = len(text_segments)
 
         text_segments = [t.strip() for t in text_segments]
