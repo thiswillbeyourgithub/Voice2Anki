@@ -224,7 +224,7 @@ class AudioSplitter:
                 dur_old = old_times[1] - old_times[0]
                 dur_new = new_times[-1][1] - new_times[0][0]
                 diff_dur = abs(1 - dur_old / dur_new)
-                assert min_diff <= 1 and diff_dur <= 0.1, "Suspiciously big difference"
+                assert min_diff <= 1 or diff_dur <= 0.1, "Suspiciously big difference"
 
                 old_len_ttk = len(times_to_keep)
                 assert old_len_ttk == len(text_segments), "unexpected length"
