@@ -68,12 +68,18 @@ class SharedModule:
 
     added_note_ids = []
 
+    def reset(self):
+        "used to reset the values when the gradio page is reloaded"
+        print("Resetting shared module.")
+        self.dirload_queue = []
+        self.dirload_doing = []
+        self.llm_to_db_buffer = {}
+        self.latest_stt_used = None
+        self.latest_llm_used = None
+        for k in self.running_threads:
+            self.running_threads[k] = []
+        self.added_note_ids = []
+
 
 
 shared = SharedModule()
-
-def reset_shared():
-    "called when the gradio page is loaded. As otherwise it means the attributes of shared at not in sync anymore."
-    global shared
-    print("Reset shared module.")
-    shared = SharedModule()
