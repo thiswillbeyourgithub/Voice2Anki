@@ -231,10 +231,10 @@ with gr.Blocks(
                     outputs=[gallery],
                     preprocess=False,
                     postprocess=False,
-                    queue=False).success(
+                    queue=False).then(
                             fn=shared.pv.save_gallery,
                             inputs=[gallery]
-                            ).success(
+                            ).then(
                                     fn=get_img_source,
                                     inputs=[gallery],
                                     queue=True,
