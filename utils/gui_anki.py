@@ -139,11 +139,11 @@ with gr.Blocks(
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
-                    mark_previous = gr.Button(value="Mark previous", scale=0)
                     txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
-                txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
+                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=1, lines=1)
 
                 with gr.Row():
+                    mark_previous = gr.Button(value="Mark previous", scale=0)
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
 
