@@ -117,6 +117,9 @@ def embedder(text, format):
     else:
         raise ValueError(format)
 
+    # try to bias the embedder to focus on the structure
+    text = f"Pay attention to the structure of  this text: '{text}'"
+
     try:
         vec = openai.Embedding.create(
                 model=embedding_model_name,
