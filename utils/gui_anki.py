@@ -628,7 +628,15 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
-                    ).then(fn=lambda: False, outputs=[check_marked])
+                    ).then(
+                            fn=lambda: False,
+                            outputs=[check_marked]
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[txt_card_done],
+                                    queue=True,
+                                    )
 
     improve_btn.click(
             fn=recur_improv,
