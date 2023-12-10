@@ -487,7 +487,7 @@ def display_price(sld_max_tkn, check_gpt4):
     price_per_request = price_adj * sld_max_tkn / 1000
     price_per_dol = round(1 / price_per_request, 0)
     message = f"Price if all tokens used: ${price_per_request:.5f}."
-    message += f" Requests per $1: {price_per_dol:.1f} req"
+    message += f"\nRequests per $1: {price_per_dol:.1f} req"
     return message
 
 def show_memories(profile):

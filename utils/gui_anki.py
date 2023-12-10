@@ -140,7 +140,7 @@ with gr.Blocks(
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
                     txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
-                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=1, lines=1)
+                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous", scale=0)
