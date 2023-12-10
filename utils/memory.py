@@ -203,8 +203,8 @@ def check_prompts(prev_prompts):
     return prev_prompts
 
 
+#@Timeout(30)
 @trace
-@Timeout(30)
 def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keywords):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
