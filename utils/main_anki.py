@@ -784,13 +784,13 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
     """when an anki card is created, find the information about its creation
     in the shared module then save it to the db. It can be missing from the db
     if the result from alfred was loaded from cache for example."""
-    if not shared.llm_to_db_buffer:
-        gr.Warning("Not saving to V2FT db because buffer is empty.")
-        return
-    buffer_keys = [k for k in shared.llm_to_db_buffer.keys()]
-    dist_buffer_keys = [lev.ratio(txt_chatgpt_cloz, x) for x in buffer_keys]
-    min_dist = min(dist_buffer_keys)
-    closest_buffer_key = buffer_keys[dist_buffer_keys.index(min_dist)]
+    if shared.llm_to_db_buffer:
+        buffer_keys = [k for k in shared.llm_to_db_buffer.keys()]
+        dist_buffer_keys = [lev.ratio(txt_chatgpt_cloz, x) for x in buffer_keys]
+        min_dist = min(dist_buffer_keys)
+        closest_buffer_key = buffer_keys[dist_buffer_keys.index(min_dist)]
+    else:
+        min_dist = 0
     if min_dist < 0.90:
         save_dict = {
                 "type": "anki_card",
