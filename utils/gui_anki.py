@@ -113,8 +113,8 @@ with gr.Blocks(
                 # rolls
                 with gr.Group():
                     with gr.Row():
-                        rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary")
                         rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary")
+                        rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary")
 
                 # 1/2/3
                 with gr.Group():
@@ -127,9 +127,9 @@ with gr.Blocks(
                 # 1+2 / 1+2+3
                 with gr.Group():
                     with gr.Row():
-                        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
-                        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
                         audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True, min_width=20)
+                        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
+                        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
 
                 # quick settings
                 with gr.Row():
