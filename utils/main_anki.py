@@ -809,6 +809,7 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 }
     else:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
+        del shared.llm_to_db_buffer[closest_buffer_key]
     if shared.running_threads["saving_chatgpt"]:
         [t.join() for t in shared.running_threads["saving_chatgpt"]]
     while shared.running_threads["saving_chatgpt"]:
@@ -821,7 +822,6 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "db_name": "anki_llm"})
     thread.start()
     shared.running_threads["saving_whisper"].append(thread)
-    del shared.llm_to_db_buffer[closest_buffer_key]
 @trace
 def to_anki(
         audio_mp3_1,
