@@ -282,9 +282,6 @@ with gr.Blocks(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[txt_card_done],
-            queue=False,
-            every=1,
-            trigger_mode="always_last",
             )
 
     # display pricing then save values
