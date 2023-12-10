@@ -7,7 +7,7 @@ from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
 from .media import get_image, reset_audio, reset_gallery, get_img_source
-from .shared_module import shared, reset_shared
+from .shared_module import shared
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -654,7 +654,7 @@ with gr.Blocks(
             )
 
     demo_anki.load(
-            fn=reset_shared,
+            fn=shared.reset,
             js=hide_some_components,
             )
     if shared.pv.profile_name == "default":
