@@ -196,6 +196,18 @@ class ValueStorage:
                     kwargs={"key": key, "item": item, "lock": threading.Lock()})
             thread.start()
             self.running_tasks[key] = thread
+        else:
+            # item is the same as in the cache value
+            # but if it's None etc, then the cache value must be destroyed
+            try:
+                if item is None or item is False or (bool(item) is False):
+                    kp = key + ".pickle"
+                    kf = self.p / kp
+                    if kf.exists():
+                        red(f"Deleting file {kf}")
+                        kf.unlink()
+            except Exception as err:
+                red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
 
     def __setitem__async(self, key, item, lock):
         kp = key + ".pickle"
