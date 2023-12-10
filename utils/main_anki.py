@@ -466,6 +466,10 @@ def dirload_splitted(
     while len(audios) < shared.audio_slot_nb:
         audios += [None]
 
+    if empty_slots == shared.audio_slot_nb:
+        assert not shared.dirload_queue, "Non empty queue of shared!"
+        assert not shared.dirload_doing, "Non empty doing of shared!"
+
     # check how many audio are needed
     whi(f"Number of empty sound slots: {empty_slots}")
     if empty_slots < 0:
