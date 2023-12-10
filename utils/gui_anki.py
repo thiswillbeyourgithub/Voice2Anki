@@ -257,6 +257,9 @@ with gr.Blocks(
             if len(saved_fg) < shared.future_gallery_slot_nb:
                 saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
             assert len(saved_fg) == shared.future_gallery_slot_nb
+            for i, fg in enumerate(range(1, shared.future_gallery_slot_nb + 1)):
+                im = saved_fg[i]
+                getattr(shared.pv, f"save_future_gallery_{fg}")(im)
             return saved_fg
 
         load_fg_btn.click(

@@ -119,7 +119,8 @@ class ValueStorage:
                     red(f"Error when loading {kf}: unexpected value for loaded value")
                     return None
             if (key == "gallery" or key.startswith("future_gallery_")) and new is not None:
-                new = [im.image.path for im in new.root]
+                if not isinstance(new, list):
+                    new = [im.image.path for im in new.root]
             self.cache_values[key] = new
             return new
         else:
