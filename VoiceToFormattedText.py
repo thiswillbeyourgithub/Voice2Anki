@@ -44,9 +44,10 @@ def start_voice2formattedtext(
         if True, will use the login/password pairs specified in VoiceToFormattedText.py
         This if forced to True if share is True
     localnetwork: bool, default True
-        Allow access from the local network
+        restrict access to the local network only
     use_ssl: bool, default True
         if True, will use the ssl configuration specified in VoiceToFormattedText.py
+        Disable if share is used as self signed certificate mess with it.
     media_folder: str, default None
         optional anki media database location
     memory_metric: str, default "embeddings"
@@ -115,7 +116,7 @@ def start_voice2formattedtext(
     else:
         raise ValueError(backend)
 
-    if use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
+    if (not share) and use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
                 "ssl_keyfile": "./utils/ssl/key.pem",
                 "ssl_certfile": "./utils/ssl/cert.pem",
