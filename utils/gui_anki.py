@@ -38,14 +38,11 @@ const hideElements = (selector) => {
 hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
 hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
 hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
-
-// also increase max width of app
-document.querySelector('.app.svelte-1kyws56.svelte-1kyws56').style.maxWidth = '100%';
 }
 """
 css = """
-.hide-element {
-  display: none !important; }
+.hide-element { display: none !important; }
+.app.svelte-1kyws56.svelte-1kyws56 { max-width: 100%; }
 """
 
 def create_audio_compo():
