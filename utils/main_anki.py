@@ -387,6 +387,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # for cosmetic purposes in the textbox
     cloz = cloz.replace("<br/>", "\n")
     cloz = cloz.replace("&nbsp;", " ")
+    cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
     cloz = "\n".join([cl.strip() for cl in cloz.splitlines() if cl.strip()])
 
     yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
