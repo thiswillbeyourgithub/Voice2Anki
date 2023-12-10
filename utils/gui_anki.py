@@ -26,7 +26,7 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
-js_hide_some_components = """
+hide_some_components = """
 () => {
 const hideElements = (selector) => {
   const elements = document.querySelectorAll(selector);
@@ -39,7 +39,6 @@ hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.
 hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
 hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
 }
-
 """
 css = """
 .hide-element {
@@ -47,9 +46,7 @@ css = """
 """
 
 def create_audio_compo():
-    aud = gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
-    aud.change(js=js_hide_some_components)
-    return
+    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
 
 
 def roll_audio(*slots):
@@ -252,7 +249,7 @@ with gr.Blocks(
                         )
             future_galleries.append([rst_, gal_, send_, add_])
 
-        clear_btn = gr.ClearButton(
+        clear_fg_btn = gr.ClearButton(
                 components=[elem[1] for elem in future_galleries],
                 value="Empty all (not saved)",
                 variant="primary",
@@ -357,7 +354,10 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
-            )
+            ).then(
+                    js=hide_some_components,
+                    fn=None,
+                    )
 
     rollaudio_12_btn.click(
             fn=roll_audio,
@@ -398,7 +398,11 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                )
+                                ).then(
+                                        fn=None,
+                                        js=hide_some_components,
+                                        queue=True,
+                                        )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -456,7 +460,14 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
-                                ).success(fn=lambda: False, outputs=[check_marked])
+                                ).success(
+                                        fn=lambda: False,
+                                        outputs=[check_marked]
+                                        ).then(
+                                                fn=None,
+                                                js=hide_some_components,
+                                                queue=True,
+                                                )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -491,7 +502,11 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
-                        )
+                        ).then(
+                                fn=None,
+                                js=hide_some_components,
+                                queue=True,
+                                )
 
     # send to whisper
     transcript_btn.click(
@@ -619,6 +634,17 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
+            queue=True,
+            )
+    gr.on(  # not really working for now
+            triggers=[
+                # rollaudio_12_btn.click,
+                # rollaudio_123_btn.click,
+                dark_mode_btn.click,
+                sync_btn.click,
+                ],
+            js=hide_some_components,
+            fn=None,
             queue=True,
             )
 
