@@ -193,22 +193,24 @@ class ValueStorage:
                     return
             thread = threading.Thread(
                     target=self.__setitem__async,
-                    kwargs={"key": key, "item": item})
+                    kwargs={"key": key, "item": item, "lock": threading.Lock()})
             thread.start()
             self.running_tasks[key] = thread
 
-    def __setitem__async(self, key, item):
+    def __setitem__async(self, key, item, lock):
         kp = key + ".pickle"
         kf = self.p / kp
 
         try:
-            self.cache_values[key] = item
+            with lock:
+                self.cache_values[key] = item
             with open(str(kf), "w") as f:
                 return pickle.dump(item, f)
         except Exception:
             try:
                 # try as binary
-                self.cache_values[key] = item
+                with lock:
+                    self.cache_values[key] = item
                 with open(str(kf), "wb") as f:
                     return pickle.dump(item, f)
             except Exception as err:
