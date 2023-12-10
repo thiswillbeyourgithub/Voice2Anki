@@ -18,7 +18,7 @@ def start_voice2formattedtext(
         open_browser=False,
         debug=False,
         authentication=False,
-        localnetworkonly=False,
+        localnetwork=True,
         use_ssl=True,
         media_folder=None,
         memory_metric="embeddings",
@@ -43,8 +43,8 @@ def start_voice2formattedtext(
     authentication: bool, default False
         if True, will use the login/password pairs specified in VoiceToFormattedText.py
         This if forced to True if share is True
-    localnetworkonly: bool, default False
-        restrict access to the local network only
+    localnetwork: bool, default True
+        Allow access from the local network
     use_ssl: bool, default True
         if True, will use the ssl configuration specified in VoiceToFormattedText.py
     media_folder: str, default None
@@ -95,7 +95,7 @@ def start_voice2formattedtext(
         yel("Authentication enabled")
     else:
         auth_args = {}
-    if localnetworkonly:
+    if localnetwork:
         server = "0.0.0.0"
         yel("Will be accessible on the local network. Use `ifconfig` to find your local IP adress.")
     else:
