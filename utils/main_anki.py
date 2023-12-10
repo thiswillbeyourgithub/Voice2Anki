@@ -789,10 +789,10 @@ def v2ft_db_save(txt_chatgpt_cloz):
     buffer_keys = [k for k in shared.llm_to_db_buffer.keys()]
     dist_buffer_keys = [lev.ratio(txt_chatgpt_cloz, x) for x in buffer_keys]
     min_dist = min(dist_buffer_keys)
-    if min_dist < 0.90:
-        gr.Warning(f"Not saving to V2FT db because min_dist is too low: {min_dist}")
-        return
     closest_buffer_key = buffer_keys[dist_buffer_keys.index(min_dist)]
+    if min_dist < 0.90:
+        gr.Warning(f"Not saving to V2FT db because min_dist is too low: {min_dist}\n* {txt_chatgpt_cloz}\n* {closest_buffer_key}")
+        return
     if shared.running_threads["saving_chatgpt"]:
         [t.join() for t in shared.running_threads["saving_chatgpt"]]
     while shared.running_threads["saving_chatgpt"]:
