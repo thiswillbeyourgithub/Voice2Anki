@@ -285,7 +285,7 @@ with gr.Blocks(
             outputs=[txt_card_done],
             queue=True,
             )
-    update_status_btn.change(
+    update_status_btn.click(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[txt_card_done],
