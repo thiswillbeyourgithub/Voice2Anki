@@ -157,15 +157,14 @@ def get_card_status(txt_chatgpt_cloz):
     txt_chatgpt_cloz is already in anki or not"""
 
     cloz = cloze_editor(txt_chatgpt_cloz)
-    cloz = re.sub(r"{{c\d+::", " ", cloz).strip()
-    cloz = cloz.replace("\n", " ").replace("<br>", " ").replace("<br/>", " ").replace("\"", " ").replace("'", " ").replace("}}", " ").replace(",", " ").replace(":", " ").replace(";", " ")
+    cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
 
     if not cloz:
         return "EMPTY"
 
     if "#####" in cloz:  # multiple cards
         splits = cloz.split("#####")
-        vals = [_call_anki(action="findCards", query=f"added:7 {sp}")
+        vals = [_call_anki(action="findCards", query=f"added:7 body:\"*{sp}*\"")
                 for sp in splits if sp.strip()]
 
         if all(vals):
@@ -176,9 +175,10 @@ def get_card_status(txt_chatgpt_cloz):
             return f"<div style=\"color: red; text-align:center !important; font-weight: bold;\"><br>MISSING {n-s}/{n}</div>"
 
     else:
+        query = f"added:7 body:\"*{cloz}*\""
         state = _call_anki(
                 action="findCards",
-                query=f"added:7 {cloz}"
+                query=query,
                 )
         if state:
             return "<div style=\"text-align: center !important; font-weight:bold;\"><br>DONE</div>"
