@@ -63,3 +63,9 @@ class SharedModule:
 
 
 shared = SharedModule()
+
+def reset_shared():
+    "called when the gradio page is loaded. As otherwise it means the attributes of shared at not in sync anymore."
+    global shared
+    print("Reset shared module.")
+    shared = SharedModule()
