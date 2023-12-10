@@ -2,7 +2,7 @@ import gradio as gr
 
 from .profiles import get_profiles, switch_profile
 from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit
-from .anki_utils import threaded_sync_anki, get_card_status
+from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
@@ -139,6 +139,7 @@ with gr.Blocks(
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
+                    mark_previous = gr.Button(value="Mark previous", scale=0)
                     txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
@@ -253,11 +254,18 @@ with gr.Blocks(
                 variant="primary",
                 )
 
-    # events
+    # events ############################################################
+
+    # load memories only if clickes
     tab_memories.select(
             fn=show_memories,
             inputs=[txt_profile],
             outputs=[txt_memories],
+            )
+
+    # mark the previous card
+    mark_previous.click(
+            fn=mark_previous_note,
             )
 
     # darkmode

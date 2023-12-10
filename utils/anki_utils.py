@@ -201,6 +201,19 @@ def threaded_sync_anki():
     thread = threading.Thread(target=sync_anki)
     thread.start()
 
+@trace
+def mark_previous_note():
+    "add the tag 'marked' to the latest added card."
+    if not shared.added_note_ids:
+        raise Exception(red("No card ids found."))
+    pc = shared.added_note_ids[-1]
+    _call_anki(
+            action="addTags",
+            notes=pc,
+            tags=["marked"],
+            )
+    gr.Message(f"Marked cards with nid:{','.join(pc)}")
+
 
 # load anki profile using ankipandas just to get the media folder
 if shared.media_folder:

@@ -59,5 +59,7 @@ class SharedModule:
 
     running_threads = {}
 
+    added_note_ids = []
+
 
 shared = SharedModule()
