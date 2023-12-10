@@ -13,7 +13,7 @@ theme = gr.themes.Soft(
         primary_hue="violet",
         secondary_hue="purple",
         neutral_hue="gray",
-        text_size="lg",
+        text_size="sm",
         spacing_size="sm",
         radius_size="sm",
         font="ui-sans-serif",
@@ -47,7 +47,9 @@ css = """
 """
 
 def create_audio_compo():
-    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
+    aud = gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
+    aud.change(js=js_hide_some_components)
+    return
 
 
 def roll_audio(*slots):
@@ -76,7 +78,6 @@ with gr.Blocks(
     with gr.Group():
         with gr.Row():
             gr.HTML(value="<h1 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h1>")
-            compact_btn = gr.Button("Compact", scale=0)
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
@@ -266,9 +267,6 @@ with gr.Blocks(
 
     # darkmode
     dark_mode_btn.click(fn=None, js=darkmode_js)
-
-    # hide some elements using js
-    compact_btn.click(js=js_hide_some_components, fn=None)
 
     # sync anki
     sync_btn.click(fn=threaded_sync_anki, queue=True)
