@@ -14,7 +14,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 def start_voice2formattedtext(
         backend="",
         print_db_then_exit=False,
-        do_share=False,
+        share=False,
         open_browser=False,
         debug=False,
         do_auth=False,
@@ -34,7 +34,7 @@ def start_voice2formattedtext(
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
         Example value: "anki_whisper.db"
-    do_share: bool, default False
+    share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
         automatically open the browser
@@ -42,7 +42,7 @@ def start_voice2formattedtext(
         increase verbosity
     do_auth: bool, default False
         if True, will use the login/password pairs specified in VoiceToFormattedText.py
-        This if forced to True if do_share is True
+        This if forced to True if share is True
     localnetworkonly: bool, default False
         restrict access to the local network only
     use_ssl: bool, default True
@@ -80,7 +80,7 @@ def start_voice2formattedtext(
     if kwargs:
         raise Exception(f"Unexpected arguments: {kwargs}")
 
-    if do_share:
+    if share:
         yel("Sharing enabled")
     else:
         whi("Sharing disabled")
@@ -90,7 +90,7 @@ def start_voice2formattedtext(
         whi("Not opening browser.")
     if debug:
         yel("Debug mode enabled")
-    if do_auth or do_share:
+    if do_auth or share:
         auth_args = {"auth": ("v2ft", "v2ft"), "auth_message": "Please login"}
         yel("Authentication enabled")
     else:
@@ -128,7 +128,7 @@ def start_voice2formattedtext(
 
     demo.queue()
     demo.launch(
-            share=do_share,
+            share=share,
             **auth_args,
             inbrowser=open_browser,
             debug=debug,
