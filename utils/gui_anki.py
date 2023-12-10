@@ -129,7 +129,7 @@ with gr.Blocks(
                     with gr.Row():
                         semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary")
                         auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary")
-                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True)
+                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True, min_width=20)
 
                 # quick settings
                 with gr.Row():
