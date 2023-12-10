@@ -201,6 +201,8 @@ class ValueStorage:
         kp = key + ".pickle"
         kf = self.p / kp
 
+        kf.unlink(missing_ok=True)
+
         try:
             with lock:
                 self.cache_values[key] = item
