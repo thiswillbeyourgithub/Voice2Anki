@@ -588,11 +588,14 @@ with gr.Blocks(
                     postprocess=False,
                     queue=True,
                     ).then(
-                            fn=get_card_status,
-                            inputs=[txt_chatgpt_cloz],
-                            outputs=[txt_card_done],
-                            queue=False,
-                            ).success(fn=lambda: False, outputs=[check_marked])
+                            fn=lambda: False,
+                            outputs=[check_marked],
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[txt_card_done],
+                                    queue=False,
+                                    )
 
     # 1+2+3
     auto_btn.click(
