@@ -412,7 +412,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "model_name": model_to_use,
                     "last_message_from_conversation": formatted_messages[-1],
                     "nb_of_message_in_conversation": len(formatted_messages),
-                    "system_prompt": formatted_messages[0],
+                    "system_prompt": default_system_prompt_anki["content"],
                     "cloze": cloz,
                     "V2FT_version": shared.VERSION,
                     })
