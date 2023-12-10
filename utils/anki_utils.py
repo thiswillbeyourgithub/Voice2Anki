@@ -168,6 +168,7 @@ def get_card_status(txt_chatgpt_cloz):
         for sp in splits:
             cloz = cloze_editor(sp)
             cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
+            cloz = cloz.replace("\"", "\\\"")
             val = _call_anki(action="findCards", query=f"added:7 body:\"*{cloz}*\"")
             vals.append(bool(val))
 
@@ -179,6 +180,7 @@ def get_card_status(txt_chatgpt_cloz):
             return f"<div style=\"color: red; text-align:center !important; font-weight: bold;\"><br>MISSING {n-s}/{n}</div>"
 
     else:
+        cloz = cloz.replace("\"", "\\\"")
         query = f"added:7 body:\"*{cloz}*\""
         state = _call_anki(
                 action="findCards",
