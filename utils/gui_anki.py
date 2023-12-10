@@ -180,22 +180,15 @@ with gr.Blocks(
                 placeholder="this string should never appear")
 
     with gr.Tab(label="Future galleries") as tab_galleries:
+        load_fg_btn = gr.Button(value="Load future galleries")
+
         future_galleries = []
-        # load the saved images beforehand to reorder so that the empty
-        # galleries are moved at the end
-        saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
-        while None in saved_fg:
-            saved_fg.remove(None)
-        if len(saved_fg) < shared.future_gallery_slot_nb:
-            saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
-        assert len(saved_fg) == shared.future_gallery_slot_nb
-        it = iter(saved_fg)
 
         for fg in range(1, shared.future_gallery_slot_nb + 1):
             with gr.Row(equal_height=False):
                 with gr.Column(scale=10):
                     gal_ = gr.Gallery(
-                        value=next(it),
+                        value=None,
                         label=f"Gallery {fg}",
                         columns=[2],
                         rows=[1],
@@ -253,6 +246,22 @@ with gr.Blocks(
                 components=[elem[1] for elem in future_galleries],
                 value="Empty all (not saved)",
                 variant="primary",
+                )
+
+        def load_future_galleries():
+            """load the saved images beforehand to reorder so that the empty
+            galleries are moved at the end"""
+            saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
+            while None in saved_fg:
+                saved_fg.remove(None)
+            if len(saved_fg) < shared.future_gallery_slot_nb:
+                saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
+            assert len(saved_fg) == shared.future_gallery_slot_nb
+            return saved_fg
+
+        load_fg_btn.click(
+                fn=load_future_galleries,
+                outputs=[row[1] for row in future_galleries],
                 )
 
     # events ############################################################
