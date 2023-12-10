@@ -212,7 +212,6 @@ def mark_previous_note():
             notes=pc,
             tags=["marked"],
             )
-    gr.Message(f"Marked cards with nid:{','.join(pc)}")
 
 
 # load anki profile using ankipandas just to get the media folder
