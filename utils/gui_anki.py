@@ -167,7 +167,7 @@ with gr.Blocks(
             sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.25, label="Keywords weight")
 
     with gr.Tab(label="Logging"):
-        output_elem = gr.Textbox(value=get_log, label="Logging", lines=10, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
+        output_elem = gr.Textbox(value=get_log, label="Logging", lines=1000, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
 
     with gr.Tab(label="Memories") as tab_memories:
         txt_memories = gr.Textbox(
