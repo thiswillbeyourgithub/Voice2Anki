@@ -71,7 +71,7 @@ class DoneAudioChecker:
                 if len(audio) <= 5000:
                     whi(f"Ignored {p.name} (too short)")
                 else:
-                    whi(f"ISSUE {p.name}")
+                    red(f"ISSUE {p.name}")
                     issues[p.name] = audio
             else:
                 whi(f"Ignored {p.name} (found)")
