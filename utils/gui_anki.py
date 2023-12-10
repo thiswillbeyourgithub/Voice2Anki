@@ -28,11 +28,16 @@ document.querySelector('body').classList.add('dark');
 }"""
 js_hide_some_components = """
 () => {
-  const selectElements = document.querySelectorAll('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
-  selectElements.forEach(el => {
+const hideElements = (selector) => {
+  const elements = document.querySelectorAll(selector);
+  elements.forEach(el => {
     el.classList.add('hide-element');
     el.style.setProperty('display', 'none', 'important');
   });
+}
+hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
+hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
+hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
 }
 
 """
@@ -42,7 +47,7 @@ css = """
 """
 
 def create_audio_compo():
-    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
+    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
 
 
 def roll_audio(*slots):
@@ -71,11 +76,10 @@ with gr.Blocks(
     with gr.Group():
         with gr.Row():
             gr.HTML(value="<h1 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h1>")
+            compact_btn = gr.Button("Compact", scale=0)
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
-            compact_btn = gr.Button("Compact", scale=0)
-            compact_btn.click(js=js_hide_some_components, fn=None)
 
     with gr.Tab(label="Main"):
 
@@ -262,6 +266,9 @@ with gr.Blocks(
 
     # darkmode
     dark_mode_btn.click(fn=None, js=darkmode_js)
+
+    # hide some elements using js
+    compact_btn.click(js=js_hide_some_components, fn=None)
 
     # sync anki
     sync_btn.click(fn=threaded_sync_anki, queue=True)
