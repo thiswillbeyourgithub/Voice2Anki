@@ -17,7 +17,7 @@ def start_voice2formattedtext(
         share=False,
         open_browser=False,
         debug=False,
-        authentication=False,
+        authentication=True,
         localnetwork=True,
         use_ssl=True,
         media_folder=None,
@@ -40,7 +40,7 @@ def start_voice2formattedtext(
         automatically open the browser
     debug: bool, default False
         increase verbosity
-    authentication: bool, default False
+    authentication: bool, default True
         if True, will use the login/password pairs specified in VoiceToFormattedText.py
         This if forced to True if share is True
     localnetwork: bool, default True
