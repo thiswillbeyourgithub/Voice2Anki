@@ -393,6 +393,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n")  # for cosmetic purposes in the textbox
+    cloz = "\n".join([cl.strip() for cl in cloz.splitlines() if cl.strip()])
 
     yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
     red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
