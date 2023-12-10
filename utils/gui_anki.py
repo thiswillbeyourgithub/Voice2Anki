@@ -72,7 +72,7 @@ with gr.Blocks(
 
     with gr.Group():
         with gr.Row():
-            gr.HTML(value="<h1 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h1>")
+            gr.HTML(value="<h3 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h3>")
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
