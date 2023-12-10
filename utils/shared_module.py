@@ -57,9 +57,17 @@ class SharedModule:
     latest_stt_used = None
     latest_llm_used = None
 
-    running_threads = {}
+    running_threads = {
+            "saving_chatgpt": [],
+            "saving_whisper": [],
+            "transcribing_audio": [],
+            "audio_to_anki": [],
+            "ocr": [],
+            "timeout": [],
+            }
 
     added_note_ids = []
+
 
 
 shared = SharedModule()

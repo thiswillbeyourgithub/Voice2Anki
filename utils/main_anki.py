@@ -43,15 +43,7 @@ openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 shared.pv = ValueStorage()
 pv = shared.pv
-
 shared.message_buffer = pv["message_buffer"]
-
-shared.running_threads["saving_chatgpt"] = []
-shared.running_threads["saving_whisper"] = []
-shared.running_threads["transcribing_audio"] = []
-shared.running_threads["audio_to_anki"] = []
-shared.running_threads["ocr"] = []
-shared.running_threads["timeout"] = []
 
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
