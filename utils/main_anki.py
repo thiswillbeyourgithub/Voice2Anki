@@ -779,6 +779,34 @@ def kill_threads():
             shared.running_threads[k] = []
 
 @trace
+def v2ft_db_save(txt_chatgpt_cloz):
+    """when an anki card is created, find the information about its creation
+    in the shared module then save it to the db. It can be missing from the db
+    if the result from alfred was loaded from cache for example."""
+    it not shared.llm_to_db_buffer:
+        gr.Message("Not saving to V2FT db because buffer is empty.")
+        return
+    buffer_keys = [k for k in shared.llm_to_db_buffer.keys()]
+    dist_buffer_keys = [lev.ratio(txt_chatgpt_cloz, x) for x in buffer_keys]
+    min_dist = min(dist_buffer_keys)
+    if min_dist < 0.90:
+        gr.Message(f"Not saving to V2FT db because min_dist is too low: {min_dist}")
+        return
+    closest_buffer_key = buffer_keys[dist_buffer_keys.index(min_dist)]
+    if shared.running_threads["saving_chatgpt"]:
+        [t.join() for t in shared.running_threads["saving_chatgpt"]]
+    while shared.running_threads["saving_chatgpt"]:
+        shared.running_threads["saving_chatgpt"].pop()
+    thread = threading.Thread(
+            target=store_to_db,
+            name="saving_chatgpt",
+            kwargs={
+                "dictionnary": json.loads(shared.llm_to_db_buffer[closest_buffer_key]),
+                "db_name": "anki_llm"})
+    thread.start()
+    shared.running_threads["saving_whisper"].append(thread)
+    del shared.llm_to_db_buffer[closest_buffer_key]
+@trace
 def to_anki(
         audio_mp3_1,
         txt_audio,
@@ -918,21 +946,7 @@ def to_anki(
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
     pv["message_buffer"] = shared.message_buffer
 
-    # if anki card created, add to db
-    closest_buffer_key = sorted([k for k in shared.llm_to_db_buffer.keys()], key=lambda x: lev.ratio(txt_chatgpt_cloz, x))[-1]
-    if shared.running_threads["saving_chatgpt"]:
-        [t.join() for t in shared.running_threads["saving_chatgpt"]]
-    while shared.running_threads["saving_chatgpt"]:
-        shared.running_threads["saving_chatgpt"].pop()
-    thread = threading.Thread(
-            target=store_to_db,
-            name="saving_chatgpt",
-            kwargs={
-                "dictionnary": json.loads(shared.llm_to_db_buffer[closest_buffer_key]),
-                "db_name": "anki_llm"})
-    thread.start()
-    shared.running_threads["saving_whisper"].append(thread)
-    del shared.llm_to_db_buffer[closest_buffer_key]
+    v2ft_db_save(txt_chatgpt_cloz)
 
     gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
     return
