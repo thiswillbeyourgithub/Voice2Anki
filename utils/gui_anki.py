@@ -369,6 +369,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            js=hide_some_components,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -376,11 +377,13 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
+                    js=hide_some_components,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
+                        js=hide_some_components,
                         ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -413,6 +416,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            js=hide_some_components,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -420,6 +424,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
+                    js=hide_some_components,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
@@ -427,6 +432,7 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         queue=True,
+                        js=hide_some_components,
                         ).success(
                             fn=to_anki,
                             inputs=[
@@ -443,6 +449,7 @@ with gr.Blocks(
                             preprocess=False,
                             postprocess=False,
                             queue=True,
+                            js=hide_some_components,
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -463,6 +470,7 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
+                                js=hide_some_components,
                                 ).success(
                                         fn=lambda: False,
                                         outputs=[check_marked]
@@ -493,6 +501,7 @@ with gr.Blocks(
                 ] + audio_slots,
             outputs=audio_slots,
             queue=True,
+            js=hide_some_components,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -500,11 +509,13 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=True,
+                    js=hide_some_components,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
+                        js=hide_some_components,
                         ).then(
                                 fn=None,
                                 js=hide_some_components,
