@@ -75,6 +75,7 @@ with gr.Blocks(
             gr.HTML(value="<h3 style=\"text-align: center; color: lightpurple;\">VoiceToFormattedText - Anki</h3>")
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
+            update_status_btn = gr.Button(value="Status", variant="secondary", scale=0)
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Main"):
@@ -279,6 +280,12 @@ with gr.Blocks(
 
     # display card status
     txt_chatgpt_cloz.change(
+            fn=get_card_status,
+            inputs=[txt_chatgpt_cloz],
+            outputs=[txt_card_done],
+            queue=True,
+            )
+    update_status_btn.change(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[txt_card_done],
