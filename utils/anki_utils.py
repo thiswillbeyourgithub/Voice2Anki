@@ -210,7 +210,7 @@ def mark_previous_note():
     _call_anki(
             action="addTags",
             notes=pc,
-            tags=["marked"],
+            tags="marked",
             )
 
 
