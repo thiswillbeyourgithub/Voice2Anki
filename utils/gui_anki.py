@@ -31,7 +31,6 @@ hide_some_components = """
 const hideElements = (selector) => {
   const elements = document.querySelectorAll(selector);
   elements.forEach(el => {
-    el.classList.add('hide-element');
     el.style.setProperty('display', 'none', 'important');
   });
 }
@@ -41,7 +40,6 @@ hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div
 }
 """
 css = """
-.hide-element { display: none !important; }
 .app.svelte-1kyws56.svelte-1kyws56 { max-width: 100%; }
 """
 
