@@ -58,7 +58,7 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
-llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
+# llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
 
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
