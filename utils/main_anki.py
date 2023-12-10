@@ -921,7 +921,7 @@ def to_anki(
         whi(f"* {cl}")
 
     results = [str(r) for r in results if str(r).isdigit()]
-    shared.added_note_ids.append(results)
+    shared.added_note_ids.append([int(r) for r in results])
 
     if not len(results) == len(clozes):
         red("Some flashcards were not added!"),
