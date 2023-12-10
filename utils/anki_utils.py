@@ -163,9 +163,13 @@ def get_card_status(txt_chatgpt_cloz):
         return "EMPTY"
 
     if "#####" in cloz:  # multiple cards
-        splits = cloz.split("#####")
-        vals = [_call_anki(action="findCards", query=f"added:7 body:\"*{sp}*\"")
-                for sp in splits if sp.strip()]
+        splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
+        vals = []
+        for sp in splits:
+            cloz = cloze_editor(sp)
+            cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
+            val = _call_anki(action="findCards", query=f"added:7 body:\"*{cloz}*\"")
+            vals.append(bool(val))
 
         if all(vals):
             return "<div style=\"text-align: center !important; font-weight:bold;\"><br>DONE</div>"
