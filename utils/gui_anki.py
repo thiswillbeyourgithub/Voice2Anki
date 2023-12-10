@@ -26,9 +26,24 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
+js_hide_some_components = """
+() => {
+  const selectElements = document.querySelectorAll('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
+  selectElements.forEach(el => {
+    el.classList.add('hide-element');
+    el.style.setProperty('display', 'none', 'important');
+  });
+}
+
+"""
+css = """
+.hide-element {
+  display: none !important; }
+"""
 
 def create_audio_compo():
-    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False})
+    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
+
 
 def roll_audio(*slots):
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
@@ -50,6 +65,7 @@ with gr.Blocks(
         analytics_enabled=False,
         title="VoiceToFormattedText - Anki",
         theme=theme,
+        css=css,
         ) as demo_anki:
 
     with gr.Group():
@@ -58,6 +74,8 @@ with gr.Blocks(
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
+            compact_btn = gr.Button("Compact", scale=0)
+            compact_btn.click(js=js_hide_some_components, fn=None)
 
     with gr.Tab(label="Main"):
 
