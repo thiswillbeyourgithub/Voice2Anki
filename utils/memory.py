@@ -344,7 +344,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # add by decreasing pick score
     picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
 
-    output_pr = [default_system_prompt_anki["content"]]  # each picked prompt will be added here
+    output_pr = [default_system_prompt_anki]  # each picked prompt will be added here
     output_pr[0]["pick_score"] = 0
 
     exit_while = False
