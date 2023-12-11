@@ -368,7 +368,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             response = openai.ChatCompletion.create(
                     model=model_to_use,
                     messages=formatted_messages,
-                    stop="END",
                     temperature=temperature,
                     user=user_identifier,
                     )
@@ -715,7 +714,6 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     response = openai.ChatCompletion.create(
             model=model_to_use,
             messages=messages,
-            stop="END",
             temperature=0,
             user=user_identifier,
             )
