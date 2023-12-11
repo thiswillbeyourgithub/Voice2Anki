@@ -95,6 +95,8 @@ with gr.Blocks(
                     with gr.Row():
                         rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
                         dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
+                    with gr.Row():
+                        flag_audio_btn = gr.Button(value="Flag audio", scale=0)
 
                 # image
                 with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
@@ -144,7 +146,6 @@ with gr.Blocks(
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous", scale=0)
-                    flag_audio_btn = gr.Button(value="Flag audio", scale=0)
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
 
