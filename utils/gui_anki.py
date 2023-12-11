@@ -398,6 +398,7 @@ with gr.Blocks(
             queue=True,
             ).then(
                     fn=None,
+                    js=hide_some_components,
                     )
 
     rollaudio_12_btn.click(
