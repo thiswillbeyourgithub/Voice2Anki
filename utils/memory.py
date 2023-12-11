@@ -295,8 +295,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             timesorted_pr[i]["content_sim"] = sim
             distances.append(sim)
 
-        whi(f"Memory with lowest similarity is: '{min_sim}'")
-        whi(f"Memory with highest similarity is: '{max_sim}'")
+        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]['context']}'")
+        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]['context']}'")
         assert len(timesorted_pr) == len(distances), "Unexpected list length"
 
         # scale the distances
