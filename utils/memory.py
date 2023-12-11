@@ -330,8 +330,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # add by decreasing pick score
     picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
 
-    output_pr = [default_system_prompt_anki]  # each picked prompt will be added here
-    output_pr[0]["pick_score"] = 0
+    output_pr = []  # each picked prompt will be added here
 
     exit_while = False
     cnt = 0
@@ -377,13 +376,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
     # or by priority:
     # output_pr = sorted(output_pr, key=lambda x: x["priority"])
-
-    # regardless, make sure the system prompt is first
-    for i, p in enumerate(output_pr):
-        if p["role"] == "system":
-            break
-    output_pr.insert(0, output_pr.pop(i))
-    assert output_pr[0]["role"] == "system", "the first prompt is not system"
 
     return output_pr
 
