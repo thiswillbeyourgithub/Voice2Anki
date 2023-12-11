@@ -219,11 +219,7 @@ with gr.Blocks(
                     queue=False).success(
                             fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
                             inputs=[gal_],
-                            ).success(
-                                    fn=get_img_source,
-                                    inputs=[gal_],
-                                    queue=True,
-                                    )
+                            )
             # send image
             send_.click(
                     fn=lambda x: x,
