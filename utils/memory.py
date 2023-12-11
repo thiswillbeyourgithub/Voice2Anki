@@ -204,6 +204,14 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     assert not any(pr["role"] == "system" for pr in prev_prompts), "Found systel prompt in prompt_filter!"
 
+    # better formatting by removing useless markup
+    for i, m in enumerate(timesorted_pr):
+        assert m["role"] == "user"
+        assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
+        m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
+        if m["content"][-1] == "'":
+            m["content"] = m["content"][:-1]
+
     # count the number of tokens added so far
     new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
     tkns = 0
