@@ -316,6 +316,18 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     return formatted_messages
 
 @trace
+def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
+    """copy audio in slot #1 to the user_directory/flagged folder"""
+    if not shared.dirload_doing:
+        raise Exception("Empty shared.dirload_doing")
+    aud = shared.dirload_doing[0]
+    new_filename = f"user_directory/flagged/{aud.name}"
+    if Path(new_filename).exists():
+        raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
+    shutil.copy2(aud, new_filename)
+    red(f"Flagged {aud} to {new_filename}")
+
+@trace
 @Timeout(30)
 @llm_cache.cache(ignore=["cache_mode"])
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):

@@ -1,7 +1,7 @@
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile
-from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit
+from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 
 from .logger import get_log
@@ -145,6 +145,7 @@ with gr.Blocks(
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous", scale=0)
+                    flag_audio_btn = gr.Button(value="Flag audio", scale=0)
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
 
@@ -269,6 +270,11 @@ with gr.Blocks(
 
     # events ############################################################
 
+    # copy audio to flag button
+    flag_audio_btn.click(
+            fn=flag_audio,
+            inputs=[txt_audio, txt_chatgpt_cloz, txt_chatgpt_context],
+            )
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(
             fn=transcribe,
