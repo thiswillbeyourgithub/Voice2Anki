@@ -304,7 +304,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             "with fewer tokens to make sure you have room for the answer")
         return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
 
-    assert tkns <= 16000, f"Too many tokens! ({tkns})"
+    assert tkns <= 15700, f"Too many tokens: {tkns}"
 
     # print prompts used for the call:
     n = len(formatted_messages)
