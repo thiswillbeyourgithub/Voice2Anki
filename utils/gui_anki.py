@@ -60,6 +60,25 @@ def roll_audio(*slots):
         audio_mp3 = create_audio_compo()
         slots.append(audio_mp3)
 
+    # add trigger to automatically 1+2 if manually pressing on the record button
+    slots[0].stop_recording(
+            fn=transcribe,
+            inputs=[slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+            outputs=[txt_audio],
+            preprocess=False,
+            postprocess=False,
+            queue=True,
+            ).success(
+                    fn=alfred,
+                    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                    outputs=[txt_chatgpt_cloz],
+                    queue=True,
+                    ).then(
+                            fn=None,
+                            js=hide_some_components,
+                            queue=True,
+                            )
+
     return slots
 
 
