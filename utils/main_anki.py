@@ -277,16 +277,22 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                     "content": m["content"],
                     }
                 )
+        formatted_messages.append({
+            "role": "assistant",
+            "content": m["answer"]})
         tkns += m["tkn_len_in"]
         tkns += m["tkn_len_out"]
-        if "answer" in m:
-            assert m["role"] == "user", "expected user"
-            formatted_messages.append({
-                "role": "assistant",
-                "content": m["answer"]})
     for mess in buffer_to_add + [new_prompt]:
         tkns += len(tokenize(mess["content"]))
+
+    # add system prompt
+    formatted_messages.insert(
+            0,
+            {"role": "system", "content": default_system_prompt_anki["content"]}
+            )
+    # add bufffer
     formatted_messages.extend(buffer_to_add)
+    # add the current prompt
     formatted_messages.append(new_prompt)
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
@@ -341,11 +347,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             assert fm["role"] == "assistant"
         elif i % 2 == 0:
             assert fm["role"] == "user"
-
-    # add system prompt
-    formatted_messages.insert(
-            0,
-            {"role": "system", "content": default_system_prompt_anki["content"]})
 
     if not check_gpt4:
         model_to_use = "gpt-3.5-turbo-1106"
