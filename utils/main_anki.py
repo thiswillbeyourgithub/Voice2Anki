@@ -344,6 +344,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         elif i % 2 == 1:
             assert fm["role"] == "user"
 
+    # check no duplicate in messages
+    assert len(set([fm["content"] for fm in formatted_messages])) == len(formatted_messages), "duplicate prompts!"
+
     if not check_gpt4:
         model_to_use = "gpt-3.5-turbo-1106"
         model_price = (0.001, 0.002)
