@@ -133,13 +133,11 @@ def check_prompts(prev_prompts):
     whi("Checking prompt validity")
     for i, mess in enumerate(prev_prompts):
 
+        assert mess["role"] != "system", "system message should not be here"
         if mess["role"] == "user":
             assert "answer" in mess, "no answer key in message"
             assert "{{c1::" in mess["answer"], f"No cloze found in {mess}"
             assert "}}" in mess["answer"], f"No cloze found in {mess}"
-        elif mess["role"] == "system":
-            mess["content"] = default_system_prompt["content"]
-            mess["priority"] = default_system_prompt["priority"]
         else:
             raise ValueError("role of previous prompt is not user or system")
 
@@ -163,13 +161,8 @@ def check_prompts(prev_prompts):
         if "hash" not in mess:
             mess["hash"] = hasher(mess["content"])
 
-        if "tkn_len_in" not in mess:
-            mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
-            if "answer" in mess:  # system prompt has no answer
-                mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
-            else:
-                assert mess["role"] == "system", "expected system message here"
-                mess["tkn_len_out"] = 0
+        mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
+        mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
         assert isinstance(mess["tkn_len_in"], int), "tkn_len_in is not int!"
         assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
         assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
