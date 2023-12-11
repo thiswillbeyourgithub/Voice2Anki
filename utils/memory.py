@@ -48,7 +48,7 @@ default_system_prompt_md = {
 
 default_system_prompt_anki = {
             "role": "system",
-            "content": dedent("""You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into Anki cloze flashcards.Always end your replies by "END". If you create several flashcards for one transcript, separate them with "#####". if you can't do itstart by 'Alfred' and I'll take a look immediately."""),
+            "content": dedent("""You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into Anki cloze flashcards.Always end your replies by "END". If you create several flashcards for one transcript, separate them with "#####". if you can't do it start by 'Alfred' and I'll take a look immediately."""),
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }

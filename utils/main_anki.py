@@ -339,7 +339,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
-        if i % 2 == 0:
+        elif i % 2 == 0:
             assert fm["role"] == "assistant"
         elif i % 2 == 1:
             assert fm["role"] == "user"
