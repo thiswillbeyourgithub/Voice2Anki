@@ -455,7 +455,7 @@ def load_prev_prompts(profile):
 
 def display_price(sld_max_tkn, check_gpt4):
     if check_gpt4:
-        price = [0.03, 0.06]
+        price = [0.01, 0.03]
     else:
         price = [0.001, 0.002]
     price_adj = price[0] * 0.9 + price[1] * 0.1
