@@ -268,8 +268,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             if timesorted_pr[i]["length_dist"] < min_sim[0]:
                 min_sim[0] = timesorted_pr[i]["length_dist"]
                 min_sim[1] = pr["content"]
-        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]['context']}'")
-        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]['context']}'")
+        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
+        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
         assert len(timesorted_pr) == len(distances), "Unexpected list length"
 
     elif shared.memory_metric == "embeddings":
@@ -295,8 +295,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             timesorted_pr[i]["content_sim"] = sim
             distances.append(sim)
 
-        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]['context']}'")
-        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]['context']}'")
+        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
+        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
         assert len(timesorted_pr) == len(distances), "Unexpected list length"
 
         # scale the distances
