@@ -198,24 +198,17 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
 
-    new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
-
-
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
 
-    # get average and spread of tkns lengths to keep only the most similar
-    lens = [p["tkn_len_in"] for p in prev_prompts]
-
     timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
-    syspr = [pr for pr in prev_prompts if pr["role"] == "system"]
-    assert len(syspr) == 1, "Number of system prompts != 1"
-    assert syspr[0] == timesorted_pr[-1], "System prompt is not the oldest memory!"
-    # remove the system prompt
-    timesorted_pr.remove(syspr[0])
+    assert not any(pr["role"] == "system" for pr in prev_prompts), "Found systel prompt in prompt_filter!"
 
-    tkns = syspr[0]["tkn_len_in"]  # count the number of tokens added so far
-    tkns += new_prompt_len
+    # count the number of tokens added so far
+    new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
+    tkns = 0
+    tkns += len(tokenize(default_system_prompt_anki["content"]))  # system prompt
+    tkns += new_prompt_len  # current question + message buffer
     all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in timesorted_pr])
 
     # score based on priority. Closer to 1 means higher chances of being picked

@@ -222,7 +222,10 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     else:
         keywords = []
 
+    # load prompts from memory.json
     prev_prompts = load_prev_prompts(profile)
+
+    # format the new prompt
     new_prompt = {
             "role": "user",
             "content": dedent(
@@ -297,7 +300,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
-    # try a better formatting
+    # better formatting by removing useless markup
     for i, m in enumerate(formatted_messages):
         if m["role"] == "user":
             assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
