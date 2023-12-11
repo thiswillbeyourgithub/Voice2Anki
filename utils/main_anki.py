@@ -285,7 +285,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             "content": m["answer"]})
         tkns += m["tkn_len_in"]
         tkns += m["tkn_len_out"]
-    for mess in buffer_to_add + [new_prompt, default_system_prompt_anki["content"]]:
+    for mess in buffer_to_add + [new_prompt, default_system_prompt_anki]:
         tkns += len(tokenize(mess["content"]))
 
     # add system prompt
