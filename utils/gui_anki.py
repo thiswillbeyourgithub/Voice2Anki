@@ -136,18 +136,22 @@ with gr.Blocks(
 
                 # quick settings
                 with gr.Row():
-                    sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=100, label="LLM avail. tkn.", scale=1)
-                    sld_whisp_temp = gr.Slider(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
-                    sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
-                    sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
-                    check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0, min_width=20)
-                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0, min_width=20)
-                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
+                    with gr.Column(scale=10):
+                        sld_max_tkn = gr.Slider(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=100, label="LLM avail. tkn.", scale=1)
+                        sld_whisp_temp = gr.Slider(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
+                        sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
+                        sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+                    with gr.Column(min_width=50, scale=0):
+                        check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0, min_width=20)
+                        check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True, scale=0, min_width=20)
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous", scale=0)
                     sld_improve = gr.Slider(minimum=0, maximum=10, value=5, step=1, label="Feedback priority", scale=5)
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary", scale=0)
+
+                with gr.Row():
+                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
