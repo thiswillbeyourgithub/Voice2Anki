@@ -138,8 +138,8 @@ with gr.Blocks(
                     sld_whisp_temp = gr.Slider(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
                     sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
-                    check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
-                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0)
+                    check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0, min_width=20)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0, min_width=20)
                     txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
                     txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
