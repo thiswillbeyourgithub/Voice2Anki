@@ -789,7 +789,10 @@ def kill_threads():
     with threading.Lock():
         for k in shared.running_threads:
             n = sum([t.is_alive() for t in shared.running_threads[k]])
-            red(f"Killing the {n} alive threads of {k}")
+            if n >= 1:
+                red(f"Killing the {n} alive threads of {k}")
+            else:
+                whi(f"No thread to kill of {k}")
             shared.running_threads[k] = []
 
 @trace
