@@ -140,7 +140,6 @@ with gr.Blocks(
                     sld_buffer = gr.Slider(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0, min_width=20)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark", show_label=True, scale=0, min_width=20)
-                    txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
                     txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2)
 
                 with gr.Row():
@@ -160,6 +159,8 @@ with gr.Blocks(
         with gr.Row():
             txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
             txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
+        with gr.Row():
+            txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
         with gr.Row():
             if shared.memory_metric == "embeddings":
                 sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.25, label="Embeddings weight")
