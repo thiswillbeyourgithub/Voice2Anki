@@ -265,10 +265,10 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             keywords=keywords,
             )
 
-    # check the number of token is fine and format the previous
-    # prompts in chatgpt format
     formatted_messages = []
 
+    # check the number of token is fine and format the previous
+    # prompts in chatgpt format
     tkns = 0
     for m in prev_prompts:
         formatted_messages.append(
@@ -282,7 +282,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             "content": m["answer"]})
         tkns += m["tkn_len_in"]
         tkns += m["tkn_len_out"]
-    for mess in buffer_to_add + [new_prompt]:
+    for mess in buffer_to_add + [new_prompt, default_system_prompt_anki["content"]]:
         tkns += len(tokenize(mess["content"]))
 
     # add system prompt
@@ -343,9 +343,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
-        if i % 2 == 1:
+        if i == 0:
+            assert fm["role"] == "system"
+        if i % 2 == 0:
             assert fm["role"] == "assistant"
-        elif i % 2 == 0:
+        elif i % 2 == 1:
             assert fm["role"] == "user"
 
     if not check_gpt4:
