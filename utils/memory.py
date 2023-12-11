@@ -349,6 +349,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         for pr_idx, pr in enumerate(picksorted):
             if pr in output_pr:
                 continue
+            if pr in prompt_messages:
+                continue
 
             if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] >= max_token:
                 # will exit while at the end of this loop but not
