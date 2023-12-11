@@ -268,11 +268,14 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             keywords=keywords,
             )
 
+    # add all prompts together to format the messages list
     formatted_messages = []
-
-    # check the number of token is fine and format the previous
-    # prompts in chatgpt format
-    tkns = 0
+    # add system prompt
+    formatted_messages.insert(
+            0,
+            {"role": "system", "content": default_system_prompt_anki["content"]}
+            )
+    # add the selected prompts
     for m in prev_prompts:
         formatted_messages.append(
                 {
@@ -283,20 +286,16 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
         formatted_messages.append({
             "role": "assistant",
             "content": m["answer"]})
-        tkns += m["tkn_len_in"]
-        tkns += m["tkn_len_out"]
-    for mess in buffer_to_add + [new_prompt, default_system_prompt_anki]:
-        tkns += len(tokenize(mess["content"]))
-
-    # add system prompt
-    formatted_messages.insert(
-            0,
-            {"role": "system", "content": default_system_prompt_anki["content"]}
-            )
-    # add bufffer
+    # add message buffer
     formatted_messages.extend(buffer_to_add)
     # add the current prompt
     formatted_messages.append(new_prompt)
+
+    # check the number of token is fine and format the previous
+    # prompts in chatgpt format
+    tkns = 0
+    for mess in formatted_messages:
+        tkns += len(tokenize(mess["content"]))
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
