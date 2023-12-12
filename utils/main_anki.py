@@ -465,8 +465,8 @@ def dirload_splitted(
         txt_keywords,
 
         *audios,
-        prog=gr.Progress(),
-        # prog=None,
+        # prog=gr.Progress(),
+        prog=None,
         ):
     """
     load the audio file that were splitted previously one by one in the
