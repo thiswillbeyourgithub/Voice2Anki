@@ -110,7 +110,7 @@ with gr.Blocks(
 
         with gr.Row():
 
-            with gr.Column(scale=1):
+            with gr.Column(scale=1, min_width=100):
 
                 # audio
                 audio_number = shared.audio_slot_nb
