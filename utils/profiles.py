@@ -185,6 +185,7 @@ class ValueStorage:
             if self.running_tasks[key] is not None:
                 red(f"Waiting for task of {key} to finish.")
                 self.running_tasks[key].join()
+                whi(f"Done waiting for task {key}")
                 if item == self.cache_values[key]:  # value might
                     # have changed during the execution
                     return
