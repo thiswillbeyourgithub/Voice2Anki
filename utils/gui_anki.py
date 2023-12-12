@@ -192,7 +192,7 @@ with gr.Blocks(
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Logging"):
-        output_elem = gr.Textbox(value=get_log, label="Logging", lines=100, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
+        output_elem = gr.Textbox(value=get_log, label="Logging", lines=100, max_lines=1000, every=5, interactive=False, placeholder="this string should never appear")
 
     with gr.Tab(label="Memories") as tab_memories:
         txt_memories = gr.Textbox(
