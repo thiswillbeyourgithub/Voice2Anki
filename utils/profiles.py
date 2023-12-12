@@ -144,18 +144,12 @@ class ValueStorage:
                 default = 0
             elif key == "message_buffer":
                 default = []
-            elif key == "txt_keywords":
-                default = None
             elif key == "sld_prio_weight":
                 default = 1
             elif key == "sld_pick_weight":
                 default = 1
             elif key == "sld_keywords_weight":
                 default = 5
-            elif key == "txt_extra_source":
-                default = None
-            elif key.startswith("future_gallery_"):
-                default = None
             else:
                 default = None
             self.cache_values[key] = default
