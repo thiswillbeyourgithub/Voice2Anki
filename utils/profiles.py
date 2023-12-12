@@ -96,7 +96,7 @@ class ValueStorage:
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         if self.running_tasks[key] is not None:
-            red(f"Waiting for task of {key} to finish.")
+            whi(f"Waiting for task of {key} to finish.")
             self.running_tasks[key].join()
             whi(f"Done waiting for task {key}")
 
@@ -183,7 +183,7 @@ class ValueStorage:
         if not self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
             if self.running_tasks[key] is not None:
-                red(f"Waiting for task of {key} to finish.")
+                whi(f"Waiting for task of {key} to finish.")
                 self.running_tasks[key].join()
                 whi(f"Done waiting for task {key}")
                 if item == self.cache_values[key]:  # value might
