@@ -273,35 +273,35 @@ with gr.Blocks(
                 outputs=[row[1] for row in future_galleries],
                 )
 
-    with gr.Tab(label="Files"):
-        with gr.Accordion(label="Done", open=False):
-            fex_done = gr.FileExplorer(
-                    root="user_directory/done",
-                    label="Done",
-                    interactive=True,
-                    # ignore_glob="**/.st*",
-                    )
-        with gr.Accordion(label="Splitted", open=False):
-            fex_splitted = gr.FileExplorer(
-                    root="user_directory/splitted",
-                    label="Splitted",
-                    interactive=True,
-                    # ignore_glob="**/.st*",
-                    )
-        with gr.Accordion(label="Unsplitted", open=False):
-            fex_unsplitted = gr.FileExplorer(
-                    root="user_directory/unsplitted",
-                    label="Unsplitted",
-                    interactive=True,
-                    # ignore_glob="**/.st*",
-                    )
-        with gr.Accordion(label="Flagged", open=False):
-            fex_flagged = gr.FileExplorer(
-                    root="user_directory/flagged",
-                    label="Flagged",
-                    interactive=True,
-                    # ignore_glob="**/.st*",
-                    )
+    # with gr.Tab(label="Files"):
+    #     with gr.Accordion(label="Done", open=False):
+    #         fex_done = gr.FileExplorer(
+    #                 root="user_directory/done",
+    #                 label="Done",
+    #                 interactive=True,
+    #                 # ignore_glob="**/.st*",
+    #                 )
+    #     with gr.Accordion(label="Splitted", open=False):
+    #         fex_splitted = gr.FileExplorer(
+    #                 root="user_directory/splitted",
+    #                 label="Splitted",
+    #                 interactive=True,
+    #                 # ignore_glob="**/.st*",
+    #                 )
+    #     with gr.Accordion(label="Unsplitted", open=False):
+    #         fex_unsplitted = gr.FileExplorer(
+    #                 root="user_directory/unsplitted",
+    #                 label="Unsplitted",
+    #                 interactive=True,
+    #                 # ignore_glob="**/.st*",
+    #                 )
+    #     with gr.Accordion(label="Flagged", open=False):
+    #         fex_flagged = gr.FileExplorer(
+    #                 root="user_directory/flagged",
+    #                 label="Flagged",
+    #                 interactive=True,
+    #                 # ignore_glob="**/.st*",
+    #                 )
 
     # events ############################################################
 
