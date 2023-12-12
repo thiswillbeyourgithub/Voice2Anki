@@ -143,7 +143,7 @@ with gr.Blocks(
                 # 1+2 / 1+2+3
                 with gr.Group():
                     with gr.Row():
-                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=False, show_label=True, scale=2, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
+                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=True, show_label=True, scale=2, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
                         auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary", scale=1)
                         semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary", scale=2)
 
@@ -164,7 +164,7 @@ with gr.Blocks(
 
                 with gr.Row():
                     check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
-                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), show_label=False, interactive=False, max_lines=2, lines=2, scale=5)
+                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
