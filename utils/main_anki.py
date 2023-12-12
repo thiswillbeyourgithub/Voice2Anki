@@ -465,14 +465,17 @@ def dirload_splitted(
         txt_keywords,
 
         *audios,
-        prog=gr.Progress()):
+        prog=gr.Progress(),
+        # prog=None,
+        ):
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
-    if not hasattr(shared, "prog_total"):
-        shared.prog_total = len(list(Path("user_directory/splitted").rglob("*mp3")))
-    pbar = prog.tqdm([True] * shared.prog_total, desc="MP3s")
+    if prog is not None:
+        if not hasattr(shared, "prog_total"):
+            shared.prog_total = len(list(Path("user_directory/splitted").rglob("*mp3")))
+        pbar = prog.tqdm([True] * shared.prog_total, desc="MP3s")
 
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
@@ -520,7 +523,8 @@ def dirload_splitted(
     sounds_to_load = []
     new_threads = []
     for path in shared.dirload_queue[:empty_slots]:
-        pbar.update(1)
+        if prog is not None:
+            pbar.update(1)
         to_temp = tmp_dir / path.name
         shutil.copy2(path, to_temp)
         assert (path.exists() and (to_temp).exists()), "unexpected sound location"
