@@ -353,6 +353,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 continue
             if pr in prompt_messages:
                 continue
+            if pr["content"] in pm_contents:
+                raise Exception("This shouldn't happen: memorized prompt present in buffer")
 
             if tkns + pr["tkn_len_in"] + pr["tkn_len_out"] >= max_token:
                 # will exit while at the end of this loop but not
