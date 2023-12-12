@@ -241,7 +241,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
         whi(f"Length of message_buffer: {len(shared.message_buffer)}")
 
         for mb in shared.message_buffer[::-1]:
-            if len(buffer_to_add) > sld_buffer:
+            if len(buffer_to_add) / 2 > sld_buffer:
                 break
             if txt_audio in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
                 continue
