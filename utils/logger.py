@@ -191,6 +191,8 @@ indent = -2
 def trace(func):
     """simple wrapper to use as decorator to print when a function is used
     and for how long"""
+    if shared.disable_tracing:
+        return func
     def wrapper(*args, **kwargs):
         global indent
         indent += 2
@@ -211,6 +213,10 @@ def trace(func):
 def Timeout(limit):
     """wrapper to add a timeout to function. I had to use threading because
     signal could not be used outside of the main thread in gradio"""
+    if shared.disable_timeout:
+        def decorator(func):
+            return func
+        return decorator
     # create methods like "t30"  to wrap with a 30s timeout
     def decorator(func):
         def wrapper(*args, **kwargs):

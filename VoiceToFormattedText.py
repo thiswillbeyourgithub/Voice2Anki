@@ -22,6 +22,8 @@ def start_voice2formattedtext(
         use_ssl=True,
         media_folder=None,
         memory_metric="embeddings",
+        disable_tracing=False,
+        disable_timeout=False,
         *args,
         **kwargs
         ):
@@ -53,6 +55,12 @@ def start_voice2formattedtext(
     memory_metric: str, default "embeddings"
         if "length", will not use embeddings to improve the memory filtering
         but instead rely on finding memories with adequate length.
+    disable_tracing: bool, default False
+        if True, disables the decorator that indicates which function were
+        called
+    disable_timeout: bool, default False
+        if True, disables the decorator that creates a thread used for
+        timeout of long functions
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -106,6 +114,8 @@ def start_voice2formattedtext(
     shared.memory_metric = memory_metric
     shared.media_folder = media_folder
     shared.debug = debug
+    shared.disable_tracing = disable_tracing
+    shared.disable_timeout = disable_timeout
 
     if backend == "anki":
         shared.backend = "anki"
