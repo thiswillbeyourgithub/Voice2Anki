@@ -272,11 +272,34 @@ with gr.Blocks(
                 )
 
     with gr.Tab(label="Files"):
-        fex = gr.FileExplorer(
-                root="../user_directory/",
-                label="User directory",
-                interactive=False,
-                )
+        with gr.Accordion(label="Done", open=False):
+            fex_done = gr.FileExplorer(
+                    root="user_directory/done",
+                    label="Done",
+                    interactive=True,
+                    # ignore_glob="**/.st*",
+                    )
+        with gr.Accordion(label="Splitted", open=False):
+            fex_splitted = gr.FileExplorer(
+                    root="user_directory/splitted",
+                    label="Splitted",
+                    interactive=True,
+                    # ignore_glob="**/.st*",
+                    )
+        with gr.Accordion(label="Unsplitted", open=False):
+            fex_unsplitted = gr.FileExplorer(
+                    root="user_directory/unsplitted",
+                    label="Unsplitted",
+                    interactive=True,
+                    # ignore_glob="**/.st*",
+                    )
+        with gr.Accordion(label="Flagged", open=False):
+            fex_flagged = gr.FileExplorer(
+                    root="user_directory/flagged",
+                    label="Flagged",
+                    interactive=True,
+                    # ignore_glob="**/.st*",
+                    )
 
     # events ############################################################
 
