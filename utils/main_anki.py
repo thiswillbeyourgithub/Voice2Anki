@@ -247,7 +247,13 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
         for mb in shared.message_buffer[::-1]:
             if len(buffer_to_add) / 2 >= sld_buffer:
                 break
-            if txt_audio in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
+            if lev.ratio(txt_audio, mb["unformatted_txt_audio"]) >= 0.95:
+                # skip this one
+                red(f"Skipped buffer: {mb}")
+                continue
+            if lev.ratio(txt_audio, mb["question"]) >= 0.95:
+                # skip this one
+                red(f"Skipped buffer: {mb}")
                 continue
             q = mb["question"]
             if "Context: '" in q:  # remove useless formatting
