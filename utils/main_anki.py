@@ -272,7 +272,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                             }
                         ]
                     )
-            whi("Added message_buffer to the prompt.")
+            # whi(f"Added message_buffer to the prompt: {mb}")
     else:
         whi("Ignored message buffer")
 
@@ -385,7 +385,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if len(set([fm["content"] for fm in formatted_messages])) != len(formatted_messages):
         contents = [pm["content"] for pm in formatted_messages]
         dupli = [dp for dp in contents if contents.count(dp) > 1]
-        raise Exception(f"{len(dupli)} duplicate prompts found in memory.py: {dupli}")
+        raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}")
 
     if not check_gpt4:
         model_to_use = "gpt-3.5-turbo-1106"
