@@ -161,7 +161,7 @@ def get_card_status(txt_chatgpt_cloz):
     cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
 
     if not cloz:
-        return gr.Button("EMPTY", variant="primary")
+        return gr.Button("EMPTY")
 
     if "#####" in cloz:  # multiple cards
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
@@ -174,7 +174,7 @@ def get_card_status(txt_chatgpt_cloz):
             vals.append(bool(val))
 
         if all(vals):
-            return gr.Button("DONE")
+            return gr.Button("Added")
         else:
             s = sum([bool(b) for b in vals])
             n = len(vals)
@@ -188,7 +188,7 @@ def get_card_status(txt_chatgpt_cloz):
                 query=query,
                 )
         if state:
-            return gr.Button("DONE")
+            return gr.Button("Added")
         else:
             return gr.Button("MISSING", variant="primary")
 
