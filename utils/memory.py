@@ -385,6 +385,12 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # or by priority:
     # output_pr = sorted(output_pr, key=lambda x: x["priority"])
 
+    # check no duplicate prompts
+    contents = [pm["content"] for pm in output_pr]
+    dupli = [dp for dp in contents if contents.count(dp) > 1]
+    if dupli:
+        raise Exception(f"Duplicate prompts found in memory.py: {dupli}")
+
     return output_pr
 
 
