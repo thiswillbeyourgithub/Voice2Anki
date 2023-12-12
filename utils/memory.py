@@ -1,3 +1,4 @@
+import gradio as gr
 import re
 from tqdm import tqdm
 import numpy as np
@@ -57,9 +58,6 @@ elif shared.backend == "markdown":
     backend = "markdown"
 else:
     raise Exception(shared.backend)
-
-assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
-openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
@@ -190,6 +188,10 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
     whi("Filtering prompts")
+    if not shared.pv["txt_openai_api_key"]:
+        gr.Error("No API key provided for OpenAI in the settings.")
+        raise Exception("No API key provided for OpenAI in the settings.")
+    openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")

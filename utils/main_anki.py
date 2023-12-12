@@ -38,9 +38,6 @@ splitted_dir.mkdir(exist_ok=True)
 unsplitted_dir.mkdir(exist_ok=True)
 done_dir.mkdir(exist_ok=True)
 
-assert Path("API_KEY.txt").exists(), "No api key found. Create a file API_KEY.txt and paste your openai API key inside"
-openai.api_key = str(Path("API_KEY.txt").read_text()).strip()
-
 shared.pv = ValueStorage()
 pv = shared.pv
 shared.message_buffer = pv["message_buffer"]
@@ -122,6 +119,10 @@ def thread_whisp_then_llm(
     audio_mp3 = format_audio_component(audio_mp3)
     if shared.latest_stt_used != modelname:
         shared.latest_stt_used = modelname
+    if not shared.pv["txt_openai_api_key"]:
+        gr.Error("No API key provided for OpenAI in the settings.")
+        raise Exception("No API key provided for OpenAI in the settings.")
+    openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -351,6 +352,10 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         else:
             gr.Error(red(f"Image change detected: '{txt_audio}'"))
             return
+    if not shared.pv["txt_openai_api_key"]:
+        gr.Error("No API key provided for OpenAI in the settings.")
+        raise Exception("No API key provided for OpenAI in the settings.")
+    openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
