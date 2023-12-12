@@ -356,12 +356,14 @@ with gr.Blocks(
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
             queue=True,
+            show_progress=False,
             )
     update_status_btn.click(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
             queue=True,
+            show_progress=False,
             )
 
     # display pricing then save values
@@ -635,6 +637,7 @@ with gr.Blocks(
                             inputs=[txt_chatgpt_cloz],
                             outputs=[update_status_btn],
                             queue=True,
+                            show_progress=False,
                             )
 
     # 1+2
@@ -676,6 +679,7 @@ with gr.Blocks(
                                     inputs=[txt_chatgpt_cloz],
                                     outputs=[update_status_btn],
                                     queue=True,
+                                    show_progress=False,
                                     )
 
     # 1+2+3
@@ -717,6 +721,7 @@ with gr.Blocks(
                                     inputs=[txt_chatgpt_cloz],
                                     outputs=[update_status_btn],
                                     queue=True,
+                                    show_progress=False,
                                     )
 
     improve_btn.click(
