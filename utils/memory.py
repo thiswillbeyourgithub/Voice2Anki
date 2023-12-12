@@ -24,8 +24,8 @@ tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 tokenize = tokenizer.encode
 
 transcript_template = """
-Context: 'CONTEXT'
-Transcript: 'TRANSCRIPT'
+CONTEXT
+TRANSCRIPT
 """.strip()
 
 default_system_prompt_md = {
@@ -89,18 +89,8 @@ embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
 def embedder(text, format):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
-    if format == "content":
-        text = text.split("Transcript: '")
-        if not len(text) == 2:
-            raise Exception(text)
-        text = text[1]
-        if not text[-1] == "'":
-            raise Exception(text)
-        text = text[:-1]
-    elif format == "answer":
-        pass
-    else:
-        raise ValueError(format)
+    assert "Transcript: '" not in text
+    assert format in ["content", "answer"]
 
     # try to bias the embedder to focus on the structure
     text = f"Pay attention to the structure of  this text: '{text}'"
@@ -205,10 +195,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # better formatting by removing useless markup
     for i, m in enumerate(timesorted_pr):
         assert m["role"] == "user"
-        assert "Context: '" in m["content"] and "Transcript: '" in m["content"], f"Invalid prompt: {m}"
-        m["content"] = m["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
-        if m["content"][-1] == "'":
-            m["content"] = m["content"][:-1]
+        assert "Context: '" not in m["content"] and "Transcript: '" not in m["content"], f"Invalid prompt: {m}"
 
     # count the number of tokens added so far
     new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
