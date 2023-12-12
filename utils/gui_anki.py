@@ -257,7 +257,7 @@ with gr.Blocks(
                     outputs=[gallery],
                     preprocess=False,
                     postprocess=False,
-                    queue=False).then(
+                    queue=False).success(
                             fn=shared.pv.save_gallery,
                             inputs=[gallery]
                             ).then(
