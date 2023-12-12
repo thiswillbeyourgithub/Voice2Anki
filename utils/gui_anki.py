@@ -91,7 +91,6 @@ with gr.Blocks(
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             update_status_btn = gr.Button(value="Status", variant="secondary", scale=0)
-            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Main"):
 
@@ -190,6 +189,8 @@ with gr.Blocks(
             sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.25, label="Keywords weight")
         with gr.Row():
             txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
+        with gr.Row():
+            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
     with gr.Tab(label="Logging"):
         output_elem = gr.Textbox(value=get_log, label="Logging", lines=100, max_lines=1000, every=1, interactive=False, placeholder="this string should never appear")
