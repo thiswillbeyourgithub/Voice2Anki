@@ -378,11 +378,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         model_price = (0.01, 0.03)
     whi(f"Will use model {model_to_use}")
 
-    # in case recur improv is called
-    if model_to_use != shared.latest_llm_used:
-        with threading.Lock():
-            shared.latest_llm_used = model_to_use
-
     cnt = 0
     while True:
         try:
@@ -404,6 +399,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     input_tkn_cost = response["usage"]["prompt_tokens"]
     output_tkn_cost = response["usage"]["completion_tokens"]
     tkn_cost = [input_tkn_cost, output_tkn_cost]
+
+    # in case recur improv is called
+    if model_to_use != shared.latest_llm_used:
+        with threading.Lock():
+            shared.latest_llm_used = model_to_use
 
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     pv["total_llm_cost"] += tkn_cost_dol
