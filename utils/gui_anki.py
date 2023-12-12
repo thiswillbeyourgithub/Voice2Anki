@@ -57,7 +57,7 @@ def create_audio_compo():
             waveform_options={"show_controls": False},
             elem_id="Audio_component_V2FT",
             elem_classes="Audio_component_V2FT",
-            min_width=10,
+            # min_width=10,
             )
 
 
