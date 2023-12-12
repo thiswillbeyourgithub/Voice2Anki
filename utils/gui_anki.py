@@ -309,6 +309,7 @@ with gr.Blocks(
     flag_audio_btn.click(
             fn=flag_audio,
             inputs=[txt_audio, txt_chatgpt_cloz, txt_chatgpt_context],
+            show_progress=False,
             )
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(
@@ -327,6 +328,7 @@ with gr.Blocks(
                             fn=None,
                             js=hide_some_components,
                             queue=True,
+                            show_progress=False,
                             )
 
     # load memories only if clickes
@@ -334,21 +336,23 @@ with gr.Blocks(
             fn=show_memories,
             inputs=[txt_profile],
             outputs=[txt_memories],
+            show_progress=False,
             )
 
     # mark the previous card
     mark_previous.click(
             fn=mark_previous_note,
+            show_progress=False,
             )
 
     # darkmode
-    dark_mode_btn.click(fn=None, js=darkmode_js)
+    dark_mode_btn.click(fn=None, js=darkmode_js, show_progress=False)
 
     # sync anki
-    sync_btn.click(fn=threaded_sync_anki, queue=True)
+    sync_btn.click(fn=threaded_sync_anki, queue=True, show_progress=False)
 
     # kill threads before timeout
-    kill_threads_btn.click(fn=kill_threads)
+    kill_threads_btn.click(fn=kill_threads, show_progress=False)
 
     # display card status
     txt_chatgpt_cloz.change(
@@ -371,35 +375,39 @@ with gr.Blocks(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
+            show_progress=False,
             ).success(
                     fn=shared.pv.save_sld_max_tkn,
                     inputs=[sld_max_tkn],
+                    show_progress=False,
                     )
     check_gpt4.change(
             fn=display_price,
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
+            show_progress=False,
             ).success(
                     fn=shared.pv.save_check_gpt4,
                     inputs=[check_gpt4],
+                    show_progress=False,
                     )
 
     # change some values to profile
-    sld_whisp_temp.change(fn=shared.pv.save_sld_whisp_temp, inputs=[sld_whisp_temp])
-    sld_buffer.change(fn=shared.pv.save_sld_buffer, inputs=[sld_buffer])
-    sld_temp.change(fn=shared.pv.save_sld_temp, inputs=[sld_temp])
-    roll_dirload_check.change(fn=shared.pv.save_dirload_check, inputs=[roll_dirload_check])
-    txt_tags.change(fn=shared.pv.save_txt_tags, inputs=[txt_tags])
-    txt_deck.change(fn=shared.pv.save_txt_deck, inputs=[txt_deck])
-    txt_chatgpt_context.change(fn=shared.pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context])
-    txt_whisp_prompt.change(fn=shared.pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt])
-    txt_whisp_lang.change(fn=shared.pv.save_txt_whisp_lang, inputs=[txt_whisp_lang])
-    txt_keywords.change(fn=shared.pv.save_txt_keywords, inputs=[txt_keywords])
-    sld_pick_weight.change(fn=shared.pv.save_sld_pick_weight, inputs=[sld_pick_weight])
-    sld_prio_weight.change(fn=shared.pv.save_sld_prio_weight, inputs=[sld_prio_weight])
-    sld_keywords_weight.change(fn=shared.pv.save_sld_keywords_weight, inputs=[sld_keywords_weight])
-    txt_extra_source.change(fn=shared.pv.save_txt_extra_source, inputs=[txt_extra_source])
-    txt_openai_api_key.change(fn=shared.pv.save_txt_openai_api_key, inputs=[txt_openai_api_key])
+    sld_whisp_temp.change(fn=shared.pv.save_sld_whisp_temp, inputs=[sld_whisp_temp], show_progress=False)
+    sld_buffer.change(fn=shared.pv.save_sld_buffer, inputs=[sld_buffer], show_progress=False)
+    sld_temp.change(fn=shared.pv.save_sld_temp, inputs=[sld_temp], show_progress=False)
+    roll_dirload_check.change(fn=shared.pv.save_dirload_check, inputs=[roll_dirload_check], show_progress=False)
+    txt_tags.change(fn=shared.pv.save_txt_tags, inputs=[txt_tags], show_progress=False)
+    txt_deck.change(fn=shared.pv.save_txt_deck, inputs=[txt_deck], show_progress=False)
+    txt_chatgpt_context.change(fn=shared.pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context], show_progress=False)
+    txt_whisp_prompt.change(fn=shared.pv.save_txt_whisp_prompt, inputs=[txt_whisp_prompt], show_progress=False)
+    txt_whisp_lang.change(fn=shared.pv.save_txt_whisp_lang, inputs=[txt_whisp_lang], show_progress=False)
+    txt_keywords.change(fn=shared.pv.save_txt_keywords, inputs=[txt_keywords], show_progress=False)
+    sld_pick_weight.change(fn=shared.pv.save_sld_pick_weight, inputs=[sld_pick_weight], show_progress=False)
+    sld_prio_weight.change(fn=shared.pv.save_sld_prio_weight, inputs=[sld_prio_weight], show_progress=False)
+    sld_keywords_weight.change(fn=shared.pv.save_sld_keywords_weight, inputs=[sld_keywords_weight], show_progress=False)
+    txt_extra_source.change(fn=shared.pv.save_txt_extra_source, inputs=[txt_extra_source], show_progress=False)
+    txt_openai_api_key.change(fn=shared.pv.save_txt_openai_api_key, inputs=[txt_openai_api_key], show_progress=False)
 
     # change profile and load previous data
     txt_profile.submit(
@@ -412,19 +420,24 @@ with gr.Blocks(
             fn=get_image,
             inputs=[gallery],
             outputs=[gallery],
-            queue=True).success(
+            show_progress=False,
+            queue=True,
+            ).success(
                     fn=shared.pv.save_gallery,
                     inputs=[gallery],
+                    show_progress=False,
                     ).success(
                             fn=get_img_source,
                             inputs=[gallery],
                             queue=True,
+                            show_progress=False,
                             )
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
             queue=True,
             cancels=[paste_image_event],
+            show_progress=False,
             )
 
     # audio
@@ -432,6 +445,7 @@ with gr.Blocks(
             fn=audio_edit,
             inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
             outputs=[txt_chatgpt_cloz, audio_corrector],
+            show_progress=False,
             )
 
     rst_audio_btn.click(
@@ -440,9 +454,11 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            show_progress=False,
             ).then(
                     fn=None,
                     js=hide_some_components,
+                    show_progress=False,
                     )
 
     rollaudio_12_btn.click(
@@ -452,6 +468,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            show_progress=False,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -484,10 +501,12 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
+                                show_progress=False,
                                 ).then(
                                         fn=None,
                                         js=hide_some_components,
                                         queue=True,
+                                        show_progress=False,
                                         )
     rollaudio_123_btn.click(
             fn=roll_audio,
@@ -496,6 +515,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            show_progress=False,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -546,13 +566,16 @@ with gr.Blocks(
                                 preprocess=False,
                                 # postprocess=False,
                                 queue=True,
+                                show_progress=False,
                                 ).success(
                                         fn=lambda: False,
-                                        outputs=[check_marked]
+                                        outputs=[check_marked],
+                                        show_progress=False,
                                         ).then(
                                                 fn=None,
                                                 js=hide_some_components,
                                                 queue=True,
+                                                show_progress=False,
                                                 )
 
     # clicking this button will load from a user directory the next sounds and
@@ -576,6 +599,7 @@ with gr.Blocks(
                 ] + audio_slots,
             outputs=audio_slots,
             queue=True,
+            show_progress=False,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
@@ -592,6 +616,7 @@ with gr.Blocks(
                                 fn=None,
                                 js=hide_some_components,
                                 queue=True,
+                                show_progress=False,
                                 )
 
     # send to whisper
@@ -631,7 +656,8 @@ with gr.Blocks(
             queue=True,
             ).then(
                     fn=lambda: False,
-                    outputs=[check_marked]
+                    outputs=[check_marked],
+                    show_progress=False,
                     ).then(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
@@ -674,6 +700,7 @@ with gr.Blocks(
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
+                            show_progress=False,
                             ).then(
                                     fn=get_card_status,
                                     inputs=[txt_chatgpt_cloz],
@@ -715,7 +742,8 @@ with gr.Blocks(
                     queue=True,
                     ).then(
                             fn=lambda: False,
-                            outputs=[check_marked]
+                            outputs=[check_marked],
+                            show_progress=False,
                             ).then(
                                     fn=get_card_status,
                                     inputs=[txt_chatgpt_cloz],
@@ -738,6 +766,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=True,
+            show_progress=False,
             )
     gr.on(  # not really working for now
             triggers=[
@@ -749,12 +778,13 @@ with gr.Blocks(
             js=hide_some_components,
             fn=None,
             queue=True,
+            show_progress=False,
             )
 
     demo_anki.load(
             fn=shared.reset,
             js=hide_some_components,
-            show_progress="minimal",
+            show_progress=False,
             )
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
