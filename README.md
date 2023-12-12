@@ -15,7 +15,6 @@
 * clone this repo
 * Install the dependencies: `python -m pip install -r requirements.txt`
 * For the anki backend: Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
-* Copy your OpenAI API key to a file called `API_KEY.txt`
 * `python VoiceToFormattedText.py --browser`
     * `--backend=anki OR markdown`
     * `--open_browser` opens the browser on the interface.
@@ -24,7 +23,7 @@
     * `--debug` to increase verbosity.
     * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use WhisperToAnki on mobile but can have privacy and security implications.
 * open your browser at the URL shown in the output.
-* The first thing to do is to enter a profile name in the `profile` field. This will automatically fill the other fields with the latest value.
+* The first thing to do is to enter a profile name in the `profile` field. This will automatically fill the other fields with the latest value. Then also go enter the API key.
 
 ## Notes
 * If using SSL, the certificates will probably be self signed, you'll likely have to tick a few checkbox on your browser to access the site.
