@@ -22,7 +22,7 @@ def start_voice2formattedtext(
         use_ssl=True,
         media_folder=None,
         memory_metric="embeddings",
-        disable_tracing=False,
+        disable_tracing=True,
         disable_timeout=False,
         *args,
         **kwargs
@@ -55,7 +55,7 @@ def start_voice2formattedtext(
     memory_metric: str, default "embeddings"
         if "length", will not use embeddings to improve the memory filtering
         but instead rely on finding memories with adequate length.
-    disable_tracing: bool, default False
+    disable_tracing: bool, default True
         if True, disables the decorator that indicates which function were
         called
     disable_timeout: bool, default False
