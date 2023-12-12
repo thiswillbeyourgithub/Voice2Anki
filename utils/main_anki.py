@@ -206,6 +206,25 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     except Exception as err:
         raise Exception(red(f"Error when transcribing audio: '{err}'"))
 
+
+@trace
+def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
+    """copy audio in slot #1 to the user_directory/flagged folder"""
+    if not shared.dirload_doing:
+        raise Exception("Empty shared.dirload_doing")
+    aud = shared.dirload_doing[0]
+    new_filename = f"user_directory/flagged/{aud.name}"
+    if Path(new_filename).exists():
+        raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
+    with open("user_directory/flagged/metadata.txt", "a") as f:
+        f.write(f"\nflagged_filename: '{new_filename}'")
+        f.write(f"\ntxt_audio: '{txt_audio}'")
+        f.write(f"\ntxt_chatgpt_cloz: '{txt_chatgpt_cloz}'")
+        f.write(f"\ntxt_chatgpt_context: '{txt_chatgpt_context}'")
+    shutil.copy2(aud, new_filename)
+    red(f"Flagged {aud} to {new_filename}")
+
+
 @trace
 def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode):
     """used to prepare the prompts for alfred call. This is a distinct
@@ -330,23 +349,6 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
         whi(indent(p['content'], " " * 5))
 
     return formatted_messages
-
-@trace
-def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
-    """copy audio in slot #1 to the user_directory/flagged folder"""
-    if not shared.dirload_doing:
-        raise Exception("Empty shared.dirload_doing")
-    aud = shared.dirload_doing[0]
-    new_filename = f"user_directory/flagged/{aud.name}"
-    if Path(new_filename).exists():
-        raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
-    with open("user_directory/flagged/metadata.txt", "a") as f:
-        f.write(f"\nflagged_filename: '{new_filename}'")
-        f.write(f"\ntxt_audio: '{txt_audio}'")
-        f.write(f"\ntxt_chatgpt_cloz: '{txt_chatgpt_cloz}'")
-        f.write(f"\ntxt_chatgpt_context: '{txt_chatgpt_context}'")
-    shutil.copy2(aud, new_filename)
-    red(f"Flagged {aud} to {new_filename}")
 
 @trace
 @Timeout(30)
