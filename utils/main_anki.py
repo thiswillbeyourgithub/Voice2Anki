@@ -233,6 +233,10 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                 transcript_template.replace("CONTEXT", txt_chatgpt_context
                     ).replace("TRANSCRIPT", txt_audio))
                 }
+    # hackish way to remove some formatting
+    new_prompt["content"] = new_prompt["content"].replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
+    if new_prompt["content"][-1] == "'":
+        new_prompt["content"] = new_prompt["content"][:-1]
 
     # the last few transcript/answer pair is always saved in message_buffer
     # even if it will not be saved to memory.
@@ -245,11 +249,16 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                 break
             if txt_audio in [mb["unformatted_txt_audio"] for mb in shared.message_buffer]:
                 continue
+            q = mb["question"]
+            if "Context: '" in q:  # remove useless formatting
+                q = q.replace("Context: '", "").replace("Transcript: '", "").strip().replace("'\n", "\n")
+                if q[-1] == "'":
+                    q = q[:-1]
             buffer_to_add.extend(
                     [
                         {
                             "role": "user",
-                            "content": mb["question"],
+                            "content": q,
                             },
                         {
                             "role": "assistant",
