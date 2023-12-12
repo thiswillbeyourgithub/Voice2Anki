@@ -749,6 +749,7 @@ with gr.Blocks(
     demo_anki.load(
             fn=shared.reset,
             js=hide_some_components,
+            show_progress="minimal",
             )
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
