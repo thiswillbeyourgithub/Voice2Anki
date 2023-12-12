@@ -24,7 +24,7 @@ def start_voice2formattedtext(
         memory_metric="embeddings",
         disable_tracing=True,
         disable_timeout=False,
-        compact_js=False,
+        compact_js=True,
         *args,
         **kwargs
         ):
