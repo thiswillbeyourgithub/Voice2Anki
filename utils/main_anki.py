@@ -324,6 +324,11 @@ def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
     new_filename = f"user_directory/flagged/{aud.name}"
     if Path(new_filename).exists():
         raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
+    with open("user_directory/flagged/metadata.txt", "a") as f:
+        f.write(f"\nflagged_filename: '{new_filename}'")
+        f.write(f"\ntxt_audio: '{txt_audio}'")
+        f.write(f"\ntxt_chatgpt_cloz: '{txt_chatgpt_cloz}'")
+        f.write(f"\ntxt_chatgpt_context: '{txt_chatgpt_context}'")
     shutil.copy2(aud, new_filename)
     red(f"Flagged {aud} to {new_filename}")
 
