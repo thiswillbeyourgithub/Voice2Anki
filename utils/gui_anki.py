@@ -53,7 +53,7 @@ def create_audio_compo():
             value=None,
             container=False,
             show_share_button=False,
-            show_download_button=False,
+            show_download_button=True,
             waveform_options={"show_controls": False},
             elem_id="Audio_component_V2FT",
             elem_classes="Audio_component_V2FT",
@@ -157,7 +157,7 @@ with gr.Blocks(
                 # 1+2 / 1+2+3
                 with gr.Group():
                     with gr.Row():
-                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=True, show_label=True, scale=2, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
+                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_download_button=True, show_share_button=False, type="filepath", show_download_button=False, min_length=2, container=True, show_label=True, scale=2, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT")
                         auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary", scale=1)
                         semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary", scale=2)
 
