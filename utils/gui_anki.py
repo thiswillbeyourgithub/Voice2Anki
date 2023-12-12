@@ -271,6 +271,13 @@ with gr.Blocks(
                 outputs=[row[1] for row in future_galleries],
                 )
 
+    with gr.Tab(label="Files"):
+        fex = gr.FileExplorer(
+                root="../user_directory/",
+                label="User directory",
+                interactive=False,
+                )
+
     # events ############################################################
 
     # copy audio to flag button
