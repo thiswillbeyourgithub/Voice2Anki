@@ -24,6 +24,7 @@ def start_voice2formattedtext(
         memory_metric="embeddings",
         disable_tracing=True,
         disable_timeout=False,
+        compact_js=False,
         *args,
         **kwargs
         ):
@@ -61,6 +62,9 @@ def start_voice2formattedtext(
     disable_timeout: bool, default False
         if True, disables the decorator that creates a thread used for
         timeout of long functions
+    compact_js: bool, default True
+        if True, will regularly run a js code to disable some controls from
+        the audio components that can be too large for mobile device.
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -116,6 +120,7 @@ def start_voice2formattedtext(
     shared.debug = debug
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
+    shared.compact_js = compact_js
 
     if backend == "anki":
         shared.backend = "anki"

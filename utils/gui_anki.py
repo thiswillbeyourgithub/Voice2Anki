@@ -26,19 +26,22 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
-hide_some_components = """
-() => {
-const hideElements = (selector) => {
-  const elements = document.querySelectorAll(selector);
-  elements.forEach(el => {
-    el.style.setProperty('display', 'none', 'important');
-  });
-}
-hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
-hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
-hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
-}
-"""
+if shared.compact_js:
+    hide_some_components = """
+    () => {
+    const hideElements = (selector) => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(el => {
+        el.style.setProperty('display', 'none', 'important');
+      });
+    }
+    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
+    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
+    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
+    }
+    """
+else:
+    hide_some_components = None
 css = """
 .app.svelte-1kyws56.svelte-1kyws56 { max-width: 100%; }
 """
