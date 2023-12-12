@@ -47,7 +47,18 @@ css = """
 """
 
 def create_audio_compo():
-    return gr.Microphone(type="filepath", format="mp3", value=None, container=False, show_share_button=False, show_download_button=False, waveform_options={"show_controls": False}, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=10)
+    return gr.Microphone(
+            type="filepath",
+            format="mp3",
+            value=None,
+            container=False,
+            show_share_button=False,
+            show_download_button=False,
+            waveform_options={"show_controls": False},
+            elem_id="Audio_component_V2FT",
+            elem_classes="Audio_component_V2FT",
+            min_width=10,
+            )
 
 
 def roll_audio(*slots):
