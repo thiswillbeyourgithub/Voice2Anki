@@ -139,7 +139,6 @@ with gr.Blocks(
                         transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
                         chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
                         anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
-                        txt_card_done = gr.HTML(value="", label="Card status")
 
                 # 1+2 / 1+2+3
                 with gr.Group():
@@ -355,13 +354,13 @@ with gr.Blocks(
     txt_chatgpt_cloz.change(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
-            outputs=[txt_card_done],
+            outputs=[update_status_btn],
             queue=True,
             )
     update_status_btn.click(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
-            outputs=[txt_card_done],
+            outputs=[update_status_btn],
             queue=True,
             )
 
@@ -634,7 +633,7 @@ with gr.Blocks(
                     ).then(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
-                            outputs=[txt_card_done],
+                            outputs=[update_status_btn],
                             queue=True,
                             )
 
@@ -675,7 +674,7 @@ with gr.Blocks(
                             ).then(
                                     fn=get_card_status,
                                     inputs=[txt_chatgpt_cloz],
-                                    outputs=[txt_card_done],
+                                    outputs=[update_status_btn],
                                     queue=True,
                                     )
 
@@ -716,7 +715,7 @@ with gr.Blocks(
                             ).then(
                                     fn=get_card_status,
                                     inputs=[txt_chatgpt_cloz],
-                                    outputs=[txt_card_done],
+                                    outputs=[update_status_btn],
                                     queue=True,
                                     )
 

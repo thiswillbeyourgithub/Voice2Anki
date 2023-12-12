@@ -1,3 +1,4 @@
+import gradio as gr
 import re
 import threading
 import shutil
@@ -160,7 +161,7 @@ def get_card_status(txt_chatgpt_cloz):
     cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
 
     if not cloz:
-        return "EMPTY"
+        return gr.Button("EMPTY", variant="primary")
 
     if "#####" in cloz:  # multiple cards
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
@@ -173,11 +174,11 @@ def get_card_status(txt_chatgpt_cloz):
             vals.append(bool(val))
 
         if all(vals):
-            return "<div style=\"text-align: center !important; font-weight:bold;\"><br>DONE</div>"
+            return gr.Button("DONE")
         else:
             s = sum([bool(b) for b in vals])
             n = len(vals)
-            return f"<div style=\"color: red; text-align:center !important; font-weight: bold;\"><br>MISSING {n-s}/{n}</div>"
+            return gr.Button(f"MISSING {n-s}/{n}", variant="primary")
 
     else:
         cloz = cloz.replace("\"", "\\\"")
@@ -187,9 +188,9 @@ def get_card_status(txt_chatgpt_cloz):
                 query=query,
                 )
         if state:
-            return "<div style=\"text-align: center !important; font-weight:bold;\"><br>DONE</div>"
+            return gr.Button("DONE")
         else:
-            return "<div style=\"color: red; text-align: center !important; font-weight:bold;\"><br>MISSING</div>"
+            return gr.Button("MISSING", variant="primary")
 
 
 @trace
