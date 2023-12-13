@@ -156,9 +156,28 @@ with gr.Blocks(
                 # 1+2 / 1+2+3
                 with gr.Group():
                     with gr.Row():
-                        audio_corrector = gr.Microphone(format="mp3", value=None, label="AudioEdit via GPT-4", show_download_button=True, show_share_button=False, type="filepath", min_length=2, container=True, show_label=True, scale=3, elem_id="Audio_component_V2FT", elem_classes="Audio_component_V2FT", min_width=100)
-                        auto_btn = gr.Button(value="1+2+3. Autopilot", variant="secondary", scale=1)
-                        semiauto_btn = gr.Button(value="1+2. Speech to Cloze", variant="secondary", scale=3)
+                        audio_corrector = gr.Microphone(
+                                format="mp3",
+                                value=None,
+                                label="AudioEdit via GPT-4",
+                                show_download_button=True,
+                                show_share_button=False,
+                                type="filepath",
+                                min_length=2,
+                                container=True,
+                                show_label=True,
+                                #scale=1,
+                                elem_id="Audio_component_V2FT",
+                                elem_classes="Audio_component_V2FT"
+                                #min_width=300,
+                                )
+                        auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False)
+                        semiauto_btn = gr.Button(
+                                value="1+2",
+                                variant="secondary",
+                                #scale=3,
+                                #min_width=50,
+                                )
 
                 # quick settings
                 with gr.Row():
