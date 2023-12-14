@@ -144,17 +144,18 @@ with gr.Blocks(
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
 
                 # quick settings
-                with gr.Row():
-                    with gr.Column(scale=10):
-                        with gr.Row():
-                            sld_max_tkn = gr.Number(minimum=500, maximum=15000, value=float(shared.pv["sld_max_tkn"]), step=100.0, label="LLM avail. tkn.", scale=1)
-                            sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=float(shared.pv["sld_whisp_temp"]), step=0.1, label="Whisper temp", scale=1)
-                            sld_temp = gr.Number(minimum=0, maximum=2, value=float(shared.pv["sld_temp"]), step=0.1, label="LLM temp", scale=1)
-                            sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+                with gr.Accordion(label="Quick settings", open=False)
+                    with gr.Row():
+                        with gr.Column(scale=10):
+                            with gr.Row():
+                                sld_max_tkn = gr.Number(minimum=500, maximum=15000, value=float(shared.pv["sld_max_tkn"]), step=100.0, label="LLM avail. tkn.", scale=1)
+                                sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=float(shared.pv["sld_whisp_temp"]), step=0.1, label="Whisper temp", scale=1)
+                                sld_temp = gr.Number(minimum=0, maximum=2, value=float(shared.pv["sld_temp"]), step=0.1, label="LLM temp", scale=1)
+                                sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
 
-                with gr.Row():
-                    check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
-                    txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
+                    with gr.Row():
+                        check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
+                        txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
