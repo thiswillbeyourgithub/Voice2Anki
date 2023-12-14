@@ -88,7 +88,7 @@ with gr.Blocks(
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
                 with gr.Row():
                     roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
-                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
+                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
 
             with gr.Column(scale=5):
 
