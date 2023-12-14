@@ -221,9 +221,11 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 @trace
 def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
     """copy audio in slot #1 to the user_directory/flagged folder"""
-    if not shared.dirload_queue[shared.dirload_queue["was_moved"] is False].tolist():
-        raise Exception("Empty shared.dirload_queue")
-    aud = shared.dirload_queue[shared.dirload_queue["was_moved"] is False].tolist()[0]
+    if not (shared.dirload_queue["is_loaded"] == True).any():
+        raise Exception("No loaded files in shared.dirload_queue")
+    aud = shared.dirload_queue[shared.dirload_queue["is_loaded"] == True].iloc[0].name
+    aud = Path(aud)
+    assert aud.exists(), f"File not found: {aud}"
     new_filename = f"user_directory/flagged/{aud.name}"
     if Path(new_filename).exists():
         raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
