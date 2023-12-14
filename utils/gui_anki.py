@@ -88,7 +88,7 @@ with gr.Blocks(
                             rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                             img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
                     with gr.Row():
-                        next_gal_btn = gr.Button(value="Load next from future", min_width=50)
+                        roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
 
             with gr.Column(scale=5):
@@ -271,12 +271,12 @@ with gr.Blocks(
                 fn=load_future_galleries,
                 outputs=[row[1] for row in future_galleries],
                 )
-        next_gal_btn.click(
+        roll_gall_btn.click(
                 fn=load_future_galleries,
                 outputs=[row[1] for row in future_galleries],
                 ).then(
                         fn=lambda x: x,
-                        inputs=[future_galleries[0][1]],
+                        inputs=[future_galleries[1][1]],
                         outputs=[gallery],
                         preprocess=False,
                         postprocess=False,
@@ -284,11 +284,17 @@ with gr.Blocks(
                         ).success(
                             fn=shared.pv.save_gallery,
                             inputs=[gallery]
-                            ).then(
+                            ).success(
                                     fn=get_img_source,
                                     inputs=[gallery],
                                     queue=True,
-                                    )
+                                    ).then(
+                                            fn=lambda: None,
+                                            outputs=[future_galleries[0][1]]
+                                            ).success(
+                                                    fn=shared.pv.save_future_gallery_1,
+                                                    inputs=[future_galleries[0][1]],
+                                                    )
 
     # with gr.Tab(label="Files"):
     #     with gr.Accordion(label="Done", open=False):
