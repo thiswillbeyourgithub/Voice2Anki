@@ -82,7 +82,7 @@ with gr.Blocks(
 
                 # image
                 with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
-                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[2], object_fit="scale-down", height="auto", container=False, min_width=50)
+                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
                     with gr.Group():
                         with gr.Row():
                             rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
