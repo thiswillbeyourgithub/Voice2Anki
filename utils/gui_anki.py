@@ -81,14 +81,13 @@ with gr.Blocks(
                     flag_audio_btn = gr.Button(value="Flag audio", scale=0)
 
                 # image
-                with gr.Accordion(label="Images", open=True if shared.pv["gallery"] else False):
-                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
-                    with gr.Group():
-                        with gr.Row():
-                            rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
-                            img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
+                with gr.Group():
                     with gr.Row():
-                        roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
+                        rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
+                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                with gr.Row():
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
 
             with gr.Column(scale=5):
