@@ -207,3 +207,35 @@ def load_future_galleries():
         im = saved_fg[i]
         getattr(shared.pv, f"save_future_gallery_{fg}")(im)
     return saved_fg
+
+
+def create_audio_compo():
+    return gr.Microphone(
+            type="filepath",
+            format="mp3",
+            value=None,
+            container=False,
+            show_share_button=False,
+            show_download_button=True,
+            waveform_options={"show_controls": False},
+            elem_id="Audio_component_V2FT",
+            elem_classes="Audio_component_V2FT",
+            # min_width=10,
+            # editable=False,
+            )
+
+
+def roll_audio(*slots):
+    assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
+    slots = list(slots)
+    if all((slot is None for slot in slots)):
+        return slots
+    if all((slot is None for slot in slots[1:])):
+        return slots
+    slots[0] = None
+    while slots[0] is None:
+        slots.pop(0)
+        audio_mp3 = create_audio_compo()
+        slots.append(audio_mp3)
+
+    return slots

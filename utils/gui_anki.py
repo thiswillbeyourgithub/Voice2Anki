@@ -3,11 +3,10 @@ import gradio as gr
 
 from .profiles import get_profiles, switch_profile
 from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio
-from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
-
+from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, delayed_get_card_status
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
-from .media import get_image, reset_audio, reset_gallery, get_img_source, load_future_galleries
+from .media import get_image, reset_audio, reset_gallery, get_img_source, load_future_galleries, create_audio_compo, roll_audio
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -47,43 +46,6 @@ css = """
 .app.svelte-1kyws56.svelte-1kyws56 { max-width: 100%; }
 """
 
-def create_audio_compo():
-    return gr.Microphone(
-            type="filepath",
-            format="mp3",
-            value=None,
-            container=False,
-            show_share_button=False,
-            show_download_button=True,
-            waveform_options={"show_controls": False},
-            elem_id="Audio_component_V2FT",
-            elem_classes="Audio_component_V2FT",
-            # min_width=10,
-            # editable=False,
-            )
-
-
-def roll_audio(*slots):
-    assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
-    slots = list(slots)
-    if all((slot is None for slot in slots)):
-        return slots
-    if all((slot is None for slot in slots[1:])):
-        return slots
-    slots[0] = None
-    while slots[0] is None:
-        slots.pop(0)
-        audio_mp3 = create_audio_compo()
-        slots.append(audio_mp3)
-
-    return slots
-
-
-
-def delayed_get_card_status(*args, **kwargs):
-    "add 2s delay for card to be added to anki"
-    time.sleep(2)
-    return get_card_status(*args, **kwargs)
 
 
 with gr.Blocks(
