@@ -288,7 +288,7 @@ with gr.Blocks(
                                     fn=get_img_source,
                                     inputs=[gallery],
                                     queue=True,
-                                    ).then(
+                                    ).success(
                                             fn=lambda: None,
                                             outputs=[future_galleries[0][1]]
                                             ).success(
