@@ -139,7 +139,7 @@ def thread_whisp_then_llm(
             modelname,
             txt_whisp_prompt,
             txt_whisp_lang,
-            sld_whisp_temp,
+            float(sld_whisp_temp),
             )["text"]
     with lock:
         shared.dirload_queue.loc[orig_path, "was_transcribed"] = True
