@@ -1,3 +1,5 @@
+import pandas as pd
+
 class SharedModule:
     """module used to store information from VoiceToFormattedText.py to
     the main .py files"""
@@ -50,8 +52,18 @@ class SharedModule:
     audio_slot_nb = 5
     future_gallery_slot_nb = 50
 
-    dirload_queue = []
-    dirload_doing = []
+    dirload_queue_columns = [
+            "n",
+            "path",
+            "temp_path",
+            "is_loaded",
+            "was_sound_preprocessed",
+            "was_transcribed",
+            "was_alfreded",
+            "was_ankified",
+            "was_moved",
+            ]
+    dirload_queue = pd.DataFrame(columns=dirload_queue_columns).set_index("path")
 
     llm_to_db_buffer = {}
     latest_stt_used = None
@@ -71,8 +83,7 @@ class SharedModule:
     def reset(self):
         "used to reset the values when the gradio page is reloaded"
         print("Resetting shared module.")
-        self.dirload_queue = []
-        self.dirload_doing = []
+        self.dirload_queue = pd.DataFrame(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
         self.latest_stt_used = None
         self.latest_llm_used = None

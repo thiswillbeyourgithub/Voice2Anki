@@ -102,6 +102,7 @@ def thread_whisp_then_llm(
         sld_buffer,
         check_gpt4,
         txt_keywords,
+        lock,
         ):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
@@ -127,16 +128,26 @@ def thread_whisp_then_llm(
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-    transcript = whisper_cached(
+    tmp_df = shared.dirload_queue.reset_index().set_index("temp_path")
+    assert str(audio_mp3) in tmp_df.index, f"Missing {audio_mp3} from shared.dirload_queue"
+    assert tmp_df.index.tolist().count(str(audio_mp3)) == 1, f"Duplicate temp_path in shared.dirload_queue: {audio_mp3}"
+    orig_path = tmp_df.loc[str(audio_mp3), "path"]
+
+    txt_audio = whisper_cached(
             audio_mp3,
             audio_hash,
             modelname,
             txt_whisp_prompt,
             txt_whisp_lang,
             sld_whisp_temp,
-            )
-    txt_audio = transcript["text"]
+            )["text"]
+    with lock:
+        shared.dirload_queue.loc[orig_path, "was_transcribed"] = True
+        shared.dirload_queue.loc[orig_path, "was_alfreded"] = "started"
+
     _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    with lock:
+        shared.dirload_queue.loc[orig_path, "was_alfreded"] = True
 
 @trace
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
@@ -210,9 +221,9 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 @trace
 def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
     """copy audio in slot #1 to the user_directory/flagged folder"""
-    if not shared.dirload_doing:
-        raise Exception("Empty shared.dirload_doing")
-    aud = shared.dirload_doing[0]
+    if not shared.dirload_queue[shared.dirload_queue["was_moved"] is False].tolist():
+        raise Exception("Empty shared.dirload_queue")
+    aud = shared.dirload_queue[shared.dirload_queue["was_moved"] is False].tolist()[0]
     new_filename = f"user_directory/flagged/{aud.name}"
     if Path(new_filename).exists():
         raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
@@ -496,8 +507,8 @@ def dirload_splitted(
         audios += [None]
 
     if empty_slots == shared.audio_slot_nb:
-        assert not shared.dirload_queue, "Non empty queue of shared!"
-        assert not shared.dirload_doing, "Non empty doing of shared!"
+        if not shared.dirload_queue.empty:
+            assert not (shared.dirload_queue["was_moved"] == False).all(), "shared.dirload_queue contains moved files even though you're loading all slots. This is suspiciou."
 
     # check how many audio are needed
     whi(f"Number of empty sound slots: {empty_slots}")
@@ -512,17 +523,25 @@ def dirload_splitted(
         return audios
 
     # sort by oldest
-    # shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: x.stat().st_ctime)
     # sort by name
-    shared.dirload_queue = sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x))
+    shared.dirload_queue = shared.dirload_queue.sort_index()
+    if not shared.dirload_queue.empty:
+        max_n = max(shared.dirload_queue["n"].values)
+    else:
+        max_n = 0
+    for todo_file in sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x)):  # by oldest: key=lambda x: x.stat().st_ctime)
+        todo_file = str(todo_file)
+        if todo_file not in shared.dirload_queue.index:
+            with threading.Lock():
+                shared.dirload_queue.loc[todo_file, :] = False
+                shared.dirload_queue.loc[todo_file, "temp_path"] = None
+                shared.dirload_queue.loc[todo_file, "n"] = max_n + 1
+            max_n += 1
+        else:
+            assert shared.dirload_queue.loc[todo_file, "was_moved"] is False, f"File {todo_file} is already in shared.dirload_queue and was_moved is True"
+    shared.dirload_queue = shared.dirload_queue.sort_index()
 
-    # remove the doing from the queue
-    for doing in shared.dirload_doing:
-        assert doing == shared.dirload_queue[0]
-        shared.dirload_queue.pop(0)
-        assert doing not in shared.dirload_queue
-
-    if not shared.dirload_queue:
+    if not (shared.dirload_queue["was_moved"] == False).any():
         gr.Error(red("No mp3 files in shared.dirload_queue"))
         return audios
 
@@ -530,18 +549,24 @@ def dirload_splitted(
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
     new_threads = []
-    for path in shared.dirload_queue[:empty_slots]:
+    lock = threading.Lock()
+    todo_path = shared.dirload_queue[shared.dirload_queue["was_moved"] == False]
+    todo_path = todo_path[todo_path["is_loaded"] == False]
+    for path in todo_path.index.tolist()[:empty_slots]:
         if prog is not None:
             pbar.update(1)
+        path = Path(path)
         to_temp = tmp_dir / path.name
         shutil.copy2(path, to_temp)
         assert (path.exists() and (to_temp).exists()), "unexpected sound location"
 
         to_temp = sound_preprocessing(to_temp)
+        with threading.Lock():
+            shared.dirload_queue.loc[str(path), "temp_path"] = str(to_temp)
+            shared.dirload_queue.loc[str(path), "was_sound_preprocessed"] = True
 
         whi(f"Will load sound {to_temp}")
         sounds_to_load.append(to_temp)
-        shared.dirload_doing.append(path)
         if txt_whisp_prompt and txt_whisp_lang:
             thread = threading.Thread(
                 target=thread_whisp_then_llm,
@@ -558,10 +583,15 @@ def dirload_splitted(
                         sld_buffer,
                         check_gpt4,
                         txt_keywords,
+                        lock,
                         ),
                 )
+            with threading.Lock():
+                shared.dirload_queue.loc[str(path), "was_transcribed"] = "started"
             thread.start()
             new_threads.append(thread)
+        with threading.Lock():
+            shared.dirload_queue.loc[str(path), "is_loaded"] = True
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
     output = audios[:-len(sounds_to_load)] + sounds_to_load
@@ -579,10 +609,16 @@ def dirload_splitted(
             # not waiting for the transcription
             shared.running_threads["transcribing_audio"].extend(new_threads)
 
-    while len(shared.dirload_doing) > shared.audio_slot_nb:
-        p = shared.dirload_doing.pop(0)
-        red(f"Moving {p} to done_dir")
-        shutil.move(p, done_dir / p.name)
+    with threading.Lock():
+        while len(shared.dirload_queue[shared.dirload_queue["is_loaded"] == True]) > shared.audio_slot_nb:
+            p = shared.dirload_queue[shared.dirload_queue["is_loaded"] == True].iloc[0].name
+            assert shared.dirload_queue.loc[p, "was_moved"] is False, f"File {p} was already moved"
+            assert shared.dirload_queue.loc[p, "was_transcribed"] is True, f"File {p} shouldn't have to be moved as it has not been transcribed"
+            assert shared.dirload_queue.loc[p, "was_alfreded"] is True, f"File {p} shouldn't have to be moved as it has not been sent to alfred"
+            red(f"Moving {p} to done_dir")
+            shutil.move(p, done_dir / Path(p).name)
+            shared.dirload_queue.loc[p, "is_loaded"] = False
+            shared.dirload_queue.loc[p, "was_moved"] = True
 
     assert len(output) == shared.audio_slot_nb, "Invalid number of audio slots in output"
 
@@ -805,6 +841,7 @@ def wait_for_queue(q, source, t=1):
             data = None
     return data
 
+
 @trace
 def kill_threads():
     """the threads in timeout are stored in the shared module, if they
@@ -817,6 +854,7 @@ def kill_threads():
             else:
                 whi(f"No thread to kill of {k}")
             shared.running_threads[k] = []
+
 
 @trace
 def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
@@ -861,6 +899,8 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "db_name": "anki_llm"})
     thread.start()
     shared.running_threads["saving_whisper"].append(thread)
+
+
 @trace
 def to_anki(
         audio_mp3_1,
@@ -959,6 +999,9 @@ def to_anki(
     if txt_extra_source.strip():
         txt_source += f"<br>{txt_extra_source}"
 
+    with threading.Lock():
+        shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "was_ankified"] = "started"
+
     for cl in clozes:
         cl = cl.strip()
         if "\n" in cl:
@@ -982,6 +1025,8 @@ def to_anki(
         red("Some flashcards were not added!"),
         gather_threads(["audio_to_anki", "ocr"])
         return
+    with threading.Lock():
+        shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "was_ankified"] = True
 
     whi("Finished adding card.\n\n")
 

@@ -241,6 +241,15 @@ with gr.Blocks(
                 interactive=False,
                 placeholder="this string should never appear")
 
+    with gr.Tab(label="Dirload Queue") as tab_dirload_queue:
+        queue_df = gr.Dataframe(
+                value=shared.dirload_queue,
+                type="pandas",
+                label="Dirload queue",
+                interactive=False,
+                )
+
+
     with gr.Tab(label="Future galleries") as tab_galleries:
         load_fg_btn = gr.Button(value="Load future galleries")
 
@@ -343,6 +352,11 @@ with gr.Blocks(
 
     # events ############################################################
 
+    # reload df
+    tab_dirload_queue.select(
+            fn=lambda: shared.dirload_queue.sort_index().reset_index().set_index("n").reset_index(),
+            outputs=[queue_df],
+            )
     # copy audio to flag button
     flag_audio_btn.click(
             fn=flag_audio,
