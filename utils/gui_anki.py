@@ -611,7 +611,7 @@ with gr.Blocks(
                                                 queue=True,
                                                 show_progress=False,
                                                 ).then(
-                                                        fn=delayed_get_card_status,
+                                                        fn=get_card_status,
                                                         inputs=[txt_chatgpt_cloz],
                                                         outputs=[update_status_btn],
                                                         queue=True,
