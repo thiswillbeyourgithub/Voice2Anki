@@ -361,7 +361,7 @@ with gr.Blocks(
                             )
 
     # load output elem if clicked
-    tab_logging.click(fn=get_log, outputs=[output_elem])
+    tab_logging.select(fn=get_log, outputs=[output_elem])
 
     # load memories only if clickes
     tab_memories.select(
