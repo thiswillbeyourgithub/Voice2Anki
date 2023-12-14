@@ -183,15 +183,15 @@ with gr.Blocks(
                 with gr.Row():
                     with gr.Column(scale=10):
                         with gr.Row():
-                            sld_max_tkn = gr.Number(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=100, label="LLM avail. tkn.", scale=1)
-                            sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
-                            sld_temp = gr.Number(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
-                            sld_buffer = gr.Number(minimum=0, maximum=shared.max_message_buffer, step=1, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+                            sld_max_tkn = gr.Number(minimum=500, maximum=15000, value=float(shared.pv["sld_max_tkn"]), step=100.0, label="LLM avail. tkn.", scale=1)
+                            sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=float(shared.pv["sld_whisp_temp"]), step=0.1, label="Whisper temp", scale=1)
+                            sld_temp = gr.Number(minimum=0, maximum=2, value=float(shared.pv["sld_temp"]), step=0.1, label="LLM temp", scale=1)
+                            sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous")
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
-                    sld_improve = gr.Number(minimum=0, maximum=10, value=5, step=1, label="Feedback priority")
+                    sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
 
                 with gr.Row():
