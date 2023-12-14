@@ -110,7 +110,7 @@ with gr.Blocks(
                         anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
 
                 # 1+2 / 1+2+3
-                with gr.Group():
+                with gr.Accordion(open=False, label="Edit")
                     with gr.Row():
                         audio_corrector = gr.Microphone(
                                 format="mp3",
