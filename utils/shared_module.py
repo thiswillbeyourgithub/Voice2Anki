@@ -3,6 +3,11 @@ import pandas as pd
 class SharedModule:
     """module used to store information from VoiceToFormattedText.py to
     the main .py files"""
+    llm_price = {
+            "gpt-3.5-turbo-1106": (0.001, 0.002),
+            "gpt-4-1106-preview": (0.01, 0.03),
+            }
+
     # sox effect when loading a sound
     preprocess_sox_effects = [
             # isolate voice frequency

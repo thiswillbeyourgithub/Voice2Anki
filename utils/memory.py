@@ -452,9 +452,9 @@ def load_prev_prompts(profile):
 
 def display_price(sld_max_tkn, check_gpt4):
     if check_gpt4:
-        price = [0.01, 0.03]
+        price = shared.llm_price["gpt-4-1106-preview"]
     else:
-        price = [0.001, 0.002]
+        price = shared.llm_price["gpt-3.5-turbo-1106"]
     price_adj = price[0] * 0.9 + price[1] * 0.1
     price_per_request = price_adj * sld_max_tkn / 1000
     price_per_dol = round(1 / price_per_request, 0)
