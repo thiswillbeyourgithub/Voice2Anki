@@ -182,8 +182,8 @@ with gr.Blocks(
         with gr.Row():
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
-    with gr.Tab(label="Logging"):
-        output_elem = gr.Textbox(value=get_log, label="Logging", lines=100, max_lines=1000, every=5, interactive=False, placeholder="this string should never appear")
+    with gr.Tab(label="Logging") as tab_logging:
+        output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
     with gr.Tab(label="Memories") as tab_memories:
         txt_memories = gr.Textbox(
@@ -359,6 +359,9 @@ with gr.Blocks(
                             queue=True,
                             show_progress=False,
                             )
+
+    # load output elem if clicked
+    tab_logging.click(fn=get_log, outputs=[output_elem])
 
     # load memories only if clickes
     tab_memories.select(
