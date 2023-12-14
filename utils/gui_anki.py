@@ -93,6 +93,7 @@ def load_future_galleries():
         getattr(shared.pv, f"save_future_gallery_{fg}")(im)
     return saved_fg
 
+
 def delayed_get_card_status(*args, **kwargs):
     "add 2s delay for card to be added to anki"
     time.sleep(2)
@@ -139,6 +140,8 @@ with gr.Blocks(
                         with gr.Row():
                             rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                             img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                    with gr.Row():
+                        next_gal_btn = gr.Button(value="Load next from future", min_width=50)
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.")
 
             with gr.Column(scale=5):
@@ -321,6 +324,24 @@ with gr.Blocks(
                 fn=load_future_galleries,
                 outputs=[row[1] for row in future_galleries],
                 )
+        next_gal_btn.click(
+                fn=load_future_galleries,
+                outputs=[row[1] for row in future_galleries],
+                ).then(
+                        fn=lambda x: x,
+                        inputs=[future_galleries[0][1]],
+                        outputs=[gallery],
+                        preprocess=False,
+                        postprocess=False,
+                        queue=False,
+                        ).success(
+                            fn=shared.pv.save_gallery,
+                            inputs=[gallery]
+                            ).then(
+                                    fn=get_img_source,
+                                    inputs=[gallery],
+                                    queue=True,
+                                    )
 
     # with gr.Tab(label="Files"):
     #     with gr.Accordion(label="Done", open=False):
