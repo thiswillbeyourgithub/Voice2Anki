@@ -12,7 +12,7 @@ os.environ["PYTHONTRACEMALLOC"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 def start_voice2formattedtext(
-        backend="",
+        backend="anki",
         print_db_then_exit=False,
         share=False,
         open_browser=False,
@@ -31,8 +31,9 @@ def start_voice2formattedtext(
     """
     Parameters
     ----------
-    backend: str
-        either "anki" or "markdown"
+    backend: str, default 'anki'
+        used to allow to select anki or markdown, but the markdown backend
+        is currently deprecated.
     print_db_then_exit: str
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
@@ -80,11 +81,7 @@ def start_voice2formattedtext(
     else:
         assert print_db_then_exit is False, "Invalid value for print_db_then_exit"
 
-    assert str(backend).lower() in ["anki", "markdown"], f"Backend argument has to be either 'anki' or 'markdown', not {backend}"
-    backend = str(backend).lower()
-    assert backend in ["anki", "markdown"], (
-            "backend must be either 'anki' "
-            "or 'markdown'")
+    assert backend == "anki", "only the 'anki' backend is currently supported."
     assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
     whi("Starting VoiceToFormattedText\n")
