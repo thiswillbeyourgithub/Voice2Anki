@@ -2,7 +2,7 @@
 
 ## What is this?
 * VoiceToFormattedText is a tool that leverages the power of ChatGPT to correct the transcription of Whisper to output useful content. Currently supported output backends are "markdown" to append your text to a .md file, and "anki" to create anki cards automatically.
-* Use case so far include writing a physics PhD in markdown with LaTeX formulae created on the go and creating anki cloze cards with specific formattings with minimal user interaction.
+* Use case so far include ~~writing a physics PhD in markdown with LaTeX formulae created on the go and~~ (deprecated as too out of date with the anki version and possibly obsolete anywa) creating anki cloze cards with specific formattings with minimal user interaction.
 
 ### Features
 * You can specify the context to whisper and to ChatGPT to reduce transcription mistake.
@@ -16,7 +16,7 @@
 * Install the dependencies: `python -m pip install -r requirements.txt`
 * For the anki backend: Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
 * `python VoiceToFormattedText.py --browser`
-    * `--backend=anki OR markdown`
+    * `--backend=anki`
     * `--open_browser` opens the browser on the interface.
     * `--authentication` enables the authentication panel. user/password have to be edited in `VoiceToFormattedText.py`.
     * `--localnetwork` to make the interface accessible to your local network. Use `ifconfig` to figure out your local IP adress and connect to it using `https://[IP]:7860` (don't forget the http**s** ). You can use that to make it accessible from the global internet if you configure port forwarding from your router. Otherwise it's only accessible from the computer.
@@ -39,5 +39,5 @@
 ## Gallery
 * Anki backend:
   * ![](./docs/anki_screenshot.png)
-* Markdown backend:
+* Markdown backend (deprecated):
   * ![](./docs/markdown_screenshot.png)

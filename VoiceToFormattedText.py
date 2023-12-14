@@ -126,6 +126,7 @@ def start_voice2formattedtext(
         shared.backend = "anki"
         from utils.gui_anki import demo_anki as demo
     elif backend == "markdown":
+        raise NotImplementedError("markdown backend was deprecated for lack of use.")
         shared.backend = "markdown"
         from utils.gui_markdown import demo_markdown as demo
     else:
