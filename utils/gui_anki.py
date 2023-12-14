@@ -91,6 +91,11 @@ def load_future_galleries():
         getattr(shared.pv, f"save_future_gallery_{fg}")(im)
     return saved_fg
 
+def delayed_get_card_status(*args, **kwargs):
+    "add 2s delay for card to be added to anki"
+    time.sleep(2)
+    return get_card_status(*args, **kwargs)
+
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -539,7 +544,13 @@ with gr.Blocks(
                                         js=hide_some_components,
                                         queue=True,
                                         show_progress=False,
-                                        )
+                                        ).then(
+                                                fn=get_card_status,
+                                                inputs=[txt_chatgpt_cloz],
+                                                outputs=[update_status_btn],
+                                                queue=True,
+                                                show_progress=False,
+                                                )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -608,7 +619,13 @@ with gr.Blocks(
                                                 js=hide_some_components,
                                                 queue=True,
                                                 show_progress=False,
-                                                )
+                                                ).then(
+                                                        fn=delayed_get_card_status,
+                                                        inputs=[txt_chatgpt_cloz],
+                                                        outputs=[update_status_btn],
+                                                        queue=True,
+                                                        show_progress=False,
+                                                        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
