@@ -47,7 +47,6 @@ css = """
 """
 
 
-
 with gr.Blocks(
         analytics_enabled=False,
         title="VoiceToFormattedText - Anki",
