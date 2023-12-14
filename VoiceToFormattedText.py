@@ -111,7 +111,6 @@ def start_voice2formattedtext(
     else:
         server = None
 
-    shared.VERSION = 0.2
     shared.memory_metric = memory_metric
     shared.media_folder = media_folder
     shared.debug = debug

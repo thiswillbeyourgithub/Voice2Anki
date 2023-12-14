@@ -3,6 +3,17 @@ import pandas as pd
 class SharedModule:
     """module used to store information from VoiceToFormattedText.py to
     the main .py files"""
+    VERSION = 0.2
+    memory_metric = None
+    media_folder = None
+    anki_media = None
+    debug = None
+    disable_tracing = None
+    disable_timeout = None
+    compact_js = None
+    backend = None
+    pv = None
+
     llm_price = {
             "gpt-3.5-turbo-1106": (0.001, 0.002),
             "gpt-4-1106-preview": (0.01, 0.03),
@@ -52,6 +63,7 @@ class SharedModule:
             ["norm"],
             ]
 
+    message_buffer = []
     max_message_buffer = 50
 
     audio_slot_nb = 5
@@ -95,6 +107,13 @@ class SharedModule:
         for k in self.running_threads:
             self.running_threads[k] = []
         self.added_note_ids = []
+
+    def __setattr__(self, name, value):
+        "forbid creation of new attributes."
+        if hasattr(self, name):
+            object.__setattr__(self, name, value)
+        else:
+            raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
 
 
 
