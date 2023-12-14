@@ -404,7 +404,7 @@ with gr.Blocks(
             inputs=[sld_max_tkn, check_gpt4],
             outputs=[txt_price],
             show_progress=False,
-            ).success(
+            ).then(
                     fn=shared.pv.save_sld_max_tkn,
                     inputs=[sld_max_tkn],
                     show_progress=False,
