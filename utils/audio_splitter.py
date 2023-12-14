@@ -16,7 +16,6 @@ from pathlib import Path
 import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
-from pydub.effects import compress_dynamic_range
 
 from logger import whi, yel, red
 from shared_module import shared
@@ -129,8 +128,14 @@ class AudioSplitter:
                 while fsize >= 19:
                     red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb. Compressing it now.")
                     audio = AudioSegment.from_mp3(file)
-                    compressed_audio = compress_dynamic_range(audio, threshold=-20, ratio=4.0, attack=5, release=50)
-                    compressed_audio.export(file, format="mp3")
+                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
+                    audio.export(tempf.name, format="mp3", bitrate="48k")
+
+                    self.to_split[i] = tempf.name
+                    file = Path(tempf.name)
+
+                    fsize = file.stat().st_size / 1024 / 1024
+                    whi(f"File size of {file} is now {fsize}Mb")
 
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="First pass")):
