@@ -134,6 +134,7 @@ with gr.Blocks(
                                 variant="secondary",
                                 #scale=3,
                                 #min_width=50,
+                                visible=False,
                                 )
 
                 # quick settings
