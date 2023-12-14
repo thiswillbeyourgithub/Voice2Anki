@@ -166,6 +166,7 @@ def sound_preprocessing(audio_mp3_path):
     whi("Done preprocessing audio")
     return audio_mp3_path
 
+
 @trace
 def format_audio_component(audio):
     """to make the whole UI faster and avoid sending multiple slightly
@@ -185,7 +186,24 @@ def format_audio_component(audio):
         raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))
     return audio
 
+
 def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+
+@trace
+def load_future_galleries():
+    """load the saved images beforehand to reorder so that the empty
+    galleries are moved at the end"""
+    saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
+    while None in saved_fg:
+        saved_fg.remove(None)
+    if len(saved_fg) < shared.future_gallery_slot_nb:
+        saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
+    assert len(saved_fg) == shared.future_gallery_slot_nb
+    for i, fg in enumerate(range(1, shared.future_gallery_slot_nb + 1)):
+        im = saved_fg[i]
+        getattr(shared.pv, f"save_future_gallery_{fg}")(im)
+    return saved_fg

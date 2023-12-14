@@ -7,7 +7,7 @@ from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
-from .media import get_image, reset_audio, reset_gallery, get_img_source
+from .media import get_image, reset_audio, reset_gallery, get_img_source, load_future_galleries
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -78,20 +78,6 @@ def roll_audio(*slots):
 
     return slots
 
-
-def load_future_galleries():
-    """load the saved images beforehand to reorder so that the empty
-    galleries are moved at the end"""
-    saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
-    while None in saved_fg:
-        saved_fg.remove(None)
-    if len(saved_fg) < shared.future_gallery_slot_nb:
-        saved_fg.extend([None] * ( shared.future_gallery_slot_nb - len(saved_fg)))
-    assert len(saved_fg) == shared.future_gallery_slot_nb
-    for i, fg in enumerate(range(1, shared.future_gallery_slot_nb + 1)):
-        im = saved_fg[i]
-        getattr(shared.pv, f"save_future_gallery_{fg}")(im)
-    return saved_fg
 
 
 def delayed_get_card_status(*args, **kwargs):
