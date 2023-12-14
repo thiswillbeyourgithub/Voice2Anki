@@ -194,8 +194,8 @@ def get_card_status(txt_chatgpt_cloz):
 
 
 def delayed_get_card_status(*args, **kwargs):
-    "add 2s delay for card to be added to anki"
-    time.sleep(2)
+    "add a delay for card to be added to anki"
+    time.sleep(4)
     return get_card_status(*args, **kwargs)
 
 
