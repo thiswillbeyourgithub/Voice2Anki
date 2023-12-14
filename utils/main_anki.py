@@ -145,7 +145,7 @@ def thread_whisp_then_llm(
         shared.dirload_queue.loc[orig_path, "was_transcribed"] = True
         shared.dirload_queue.loc[orig_path, "was_alfreded"] = "started"
 
-    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, float(max_token), float(temperature), float(sld_buffer), check_gpt4, txt_keywords, cache_mode=True)
     with lock:
         shared.dirload_queue.loc[orig_path, "was_alfreded"] = True
 
