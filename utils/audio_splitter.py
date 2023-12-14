@@ -126,7 +126,7 @@ class AudioSplitter:
         if self.compress_if_too_large:
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Compressing")):
                 fsize = file.stat().st_size / 1024 / 1024
-                while fsize >= 20:
+                while fsize >= 19:
                     red(f"{file}'s size is {round(fsize, 3)}Mb which is > 20Mb. Compressing it now.")
                     audio = AudioSegment.from_mp3(file)
                     compressed_audio = compress_dynamic_range(audio, threshold=-20, ratio=4.0, attack=5, release=50)
