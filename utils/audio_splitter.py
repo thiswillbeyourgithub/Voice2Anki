@@ -176,7 +176,7 @@ class AudioSplitter:
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
-                sub_audio = audio[t0 * 1000:t1 * 1000]
+                sub_audio = audio_o[t0 * 1000 * self.spf:t1 * 1000 * self.spf]
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
 
                 # sf and pyrb way:
