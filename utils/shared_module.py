@@ -31,7 +31,7 @@ class SharedModule:
             # # normalize audio
             ["norm"],
             # max silence should be 1s
-            ["silence", "-l", "1", "0.1", "1%", "-1", "1.0", "1%"],
+            ["silence", "-l", "1", "0", "1%", "-1", "1.0", "1%"],
 
             # remove leading silence
             ["vad", "-p", "0.2", "-t", "5"],
@@ -58,7 +58,7 @@ class SharedModule:
             ["norm"],  # normalize audio
 
             # max silence should be 3s
-            ["silence", "-l", "1", "0.1", "0.1%", "-1", "2.0", "0.1%"],
+            ["silence", "-l", "1", "0", "0.1%", "-1", "2.0", "0.1%"],
 
             ["norm"],
             ]
