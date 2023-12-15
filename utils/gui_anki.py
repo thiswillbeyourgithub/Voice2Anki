@@ -392,6 +392,7 @@ with gr.Blocks(
             show_progress=False,
             every=2
             js=hide_some_components,
+            trigger_mode="once",
             )
 
     # display pricing then save values
