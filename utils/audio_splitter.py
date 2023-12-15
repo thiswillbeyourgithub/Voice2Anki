@@ -1,3 +1,4 @@
+import json
 import torchaudio
 import copy
 import soundfile as sf
@@ -55,6 +56,7 @@ class AudioSplitter:
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
+        self.metadata_file = self.sp_dir / "metadata.txt"
         assert silence_method in ["sox_cli", "pydub", "torchaudio"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
@@ -138,14 +140,14 @@ class AudioSplitter:
                     whi(f"File size of {file} is now {fsize}Mb")
 
         # splitting the long audio
-        for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="First pass")):
+        for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file")):
             whi(f"Splitting file {file}")
             try:
                 if self.stop_source == "replicate":
-                    transcript = self.run_whisperx(file, "medium")
-                    times_to_keep, text_segments = self.split_one_transcript(transcript, False)
-                    whi("Text segments found:")
-                    for i, t in enumerate(text_segments):
+                    transcript = self.run_whisperx(file, "large-v2")
+                    times_to_keep, metadata = self.split_one_transcript(transcript, False)
+                    whi("Text segments metadata:")
+                    for i, t in enumerate(metadata):
                         whi(f"* {i:03d}: {t}")
 
                 elif self.stop_source == "local_json":
@@ -170,9 +172,12 @@ class AudioSplitter:
             alterations = {}
             spf = 1.0  # speed factor
             n = len(times_to_keep)
-            for iter_ttk, (t0, t1) in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
+            for iter_ttk, val in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
+                if val is None:
+                    continue
+                t0, t1 = val
                 dur = t1 - t0
-                whi(f"Text content before second pass: {text_segments[iter_ttk]}\n")
+                whi(f"Text content before second pass: {metadata[iter_ttk]['text']}\n")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
@@ -200,97 +205,139 @@ class AudioSplitter:
                 # whi("Saved")
 
                 transcript = self.run_whisperx(tempf.name, "large-v2")
-                sub_ttk, sub_ts = self.split_one_transcript(transcript, True)
-                if not sub_ttk and not sub_ts:
+                sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
+                if not sub_ttk and not sub_meta:
                     red(f"Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
                     continue
-                new_times = [[t0 + k * spf, t0 + v * spf] for k, v in sub_ttk]
-                alterations[iter_ttk] = [new_times, sub_ts]
-                assert new_times[-1][-1] <= t1, "unexpected split timeline"
+                new_times = []
+                for val, met in zip(sub_ttk, sub_meta):
+                    met["start"] = t0 + met["start"] * spf
+                    met["end"] = t0 + met["end"] * spf
+                    if val is None:
+                        new_times.append(val)
+                    else:
+                        new_times.append([t0 + val[0] * spf, t0 + val[1] * spf])
+                alterations[iter_ttk] = [new_times, sub_meta]
+                if [nt for nt in new_times if nt]:
+                    assert [nt for nt in new_times if nt][-1][-1] <= t1, "unexpected split timeline"
                 Path(tempf.name).unlink()
 
-                if len(sub_ts) > 1:
-                    red("Segment was rescinded in those texts:")
-                    for ts in sub_ts:
-                        red(f"* '{ts}'")
-                elif sub_ts[0] != text_segments[iter_ttk]:
-                    red(f"Text segment after second pass is: '{sub_ts[0]}'")
+                if len(sub_meta) > 1:
+                    red("Segment was rescinded in those texts. Metadata:")
+                    for meta in sub_meta:
+                        red(f"* '{meta}'")
+                elif sub_meta[0]["text"] != metadata[iter_ttk]["text"]:
+                    red(f"Text segment after second pass is: '{sub_meta[0]['text']}'")
+                else:
+                    whi("No change after second pass")
 
             red("Resplitting after second pass")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
                 new_times = vals[0]
-                sub_ts = vals[1]
+                sub_meta = vals[1]
+                new_times_real = [val for val in new_times if val is not None]
+                if not new_times_real:
+                    metadata[iter_alt]["status"] += "2nd pass considered it empty"
+                    metadata[iter_alt]["2nd_pass_metadata"] = sub_meta
+                    continue
 
                 # find the corresponding segment: it's when the start
                 # time is very close
                 diffs = []
                 for j, old_vals in enumerate(times_to_keep):
-                    diffs.append(abs(old_vals[0] - new_times[0][0]))
-                min_diff = min(diffs)
+                    if old_vals is None:
+                        diffs.append(None)
+                    else:
+                        diffs.append(abs(old_vals[0] - new_times_real[0][0]))
+                min_diff = min([d for d in diffs if d])
+                assert len(diffs) == len(times_to_keep)
                 i_good_seg = diffs.index(min_diff)
                 old_times = times_to_keep[i_good_seg]
                 dur_old = old_times[1] - old_times[0]
-                dur_new = new_times[-1][1] - new_times[0][0]
+                dur_new = new_times_real[-1][1] - new_times_real[0][0]
                 diff_dur = abs(1 - dur_old / dur_new)
-                assert min_diff <= 2 or diff_dur <= 0.15, "Suspiciously big difference"
+                if not (min_diff <= 2 or diff_dur <= 0.15):
+                    red(f"Suspiciously big difference: min_diff: {min_diff}; diff_dur: {diff_dur}; old_times: {old_times}; new_times: {new_times}")
+                    # if old_times[0] - new_times_real[0][0] <= -3:
+                    #     new_times.insert(0, [old_times[0], new_times_real[0][0]])
+                    #     sub_meta.insert(0, sub_meta[0])
+                    #     sub_meta[0]["start"] = old_times[0]
+                    #     sub_meta[0]["end"] = new_times[0][0]
+                    #     sub_meta[0]["duration"] = sub_meta[0]["end"] - sub_meta[0]["start"]
+                    #     sub_meta[0]["status"] += " ADDED BECAUSE MISSING LEAD IN SECOND PASS"
+                    #     red(f"Added just in case {new_times[0]}")
+                    # if old_times[1] - new_times_real[-1][1] >= 3:
+                    #     new_times.append([new_times_real[-1][1], old_times[1]])
+                    #     sub_meta.append(sub_meta[-1])
+                    #     sub_meta[-1]["start"] = new_times_real[-1][1]
+                    #     sub_meta[-1]["end"] = old_times[0]
+                    #     sub_meta[-1]["duration"] = sub_meta[-1]["end"] - sub_meta[-1]["start"]
+                    #     sub_meta[-1]["status"] += " ADDED BECAUSE MISSING END IN SECOND PASS"
+                    #     red(f"Added just in case {new_times[-1]}")
 
+                assert len(new_times) == len(sub_meta)
                 old_len_ttk = len(times_to_keep)
-                assert old_len_ttk == len(text_segments), "unexpected length"
+                assert old_len_ttk == len(metadata), "unexpected length"
 
-                if len(new_times) == 1:
+                if len(new_times_real) == 1:
                     whi(f"The split #{iter_alt} is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times[0]}")
                 else:
                     whi(f"Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
-                    times_to_keep[i_good_seg:i_good_seg+1] = new_times
-                    text_segments[i_good_seg:i_good_seg+1] = sub_ts
+                    times_to_keep[i_good_seg+1] = None
+                    metadata[i_good_seg+1]["status"] += "Replaced by 2nd pass"
+                    times_to_keep[i_good_seg+1:i_good_seg+2] = new_times
+                    metadata[i_good_seg+1:i_good_seg+2] = sub_meta
                     assert old_len_ttk + len(new_times) - 1 == len(times_to_keep), (
                         "Unexpected new length when resplitting audio")
-                    assert len(times_to_keep) == len(text_segments), "unexpected length"
+                    assert len(times_to_keep) == len(metadata), "unexpected length"
 
             # check values
             prev_t0 = -1
             prev_t1 = -1
             n = len(times_to_keep)
             whi("\nChecking if some splits are too long")
-            for iter_ttk, (t0, t1) in enumerate(times_to_keep):
+            for iter_ttk, val in enumerate(times_to_keep):
+                if val is None:
+                    continue
+                t0, t1 = val
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
-                    red(f"Split #{iter_ttk}/{n} has too long duration even after correction! {dur}s.")
-                    red(f"Text content: {text_segments[iter_ttk]}\n")
+                    red(f"Split #{iter_ttk}/{n} has too long duration even after second pass: {dur:02f}s.")
+                    red(f"metadata: {metadata[iter_ttk]}\n")
                 prev_t0 = t0
                 prev_t1 = t1
 
-            assert times_to_keep[-1][1] * 1000 * self.spf <= len(audio_o)
+            assert [t for t in times_to_keep if t][-1][1] * 1000 * self.spf <= len(audio_o)
             # # make sure to start at 0 and end at the end. Even though if
             # # it was removed from times_to_keep means that it
             # # contained no words
             # times_to_keep[-1][1] = len(audio_o) / 1000 / self.spf
             # times_to_keep[0][0] = 0
 
-            for iter_ttk, (start_cut, end_cut) in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
-                sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
+            for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
                 assert not out_file.exists(), f"file {out_file} already exists!"
+
+                with self.metadata_file.open("a") as mf:
+                    mf.write("\n")
+                    metadata[iter_ttk]["file_path"] = str(out_file)
+                    mf.write(json.dumps(metadata[iter_ttk], ensure_ascii=False))
+                if val is None:
+                    continue
+
+                start_cut, end_cut = val
+                sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
-                if len(sliced) < 1000:
-                    red(f"Split too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
-                    continue
+                # if len(sliced) < 1000:
+                #     red(f"Split too short so ignored: {out_file} of length {len(sliced)/1000:.1f}s")
+                #     continue
                 whi(f"Saving sliced to {out_file}")
                 sliced.export(out_file, format="mp3")
-
-                # TODO fix metadata setting
-                # for each file, keep the relevant transcript
-                # whi(f"Setting metadata for {out_file}")
-                # with exiftool.ExifToolHelper() as et:
-                #     et.execute(b"-whisperx_transcript='" + bytes(text_segments[i].replace(" ", "\ ")) + b"'", str(out_file))
-                #     et.execute(b"-transcription_date=" + bytes(int(time.time())), str(out_file))
-                #     et.execute(b"-chunk_i=" + bytes(i), str(out_file))
-                #     et.execute(b"-chunk_ntotal=" + bytes(n), str(out_file))
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
             shutil.move(fileo, self.done_dir / fileo.name)
@@ -315,27 +362,38 @@ class AudioSplitter:
             whi(f"Full text:\n'''\n{full_text}\n'''")
 
         # verbose_json
-        text_segments = [""]
         times_to_keep = [[0, duration]]
         previous_start = -1
         previous_end = -1
+        metadata = [{"text": "", "start": 0, "end": duration, "status": ""}]
         for segment in tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False):
+
+            metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
+            metadata[-1]["avg_logprob"] = segment["avg_logprob"]
+            metadata[-1]["compression_ratio"] = segment["compression_ratio"]
+            metadata[-1]["temperature"] = segment["temperature"]
+
             st = segment["start"]
             ed = segment["end"]
 
             text = segment["text"]
             if not second_pass:
-                whi(f"Text of segment: {text}")
+                whi(f"Text in transcript segment: {text}")
+                metadata[-1]["n_pass"] = 1
+            else:
+                metadata[-1]["n_pass"] = 2
 
             # impossibly short token
             if ed - st <= 0.05:
                 red(f"Too short segment is ignored: {ed-st}s (text was '{text}')")
+                metadata[-1]["status"] = "Too short"
                 continue
 
             # low speech probability
             nsprob = segment["no_speech_prob"]
             if nsprob >= 0.9:
                 red(f"No speech probability is {nsprob}%>90% so ignored.")
+                metadata[-1]["status"] = "No speech"
                 continue
 
             assert st >= previous_start, "Output from whisperx contains overlapping segments"
@@ -346,7 +404,8 @@ class AudioSplitter:
 
             if not [re.search(stop, text) for stop in self.stop_list]:
                 # not stopping
-                text_segments[-1] += f" {text}"
+                metadata[-1]["text"] += f" {text}"
+                metadata[-1]["end"] = ed
                 times_to_keep[-1][1] = ed
                 continue
 
@@ -358,15 +417,21 @@ class AudioSplitter:
                     if re.search(stop, word):
                         # whi(f"Found {stop.pattern} in '{text}' ({st}->{ed})")
                         times_to_keep[-1][1] = (w["start"] + w["end"]) / 2
+                        metadata[-1]["end"] = times_to_keep[-1][1]
+                        metadata[-1]["status"] = "Kept"
+
                         times_to_keep.append([w["end"], duration])
-                        text_segments.append("")
+                        metadata.append({"text": "", "start": w["end"], "end": duration, "status": ""})
                         not_matched = False
                         break
                 if not_matched:
-                    text_segments[-1] += f" {word}"
+                    metadata[-1]["text"] += f" {word}"
                     times_to_keep[-1][1] = duration
+                    metadata[-1]["end"] = duration
 
-        n = len(text_segments)
+        if not metadata[-1]["status"]:
+            metadata[-1]["status"] = "Kept"
+        n = len(metadata)
         if not second_pass:
             whi(f"Found {n} splits")
 
@@ -374,41 +439,39 @@ class AudioSplitter:
         latest_kept_i = 0
         time_limit = 1
         for iter_ttk, (start, end) in enumerate(times_to_keep):
+            metadata[iter_ttk]["duration"] = end - start
             if end - start < time_limit:
                 assert times_to_keep[latest_kept_i][1] <= end, "overlapping audio"
                 times_to_keep[latest_kept_i][1] = end
 
                 times_to_keep[iter_ttk] = None
-                text_segments[iter_ttk] = None
+                metadata[iter_ttk]["status"] += " Too short"
             else:
                 assert end - start >= 0, "End before start"
                 latest_kept_i = iter_ttk
-                while "  " in text_segments[iter_ttk]:
-                    text_segments[iter_ttk] = text_segments[iter_ttk].replace("  ", " ").strip()
-        text_segments = [t for t in text_segments if t is not None]
-        times_to_keep = [t for t in times_to_keep if t is not None]
-        n = len(text_segments)
+                while "  " in metadata[iter_ttk]["text"]:
+                    metadata[iter_ttk]["text"] = metadata[iter_ttk]["text"].replace("  ", " ").strip()
+        nbefore = len(times_to_keep)
+        nafter = len([t for t in times_to_keep if t is not None])
         if not second_pass:
-            whi(f"Kept {n} splits when removing those <{time_limit}s")
+            whi(f"Kept {nafter}/{nbefore} splits when removing those <{time_limit}s")
 
         # remove almost no words if large model was used
         if second_pass:
             word_limit = 3
-            for i, te in enumerate(text_segments):
-                if len(te.split(" ")) <= word_limit:
-                    text_segments[i] = None
+            for i, te in enumerate(metadata):
+                te = te["text"]
+                metadata[iter_ttk]["n_words"] = len(te.split(" "))
+                if metadata[iter_ttk]["n_words"] <= word_limit:
                     times_to_keep[i] = None
-            text_segments = [t for t in text_segments if t is not None]
-            times_to_keep = [t for t in times_to_keep if t is not None]
-            if len(text_segments)-n:
-                whi(f"Removed {len(text_segments)-n} splits with less than {word_limit} words")
-            n = len(text_segments)
+                    metadata[iter_ttk]["status"] += "Low nwords"
+            nbefore = len(times_to_keep)
+            nafter = len([t for t in times_to_keep if t is not None])
+            whi(f"Removed {nafter}/{nbefore} splits with less than {word_limit} words")
 
-        text_segments = [t.strip() for t in text_segments]
+        assert len(times_to_keep) == len(metadata), "invalid lengths"
 
-        assert len(times_to_keep) == len(text_segments), "invalid lengths"
-
-        return times_to_keep, text_segments
+        return times_to_keep, metadata
 
     def run_whisperx(self, audio_path, model):
         whi(f"Running whisperx on {audio_path}")
