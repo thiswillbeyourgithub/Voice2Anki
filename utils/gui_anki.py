@@ -353,6 +353,8 @@ with gr.Blocks(
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                     outputs=[txt_chatgpt_cloz],
                     queue=True,
+                    preprocess=False,
+                    postprocess=False,
                     ).then(
                             fn=None,
                             js=hide_some_components,
@@ -513,6 +515,8 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
+                        preprocess=False,
+                        postprocess=False,
                         ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -656,6 +660,8 @@ with gr.Blocks(
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=True,
+                        preprocess=False,
+                        postprocess=False,
                         ).then(
                                 fn=None,
                                 js=hide_some_components,
@@ -679,6 +685,8 @@ with gr.Blocks(
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
             outputs=[txt_chatgpt_cloz],
             queue=True,
+            preprocess=False,
+            postprocess=False,
             )
 
     # send to anki
