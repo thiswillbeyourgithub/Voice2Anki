@@ -262,7 +262,7 @@ with gr.Blocks(
             rst_.click(
                     fn=lambda: None,
                     outputs=[gal_],
-                    queue=True).then(
+                    queue=False).then(
                         fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
                         inputs=[gal_],
                         )
