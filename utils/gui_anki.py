@@ -35,9 +35,15 @@ if shared.compact_js:
         el.style.setProperty('display', 'none', 'important');
       });
     }
-    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
-    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
-    hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
+    try {
+        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
+    } catch(e) {};
+    try {
+        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
+    } catch(e) {};
+    try {
+        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
+    } catch(e) {};
     }
     """
 else:
