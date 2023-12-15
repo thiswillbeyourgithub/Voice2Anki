@@ -193,12 +193,6 @@ def get_card_status(txt_chatgpt_cloz):
             return gr.Button("MISSING", variant="primary")
 
 
-def delayed_get_card_status(*args, **kwargs):
-    "add a delay for card to be added to anki"
-    time.sleep(4)
-    return get_card_status(*args, **kwargs)
-
-
 @trace
 def sync_anki():
     "trigger anki synchronization"

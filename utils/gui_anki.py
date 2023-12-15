@@ -3,7 +3,7 @@ import gradio as gr
 
 from .profiles import get_profiles, switch_profile
 from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio
-from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, delayed_get_card_status
+from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
 from .media import get_image, reset_audio, reset_gallery, get_img_source, load_future_galleries, create_audio_compo, roll_audio
@@ -395,13 +395,7 @@ with gr.Blocks(
             outputs=[update_status_btn],
             queue=True,
             show_progress=False,
-            )
-    update_status_btn.click(
-            fn=get_card_status,
-            inputs=[txt_chatgpt_cloz],
-            outputs=[update_status_btn],
-            queue=True,
-            show_progress=False,
+            every=2
             )
 
     # display pricing then save values
@@ -543,13 +537,7 @@ with gr.Blocks(
                                         js=hide_some_components,
                                         queue=True,
                                         show_progress=False,
-                                        ).then(
-                                                fn=get_card_status,
-                                                inputs=[txt_chatgpt_cloz],
-                                                outputs=[update_status_btn],
-                                                queue=True,
-                                                show_progress=False,
-                                                )
+                                        )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -618,13 +606,7 @@ with gr.Blocks(
                                                 js=hide_some_components,
                                                 queue=True,
                                                 show_progress=False,
-                                                ).then(
-                                                        fn=get_card_status,
-                                                        inputs=[txt_chatgpt_cloz],
-                                                        outputs=[update_status_btn],
-                                                        queue=True,
-                                                        show_progress=False,
-                                                        )
+                                                )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -710,13 +692,7 @@ with gr.Blocks(
                     fn=lambda: False,
                     outputs=[check_marked],
                     show_progress=False,
-                    ).then(
-                            fn=get_card_status,
-                            inputs=[txt_chatgpt_cloz],
-                            outputs=[update_status_btn],
-                            queue=True,
-                            show_progress=False,
-                            )
+                    )
 
     # 1+2
     semiauto_btn.click(
@@ -753,13 +729,7 @@ with gr.Blocks(
                             fn=lambda: False,
                             outputs=[check_marked],
                             show_progress=False,
-                            ).then(
-                                    fn=get_card_status,
-                                    inputs=[txt_chatgpt_cloz],
-                                    outputs=[update_status_btn],
-                                    queue=True,
-                                    show_progress=False,
-                                    )
+                            )
 
     # 1+2+3
     auto_btn.click(
@@ -796,13 +766,7 @@ with gr.Blocks(
                             fn=lambda: False,
                             outputs=[check_marked],
                             show_progress=False,
-                            ).then(
-                                    fn=get_card_status,
-                                    inputs=[txt_chatgpt_cloz],
-                                    outputs=[update_status_btn],
-                                    queue=True,
-                                    show_progress=False,
-                                    )
+                            )
 
     improve_btn.click(
             fn=recur_improv,
@@ -820,7 +784,7 @@ with gr.Blocks(
             queue=True,
             show_progress=False,
             )
-    gr.on(  # not really working for now
+    gr.on(
             triggers=[
                 # rollaudio_12_btn.click,
                 # rollaudio_123_btn.click,
