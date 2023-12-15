@@ -769,18 +769,18 @@ with gr.Blocks(
             queue=True,
             show_progress=False,
             )
-    # gr.on(
-    #         triggers=[
-    #             # rollaudio_12_btn.click,
-    #             # rollaudio_123_btn.click,
-    #             dark_mode_btn.click,
-    #             sync_btn.click,
-    #             ],
-    #         js=hide_some_components,
-    #         fn=None,
-    #         queue=True,
-    #         show_progress=False,
-    #         )
+    gr.on(
+            triggers=[
+                # rollaudio_12_btn.click,
+                # rollaudio_123_btn.click,
+                dark_mode_btn.click,
+                sync_btn.click,
+                ],
+            js=hide_some_components,
+            fn=None,
+            queue=True,
+            show_progress=False,
+            )
 
     demo_anki.load(
             fn=shared.reset,
