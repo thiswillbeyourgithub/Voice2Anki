@@ -397,9 +397,9 @@ with gr.Blocks(
             queue=True,
             show_progress=False,
             every=2,
-            js=hide_some_components,
-            trigger_mode="once",
+            trigger_mode="multiple",
             )
+
 
     # display pricing then save values
     sld_max_tkn.change(
