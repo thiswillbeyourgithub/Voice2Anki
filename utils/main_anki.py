@@ -939,12 +939,10 @@ def to_anki(
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
-        gr.Error(red(f"Invalid cloze: '{txt_chatgpt_cloz}'"))
-        return
+        raise Exception(red(f"Invalid cloze: '{txt_chatgpt_cloz}'"))
 
     if "alfred" in txt_chatgpt_cloz.lower():
-        gr.Error(red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"))
-        return
+        raise Exception(red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"))
 
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
@@ -987,9 +985,8 @@ def to_anki(
     # sending sound file to anki media
     audio_html = wait_for_queue(audio_to_anki_queue, "audio_to_anki")
     if "Error" in audio_html:  # then out is an error message and not the source
-        gr.Error(f"Error in audio_html: '{audio_html}'")
         gather_threads(["audio_to_anki", "ocr"])
-        return
+        raise Exception(f"Error in audio_html: '{audio_html}'")
 
     # gather text from the source image(s)
     if not txt_source:
@@ -1031,9 +1028,8 @@ def to_anki(
     shared.added_note_ids.append([int(r) for r in results])
 
     if not len(results) == len(clozes):
-        gr.Error(red("Some flashcards were not added!"))
         gather_threads(["audio_to_anki", "ocr"])
-        return
+        raise Exception(red("Some flashcards were not added!"))
     with threading.Lock():
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "was_ankified"] = True
 
