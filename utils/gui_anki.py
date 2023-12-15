@@ -390,7 +390,7 @@ with gr.Blocks(
             outputs=[update_status_btn],
             queue=True,
             show_progress=False,
-            every=2
+            every=2,
             js=hide_some_components,
             trigger_mode="once",
             )
