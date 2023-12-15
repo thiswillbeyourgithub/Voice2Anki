@@ -347,18 +347,18 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                     outputs=[txt_chatgpt_cloz],
-                    queue=True,
+                    queue=False,
                     preprocess=False,
                     postprocess=False,
                     ).then(
                             fn=None,
                             js=hide_some_components,
-                            queue=True,
+                            queue=False,
                             show_progress=False,
                             )
 
@@ -383,7 +383,7 @@ with gr.Blocks(
     dark_mode_btn.click(fn=None, js=darkmode_js, show_progress=False)
 
     # sync anki
-    sync_btn.click(fn=threaded_sync_anki, queue=True, show_progress=False)
+    sync_btn.click(fn=threaded_sync_anki, queue=False, show_progress=False)
 
     # kill threads before timeout
     kill_threads_btn.click(fn=kill_threads, show_progress=False)
@@ -495,7 +495,7 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             show_progress=False,
             ).success(
                     fn=transcribe,
@@ -503,12 +503,12 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    queue=True,
+                    queue=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
-                        queue=True,
+                        queue=False,
                         preprocess=False,
                         postprocess=False,
                         ).then(
@@ -530,7 +530,7 @@ with gr.Blocks(
                                 outputs=[audio_slots[-1]],
                                 # preprocess=False,
                                 # postprocess=False,
-                                queue=True,
+                                queue=False,
                                 show_progress=False,
                                 ).then(
                                         fn=None,
@@ -544,7 +544,7 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             show_progress=False,
             ).success(
                     fn=transcribe,
@@ -552,14 +552,14 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    queue=True,
+                    queue=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
-                        queue=True,
+                        queue=False,
                         ).success(
                             fn=to_anki,
                             inputs=[
@@ -575,7 +575,7 @@ with gr.Blocks(
                                 ],
                             preprocess=False,
                             postprocess=False,
-                            queue=True,
+                            queue=False,
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -595,7 +595,7 @@ with gr.Blocks(
                                 outputs=[audio_slots[-1]],
                                 # preprocess=False,
                                 # postprocess=False,
-                                queue=True,
+                                queue=False,
                                 show_progress=False,
                                 ).success(
                                         fn=lambda: False,
@@ -628,7 +628,7 @@ with gr.Blocks(
                 txt_keywords,
                 ] + audio_slots,
             outputs=audio_slots,
-            queue=True,
+            queue=False,
             show_progress=False,
             ).success(
                     fn=transcribe,
@@ -636,12 +636,12 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    queue=True,
+                    queue=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
-                        queue=True,
+                        queue=False,
                         preprocess=False,
                         postprocess=False,
                         ).then(
@@ -658,7 +658,7 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             )
 
     # send to chatgpt
@@ -666,7 +666,7 @@ with gr.Blocks(
             fn=alfred,
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
             outputs=[txt_chatgpt_cloz],
-            queue=True,
+            queue=False,
             preprocess=False,
             postprocess=False,
             )
@@ -687,7 +687,7 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             ).then(
                     fn=lambda: False,
                     outputs=[check_marked],
@@ -701,14 +701,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                queue=True,
+                queue=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -724,7 +724,7 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    queue=True,
+                    queue=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
@@ -738,14 +738,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                queue=True,
+                queue=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -761,7 +761,7 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    queue=True,
+                    queue=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
