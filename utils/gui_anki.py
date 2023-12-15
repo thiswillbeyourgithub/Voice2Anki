@@ -256,7 +256,7 @@ with gr.Blocks(
                             ).then(
                                     fn=get_img_source,
                                     inputs=[gallery],
-                                    queue=True,
+                                    queue=False,
                                     )
             # reset image
             rst_.click(
@@ -294,7 +294,7 @@ with gr.Blocks(
                             ).success(
                                     fn=get_img_source,
                                     inputs=[gallery],
-                                    queue=True,
+                                    queue=False,
                                     ).success(
                                             fn=lambda: None,
                                             outputs=[future_galleries[0][1]]
@@ -452,7 +452,7 @@ with gr.Blocks(
             inputs=[gallery],
             outputs=[gallery],
             show_progress=False,
-            queue=True,
+            queue=False,
             ).success(
                     fn=shared.pv.save_gallery,
                     inputs=[gallery],
@@ -460,14 +460,13 @@ with gr.Blocks(
                     ).success(
                             fn=get_img_source,
                             inputs=[gallery],
-                            queue=True,
+                            queue=False,
                             show_progress=False,
                             )
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
-            queue=True,
-            cancels=[paste_image_event],
+            queue=False,
             show_progress=False,
             )
 
@@ -484,7 +483,7 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             show_progress=False,
             ).then(
                     fn=None,
@@ -538,7 +537,7 @@ with gr.Blocks(
                                 ).then(
                                         fn=None,
                                         js=hide_some_components,
-                                        queue=True,
+                                        queue=False,
                                         show_progress=False,
                                         )
     rollaudio_123_btn.click(
@@ -607,7 +606,7 @@ with gr.Blocks(
                                         ).then(
                                                 fn=None,
                                                 js=hide_some_components,
-                                                queue=True,
+                                                queue=False,
                                                 show_progress=False,
                                                 )
 
@@ -650,7 +649,7 @@ with gr.Blocks(
                         ).then(
                                 fn=None,
                                 js=hide_some_components,
-                                queue=True,
+                                queue=False,
                                 show_progress=False,
                                 )
 
@@ -784,7 +783,7 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
-            queue=True,
+            queue=False,
             show_progress=False,
             )
     gr.on(
@@ -796,7 +795,7 @@ with gr.Blocks(
                 ],
             js=hide_some_components,
             fn=None,
-            queue=True,
+            queue=False,
             show_progress=False,
             )
 
