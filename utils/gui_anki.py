@@ -126,7 +126,7 @@ with gr.Blocks(
                                 elem_id="Audio_component_V2FT",
                                 elem_classes="Audio_component_V2FT",
                                 #min_width=300,
-                                # editable=False,
+                                editable=False,
                                 )
                         auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False)
                         semiauto_btn = gr.Button(

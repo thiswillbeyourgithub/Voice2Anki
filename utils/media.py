@@ -222,7 +222,7 @@ def create_audio_compo():
             elem_id="Audio_component_V2FT",
             elem_classes="Audio_component_V2FT",
             # min_width=10,
-            # editable=False,
+            editable=False,
             )
 
 
