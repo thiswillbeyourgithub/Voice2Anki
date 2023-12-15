@@ -49,6 +49,16 @@ stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 # llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
 
+def floatizer(func):
+    "used to cast the ints as float to make sure the cache is used"
+    def wrapper(*args, **kwargs):
+        args = [float(ar) if isinstance(ar, int) else ar for ar in args]
+        kwargs = {k: float(v) if isinstance(v, int) else v for k, v in kwargs.items()}
+        return func(*args, **kwargs)
+    return wrapper
+
+@floatizer
+@trace
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
         audio_path,
@@ -139,13 +149,13 @@ def thread_whisp_then_llm(
             modelname,
             txt_whisp_prompt,
             txt_whisp_lang,
-            float(sld_whisp_temp),
+            sld_whisp_temp,
             )["text"]
     with lock:
         shared.dirload_queue.loc[orig_path, "was_transcribed"] = True
         shared.dirload_queue.loc[orig_path, "was_alfreded"] = "started"
 
-    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, float(max_token), float(temperature), float(sld_buffer), check_gpt4, txt_keywords, cache_mode=True)
+    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
     with lock:
         shared.dirload_queue.loc[orig_path, "was_alfreded"] = True
 
@@ -353,6 +363,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
     return formatted_messages
 
+@floatizer
 @trace
 @Timeout(30)
 @llm_cache.cache(ignore=["cache_mode"])
