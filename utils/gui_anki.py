@@ -486,7 +486,11 @@ with gr.Blocks(
             postprocess=False,
             queue=True,
             show_progress=False,
-            )
+            ).then(
+                    fn=None,
+                    js=hide_some_components,
+                    show_progress=False,
+                    )
 
     rollaudio_12_btn.click(
             fn=roll_audio,
@@ -531,8 +535,12 @@ with gr.Blocks(
                                 # postprocess=False,
                                 queue=False,
                                 show_progress=False,
-                                )
-
+                                ).then(
+                                        fn=None,
+                                        js=hide_some_components,
+                                        queue=True,
+                                        show_progress=False,
+                                        )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -596,7 +604,12 @@ with gr.Blocks(
                                         fn=lambda: False,
                                         outputs=[check_marked],
                                         show_progress=False,
-                                        )
+                                        ).then(
+                                                fn=None,
+                                                js=hide_some_components,
+                                                queue=True,
+                                                show_progress=False,
+                                                )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
@@ -634,7 +647,12 @@ with gr.Blocks(
                         queue=False,
                         preprocess=False,
                         postprocess=False,
-                        )
+                        ).then(
+                                fn=None,
+                                js=hide_some_components,
+                                queue=True,
+                                show_progress=False,
+                                )
 
     # send to whisper
     transcript_btn.click(
@@ -784,7 +802,7 @@ with gr.Blocks(
 
     demo_anki.load(
             fn=shared.reset,
-            # js=hide_some_components,
+            js=hide_some_components,
             show_progress=False,
             )
     if shared.pv.profile_name == "default":
