@@ -939,11 +939,11 @@ def to_anki(
     # checks clozes validity
     clozes = txt_chatgpt_cloz.split("#####")
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
-        red(f"Invalid cloze: '{txt_chatgpt_cloz}'")
+        gr.Error(red(f"Invalid cloze: '{txt_chatgpt_cloz}'"))
         return
 
     if "alfred" in txt_chatgpt_cloz.lower():
-        red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"),
+        gr.Error(red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"))
         return
 
     # load the source text of the image in the gallery
@@ -1031,7 +1031,7 @@ def to_anki(
     shared.added_note_ids.append([int(r) for r in results])
 
     if not len(results) == len(clozes):
-        red("Some flashcards were not added!"),
+        gr.Error(red("Some flashcards were not added!"))
         gather_threads(["audio_to_anki", "ocr"])
         return
     with threading.Lock():
