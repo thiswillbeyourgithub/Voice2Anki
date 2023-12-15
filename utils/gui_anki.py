@@ -355,12 +355,7 @@ with gr.Blocks(
                     queue=False,
                     preprocess=False,
                     postprocess=False,
-                    ).then(
-                            fn=None,
-                            js=hide_some_components,
-                            queue=False,
-                            show_progress=False,
-                            )
+                    )
 
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
