@@ -65,7 +65,7 @@ with gr.Blocks(
             gr.Button(value="VoiceToFormattedText - Anki", variant="primary", scale=3, interactive=True)
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
-            update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=False)
+            update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True)
 
     with gr.Tab(label="Main"):
 
@@ -390,14 +390,16 @@ with gr.Blocks(
     kill_threads_btn.click(fn=kill_threads, show_progress=False)
 
     # display card status
-    txt_chatgpt_cloz.change(
+    update_status_btn.click(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
-            queue=True,
-            show_progress=False,
-            every=2,
-            trigger_mode="always_last",
+            queue=False,
+            # show_progress=True,
+            # every=2,
+            # trigger_mode="once",
+            preprocess=False,
+            postprocess=False,
             )
 
 
