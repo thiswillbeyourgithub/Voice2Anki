@@ -397,7 +397,7 @@ with gr.Blocks(
             queue=True,
             show_progress=False,
             every=2,
-            trigger_mode="multiple",
+            trigger_mode="always_last",
             )
 
 
