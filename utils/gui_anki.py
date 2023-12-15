@@ -234,7 +234,7 @@ with gr.Blocks(
                     inputs=[gal_],
                     outputs=[gal_],
                     queue=False).success(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
                             inputs=[gal_],
                             )
             # send image
@@ -257,7 +257,7 @@ with gr.Blocks(
                     fn=lambda: None,
                     outputs=[gal_],
                     queue=True).then(
-                        fn=getattr(shared.pv, f"save_future_gallery_{fg}"),
+                        fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
                         inputs=[gal_],
                         )
             future_galleries.append([rst_, gal_, send_, add_])
@@ -293,7 +293,7 @@ with gr.Blocks(
                                             fn=lambda: None,
                                             outputs=[future_galleries[0][1]]
                                             ).success(
-                                                    fn=shared.pv.save_future_gallery_1,
+                                                    fn=shared.pv.save_future_gallery_001,
                                                     inputs=[future_galleries[0][1]],
                                                     )
 

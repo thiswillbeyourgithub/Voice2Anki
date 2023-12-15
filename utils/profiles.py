@@ -27,7 +27,7 @@ approved_keys_all = [
         "txt_extra_source",
         "txt_openai_api_key",
         ]
-approved_keys_all += [f"future_gallery_{i}" for i in range(1, shared.future_gallery_slot_nb + 1)]
+approved_keys_all += [f"future_gallery_{i:03d}" for i in range(1, shared.future_gallery_slot_nb + 1)]
 approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
 approved_keys_md = approved_keys_all + ["txt_mdpath"]
 

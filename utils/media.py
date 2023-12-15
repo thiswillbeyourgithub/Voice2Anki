@@ -197,7 +197,7 @@ def rgb_to_bgr(image):
 def load_future_galleries():
     """load the saved images beforehand to reorder so that the empty
     galleries are moved at the end"""
-    saved_fg = [shared.pv[f"future_gallery_{fg}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
+    saved_fg = [shared.pv[f"future_gallery_{fg:03d}"] for fg in range(1, shared.future_gallery_slot_nb + 1)]
     while None in saved_fg:
         saved_fg.remove(None)
     if len(saved_fg) < shared.future_gallery_slot_nb:
@@ -205,7 +205,7 @@ def load_future_galleries():
     assert len(saved_fg) == shared.future_gallery_slot_nb
     for i, fg in enumerate(range(1, shared.future_gallery_slot_nb + 1)):
         im = saved_fg[i]
-        getattr(shared.pv, f"save_future_gallery_{fg}")(im)
+        getattr(shared.pv, f"save_future_gallery_{fg:03d}")(im)
     return saved_fg
 
 
