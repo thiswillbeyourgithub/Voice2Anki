@@ -224,14 +224,27 @@ class AudioSplitter:
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
                     continue
+
+                # adjusting times so that the second pass is synced with the original
+                # also check for overlap
+                prev_t0 = -1
+                prev_t1 = -1
                 new_times = []
                 for val, met in zip(sub_ttk, sub_meta):
-                    met["start"] = t0 + met["start"] * spf
-                    met["end"] = t0 + met["end"] * spf
+                    met["start"] = t0 + met["start"] * spf * self.spf
+                    met["end"] = t0 + met["end"] * spf * self.spf
+                    assert met["start"] > prev_t0 and met["end"] >= prev_t1, "overlap"
                     if val is None:
                         new_times.append(val)
                     else:
-                        new_times.append([t0 + val[0] * spf, t0 + val[1] * spf])
+                        new_times.append([t0 + val[0] * spf * self.spf, t0 + val[1] * spf * self.spf])
+                        assert new_times[-1][0] > prev_t0 and new_times[-1][1] >= prev_t1, "overlap"
+                        assert new_times[-1][0] == met["start"], "Inconsistency between metadata and times_to_keep"
+                        assert new_times[-1][1] == met["end"], "Inconsistency between metadata and times_to_keep"
+
+                    prev_t0 = met["start"]
+                    prev_t1 = met["end"]
+
                 alterations[iter_ttk] = [new_times, sub_meta]
                 if [nt for nt in new_times if nt]:
                     assert [nt for nt in new_times if nt][-1][-1] <= t1, "unexpected split timeline"
