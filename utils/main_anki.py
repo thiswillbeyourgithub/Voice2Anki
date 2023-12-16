@@ -632,6 +632,9 @@ def dirload_splitted(
             shared.dirload_queue.loc[p, "is_loaded"] = False
             shared.dirload_queue.loc[p, "was_moved"] = True
 
+    while len(output) < shared.audio_slot_nb:
+        output.append(None)
+
     assert len(output) == shared.audio_slot_nb, "Invalid number of audio slots in output"
 
     return output
