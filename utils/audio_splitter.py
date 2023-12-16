@@ -409,6 +409,11 @@ class AudioSplitter:
                 metadata[-1]["status"] = "No speech"
                 continue
 
+            if segment["temperature"] == 1 and nsprob >= 0.4:
+                red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored.")
+                metadata[-1]["status"] = "No speech at high temp"
+                continue
+
             assert st >= previous_start, "Output from whisperx contains overlapping segments"
             assert ed >= previous_end, "Output from whisperx contains overlapping segments"
             assert ed >= previous_start, "Output from whisperx contains overlapping segments"
