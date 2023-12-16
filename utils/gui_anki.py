@@ -549,7 +549,7 @@ with gr.Blocks(
                                                 fn=get_card_status,
                                                 inputs=[txt_chatgpt_cloz],
                                                 outputs=[update_status_btn],
-                                                queue=False,
+                                                queue=True,
                                                 preprocess=False,
                                                 postprocess=False,
                                                 )
@@ -625,7 +625,7 @@ with gr.Blocks(
                                                         fn=get_card_status,
                                                         inputs=[txt_chatgpt_cloz],
                                                         outputs=[update_status_btn],
-                                                        queue=False,
+                                                        queue=True,
                                                         preprocess=False,
                                                         postprocess=False,
                                                         )
