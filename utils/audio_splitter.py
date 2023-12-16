@@ -138,7 +138,7 @@ class AudioSplitter:
                     file = Path(tempf.name)
 
                     fsize = file.stat().st_size / 1024 / 1024
-                    whi(f"File size of {file} is now {fsize}Mb")
+                    whi(f"File size of {file} is now {round(fsize, 3)}Mb")
 
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
