@@ -460,6 +460,7 @@ class AudioSplitter:
             if end - start < time_limit:
                 assert times_to_keep[latest_kept_i][1] <= end, "overlapping audio"
                 times_to_keep[latest_kept_i][1] = end
+                metadata[latest_kept_i]["end"] = end
 
                 times_to_keep[iter_ttk] = None
                 metadata[iter_ttk]["status"] += " Too short"
