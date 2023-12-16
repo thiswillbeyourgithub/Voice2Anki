@@ -279,7 +279,7 @@ class AudioSplitter:
                         diffs.append(None)
                     else:
                         diffs.append(abs(old_vals[0] - new_times_real[0][0]))
-                min_diff = min([d for d in diffs if d])
+                min_diff = min([d for d in diffs if d is not None])
                 assert len(diffs) == len(times_to_keep)
                 i_good_seg = diffs.index(min_diff)
                 old_times = times_to_keep[i_good_seg]
