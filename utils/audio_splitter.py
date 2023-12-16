@@ -288,22 +288,6 @@ class AudioSplitter:
                 diff_dur = abs(1 - dur_old / dur_new)
                 if not (min_diff <= 2 or diff_dur <= 0.15):
                     red(f"{iter_print}Suspiciously big difference: min_diff: {min_diff}; diff_dur: {diff_dur}; old_times: {old_times}; new_times: {new_times}")
-                    # if old_times[0] - new_times_real[0][0] <= -3:
-                    #     new_times.insert(0, [old_times[0], new_times_real[0][0]])
-                    #     sub_meta.insert(0, sub_meta[0])
-                    #     sub_meta[0]["start"] = old_times[0]
-                    #     sub_meta[0]["end"] = new_times[0][0]
-                    #     sub_meta[0]["duration"] = sub_meta[0]["end"] - sub_meta[0]["start"]
-                    #     sub_meta[0]["status"] += " ADDED BECAUSE MISSING LEAD IN SECOND PASS"
-                    #     red(f"Added just in case {new_times[0]}")
-                    # if old_times[1] - new_times_real[-1][1] >= 3:
-                    #     new_times.append([new_times_real[-1][1], old_times[1]])
-                    #     sub_meta.append(sub_meta[-1])
-                    #     sub_meta[-1]["start"] = new_times_real[-1][1]
-                    #     sub_meta[-1]["end"] = old_times[0]
-                    #     sub_meta[-1]["duration"] = sub_meta[-1]["end"] - sub_meta[-1]["start"]
-                    #     sub_meta[-1]["status"] += " ADDED BECAUSE MISSING END IN SECOND PASS"
-                    #     red(f"Added just in case {new_times[-1]}")
 
                 assert len(new_times) == len(sub_meta)
                 old_len_ttk = len(times_to_keep)
