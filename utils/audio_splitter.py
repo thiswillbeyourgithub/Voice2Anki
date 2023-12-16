@@ -294,16 +294,19 @@ class AudioSplitter:
                 assert old_len_ttk == len(metadata), "unexpected length"
 
                 if len(new_times_real) == 1:
-                    whi(f"{iter_print}The split #{iter_alt} is not split "
+                    whi(f"{iter_print}The split is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times[0]}")
+                    metadata[iter_alt]["2nd_pass_metadata"] = sub_meta
                 else:
                     whi(f"{iter_print}Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
-                    times_to_keep[i_good_seg+1] = None
-                    metadata[i_good_seg+1]["status"] += "Replaced by 2nd pass"
-                    times_to_keep[i_good_seg+1:i_good_seg+2] = new_times
-                    metadata[i_good_seg+1:i_good_seg+2] = sub_meta
+                    times_to_keep[i_good_seg] = None
+                    metadata[i_good_seg]["status"] += "Replaced by 2nd pass"
+                    times_to_keep[i_good_seg:i_good_seg+1] = new_times
+                    for sm in sub_meta:
+                        sm["1st_pass_metadata"] = metadata[i_good_seg:i_good_seg+1]
+                    metadata[i_good_seg:i_good_seg+1] = sub_meta
                     assert old_len_ttk + len(new_times) - 1 == len(times_to_keep), (
                         "Unexpected new length when resplitting audio")
                     assert len(times_to_keep) == len(metadata), "unexpected length"
@@ -482,7 +485,7 @@ class AudioSplitter:
                     metadata[iter_ttk]["status"] += "Low nwords"
             nbefore = len(times_to_keep)
             nafter = len([t for t in times_to_keep if t is not None])
-            whi(f"    Removed {nafter}/{nbefore} splits with less than {word_limit} words")
+            whi(f"    Removed {nafter-nbefore}/{nbefore} splits with less than {word_limit} words")
 
         assert len(times_to_keep) == len(metadata), "invalid lengths"
 
