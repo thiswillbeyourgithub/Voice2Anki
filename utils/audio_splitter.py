@@ -293,9 +293,10 @@ class AudioSplitter:
                     whi(f"{iter_print}The split is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times[0]}")
-                    metadata[iter_alt]["2nd_pass_metadata"] = sub_meta
+                    metadata[i_good_seg]["2nd_pass_metadata"] = sub_meta
+                    metadata[i_good_seg]["status"] += "2nd split contained only one split"
                 else:
-                    whi(f"{iter_print}Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
+                    whi(f"{iter_print}Found {len(new_times)} new splits inside split")
 
                     times_to_keep[i_good_seg] = None
                     metadata[i_good_seg]["status"] += "Replaced by 2nd pass"
