@@ -1,3 +1,4 @@
+import textwrap
 import json
 import torchaudio
 import copy
@@ -148,7 +149,9 @@ class AudioSplitter:
                     times_to_keep, metadata = self.split_one_transcript(transcript, False)
                     whi("Text segments metadata:")
                     for i, t in enumerate(metadata):
-                        whi(f"* {i:03d}: {t}")
+                        whi(f"* {i:03d}:")
+                        for k, v in t.items():
+                            whi(textwrap.indent(f"{k}: {v}", "    "))
 
                 elif self.stop_source == "local_json":
                     raise NotImplementedError
@@ -175,9 +178,10 @@ class AudioSplitter:
             for iter_ttk, val in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
                 if val is None:
                     continue
+                iter_print = f"* {iter_ttk}/{n} "
                 t0, t1 = val
                 dur = t1 - t0
-                whi(f"Text content before second pass: {metadata[iter_ttk]['text']}\n")
+                whi(f"{iter_print}Text content before second pass: {metadata[iter_ttk]['text']}")
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
@@ -188,7 +192,7 @@ class AudioSplitter:
                 # we need to use sf and pyrb because
                 # pydub is buggingly slow to change the speedup
                 if spf != 1.0:
-                    whi(f"Saving segment to {tempf.name} as wav")
+                    whi(f"{iter_print}Saving segment to {tempf.name} as wav")
                     sub_audio.export(tempf.name, format="wav")
                     # Stretching time
                     y, sr = sf.read(tempf.name)
@@ -204,10 +208,10 @@ class AudioSplitter:
                 # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                 # whi("Saved")
 
-                transcript = self.run_whisperx(tempf.name, "large-v2")
+                transcript = self.run_whisperx(tempf.name, "large-v2", second_pass=True)
                 sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_meta:
-                    red(f"Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
+                    red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
                     continue
                 new_times = []
                 for val, met in zip(sub_ttk, sub_meta):
@@ -223,16 +227,18 @@ class AudioSplitter:
                 Path(tempf.name).unlink()
 
                 if len(sub_meta) > 1:
-                    red("Segment was rescinded in those texts. Metadata:")
+                    red(f"{iter_print}Segment was rescinded in those texts. Metadata:")
                     for meta in sub_meta:
                         red(f"* '{meta}'")
                 elif sub_meta[0]["text"] != metadata[iter_ttk]["text"]:
-                    red(f"Text segment after second pass is: '{sub_meta[0]['text']}'")
+                    red(f"{iter_print}Text segment after second pass is: '{sub_meta[0]['text']}'")
                 else:
-                    whi("No change after second pass")
+                    whi(f"{iter_print}No change after second pass")
 
-            red("Resplitting after second pass")
+            red(f"{iter_print}Resplitting after second pass")
+            n = len(alterations)
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
+                iter_print = f"* {iter_alt}/{n} "
                 new_times = vals[0]
                 sub_meta = vals[1]
                 new_times_real = [val for val in new_times if val is not None]
@@ -257,7 +263,7 @@ class AudioSplitter:
                 dur_new = new_times_real[-1][1] - new_times_real[0][0]
                 diff_dur = abs(1 - dur_old / dur_new)
                 if not (min_diff <= 2 or diff_dur <= 0.15):
-                    red(f"Suspiciously big difference: min_diff: {min_diff}; diff_dur: {diff_dur}; old_times: {old_times}; new_times: {new_times}")
+                    red(f"{iter_print}Suspiciously big difference: min_diff: {min_diff}; diff_dur: {diff_dur}; old_times: {old_times}; new_times: {new_times}")
                     # if old_times[0] - new_times_real[0][0] <= -3:
                     #     new_times.insert(0, [old_times[0], new_times_real[0][0]])
                     #     sub_meta.insert(0, sub_meta[0])
@@ -280,11 +286,11 @@ class AudioSplitter:
                 assert old_len_ttk == len(metadata), "unexpected length"
 
                 if len(new_times_real) == 1:
-                    whi(f"The split #{iter_alt} is not split "
+                    whi(f"{iter_print}The split #{iter_alt} is not split "
                         "differently than the first pass so keeping the "
                         f"original: {old_times} vs {new_times[0]}")
                 else:
-                    whi(f"Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
+                    whi(f"{iter_print}Found {len(new_times)} new splits inside split #{iter_alt}/{n}")
 
                     times_to_keep[i_good_seg+1] = None
                     metadata[i_good_seg+1]["status"] += "Replaced by 2nd pass"
@@ -307,7 +313,7 @@ class AudioSplitter:
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
                     red(f"Split #{iter_ttk}/{n} has too long duration even after second pass: {dur:02f}s.")
-                    red(f"metadata: {metadata[iter_ttk]}\n")
+                    red(f"metadata: {metadata[iter_ttk]}")
                 prev_t0 = t0
                 prev_t1 = t1
 
@@ -366,7 +372,7 @@ class AudioSplitter:
         previous_start = -1
         previous_end = -1
         metadata = [{"text": "", "start": 0, "end": duration, "status": ""}]
-        for segment in tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False):
+        for iter_seg, segment in enumerate(tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False)):
 
             metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
             metadata[-1]["avg_logprob"] = segment["avg_logprob"]
@@ -378,7 +384,7 @@ class AudioSplitter:
 
             text = segment["text"]
             if not second_pass:
-                whi(f"Text in transcript segment: {text}")
+                whi(f"* {iter_seg:03d} Text segment: {text}")
                 metadata[-1]["n_pass"] = 1
             else:
                 metadata[-1]["n_pass"] = 2
@@ -467,14 +473,15 @@ class AudioSplitter:
                     metadata[iter_ttk]["status"] += "Low nwords"
             nbefore = len(times_to_keep)
             nafter = len([t for t in times_to_keep if t is not None])
-            whi(f"Removed {nafter}/{nbefore} splits with less than {word_limit} words")
+            whi(f"    Removed {nafter}/{nbefore} splits with less than {word_limit} words")
 
         assert len(times_to_keep) == len(metadata), "invalid lengths"
 
         return times_to_keep, metadata
 
-    def run_whisperx(self, audio_path, model):
-        whi(f"Running whisperx on {audio_path}")
+    def run_whisperx(self, audio_path, model, second_pass=False):
+        if not second_pass:
+            whi(f"Running whisperx on {audio_path}")
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
