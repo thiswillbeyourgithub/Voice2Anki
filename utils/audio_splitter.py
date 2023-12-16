@@ -170,6 +170,17 @@ class AudioSplitter:
                 shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
                 continue
 
+            # check overlap
+            prev_t0 = -1
+            prev_t1 = -1
+            n = len(times_to_keep)
+            for iter_ttk, val in enumerate(times_to_keep):
+                if val is None:
+                    continue
+                t0, t1 = val
+                assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
+                prev_t0 = t0
+                prev_t1 = t1
 
             whi("\nSecond pass")
             alterations = {}
