@@ -303,13 +303,14 @@ with gr.Blocks(
                                                     inputs=[future_galleries[0][1]],
                                                     )
 
-    # with gr.Tab(label="Files"):
+    # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
     #         fex_done = gr.FileExplorer(
     #                 root="user_directory/done",
     #                 label="Done",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
+    #                 # visible=False,
     #                 )
     #     with gr.Accordion(label="Splitted", open=False):
     #         fex_splitted = gr.FileExplorer(
@@ -317,6 +318,7 @@ with gr.Blocks(
     #                 label="Splitted",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
+    #                 # visible=False,
     #                 )
     #     with gr.Accordion(label="Unsplitted", open=False):
     #         fex_unsplitted = gr.FileExplorer(
@@ -324,6 +326,7 @@ with gr.Blocks(
     #                 label="Unsplitted",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
+    #                 # visible=False,
     #                 )
     #     with gr.Accordion(label="Flagged", open=False):
     #         fex_flagged = gr.FileExplorer(
@@ -331,6 +334,7 @@ with gr.Blocks(
     #                 label="Flagged",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
+    #                 # visible=False,
     #                 )
 
     # events ############################################################
