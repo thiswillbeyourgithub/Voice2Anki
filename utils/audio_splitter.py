@@ -255,10 +255,8 @@ class AudioSplitter:
                 else:
                     whi(f"{iter_print}No change after second pass")
 
-            red(f"{iter_print}Resplitting after second pass")
-            n = len(alterations)
+            red(f"Resplitting after second pass")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
-                iter_print = f"* {iter_alt}/{n} "
                 new_times = vals[0]
                 sub_meta = vals[1]
                 new_times_real = [val for val in new_times if val is not None]
@@ -278,6 +276,7 @@ class AudioSplitter:
                 min_diff = min([d for d in diffs if d is not None])
                 assert len(diffs) == len(times_to_keep)
                 i_good_seg = diffs.index(min_diff)
+                iter_print = f"* {i_good_seg}/{len(times_to_keep)} "
                 old_times = times_to_keep[i_good_seg]
                 dur_old = old_times[1] - old_times[0]
                 dur_new = new_times_real[-1][1] - new_times_real[0][0]
