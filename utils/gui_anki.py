@@ -545,7 +545,14 @@ with gr.Blocks(
                                         js=hide_some_components,
                                         queue=False,
                                         show_progress=False,
-                                        )
+                                        ).then(
+                                                fn=get_card_status,
+                                                inputs=[txt_chatgpt_cloz],
+                                                outputs=[update_status_btn],
+                                                queue=False,
+                                                preprocess=False,
+                                                postprocess=False,
+                                                )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -614,7 +621,14 @@ with gr.Blocks(
                                                 js=hide_some_components,
                                                 queue=False,
                                                 show_progress=False,
-                                                )
+                                                ).then(
+                                                        fn=get_card_status,
+                                                        inputs=[txt_chatgpt_cloz],
+                                                        outputs=[update_status_btn],
+                                                        queue=False,
+                                                        preprocess=False,
+                                                        postprocess=False,
+                                                        )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use V2FT on the computer but record the audio
