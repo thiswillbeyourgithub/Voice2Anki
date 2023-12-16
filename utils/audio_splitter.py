@@ -141,7 +141,7 @@ class AudioSplitter:
                     whi(f"File size of {file} is now {fsize}Mb")
 
         # splitting the long audio
-        for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=bool(len(self.to_split)-1))):
+        for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
             try:
                 if self.stop_source == "replicate":
