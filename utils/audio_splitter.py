@@ -405,12 +405,12 @@ class AudioSplitter:
             # low speech probability
             nsprob = segment["no_speech_prob"]
             if nsprob >= 0.9:
-                red(f"No speech probability is {nsprob}%>90% so ignored.")
+                red(f"No speech probability is {nsprob}%>90% so ignored. Text was '{text}'")
                 metadata[-1]["status"] = "No speech"
                 continue
 
             if segment["temperature"] == 1 and nsprob >= 0.4:
-                red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored.")
+                red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored. Text was '{text}'")
                 metadata[-1]["status"] = "No speech at high temp"
                 continue
 
