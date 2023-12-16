@@ -627,7 +627,7 @@ def dirload_splitted(
             assert shared.dirload_queue.loc[p, "was_moved"] is False, f"File {p} was already moved"
             assert shared.dirload_queue.loc[p, "was_transcribed"] is True, f"File {p} shouldn't have to be moved as it has not been transcribed"
             if shared.dirload_queue.loc[p, "was_alfreded"] is False:
-                gr.Error(f"File {p} was moved but had not been sent to alfred")
+                gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
             red(f"Moving {p} to done_dir")
             shutil.move(p, done_dir / Path(p).name)
             shared.dirload_queue.loc[p, "is_loaded"] = False
