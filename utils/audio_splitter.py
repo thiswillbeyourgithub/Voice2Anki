@@ -143,23 +143,19 @@ class AudioSplitter:
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
-            try:
-                if self.stop_source == "replicate":
-                    transcript = self.run_whisperx(file, "large-v2")
-                    times_to_keep, metadata = self.split_one_transcript(transcript, False)
-                    whi("Text segments metadata:")
-                    for i, t in enumerate(metadata):
-                        whi(f"* {i:03d}:")
-                        for k, v in t.items():
-                            whi(textwrap.indent(f"{k}: {v}", "    "))
+            if self.stop_source == "replicate":
+                transcript = self.run_whisperx(file, "large-v2")
+                times_to_keep, metadata = self.split_one_transcript(transcript, False)
+                whi("Text segments metadata:")
+                for i, t in enumerate(metadata):
+                    whi(f"* {i:03d}:")
+                    for k, v in t.items():
+                        whi(textwrap.indent(f"{k}: {v}", "    "))
 
-                elif self.stop_source == "local_json":
-                    raise NotImplementedError
-                else:
-                    raise ValueError(self.stop_source)
-            except Exception as err:
-                red(f"Error when transcribing: '{err}'")
-                continue
+            elif self.stop_source == "local_json":
+                raise NotImplementedError
+            else:
+                raise ValueError(self.stop_source)
 
             audio = AudioSegment.from_mp3(file)
             fileo = self.to_split_original[iter_file]  # original file
