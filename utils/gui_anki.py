@@ -6,7 +6,7 @@ from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_sp
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
-from .media import get_image, reset_audio, reset_gallery, get_img_source, load_future_galleries, create_audio_compo, roll_audio
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -211,6 +211,20 @@ with gr.Blocks(
 
 
     with gr.Tab(label="Future galleries") as tab_galleries:
+
+        with gr.Row():
+            with gr.Column():
+                source_txt_btn = gr.Button("OCR the gallery")
+                source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
+                source_txt_btn.click(
+                        fn=ocr_image,
+                        inputs=[gallery],
+                        outputs=[source_txt],
+                        queue=False,
+                        preprocess=False,
+                        postprocess=False,
+                        )
+
         load_fg_btn = gr.Button(value="Load future galleries")
 
         future_galleries = []

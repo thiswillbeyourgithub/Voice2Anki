@@ -82,21 +82,17 @@ def check_source(source):
 
 #@Timeout(120)
 @trace
-def get_img_source(gallery, queue=queue.Queue(), do_return=False, use_html=True):
+def get_img_source(gallery, queue=queue.Queue(), use_html=True):
     whi("Getting source from image")
-    if not do_return:
-        qp = queue.put
-    else:
-        qp = lambda x: x
 
     try:
         if hasattr(gallery, "root"):
             gallery = gallery.root
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
         if gallery is None:
-            return qp(red("No image in gallery."))
+            return queue.put(red("No image in gallery."))
         if len(gallery) == 0:
-            return qp(red("0 image found in gallery."))
+            return queue.put(red("0 image found in gallery."))
 
         source = ""
         for img in gallery:
@@ -126,9 +122,16 @@ def get_img_source(gallery, queue=queue.Queue(), do_return=False, use_html=True)
 
         if use_html:
             source = check_source(source)
-        return qp(source)
+        return queue.put(source)
     except Exception as err:
-        return qp(red(f"Error getting source: '{err}'"))
+        return queue.put(red(f"Error getting source: '{err}'"))
+
+@trace
+def ocr_image(gallery):
+    "use OCR to get the text of an image to display in a textbox"
+    q = queue.Qeueue()
+    get_img_source(gallery, q, use_html=False)
+    return q.get()
 
 
 # @trace
