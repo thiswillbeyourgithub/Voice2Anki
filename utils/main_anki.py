@@ -87,6 +87,10 @@ def whisper_cached(
                         temperature=sld_whisp_temp,
                         response_format="verbose_json",
                         )
+                    if sld_whisp_temp == 0:
+                        temps = [seg["temperature"] for seg in transcript["segments"]]
+                        if sum(temps) / len(temps) == 1:
+                            raise Exception(f"Whisper increased temperature to maximum, probably because no words could be heard.")
 
                 return transcript
             except RateLimitError as err:
