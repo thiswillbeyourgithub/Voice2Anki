@@ -82,18 +82,21 @@ def check_source(source):
 
 #@Timeout(120)
 @trace
-def get_img_source(gallery, queue=queue.Queue()):
+def get_img_source(gallery, queue=queue.Queue(), do_return=False, use_html=True):
     whi("Getting source from image")
+    if not do_return:
+        qp = queue.put
+    else:
+        qp = lambda x: x
+
     try:
         if hasattr(gallery, "root"):
             gallery = gallery.root
         assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
         if gallery is None:
-            queue.put(red("No image in gallery."))
-            return
+            return qp(red("No image in gallery."))
         if len(gallery) == 0:
-            queue.put(red("0 image found in gallery."))
-            return
+            return qp(red("0 image found in gallery."))
 
         source = ""
         for img in gallery:
@@ -111,20 +114,21 @@ def get_img_source(gallery, queue=queue.Queue()):
                 ocr = get_text(str(new))
             except Exception as err:
                 red(f"Error when OCRing image: '{err}'")
-            if ocr:
+            if ocr and use_html:
                 ocr = ocr.replace("\"", "").replace("'", "")
                 ocr = f"title=\"{ocr}\" "
 
             newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
 
             # only add if not duplicate, somehow
-            if newsource not in source:
+            if newsource not in source and use_html:
                 source += newsource
 
-        source = check_source(source)
-        queue.put(source)
+        if use_html:
+            source = check_source(source)
+        return qp(source)
     except Exception as err:
-        queue.put(red(f"Error getting source: '{err}'"))
+        return qp(red(f"Error getting source: '{err}'"))
 
 
 # @trace
