@@ -83,8 +83,6 @@ with gr.Blocks(
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
                     dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
-                with gr.Row():
-                    flag_audio_btn = gr.Button(value="Flag audio", scale=0)
 
                 # image
                 gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="auto", container=False, min_width=50)
@@ -92,8 +90,6 @@ with gr.Blocks(
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
-                with gr.Row():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
 
             with gr.Column(scale=5):
@@ -163,6 +159,10 @@ with gr.Blocks(
                     with gr.Row():
                         check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                         txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
+
+                with gr.Row():
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
+                    flag_audio_btn = gr.Button(value="Flag audio", scale=0)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
