@@ -105,23 +105,26 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True):
             if not new.exists():
                 cv2.imwrite(str(new), decoded)
 
-            ocr = ""
             try:
                 ocr = get_text(str(new))
             except Exception as err:
-                red(f"Error when OCRing image: '{err}'")
-            if ocr and use_html:
-                ocr = ocr.replace("\"", "").replace("'", "")
-                ocr = f"title=\"{ocr}\" "
+                ocr = red(f"Error when OCRing image: '{err}'")
 
-            newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
+            if use_html:
+                if ocr:
+                    ocr = ocr.replace("\"", "").replace("'", "")
+                    ocr = f"title=\"{ocr}\" "
 
-            # only add if not duplicate, somehow
-            if newsource not in source and use_html:
-                source += newsource
+                newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
 
-        if use_html:
-            source = check_source(source)
+                # only add if not duplicate, somehow
+                if newsource not in source:
+                    source += newsource
+
+                source = check_source(source)
+            else:
+                source += "\n" + ocr
+
         return queue.put(source)
     except Exception as err:
         return queue.put(red(f"Error getting source: '{err}'"))
