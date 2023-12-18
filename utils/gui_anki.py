@@ -214,7 +214,7 @@ with gr.Blocks(
 
         with gr.Row():
             with gr.Column():
-                source_txt_btn = gr.Button("OCR the gallery")
+                source_txt_btn = gr.Button("OCR the main gallery")
                 source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
                 source_txt_btn.click(
                         fn=ocr_image,
