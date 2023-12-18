@@ -73,12 +73,12 @@ class SharedModule:
             "n",
             "path",
             "temp_path",
-            "is_loaded",
-            "was_sound_preprocessed",
-            "was_transcribed",
-            "was_alfreded",
-            "was_ankified",
-            "was_moved",
+            "loaded",
+            "sound_preprocessed",
+            "transcribed",
+            "alfreded",
+            "ankified",
+            "moved",
             ]
     dirload_queue = pd.DataFrame(columns=dirload_queue_columns).set_index("path")
 
