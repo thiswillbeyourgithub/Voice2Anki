@@ -152,12 +152,12 @@ def thread_whisp_then_llm(
             sld_whisp_temp,
             )["text"]
     with lock:
-        shared.dirload_queue.loc[orig_path, "was_transcribed"] = True
+        shared.dirload_queue.loc[orig_path, "was_transcribed"] = f"Done: {txt_audio}"
         shared.dirload_queue.loc[orig_path, "was_alfreded"] = "started"
 
-    _ = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
     with lock:
-        shared.dirload_queue.loc[orig_path, "was_alfreded"] = True
+        shared.dirload_queue.loc[orig_path, "was_alfreded"] = f"Done: {cloze}"
 
 @trace
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
