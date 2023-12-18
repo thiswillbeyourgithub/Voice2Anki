@@ -625,8 +625,8 @@ def dirload_splitted(
         while len(shared.dirload_queue[shared.dirload_queue["loaded"] == True]) > shared.audio_slot_nb:
             p = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
             assert shared.dirload_queue.loc[p, "moved"] is False, f"File {p} was already moved"
-            assert shared.dirload_queue.loc[p, "transcribed"] is True, f"File {p} shouldn't have to be moved as it has not been transcribed"
-            if shared.dirload_queue.loc[p, "alfreded"] is False:
+            assert not shared.dirload_queue.loc[p, "transcribed"] in [False, "started"], f"File {p} shouldn't have to be moved as it has not been transcribed"
+            if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
                 gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
             red(f"Moving {p} to done_dir")
             shutil.move(p, done_dir / Path(p).name)
