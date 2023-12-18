@@ -129,7 +129,7 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True):
 @trace
 def ocr_image(gallery):
     "use OCR to get the text of an image to display in a textbox"
-    q = queue.Qeueue()
+    q = queue.Queue()
     get_img_source(gallery, q, use_html=False)
     return q.get()
 
