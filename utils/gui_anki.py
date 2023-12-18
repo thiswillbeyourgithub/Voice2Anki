@@ -247,7 +247,9 @@ with gr.Blocks(
                 with gr.Column(scale=0):
                     send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=50, scale=10)
                     add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=50, scale=10)
-                    rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
+                    with gr.Row():
+                        rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
+                        ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
 
             # add image
             add_.click(
@@ -281,7 +283,15 @@ with gr.Blocks(
                         fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
                         inputs=[gal_],
                         )
-            future_galleries.append([rst_, gal_, send_, add_])
+            ocr_.click(
+                    fn=ocr_image,
+                    inputs=[gal_],
+                    outputs=[source_txt],
+                    queue=False,
+                    preprocess=False,
+                    postprocess=False,
+                    )
+            future_galleries.append([rst_, gal_, send_, add_, ocr_])
 
         clear_fg_btn = gr.ClearButton(
                 components=[elem[1] for elem in future_galleries],
