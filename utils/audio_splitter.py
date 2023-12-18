@@ -132,7 +132,7 @@ class AudioSplitter:
                     red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb. Compressing it now.")
                     audio = AudioSegment.from_mp3(file)
                     tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
-                    audio.export(tempf.name, format="mp3", bitrate="30k")
+                    audio.export(tempf.name, format="mp3", bitrate="40k")
 
                     self.to_split[i] = tempf.name
                     file = Path(tempf.name)
