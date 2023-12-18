@@ -304,7 +304,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
                             }
                         ]
                     )
-            # whi(f"Added message_buffer to the prompt: {mb}")
+            whi(f"Added message_buffer to the prompt: {mb}")
     else:
         whi("Ignored message buffer")
 
