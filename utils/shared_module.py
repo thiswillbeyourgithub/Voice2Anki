@@ -48,12 +48,11 @@ class SharedModule:
     # sox effects when splitting long audio
     splitter_sox_effects = [
             # isolate voice frequency
-            # -2 is for a steeper filtering
             ["highpass", "-1", "100"],
             ["lowpass", "-1", "3000"],
-            # removes high frequency and very low ones
-            ["highpass", "-2", "50"],
-            ["lowpass", "-2", "5000"],
+            # -2 is for a steeper filtering: removes high frequency and very low ones
+            # ["highpass", "-2", "50"],
+            # ["lowpass", "-2", "5000"],
 
             ["norm"],  # normalize audio
 
