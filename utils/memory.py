@@ -65,7 +65,7 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 # from sentence_transformers import SentenceTransformer
 # from sentence_transformers.util import cosine_similarity as cos_sim
 # embedding_model_name = "paraphrase-multilingual-MiniLM-L12-v2"
-# embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
+# embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
 # embed_model = SentenceTransformer(embedding_model_name)
 #
 # @embeddings_cache.cache
@@ -84,7 +84,7 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 
 # embeddings using ada2:
 embedding_model_name = "text-embedding-ada-002"
-embeddings_cache = Memory(f".cache/{embedding_model_name}", verbose=0)
+embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
 @embeddings_cache.cache
 def embedder(text, format):
     red("Computing embedding of 1 memory")

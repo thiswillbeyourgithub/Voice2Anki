@@ -9,7 +9,7 @@ from joblib import Memory
 
 from .logger import yel, trace
 
-memory = Memory(".cache/ocr_cache", verbose=0)
+memory = Memory("cache/ocr_cache", verbose=0)
 
 # pre compiled regex
 bbox_regex = re.compile(r'bbox\s(\d+)\s(\d+)\s(\d+)\s(\d+)')
