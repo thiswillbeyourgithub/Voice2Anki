@@ -31,18 +31,18 @@ class SharedModule:
             # # # normalize audio
             # ["norm"],
             # max silence should be 1s
-            ["silence", "-l", "1", "0", "0.1%", "-1", "1.0", "0.1%"],
+            ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.1%"],
 
             # remove leading silence
-            ["vad", "-p", "0.2", "-t", "5"],
+            # ["vad", "-p", "0.2", "-t", "5"],
 
             # and ending silence, this might be unecessary for splitted audio
-            ["reverse"],
-            ["vad", "-p", "0.2", "-t", "5"],
-            ["reverse"],
+            # ["reverse"],
+            # ["vad", "-p", "0.2", "-t", "5"],
+            # ["reverse"],
 
             # add blank sound to help whisper
-            ["pad", "0.2@0"],
+            # ["pad", "0.2@0"],
 
             ]
     # sox effects when splitting long audio
