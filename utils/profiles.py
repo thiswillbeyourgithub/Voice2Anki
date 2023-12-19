@@ -213,16 +213,15 @@ class ValueStorage:
 
         kf.unlink(missing_ok=True)
 
+        with lock:
+            self.cache_values[key] = item
+
         try:
-            with lock:
-                self.cache_values[key] = item
             with open(str(kf), "w") as f:
                 return pickle.dump(item, f)
         except Exception:
             try:
                 # try as binary
-                with lock:
-                    self.cache_values[key] = item
                 with open(str(kf), "wb") as f:
                     return pickle.dump(item, f)
             except Exception as err:
