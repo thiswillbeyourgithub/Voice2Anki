@@ -23,13 +23,13 @@ class SharedModule:
     preprocess_sox_effects = [
             # isolate voice frequency
             # -2 is for a steeper filtering
-            ["highpass", "-1", "100"],
-            ["lowpass", "-1", "3000"],
-            # removes high frequency and very low ones
-            ["highpass", "-2", "50"],
-            ["lowpass", "-2", "5000"],
-            # # normalize audio
-            ["norm"],
+            # ["highpass", "-1", "100"],
+            # ["lowpass", "-1", "3000"],
+            # # removes high frequency and very low ones
+            # ["highpass", "-2", "50"],
+            # ["lowpass", "-2", "5000"],
+            # # # normalize audio
+            # ["norm"],
             # max silence should be 1s
             ["silence", "-l", "1", "0", "1%", "-1", "1.0", "1%"],
 
