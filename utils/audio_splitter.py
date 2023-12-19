@@ -144,7 +144,11 @@ class AudioSplitter:
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
-                transcript = self.run_whisperx(file, "large-v2")
+                try:
+                    transcript = self.run_whisperx(file, "large-v2")
+                except Exception as err:
+                    red(f"Error when transcribing, trying with a smaller model: '{err}'")
+                    transcript = self.run_whisperx(file, "medium")
                 times_to_keep, metadata = self.split_one_transcript(transcript, False)
                 whi("Text segments metadata:")
                 for i, t in enumerate(metadata):
