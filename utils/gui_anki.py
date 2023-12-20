@@ -376,7 +376,7 @@ with gr.Blocks(
     # copy audio to flag button
     flag_audio_btn.click(
             fn=flag_audio,
-            inputs=[txt_audio, txt_chatgpt_cloz, txt_chatgpt_context],
+            inputs=[txt_audio, txt_chatgpt_cloz, txt_chatgpt_context, gallery],
             show_progress=False,
             )
     # trigger transcription when first audio stops recording

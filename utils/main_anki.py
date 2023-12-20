@@ -239,7 +239,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 
 
 @trace
-def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
+def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context, gallery):
     """copy audio in slot #1 to the user_directory/flagged folder"""
     if not (shared.dirload_queue["loaded"] == True).any():
         raise Exception("No loaded files in shared.dirload_queue")
@@ -250,10 +250,11 @@ def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context):
     if Path(new_filename).exists():
         raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
     with open("user_directory/flagged/metadata.txt", "a") as f:
-        f.write(f"\nflagged_filename: '{new_filename}'")
+        f.write(f"\n\nflagged_filename: '{new_filename}'")
         f.write(f"\ntxt_audio: '{txt_audio}'")
         f.write(f"\ntxt_chatgpt_cloz: '{txt_chatgpt_cloz}'")
         f.write(f"\ntxt_chatgpt_context: '{txt_chatgpt_context}'")
+        f.write(f"\ngallery: '{gallery}'")
     shutil.copy2(aud, new_filename)
     red(f"Flagged {aud} to {new_filename}")
 
