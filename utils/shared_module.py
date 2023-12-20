@@ -33,10 +33,10 @@ class SharedModule:
             # max silence should be 1s
             ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.1%"],
 
-            # remove leading silence
+            # # remove leading silence
             # ["vad", "-p", "0.2", "-t", "5"],
 
-            # and ending silence, this might be unecessary for splitted audio
+            # # and ending silence, this might be unecessary for splitted audio
             # ["reverse"],
             # ["vad", "-p", "0.2", "-t", "5"],
             # ["reverse"],
