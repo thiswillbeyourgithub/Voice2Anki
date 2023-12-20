@@ -143,7 +143,7 @@ with gr.Blocks(
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous")
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
-                    pop_buffer_btn = gr.Button(value="Pop message buffer", variant="secondary")
+                    pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
                     sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
 
