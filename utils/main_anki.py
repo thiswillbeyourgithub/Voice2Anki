@@ -52,8 +52,8 @@ llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 @trace
 def pop_buffer():
     "remove the latest card from message buffer"
-    shared.message_buffer.pop(-1)
-    red(f"Message buffer size is now {len(shared.message_buffer)}")
+    removed = shared.message_buffer.pop(-1)
+    red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
 
 def floatizer(func):
     "used to cast the ints as float to make sure the cache is used"
