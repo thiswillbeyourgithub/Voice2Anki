@@ -49,6 +49,12 @@ stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 # llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
 
+@trace
+def pop_buffer():
+    "remove the latest card from message buffer"
+    shared.message_buffer.pop(-1)
+    red(f"Message buffer size is now {len(shared.message_buffer)}")
+
 def floatizer(func):
     "used to cast the ints as float to make sure the cache is used"
     def wrapper(*args, **kwargs):

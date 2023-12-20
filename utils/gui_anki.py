@@ -2,7 +2,7 @@ import time
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile
-from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio
+from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
@@ -143,6 +143,7 @@ with gr.Blocks(
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous")
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
+                    pop_buffer_btn = gr.Button(value="Pop message buffer", variant="secondary")
                     sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                     improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
 
@@ -363,6 +364,9 @@ with gr.Blocks(
     #                 )
 
     # events ############################################################
+
+    # remove the last item from message buffer
+    pop_buffer_btn.click(fn=pop_buffer)
 
     # reload df
     tab_dirload_queue.select(
