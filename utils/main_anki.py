@@ -398,7 +398,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
 
 @trace
-@Timeout(60)
+@Timeout(90)
 @llm_cache.cache(ignore=["cache_mode"])
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
