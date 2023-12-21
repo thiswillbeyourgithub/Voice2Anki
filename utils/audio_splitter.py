@@ -613,40 +613,44 @@ class AudioSplitter:
 
 
 @stt_cache.cache(ignore=["audio_path"])
-def whisperx_splitter(audio_path, audio_hash, prompt, language, model="large-v2"):
+def whisperx_splitter(audio_path, audio_hash, prompt, language, repo="collectiveai", model="large-v2"):
     whi("Starting replicate (meaning cache is not used)")
     start = time.time()
-    # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
-    # https://github.com/collectiveai-team/whisper-wordtimestamps/
-    # fork from hnesk's repo. Allows larger file to be sent apparently.
-    transcript = replicate.run(
-            "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
-            input={
-                "audio": open(audio_path, "rb"),
-                "model": model,
-                "language": language,
-                "temperature": 0,
-                "initial_prompt": prompt,
-                "condition_on_previous_text": False,
-                "word_timestamps": True,
-                "no_speech_threshold": 1,
-                },
-            )
-    # https://replicate.com/hnesk/whisper-wordtimestamps/
-    # https://github.com/hnesk/whisper-wordtimestamps
-    # transcript = replicate.run(
-    #         "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
-    #         input={
-    #             "audio": open(audio_path, "rb"),
-    #             "model": model,
-    #             "language": language,
-    #             "temperature": 0,
-    #             "initial_prompt": prompt,
-    #             "condition_on_previous_text": False,
-    #             "word_timestamps": True,
-    #             "no_speech_threshold": 1,
-    #             },
-    #         )
+    if repo == "collectiveai":
+        # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
+        # https://github.com/collectiveai-team/whisper-wordtimestamps/
+        # fork from hnesk's repo. Allows larger file to be sent apparently.
+        transcript = replicate.run(
+                "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
+                input={
+                    "audio": open(audio_path, "rb"),
+                    "model": model,
+                    "language": language,
+                    "temperature": 0,
+                    "initial_prompt": prompt,
+                    "condition_on_previous_text": False,
+                    "word_timestamps": True,
+                    "no_speech_threshold": 1,
+                    },
+                )
+    elif repo == "hnesk":
+        # https://replicate.com/hnesk/whisper-wordtimestamps/
+        # https://github.com/hnesk/whisper-wordtimestamps
+        transcript = replicate.run(
+                "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
+                input={
+                    "audio": open(audio_path, "rb"),
+                    "model": model,
+                    "language": language,
+                    "temperature": 0,
+                    "initial_prompt": prompt,
+                    "condition_on_previous_text": False,
+                    "word_timestamps": True,
+                    "no_speech_threshold": 1,
+                    },
+                )
+    else:
+        raise ValueError(repo)
     whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
 
