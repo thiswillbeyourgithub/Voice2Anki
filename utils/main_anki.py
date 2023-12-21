@@ -455,7 +455,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     )
             break
         except RateLimitError as err:
-            if cnt >= 5:
+            if cnt >= 2:
                 raise Exception(red("ChatGPT: too many retries."))
             red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
             time.sleep(2 * cnt)
