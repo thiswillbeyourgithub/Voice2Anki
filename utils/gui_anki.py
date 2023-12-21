@@ -82,7 +82,7 @@ with gr.Blocks(
                         audio_slots.append(audio_mp3)
                 with gr.Row():
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
-                    dir_load_btn = gr.Button(value="Dirload 1+2", variant="secondary", min_width=50)
+                    dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50)
 
                 # image
                 gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="20%", container=False, min_width=50)
@@ -707,19 +707,19 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=False,
-                    ).success(
-                        fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
-                        outputs=[txt_chatgpt_cloz],
-                        queue=False,
-                        preprocess=False,
-                        postprocess=False,
-                        ).then(
-                                fn=None,
-                                js=hide_some_components,
-                                queue=False,
-                                show_progress=False,
-                                )
+                    )# .success(
+                     #    fn=alfred,
+                     #    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                     #    outputs=[txt_chatgpt_cloz],
+                     #    queue=False,
+                     #    preprocess=False,
+                     #    postprocess=False,
+                     #    ).then(
+                     #            fn=None,
+                     #            js=hide_some_components,
+                     #            queue=False,
+                     #            show_progress=False,
+                     #            )
 
     # send to whisper
     transcript_btn.click(

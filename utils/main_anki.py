@@ -432,7 +432,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             txt_audio = splits[0]
         else:
             answers = []
-            for sp in splits:
+            for sp in tqdm(splits, desc="Sending split to alfred"):
                 try:
                     cloz = alfred(sp, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
                     answers.append(cloz)
