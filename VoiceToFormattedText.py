@@ -151,6 +151,9 @@ def start_voice2formattedtext(
             show_api=False,
             server_name=server,
             server_port=7860,
+            inline=True,
+            width="100%",
+            height="100%",
             **ssl_args,
             )
 
