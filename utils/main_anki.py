@@ -55,15 +55,6 @@ def pop_buffer():
     removed = shared.message_buffer.pop(-1)
     red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
 
-def floatizer(func):
-    "used to cast the ints as float to make sure the cache is used"
-    def wrapper(*args, **kwargs):
-        args = [float(ar) if isinstance(ar, int) else ar for ar in args]
-        kwargs = {k: float(v) if isinstance(v, int) else v for k, v in kwargs.items()}
-        return func(*args, **kwargs)
-    return wrapper
-
-@floatizer
 @trace
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
@@ -374,7 +365,6 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
     return formatted_messages
 
-@floatizer
 @trace
 @Timeout(30)
 @llm_cache.cache(ignore=["cache_mode"])
