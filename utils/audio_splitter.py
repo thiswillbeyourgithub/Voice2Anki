@@ -618,6 +618,7 @@ def whisperx_splitter(audio_path, audio_hash, prompt, language, model="large-v2"
     start = time.time()
     # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
     # https://github.com/collectiveai-team/whisper-wordtimestamps/
+    # fork from hnesk's repo. Allows larger file to be sent apparently.
     transcript = replicate.run(
             "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
             input={
