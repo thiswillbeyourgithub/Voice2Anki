@@ -420,6 +420,26 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         raise Exception("No API key provided for OpenAI in the settings.")
     openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
+    # if contains #####, split into subclozes
+    if "#####" in txt_audio:
+        red(f"Splitting txt_audio for Alfred: '{txt_audio}'")
+
+        splits = txt_audio.split("#####")
+        splits = [sp.strip() for sp in splits if sp.strip()]
+        if len(splits) == 1:
+            gr.Error(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
+            txt_audio = splits[0]
+        else:
+            answers = []
+            for sp in splits:
+                try:
+                    cloz = alfred(sp, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
+                    answers.append(cloz)
+                except Exception as err:
+                    answers.append(red(f"Error on alfred split of {sp}: {err}"))
+            assert len(answers) == len(splits), "Unexpected length"
+            return "\n#####\n".join(answers).strip()
+
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
         if i == 0:
