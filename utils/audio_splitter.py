@@ -27,7 +27,7 @@ assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file 
 os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text()).strip()
 import replicate
 
-stt_cache = joblib.Memory("cache/transcript_cache", verbose=1)
+stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=1)
 
 d = datetime.today()
 today = f"{d.day:02d}_{d.month:02d}"
