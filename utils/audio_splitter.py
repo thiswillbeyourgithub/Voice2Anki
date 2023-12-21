@@ -145,14 +145,14 @@ class AudioSplitter:
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
                 try:
-                    transcript = self.run_whisperx(file, model="large-v3", repo="fast")
+                    transcript = self.run_whisper(file, model="large-v3", repo="fast")
                 except Exception as err:
                     red(f"Error when transcribing, trying with collectiveai: '{err}'")
                     try:
-                        transcript = self.run_whisperx(file, model="large-v2", repo="collectiveai")
+                        transcript = self.run_whisper(file, model="large-v2", repo="collectiveai")
                     except Exception as err:
                         red(f"Error when transcribing, trying with a smaller model: '{err}'")
-                        transcript = self.run_whisperx(file, model="medium", repo="collectiveai")
+                        transcript = self.run_whisper(file, model="medium", repo="collectiveai")
                 times_to_keep, metadata = self.split_one_transcript(transcript, False)
                 whi("Text segments metadata:")
                 for i, t in enumerate(metadata):
@@ -223,7 +223,7 @@ class AudioSplitter:
                 # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                 # whi("Saved")
 
-                transcript = self.run_whisperx(tempf.name, model="large-v3", repo="fast", second_pass=True)
+                transcript = self.run_whisper(tempf.name, model="large-v3", repo="fast", second_pass=True)
                 sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
@@ -422,9 +422,9 @@ class AudioSplitter:
                 metadata[-1]["status"] = "No speech at high temp"
                 continue
 
-            assert st >= previous_start, "Output from whisperx contains overlapping segments"
-            assert ed >= previous_end, "Output from whisperx contains overlapping segments"
-            assert ed >= previous_start, "Output from whisperx contains overlapping segments"
+            assert st >= previous_start, "Output from whisper contains overlapping segments"
+            assert ed >= previous_end, "Output from whisper contains overlapping segments"
+            assert ed >= previous_start, "Output from whisper contains overlapping segments"
             previous_start = st
             previous_end = ed
 
@@ -500,14 +500,14 @@ class AudioSplitter:
 
         return times_to_keep, metadata
 
-    def run_whisperx(self, audio_path, model, repo, second_pass=False):
+    def run_whisper(self, audio_path, model, repo, second_pass=False):
         if not second_pass:
-            whi(f"Running whisperx on {audio_path}")
+            whi(f"Running whisper on {audio_path}")
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
         try:
-            transcript = whisperx_splitter(
+            transcript = whisper_splitter(
                     audio_path=str(audio_path),
                     audio_hash=audio_hash,
                     prompt=self.prompt,
@@ -517,7 +517,7 @@ class AudioSplitter:
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
-            red(f"Exception when running whisperx: '{err}'")
+            red(f"Exception when running whisper: '{err}'")
             raise
 
         return transcript
@@ -618,7 +618,7 @@ class AudioSplitter:
 
 
 @stt_cache.cache(ignore=["audio_path"])
-def whisperx_splitter(audio_path, audio_hash, prompt, language, repo, model="large-v2"):
+def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="large-v2"):
     whi("Starting replicate (meaning cache is not used)")
     start = time.time()
     if repo == "fast":
