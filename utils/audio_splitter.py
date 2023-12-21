@@ -52,7 +52,7 @@ class AudioSplitter:
 
             remove_silence=True,
             silence_method="torchaudio",
-            compress_if_too_large=True,
+            compress_if_too_large=False,
             ):
         self.unsp_dir = Path(unsplitted_dir)
         self.sp_dir = Path(splitted_dir)
