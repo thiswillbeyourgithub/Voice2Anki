@@ -410,7 +410,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if not txt_chatgpt_context:
         raise Exception(red("No txt_chatgpt_context found."))
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
-            mess = f"Image change detected: '{txt_audio}'"
+        mess = f"Image change detected: '{txt_audio}'"
         if cache_mode:
             return red(mess)
         else:
