@@ -48,12 +48,16 @@ if shared.compact_js:
     """
 else:
     hide_some_components = None
+css = """
+.app.svelte-1kyws56.svelte-1kyws56 { max-width: 100%; }
+"""
 
 
 with gr.Blocks(
         analytics_enabled=False,
         title="VoiceToFormattedText - Anki",
         theme=theme,
+        css=css,
         ) as demo_anki:
 
     with gr.Group():
