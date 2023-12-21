@@ -517,7 +517,7 @@ class AudioSplitter:
                     )
             # TODO handle case where sound too long, must be cut
         except Exception as err:
-            red(f"Exception when running whisper: '{err}'")
+            red(f"Exception when running whisper of {repo} - {model}: '{err}'")
             raise
 
         return transcript
