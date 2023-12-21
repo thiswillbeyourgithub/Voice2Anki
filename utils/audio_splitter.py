@@ -616,7 +616,22 @@ class AudioSplitter:
 def whisperx_splitter(audio_path, audio_hash, prompt, language, repo="collectiveai", model="large-v2"):
     whi("Starting replicate (meaning cache is not used)")
     start = time.time()
-    if repo == "collectiveai":
+    if repo == "fast":
+        # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
+        # https://github.com/chenxwh/insanely-fast-whisper
+        transcript = replicate.run(
+                "vaibhavs10/incredibly-fast-whisper:65fa8e5a537c692838805dee5e8e845e4c8a70f909ba23b28434b7525b94020e",
+                input={
+                    "audio": open(audio_path, "rb"),
+                    "task": "transcribe",
+                    "model": model,
+                    "language": language,
+                    "timestamp": "word",
+                    "diarise_audio": False,
+                    },
+                )
+
+    elif repo == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
         # https://github.com/collectiveai-team/whisper-wordtimestamps/
         # fork from hnesk's repo. Allows larger file to be sent apparently.
