@@ -1,3 +1,5 @@
+import cv2
+import pickle
 from tqdm import tqdm
 import gradio as gr
 import re
@@ -230,24 +232,53 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 
 
 @trace
-def flag_audio(txt_audio, txt_chatgpt_cloz, txt_chatgpt_context, gallery):
+def flag_audio(
+        txt_profile,
+        txt_audio,
+        txt_whisp_lang,
+        txt_whisp_prompt,
+        txt_chatgpt_cloz,
+        txt_chatgpt_context,
+        gallery,
+        ):
     """copy audio in slot #1 to the user_directory/flagged folder"""
+    # move audio file
     if not (shared.dirload_queue["loaded"] == True).any():
         raise Exception("No loaded files in shared.dirload_queue")
-    aud = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
-    aud = Path(aud)
+    aud = Path(shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name)
     assert aud.exists(), f"File not found: {aud}"
     new_filename = f"user_directory/flagged/{aud.name}"
     if Path(new_filename).exists():
         raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
-    with open("user_directory/flagged/metadata.txt", "a") as f:
-        f.write(f"\n\nflagged_filename: '{new_filename}'")
-        f.write(f"\ntxt_audio: '{txt_audio}'")
-        f.write(f"\ntxt_chatgpt_cloz: '{txt_chatgpt_cloz}'")
-        f.write(f"\ntxt_chatgpt_context: '{txt_chatgpt_context}'")
-        f.write(f"\ngallery: '{gallery}'")
     shutil.copy2(aud, new_filename)
     red(f"Flagged {aud} to {new_filename}")
+
+    # make sure the gallery is saved as image and not as path
+    if gallery is not None:
+        if hasattr(gallery, "root"):
+            gallery = gallery.root
+        assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
+        new_gal = []
+        for img in gallery:
+            try:
+                decoded = cv2.imread(img.image.path, flags=1)
+            except:
+                decoded = cv2.imread(img["image"]["path"], flags=1)
+            new_gal.append(decoded)
+        gallery = new_gal
+
+    # move the other component's data
+    to_save = [
+            txt_profile,
+            txt_audio,
+            txt_whisp_lang,
+            txt_whisp_prompt,
+            txt_chatgpt_cloz,
+            txt_chatgpt_context,
+            gallery,
+            ]
+    with open(f"user_directory/flagged/{aud.name}.pickle", "wb") as f:
+        pickle.dump(to_save, f)
 
 
 @trace
