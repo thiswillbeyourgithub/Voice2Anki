@@ -479,8 +479,6 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
     cloz = "\n".join([cl.strip() for cl in cloz.splitlines() if cl.strip()])
 
-    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
-
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
         red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
@@ -506,8 +504,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "V2FT_version": shared.VERSION,
                     })
 
+    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
     whi(f"ChatGPT cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
-    yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
+    yel(f"\n\nChatGPT answer:\n{cloz}\n\n")
 
     return cloz
 
