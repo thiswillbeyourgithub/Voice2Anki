@@ -841,7 +841,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n").strip()  # for cosmetic purposes in the textbox
 
-    yel(f"\n###\nChatGPT answer:\n{cloz}\n###\n")
+    yel(f"\n\nChatGPT answer:\n{cloz}\n\n")
     red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
     reason = response["choices"][0]["finish_reason"]
