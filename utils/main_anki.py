@@ -268,15 +268,15 @@ def flag_audio(
         gallery = new_gal
 
     # move the other component's data
-    to_save = [
-            txt_profile,
-            txt_audio,
-            txt_whisp_lang,
-            txt_whisp_prompt,
-            txt_chatgpt_cloz,
-            txt_chatgpt_context,
-            gallery,
-            ]
+    to_save = {
+            "txt_profile": txt_profile,
+            "txt_audio": txt_audio,
+            "txt_whisp_lang": txt_whisp_lang,
+            "txt_whisp_prompt": txt_whisp_prompt,
+            "txt_chatgpt_cloz": txt_chatgpt_cloz,
+            "txt_chatgpt_context": txt_chatgpt_context,
+            "gallery": gallery,
+            }
     with open(f"user_directory/flagged/{aud.name}.pickle", "wb") as f:
         pickle.dump(to_save, f)
 
