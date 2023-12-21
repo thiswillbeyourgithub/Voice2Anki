@@ -149,8 +149,8 @@ def reset_audio():
     whi("Resetting all audio")
     return None, None, None, None, None
 
-#@soundpreprocess_cache.cache
 @trace
+@soundpreprocess_cache.cache
 def sound_preprocessing(audio_mp3_path):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Preprocessing {audio_mp3_path}")
@@ -171,10 +171,11 @@ def sound_preprocessing(audio_mp3_path):
     # write to file as wav
     sf.write(str(audio_mp3_path), waveform.numpy().T, sample_rate, format='wav')
     temp = AudioSegment.from_wav(audio_mp3_path)
-    temp.export(audio_mp3_path, format="mp3")
+    new_path = Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix
+    temp.export(new_path, format="mp3")
 
-    whi("Done preprocessing audio")
-    return audio_mp3_path
+    whi("Done preprocessing {audio_mp3_path} to {new_path}")
+    return new_path
 
 
 @trace
