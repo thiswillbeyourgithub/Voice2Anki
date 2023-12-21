@@ -228,7 +228,7 @@ def Timeout(limit):
                     target=appender,
                     args=[func] + list(args),
                     kwargs=kwargs,
-                    daemon=True,
+                    daemon=False,
                     )
             thread.start()
 
