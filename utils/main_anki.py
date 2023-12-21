@@ -413,8 +413,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             red(f"Image change detected: '{txt_audio}'")
             return
         else:
-            gr.Error(red(f"Image change detected: '{txt_audio}'"))
-            return
+            gr.Error(f"Image change detected: '{txt_audio}'")
+            return red(f"Image change detected: '{txt_audio}'")
     if not shared.pv["txt_openai_api_key"]:
         gr.Error("No API key provided for OpenAI in the settings.")
         raise Exception("No API key provided for OpenAI in the settings.")
