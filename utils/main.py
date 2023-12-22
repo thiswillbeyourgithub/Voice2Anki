@@ -363,7 +363,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     # add system prompt
     formatted_messages.insert(
             0,
-            {"role": "system", "content": default_system_prompt_anki["content"]}
+            {"role": "system", "content": default_system_prompt["content"]}
             )
     # add the selected prompts
     for m in prev_prompts:
@@ -537,7 +537,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "model_name": model_to_use,
                     "last_message_from_conversation": formatted_messages[-1],
                     "nb_of_message_in_conversation": len(formatted_messages),
-                    "system_prompt": default_system_prompt_anki["content"],
+                    "system_prompt": default_system_prompt["content"],
                     "cloze": cloz,
                     "V2FT_version": shared.VERSION,
                     })
@@ -770,7 +770,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     '''
 
     I'm counting on you.
-    """).replace("OTHER_SYSPROMPT", default_system_prompt_anki["content"])
+    """).replace("OTHER_SYSPROMPT", default_system_prompt["content"])
     prompt_example = dedent("""
     Context:
     '''
@@ -962,7 +962,7 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "model_name": f"Probably:{shared.latest_llm_used}",
                 "last_message_from_conversation": None,
                 "nb_of_message_in_conversation": None,
-                "system_prompt": default_system_prompt_anki["content"],
+                "system_prompt": default_system_prompt["content"],
                 "cloze": txt_chatgpt_cloz,
                 "V2FT_version": shared.VERSION,
                 }

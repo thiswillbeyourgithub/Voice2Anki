@@ -178,7 +178,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     # count the number of tokens added so far
     new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
     tkns = 0
-    tkns += len(tokenize(default_system_prompt_anki["content"]))  # system prompt
+    tkns += len(tokenize(default_system_prompt["content"]))  # system prompt
     tkns += new_prompt_len  # current question + message buffer
     all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in timesorted_pr])
 
@@ -404,7 +404,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 
         prev_prompts = check_prompts(prev_prompts)
 
-        with open(f"profiles/{backend}/{txt_profile}/memories.json", "w") as f:
+        with open(f"profiles/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
@@ -415,14 +415,14 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 @trace
 def load_prev_prompts(profile):
     assert Path("profiles/").exists(), "profile directory not found"
-    if Path(f"profiles/{backend}/{profile}/memories.json").exists():
-        with open(f"profiles/{backend}/{profile}/memories.json", "r") as f:
+    if Path(f"profiles/{profile}/memories.json").exists():
+        with open(f"profiles/{profile}/memories.json", "r") as f:
             prev_prompts = json.load(f)
         prev_prompts = check_prompts(prev_prompts)
     else:
         red(f"No memories in profile {profile} found, creating it")
         prev_prompts = check_prompts([default_system_prompt.copy()])
-        with open(f"profiles/{backend}/{profile}/memories.json", "w") as f:
+        with open(f"profiles/{profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
 
     return prev_prompts
