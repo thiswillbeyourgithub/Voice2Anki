@@ -41,12 +41,12 @@ def start_voice2formattedtext(
     debug: bool, default False
         increase verbosity
     authentication: bool, default True
-        if True, will use the login/password pairs specified in VoiceToFormattedText.py
+        if True, will use the login/password pairs specified in Voice2Anki.py
         This if forced to True if share is True
     localnetwork: bool, default True
         restrict access to the local network only
     use_ssl: bool, default True
-        if True, will use the ssl configuration specified in VoiceToFormattedText.py
+        if True, will use the ssl configuration specified in Voice2Anki.py
         Disable if share is used as self signed certificate mess with it.
     media_folder: str, default None
         optional anki media database location
@@ -79,7 +79,7 @@ def start_voice2formattedtext(
 
     assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
-    whi("Starting VoiceToFormattedText\n")
+    whi("Starting Voice2Anki\n")
     if args:
         raise Exception(f"Unexpected arguments: {args}")
     if kwargs:

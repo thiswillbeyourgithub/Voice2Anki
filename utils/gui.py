@@ -55,7 +55,7 @@ css = """
 
 with gr.Blocks(
         analytics_enabled=False,
-        title="VoiceToFormattedText - Anki",
+        title=f"Voice2Anki V{shared.VERSION}",
         theme=theme,
         css=css,
         ) as demo:

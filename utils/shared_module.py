@@ -1,7 +1,7 @@
 import pandas as pd
 
 class SharedModule:
-    """module used to store information from VoiceToFormattedText.py to
+    """module used to store information from Voice2Anki.py to
     the main .py files"""
     VERSION = 0.2
     memory_metric = None
