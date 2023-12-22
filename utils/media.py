@@ -150,7 +150,6 @@ def reset_audio():
     return None, None, None, None, None
 
 @trace
-@soundpreprocess_cache.cache
 def sound_preprocessing(audio_mp3_path):
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Preprocessing {audio_mp3_path}")
