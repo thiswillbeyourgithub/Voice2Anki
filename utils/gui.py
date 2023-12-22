@@ -62,7 +62,7 @@ with gr.Blocks(
 
     with gr.Group():
         with gr.Row():
-            gr.Button(value="VoiceToFormattedText - Anki", variant="primary", scale=3, interactive=True)
+            gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=3, interactive=True)
             dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
             update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True)
