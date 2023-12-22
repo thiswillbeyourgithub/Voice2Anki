@@ -327,7 +327,11 @@ with gr.Blocks(
                                             ).success(
                                                     fn=shared.pv.save_future_gallery_001,
                                                     inputs=[future_galleries[0][1]],
-                                                    )
+                                                    ).success(
+                                                            fn=get_img_source,
+                                                            inputs=[future_galleries[1][1]],
+                                                            queue=False,
+                                                            )
 
     # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
