@@ -171,7 +171,7 @@ def sound_preprocessing(audio_mp3_path):
     # write to file as wav
     sf.write(str(audio_mp3_path), waveform.numpy().T, sample_rate, format='wav')
     temp = AudioSegment.from_wav(audio_mp3_path)
-    new_path = Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix
+    new_path = Path(audio_mp3_path).parent / (Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix)
     temp.export(new_path, format="mp3")
 
     whi("Done preprocessing {audio_mp3_path} to {new_path}")
