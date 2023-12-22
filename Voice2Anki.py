@@ -74,9 +74,9 @@ def start_voice2formattedtext(
         else:
             raise ValueError(
                 f"Unexpected {print_db_then_exit} value, should be "
-                f"a value from {','.join(db_list)}")
+                f"a value from {', '.join(db_list)}")
     else:
-        assert print_db_then_exit is False, "Invalid value for print_db_then_exit"
+        assert print_db_then_exit is False, "Invalid value for print_db_then_exit. You must specify the name of a db"
 
     assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
