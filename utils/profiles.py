@@ -10,28 +10,34 @@ from .logger import whi, red, trace
 from .shared_module import shared
 from .media import rgb_to_bgr
 
-approved_keys = [
-        "sld_max_tkn",
-        "sld_buffer",
-        "sld_temp",
-        "txt_chatgpt_context",
-        "txt_whisp_lang",
-        "txt_whisp_prompt",
-        "total_llm_cost",
-        "dirload_check",
-        "check_gpt4",
-        "sld_whisp_temp",
-        "message_buffer",
-        "txt_keywords",
-        "sld_prio_weight",
-        "sld_keywords_weight",
-        "sld_pick_weight",
-        "txt_extra_source",
-        "txt_openai_api_key",
-        "gallery",
-        "txt_deck",
-        "txt_tags",
-        ] + [f"future_gallery_{i:03d}" for i in range(1, shared.future_gallery_slot_nb + 1)]
+profile_keys = {
+        "sld_max_tkn": {"default": 3500},
+        "sld_buffer": {"default": 0},
+        "sld_temp": {"default": 0.0, "type": float},
+        "txt_chatgpt_context": {},
+        "txt_whisp_lang": {"default": "en"},
+        "txt_whisp_prompt": {},
+        "total_llm_cost": {"default": 0, "type": float},
+        "dirload_check": {"default": False},
+        "check_gpt4": {"default": True},
+        "sld_whisp_temp": {"default": 0, "type": float},
+        "message_buffer": {"default": [], "type": list},
+        "txt_keywords": {"default": "", "type": str},
+        "sld_prio_weight": {"default": 1},
+        "sld_keywords_weight": {"default": 1},
+        "sld_pick_weight": {"default": 1},
+        "txt_extra_source": {},
+        "txt_openai_api_key": {},
+        "gallery": {},
+        "txt_deck": {},
+        "txt_tags": {},
+        }
+for i in range(1, shared.future_gallery_slot_nb + 1):
+    profile_keys[f"future_gallery_{i:03d}"] = {}
+
+for k in profile_keys:
+    if "default" not in profile_keys[k]:
+        profile_keys[k]["default"] = None
 
 profile_path = Path("./profiles")
 
@@ -42,7 +48,7 @@ class ValueStorage:
     @trace
     def __init__(self, profile="latest"):
 
-        self.approved_keys = approved_keys
+        self.profile_keys = profile_keys
 
         if profile == "latest":
             try:
@@ -67,15 +73,15 @@ class ValueStorage:
                 )
         self.thread.start()
 
-        self.running_tasks = {k: None for k in self.approved_keys}
-        self.cache_values = {k: None for k in self.approved_keys}
-        self.profile_name = profile
+        self.running_tasks = {k: None for k in self.profile_keys}
+        self.cache_values = {k: None for k in self.profile_keys}
 
+        self.profile_name = profile
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
 
         # create methods like "save_gallery" to save the gallery to the profile
-        for key in self.approved_keys:
+        for key in self.profile_keys:
             def create_save_method(key):
                 @trace
                 def save_method(value):
@@ -84,17 +90,53 @@ class ValueStorage:
 
             setattr(self, f"save_{key}", create_save_method(key))
 
+    def __check_equality(self, a, b):
+        if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
+            return False
+        if isinstance(a, list):
+            for i in range(len(a)):
+                if not self.__check_equality(a[i], b[i]):
+                    return False
+            return True
+        if isinstance(a, dict):
+            for k in b:
+                if k not in a:
+                    return False
+            for k, v in a.items():
+                if k not in b or self.__check_equality(b[k], v):
+                    return False
+        try:
+            return (a == b).all()
+        except Exception:
+            return a == b
+
     def __getitem__(self, key):
         assert self.thread.is_alive(), "Saving thread appears to be dead!"
-        if key not in self.approved_keys:
+        if key not in self.profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
-        if self.running_tasks[key] is not None:
-            whi(f"Waiting for task of {key} to finish.")
-            self.running_tasks[key].join()
-            whi(f"Done waiting for task {key}")
+
+        # make sure to wait for the previous setitem of the same key to finish
+        prev_q = self.running_tasks[key]
+        if prev_q is None:
+            prev_q_val = True
+        while prev_q is not None:
+            try:
+                # Waits for X seconds, otherwise throws `Queue.Empty`
+                prev_q_val = prev_q.get(True, 1)
+                whi(f"Done waiting for task {key}")
+                break
+            except queue.Empty:
+                red(f"Waiting for {key} queue to output")
+        if prev_q_val is not True:
+            assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
+            raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
 
         if self.cache_values[key] is not None:
-            return self.cache_values[key]
+            if "type" in self.profile_keys[key]:
+                # cast as specific type
+                return self.profile_keys[key]["type"](self.cache_values[key])
+            else:
+                return self.cache_values[key]
 
         kp = key + ".pickle"
         kf = self.p / kp
@@ -124,64 +166,18 @@ class ValueStorage:
                 if (key == "gallery" or key.startswith("future_gallery_")) and new is not None:
                     if not isinstance(new, list):
                         new = [im.image.path for im in new.root]
+            if "type" in self.profile_keys[key]:
+                new = self.profile_keys[key]["type"](new)
             self.cache_values[key] = new
             return new
         else:
-            if not key.startswith("future_gallery_"):
-                whi(f"No {kf} stored in profile dir, using appropriate default value for key {key}")
-            if key == "sld_max_tkn":
-                default = 3500
-            elif key == "sld_buffer":
-                default = 0
-            elif key == "sld_temp":
-                default = 0.2
-            elif key == "txt_whisp_lang":
-                default = "fr"
-            elif key == "total_llm_cost":
-                default = 0
-            elif key == "dirload_check":
-                default = False
-            elif key == "check_gpt4":
-                default = False
-            elif key == "sld_whisp_temp":
-                default = 0
-            elif key == "message_buffer":
-                default = []
-            elif key == "sld_prio_weight":
-                default = 1
-            elif key == "sld_pick_weight":
-                default = 1
-            elif key == "sld_keywords_weight":
-                default = 5
-            else:
-                default = None
-            self.cache_values[key] = default
-            return default
-
-    def __check_equality(self, a, b):
-        if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
-            return False
-        if isinstance(a, list):
-            for i in range(len(a)):
-                if not self.__check_equality(a[i], b[i]):
-                    return False
-            return True
-        if isinstance(a, dict):
-            for k in b:
-                if k not in a:
-                    return False
-            for k, v in a.items():
-                if k not in b or self.__check_equality(b[k], v):
-                    return False
-        try:
-            return (a == b).all()
-        except Exception:
-            return a == b
+            self.cache_values[key] = self.profile_keys[key]["default"]
+            return self.cache_values[key]
 
     def __setitem__(self, key, item):
         assert self.thread.is_alive(), "Saver worker appears to be dead!"
 
-        if key not in self.approved_keys:
+        if key not in self.profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
 
         if not self.__check_equality(item, self.cache_values[key]):
@@ -193,6 +189,7 @@ class ValueStorage:
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
                     prev_q_val = prev_q.get(True, 1)
+                    whi(f"Done waiting for task {key}")
                     break
                 except queue.Empty:
                     red(f"Waiting for {key} queue to output")
@@ -203,6 +200,10 @@ class ValueStorage:
                 # value might have changed during the execution
                 return
             else:
+                # cast as required type
+                if "type" in self.profile_keys[key]:
+                    item = self.profile_keys[key]["type"](item)
+
                 # save to cache
                 self.cache_values[key] = item
 
