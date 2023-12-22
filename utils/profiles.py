@@ -248,20 +248,20 @@ def worker_setitem(in_queue):
                 out_queue.put(True)
             except Exception as err:
                 out_queue.put(red(f"Error when saving message_buffer as json in pickle: '{err}'"))
-
-        try:
-            with open(str(kf), "w") as f:
-                pickle.dump(item, f)
-            out_queue.put(True)
-        except Exception:
+        else:
             try:
-                # try as binary
-                with open(str(kf), "wb") as f:
+                with open(str(kf), "w") as f:
                     pickle.dump(item, f)
                 out_queue.put(True)
-            except Exception as err:
-                out_queue.put(f"Error when setting {kf}: '{err}'")
-                raise Exception(f"Error when setting {kf}: '{err}'")
+            except Exception:
+                try:
+                    # try as binary
+                    with open(str(kf), "wb") as f:
+                        pickle.dump(item, f)
+                    out_queue.put(True)
+                except Exception as err:
+                    out_queue.put(f"Error when setting {kf}: '{err}'")
+                    raise Exception(f"Error when setting {kf}: '{err}'")
 
 
 @trace
