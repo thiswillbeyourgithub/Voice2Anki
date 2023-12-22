@@ -1,3 +1,4 @@
+import asyncio
 import cv2
 import pickle
 from tqdm import tqdm
@@ -405,6 +406,14 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
     return formatted_messages
 
+async def async_alfred(*args, **kwargs):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, alfred, *args, **kwargs)
+
+async def async_parallel_alfred(splits, *args, **kwargs):
+    tasks = [async_alfred(sp, *args, **kwargs) for sp in splits]
+    return await asyncio.gather(*tasks)
+
 @floatizer
 @trace
 @Timeout(90)
@@ -440,13 +449,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             gr.Error(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
             txt_audio = splits[0]
         else:
-            answers = []
-            for sp in tqdm(splits, desc="Sending split to alfred"):
-                try:
-                    cloz = alfred(sp, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
-                    answers.append(cloz)
-                except Exception as err:
-                    answers.append(red(f"Error on alfred split of {sp}: {err}"))
+            answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode))
             assert len(answers) == len(splits), "Unexpected length"
             return "\n#####\n".join(answers).strip()
 
