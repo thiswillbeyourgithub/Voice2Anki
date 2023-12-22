@@ -220,7 +220,6 @@ def load_future_galleries():
     return saved_fg
 
 
-@trace
 def create_audio_compo():
     return gr.Microphone(
             type="filepath",
