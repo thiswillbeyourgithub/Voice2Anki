@@ -66,6 +66,7 @@ class ValueStorage:
             f.write(profile)
 
         self.in_queue = queue.Queue()
+        self.lock = threading.Lock()
         self.thread = threading.Thread(
                 target=worker_setitem,
                 args=[self.in_queue],
@@ -120,13 +121,16 @@ class ValueStorage:
         if prev_q is None:
             prev_q_val = True
         while prev_q is not None:
+            prev_q = self.running_tasks[key]
             try:
                 # Waits for X seconds, otherwise throws `Queue.Empty`
                 prev_q_val = prev_q.get(True, 1)
+                with self.lock:
+                    self.running_tasks[key] = None
                 whi(f"Done waiting for task {key}")
                 break
             except queue.Empty:
-                red(f"Waiting for {key} queue to output")
+                red(f"Waiting for {key} queue to output in getitem")
         if prev_q_val is not True:
             assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
             raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
@@ -186,13 +190,16 @@ class ValueStorage:
             if prev_q is None:
                 prev_q_val = True
             while prev_q is not None:
+                prev_q = self.running_tasks[key]
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
                     prev_q_val = prev_q.get(True, 1)
+                    with self.lock:
+                        self.running_tasks[key] = None
                     whi(f"Done waiting for task {key}")
                     break
                 except queue.Empty:
-                    red(f"Waiting for {key} queue to output")
+                    red(f"Waiting for {key} queue to output in setitem")
             if prev_q_val is not True:
                 assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
                 raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
