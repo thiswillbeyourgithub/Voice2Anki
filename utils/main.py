@@ -910,13 +910,6 @@ def wait_for_queue(q, source, t=1):
     "source : https://stackoverflow.com/questions/19206130/does-queue-get-block-main"
     start = time.time()
     while True:
-        # try:
-        #     data = q.get(False)
-        #     # If `False`, the program is not blocked. `Queue.Empty` is thrown if
-        #     # the queue is empty
-        # except queue.Queue.Empty:
-        #     data = None
-
         try:
             # Waits for X seconds, otherwise throws `Queue.Empty`
             data = q.get(True, t)
