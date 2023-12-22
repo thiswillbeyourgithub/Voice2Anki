@@ -174,7 +174,7 @@ def sound_preprocessing(audio_mp3_path):
     new_path = Path(audio_mp3_path).parent / (Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix)
     temp.export(new_path, format="mp3")
 
-    whi("Done preprocessing {audio_mp3_path} to {new_path}")
+    whi(f"Done preprocessing {audio_mp3_path} to {new_path}")
     return new_path
 
 
