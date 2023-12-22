@@ -1,24 +1,24 @@
-# VoiceToFormattedText
+# Voice2Anki
 
 ## What is this?
-* VoiceToFormattedText is a tool that leverages the power of ChatGPT to correct the transcription of Whisper to output useful content. Currently supported output backends are "markdown" to append your text to a .md file, and "anki" to create anki cards automatically.
-* Use case so far include ~~writing a physics PhD in markdown with LaTeX formulae created on the go and~~ (deprecated as too out of date with the anki version and possibly obsolete anywa) creating anki cloze cards with specific formattings with minimal user interaction.
+* Voice2Anki is a tool that leverages the power of ChatGPT to correct the transcription of Whisper to create anki flashcards. It allows to create many very high quality flashcards.
 
 ### Features
-* You can specify the context to whisper and to ChatGPT to reduce transcription mistake.
-* With the click of a button you can save a completion to serve as an example to ChatGPT's next completion.
-  * you can specify the importance of each supplied example then let an algorithm fill as much as the context window as you want.
-* For the anki backend, you can create multiple flashcard with a single voice recording that will include images and tags and straight to the right deck.
-  * Images supplied this way will be OCR'ed using a special DIY formatting algorithm to maintain the text formatting of the image.
+* Works in any language
+* Works on any topic: LLM can correct Whisper efficiently
+* **Adapts to you** If a flashcard was not exactly like you wanted, correct it (manually or using your voice) then save it for the future and the LLM will use it for the next cards. You can save many examples like this as embeddings and keywords are used to find the most relevant example for your use case at each prompt.
+* You can specify anki tags, marks, deck etc.
+* If you supply one or several images, it will be OCR'ed then saved in the flashcard in a source field. A special algorithm is used to keep the formatting of the image in the OCR step.
+* Supports ChatGPT, GPT-4, and many more support can be added.
+* Supports multiple profile. Making it handy for various use.
 
 ## Getting started
 * clone this repo
 * Install the dependencies: `python -m pip install -r requirements.txt`
-* For the anki backend: Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
-* `python VoiceToFormattedText.py --browser`
-    * `--backend=anki`
+* Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
+* `python Voice2Anki.py --browser`
     * `--open_browser` opens the browser on the interface.
-    * `--authentication` enables the authentication panel. user/password have to be edited in `VoiceToFormattedText.py`.
+    * `--authentication` enables the authentication panel. user/password have to be edited in `Voice2Anki.py`.
     * `--localnetwork` to make the interface accessible to your local network. Use `ifconfig` to figure out your local IP adress and connect to it using `https://[IP]:7860` (don't forget the http**s** ). You can use that to make it accessible from the global internet if you configure port forwarding from your router. Otherwise it's only accessible from the computer.
     * `--debug` to increase verbosity.
     * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use WhisperToAnki on mobile but can have privacy and security implications.
@@ -29,7 +29,7 @@
 * If using SSL, the certificates will probably be self signed, you'll likely have to tick a few checkbox on your browser to access the site.
 * It's apparently way less CPU intensive to use Chromium than to use firefox according to my limited testing with a heavily modified firefox.
 * For now running the script creates temporary .wav files that are deleted at each startup automatically. This will be fixed eventually.
-* tips for anki: if you want to quickly have high quality card, add the end of the recording mention notes to alfred like "Note à Alfred: fait 3 cartes sur cette notion" or "Note à Alfred: fait une carte de liste". Then simply manually delete from the transcript that you guided Alfred and save the prompt as a good example of Alfred doing what you wanted.
+* tips: if you want to quickly have high quality card, add the end of the recording mention notes to alfred like "Note à Alfred: fait 3 cartes sur cette notion" or "Note à Alfred: fait une carte de liste". Then simply manually delete from the transcript that you guided Alfred and save the prompt as a good example of Alfred doing what you wanted.
 * The memories prompts are stored in your profile folder.
 * To update the app, you just have to do `git pull`
 * Reach out if you have any issue.
@@ -39,5 +39,3 @@
 ## Gallery
 * Anki backend:
   * ![](./docs/anki_screenshot.png)
-* Markdown backend (deprecated):
-  * ![](./docs/markdown_screenshot.png)

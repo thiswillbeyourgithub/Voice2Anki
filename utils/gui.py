@@ -2,7 +2,7 @@ import time
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile
-from .main_anki import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer
+from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
@@ -58,7 +58,7 @@ with gr.Blocks(
         title="VoiceToFormattedText - Anki",
         theme=theme,
         css=css,
-        ) as demo_anki:
+        ) as demo:
 
     with gr.Group():
         with gr.Row():
@@ -867,7 +867,7 @@ with gr.Blocks(
             show_progress=False,
             )
 
-    demo_anki.load(
+    demo.load(
             fn=shared.reset,
             js=hide_some_components,
             show_progress=False,

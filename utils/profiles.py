@@ -9,7 +9,7 @@ from .logger import whi, red, trace
 from .shared_module import shared
 from .media import rgb_to_bgr
 
-approved_keys_all = [
+approved_keys = [
         "sld_max_tkn",
         "sld_buffer",
         "sld_temp",
@@ -27,53 +27,35 @@ approved_keys_all = [
         "sld_pick_weight",
         "txt_extra_source",
         "txt_openai_api_key",
-        ]
-approved_keys_all += [f"future_gallery_{i:03d}" for i in range(1, shared.future_gallery_slot_nb + 1)]
-approved_keys_anki = approved_keys_all + ["gallery", "txt_deck", "txt_tags"]
-approved_keys_md = approved_keys_all + ["txt_mdpath"]
+        "gallery",
+        "txt_deck",
+        "txt_tags",
+        ] + [f"future_gallery_{i:03d}" for i in range(1, shared.future_gallery_slot_nb + 1)]
 
 profile_path = Path("./profiles")
-anki_path = profile_path / "anki"
-md_path = profile_path / "markdown"
 
 profile_path.mkdir(exist_ok=True)
-anki_path.mkdir(exist_ok=True)
-md_path.mkdir(exist_ok=True)
-(anki_path / "default").mkdir(exist_ok=True)
-(md_path / "default").mkdir(exist_ok=True)
-
-assert len([p for p in profile_path.iterdir() if str(p.name) not in ["anki", "markdown"]]) == 0, (
-    "Directory profiles should only contains dir anki and markdown. Please move your profiles accordingly.")
+(profile_path / "default").mkdir(exist_ok=True)
 
 class ValueStorage:
     @trace
     def __init__(self, profile="latest"):
 
-        # determine the backend to know where to look for the profile
-        if shared.backend == "anki":
-            self.backend = "anki"
-            self.approved_keys = approved_keys_anki
-            self.backend_dir = anki_path
-        elif shared.backend == "markdown":
-            self.backend = "markdown"
-            self.approved_keys = approved_keys_md
-            self.backend_dir = md_path
-        else:
-            raise Exception(shared.backend)
+        self.approved_keys = approved_keys
 
         if profile == "latest":
             try:
-                with open(str(self.backend_dir / "latest_profile.txt"), "r") as f:
+                with open(str(profile_path / "latest_profile.txt"), "r") as f:
                     profile = f.read()
             except Exception as err:
                 red(f"Error when loading profile '{profile}': '{err}'")
                 profile = "default"
         assert isinstance(profile, str), f"profile is not a string: '{profile}'"
         assert profile.replace("_", "").replace("-", "").isalpha(), f"profile is not alphanumeric: '{profile}'"
-        self.p = self.backend_dir / profile
+        self.p = profile_path / profile
 
         # stored latest used profile
-        with open(str(self.backend_dir / "latest_profile.txt"), "w") as f:
+        with open(str(profile_path / "latest_profile.txt"), "w") as f:
             f.write(profile)
 
         self.running_tasks = {k: None for k in self.approved_keys}
@@ -247,10 +229,6 @@ class ValueStorage:
 @trace
 def get_profiles():
     profiles = [str(p.name) for p in profile_path.iterdir()]
-    if shared.backend == "anki":
-        profiles = [str(p.name) for p in anki_path.iterdir()]
-    elif shared.backend == "markdown":
-        profiles = [str(p.name) for p in md_path.iterdir()]
     assert profiles, "Empty list of profiles"
     return profiles
 
@@ -275,12 +253,7 @@ def switch_profile(profile):
     profile = profile.lower()
 
     if profile not in get_profiles():
-        if shared.backend == "anki":
-            (anki_path / profile).mkdir(exist_ok=False)
-        elif shared.backend == "markdown":
-            (md_path / profile).mkdir(exist_ok=False)
-        else:
-            raise Exception(shared.backend)
+        (profile_path / profile).mkdir(exist_ok=False)
         red(f"created {profile}.")
         return [
                 None,
@@ -299,33 +272,15 @@ def switch_profile(profile):
 
     # reset the fields to the previous values of profile
     whi(f"Switch profile to '{profile}'")
-    if shared.pv.backend == "anki":
-        return [
-                shared.pv["txt_deck"],
-                shared.pv["txt_tags"],
-                shared.pv["txt_chatgpt_context"],
-                shared.pv["txt_whisp_prompt"],
-                shared.pv["txt_whisp_lang"],
-                shared.pv["gallery"],
-                None,
-                None,
-                None,
-                profile,
-                ]
-    elif shared.pv.backend == "markdown":
-        return [
-                shared.pv["txt_mdpath"],
-                shared.pv["txt_chatgpt_context"],
-                shared.pv["txt_whisp_prompt"],
-                shared.pv["txt_whisp_lang"],
-                None,
-                None,
-                None,
-                profile,
-                ]
-
-
-@trace
-def save_path(txt_profile, txt_mdpath):
-    if txt_mdpath:
-        ValueStorage(txt_profile)["txt_mdpath"] = txt_mdpath
+    return [
+            shared.pv["txt_deck"],
+            shared.pv["txt_tags"],
+            shared.pv["txt_chatgpt_context"],
+            shared.pv["txt_whisp_prompt"],
+            shared.pv["txt_whisp_lang"],
+            shared.pv["gallery"],
+            None,
+            None,
+            None,
+            profile,
+            ]

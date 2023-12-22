@@ -11,7 +11,6 @@ class SharedModule:
     disable_tracing = None
     disable_timeout = None
     compact_js = None
-    backend = None
     pv = None
 
     llm_price = {

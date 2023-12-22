@@ -28,36 +28,14 @@ CONTEXT
 TRANSCRIPT
 """.strip()
 
-default_system_prompt_md = {
-             "role": "system",
-             "content": dedent("""
-             You are my excellent assistant Alfred. You always exceed my expectations. Your task today is the to transform audio transcripts into markdown formatted text.
 
-             You follow these rules:
-             - separate bullet points by a dash '-'
-             - the transcript can be of poor quality, it is your job to correct transcription errors using the context.
-             - If relevant, use LaTeX formatting in your answer.
-             - if you're absolutely certain that you can't accomplish your task: begin your answer by 'Alfred:' and I'll take a look immediately."""),
-             "timestamp": int(time.time()),
-             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
-             }
-
-
-default_system_prompt_anki = {
+default_system_prompt = {
             "role": "system",
             "content": dedent("""You are my excellent assistant Alfred. Your task today is the to transform audio transcripts into Anki cloze flashcards. If you create several flashcards for one transcript, separate them with "#####". if you can't do it start by 'Alfred' and I'll take a look immediately. The answer must be reminiscent of the question (i.e. If the question starts by 'The types of cancer that' then the answer should start also by 'The types of cancer that'. Use common sense to make it easy to memorize.)"""),
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
             }
 
-if shared.backend == "anki":
-    default_system_prompt = default_system_prompt_anki
-    backend = "anki"
-elif shared.backend == "markdown":
-    default_system_prompt = default_system_prompt_md
-    backend = "markdown"
-else:
-    raise Exception(shared.backend)
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 

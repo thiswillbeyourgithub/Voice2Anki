@@ -12,7 +12,6 @@ os.environ["PYTHONTRACEMALLOC"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 def start_voice2formattedtext(
-        backend="anki",
         print_db_then_exit=False,
         share=False,
         open_browser=False,
@@ -31,9 +30,6 @@ def start_voice2formattedtext(
     """
     Parameters
     ----------
-    backend: str, default 'anki'
-        used to allow to select anki or markdown, but the markdown backend
-        is currently deprecated.
     print_db_then_exit: str
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
@@ -81,7 +77,6 @@ def start_voice2formattedtext(
     else:
         assert print_db_then_exit is False, "Invalid value for print_db_then_exit"
 
-    assert backend == "anki", "only the 'anki' backend is currently supported."
     assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
     whi("Starting VoiceToFormattedText\n")
@@ -118,15 +113,7 @@ def start_voice2formattedtext(
     shared.disable_timeout = disable_timeout
     shared.compact_js = compact_js
 
-    if backend == "anki":
-        shared.backend = "anki"
-        from utils.gui_anki import demo_anki as demo
-    elif backend == "markdown":
-        raise NotImplementedError("markdown backend was deprecated for lack of use.")
-        shared.backend = "markdown"
-        from utils.gui_markdown import demo_markdown as demo
-    else:
-        raise ValueError(backend)
+    from utils.gui import demo
 
     if (not share) and use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
