@@ -224,12 +224,12 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                         "whisper_language": txt_whisp_lang,
                         "whisper_context": txt_whisp_prompt,
                         "whisper_temperature": sld_whisp_temp,
-                        "V2FT_profile": pv.profile_name,
+                        "Voice2Anki_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript,
                         "model_name": f"OpenAI {modelname}",
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
-                        "V2FT_version": shared.VERSION,
+                        "Voice2Anki_version": shared.VERSION,
                         },
                     "db_name": "whisper"
                     })
@@ -535,14 +535,14 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "token_cost": tkn_cost,
                     "temperature": temperature,
                     "LLM_context": txt_chatgpt_context,
-                    "V2FT_profile": pv.profile_name,
+                    "Voice2Anki_profile": pv.profile_name,
                     "transcribed_input": txt_audio,
                     "model_name": model_to_use,
                     "last_message_from_conversation": formatted_messages[-1],
                     "nb_of_message_in_conversation": len(formatted_messages),
                     "system_prompt": default_system_prompt["content"],
                     "cloze": cloz,
-                    "V2FT_version": shared.VERSION,
+                    "Voice2Anki_version": shared.VERSION,
                     })
 
     yel(f"\n\nChatGPT answer:\n{cloz}\n\n")
@@ -935,7 +935,7 @@ def kill_threads():
 
 
 @trace
-def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
+def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
     """when an anki card is created, find the information about its creation
     in the shared module then save it to the db. It can be missing from the db
     if the result from alfred was loaded from cache for example."""
@@ -953,14 +953,14 @@ def v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "token_cost": None,
                 "temperature": None,
                 "LLM_context": txt_chatgpt_context,
-                "V2FT_profile": shared.pv.profile_name,
+                "Voice2Anki_profile": shared.pv.profile_name,
                 "transcribed_input": txt_audio,
                 "model_name": f"Probably:{shared.latest_llm_used}",
                 "last_message_from_conversation": None,
                 "nb_of_message_in_conversation": None,
                 "system_prompt": default_system_prompt["content"],
                 "cloze": txt_chatgpt_cloz,
-                "V2FT_version": shared.VERSION,
+                "Voice2Anki_version": shared.VERSION,
                 }
     else:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
@@ -1123,7 +1123,7 @@ def to_anki(
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
     pv["message_buffer"] = shared.message_buffer
 
-    v2ft_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio)
+    Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio)
 
     gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
     return

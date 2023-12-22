@@ -36,13 +36,13 @@ if shared.compact_js:
       });
     }
     try {
-        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
+        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
     } catch(e) {};
     try {
-        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
+        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
     } catch(e) {};
     try {
-        hideElements('#Audio_component_V2FT > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
+        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
     } catch(e) {};
     }
     """
@@ -126,8 +126,8 @@ with gr.Blocks(
                                 container=True,
                                 show_label=True,
                                 #scale=1,
-                                elem_id="Audio_component_V2FT",
-                                elem_classes="Audio_component_V2FT",
+                                elem_id="Audio_component_Voice2Anki",
+                                elem_classes="Audio_component_Voice2Anki",
                                 #min_width=300,
                                 editable=False,
                                 )
@@ -679,7 +679,7 @@ with gr.Blocks(
                                                         )
 
     # clicking this button will load from a user directory the next sounds and
-    # images. This allow to use V2FT on the computer but record the audio
+    # images. This allow to use Voice2Anki on the computer but record the audio
     # on another distance device
     dir_load_btn.click(
             fn=dirload_splitted,
