@@ -408,7 +408,10 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
 async def async_alfred(*args, **kwargs):
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(None, alfred, *args, **kwargs)
+    try:
+        return await loop.run_in_executor(None, alfred, *args, **kwargs)
+    except Exception as err:
+        return err
 
 async def async_parallel_alfred(splits, *args, **kwargs):
     tasks = [async_alfred(sp, *args, **kwargs) for sp in splits]
