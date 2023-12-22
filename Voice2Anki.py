@@ -24,6 +24,7 @@ def start_voice2formattedtext(
         disable_tracing=False,
         disable_timeout=False,
         compact_js=True,
+        port=7860,
         *args,
         **kwargs
         ):
@@ -137,7 +138,7 @@ def start_voice2formattedtext(
             show_error=True,
             show_api=False,
             server_name=server,
-            server_port=7860,
+            server_port=port,
             inline=True,
             width="100%",
             **ssl_args,
