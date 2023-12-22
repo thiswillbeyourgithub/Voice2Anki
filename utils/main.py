@@ -439,6 +439,14 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         raise Exception("No API key provided for OpenAI in the settings.")
     openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
+    # automatically split repeated newlines as several distinct cards
+    txt_audio = txt_audio.strip()
+    while "\n\n\n" in txt_audio:
+        txt_audio = txt_audio.replace("\n\n\n", "\n\n")
+    if "\n\n" in txt_audio:
+        red(f"Detected txt_audio that needed to be split: '{txt_audio}'")
+        txt_audio = txt_audio.replace("\n\n", "\n#####\n")
+
     # if contains #####, split into subclozes
     if "#####" in txt_audio:
         red(f"Splitting txt_audio for Alfred: '{txt_audio}'")
