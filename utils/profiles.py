@@ -1,6 +1,7 @@
 import json
 import cv2
 import threading
+import queue
 import pickle
 from pathlib import Path
 import numpy as np
@@ -58,6 +59,14 @@ class ValueStorage:
         with open(str(profile_path / "latest_profile.txt"), "w") as f:
             f.write(profile)
 
+        self.in_queue = queue.Queue()
+        self.thread = threading.Thread(
+                target=worker_setitem,
+                args=[self.in_queue],
+                daemon=False,
+                )
+        self.thread.start()
+
         self.running_tasks = {k: None for k in self.approved_keys}
         self.cache_values = {k: None for k in self.approved_keys}
         self.profile_name = profile
@@ -76,6 +85,7 @@ class ValueStorage:
             setattr(self, f"save_{key}", create_save_method(key))
 
     def __getitem__(self, key):
+        assert self.thread.is_alive(), "Saving thread appears to be dead!"
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
         if self.running_tasks[key] is not None:
@@ -169,22 +179,37 @@ class ValueStorage:
             return a == b
 
     def __setitem__(self, key, item):
+        assert self.thread.is_alive(), "Saver worker appears to be dead!"
+
         if key not in self.approved_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
+
         if not self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
-            if self.running_tasks[key] is not None:
-                whi(f"Waiting for task of {key} to finish.")
-                self.running_tasks[key].join()
-                whi(f"Done waiting for task {key}")
-                if item == self.cache_values[key]:  # value might
-                    # have changed during the execution
-                    return
-            thread = threading.Thread(
-                    target=self.__setitem__async,
-                    kwargs={"key": key, "item": item, "lock": threading.Lock()})
-            thread.start()
-            self.running_tasks[key] = thread
+            prev_q = self.running_tasks[key]
+            if prev_q is None:
+                prev_q_val = True
+            while prev_q is not None:
+                try:
+                    # Waits for X seconds, otherwise throws `Queue.Empty`
+                    prev_q_val = prev_q.get(True, 1)
+                    break
+                except queue.Empty:
+                    red(f"Waiting for {key} queue to output")
+            if prev_q_val is not True:
+                assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
+                raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
+            if item == self.cache_values[key]:
+                # value might have changed during the execution
+                return
+            else:
+                # save to cache
+                self.cache_values[key] = item
+
+                # save to file
+                out_q = queue.Queue()
+                self.in_queue.put([self.p, key, item, out_q])
+                self.running_tasks[key] = out_q
         else:
             # item is the same as in the cache value
             # but if it's None etc, then the cache value must be destroyed
@@ -198,31 +223,36 @@ class ValueStorage:
             except Exception as err:
                 red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
 
-    def __setitem__async(self, key, item, lock):
+def worker_setitem(in_queue):
+    """continuously running worker that is used to save components value to
+    the appropriate profile"""
+    while True:
+        profile, key, item, out_queue = in_queue.get()
         kp = key + ".pickle"
-        kf = self.p / kp
+        kf = profile / kp
 
         kf.unlink(missing_ok=True)
-
-        with lock:
-            self.cache_values[key] = item
 
         if key == "message_buffer":
             try:
                 with open(str(kf), "w") as f:
-                    return json.dump(item, f, indent=4, ensure_ascii=False)
+                    json.dump(item, f, indent=4, ensure_ascii=False)
+                out_queue.put(True)
             except Exception as err:
-                red(f"Error when saving message_buffer as json in pickle: '{err}'")
+                out_queue.put(red(f"Error when saving message_buffer as json in pickle: '{err}'"))
 
         try:
             with open(str(kf), "w") as f:
-                return pickle.dump(item, f)
+                pickle.dump(item, f)
+            out_queue.put(True)
         except Exception:
             try:
                 # try as binary
                 with open(str(kf), "wb") as f:
-                    return pickle.dump(item, f)
+                    pickle.dump(item, f)
+                out_queue.put(True)
             except Exception as err:
+                out_queue.put(f"Error when setting {kf}: '{err}'")
                 raise Exception(f"Error when setting {kf}: '{err}'")
 
 
