@@ -14,8 +14,8 @@ theme = gr.themes.Soft(
         secondary_hue="purple",
         neutral_hue="gray",
         text_size="sm",
-        #spacing_size="sm",
-        #radius_size="sm",
+        spacing_size="sm",
+        radius_size="sm",
         font="ui-sans-serif",
         font_mono="ui-monospace",
         )
