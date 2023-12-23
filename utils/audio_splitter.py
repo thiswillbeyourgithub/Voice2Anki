@@ -409,12 +409,6 @@ class AudioSplitter:
         metadata = [{"text": "", "start": 0, "end": duration, "status": "", "repo": transcript["repo"], "modelname": transcript["modelname"]}]
         for iter_seg, segment in enumerate(tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False)):
 
-            if segment["repo"] != "fast":
-                metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
-                metadata[-1]["avg_logprob"] = segment["avg_logprob"]
-                metadata[-1]["compression_ratio"] = segment["compression_ratio"]
-                metadata[-1]["temperature"] = segment["temperature"]
-
             st = segment["start"]
             ed = segment["end"]
 
@@ -431,8 +425,14 @@ class AudioSplitter:
                 metadata[-1]["status"] = "Too short"
                 continue
 
-            # low speech probability
-            if segment["repo"] != "fast":
+            if transcript["repo"] != "fast":
+                # store whisper metadata
+                metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
+                metadata[-1]["avg_logprob"] = segment["avg_logprob"]
+                metadata[-1]["compression_ratio"] = segment["compression_ratio"]
+                metadata[-1]["temperature"] = segment["temperature"]
+
+                # low speech probability
                 nsprob = segment["no_speech_prob"]
                 if nsprob >= 0.9:
                     red(f"No speech probability is {nsprob}%>90% so ignored. Text was '{text}'")
