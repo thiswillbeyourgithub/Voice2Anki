@@ -129,13 +129,19 @@ class AudioSplitter:
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Compressing")):
                 fsize = file.stat().st_size / 1024 / 1024
                 while fsize >= 19:
-                    red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb. Compressing it now.")
-                    audio = AudioSegment.from_mp3(file)
-                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + "__")
-                    audio.export(tempf.name, format="mp3", bitrate="40k")
-
-                    self.to_split[i] = tempf.name
-                    file = Path(tempf.name)
+                    red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb.")
+                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + f"_compressed_because_{round(fsize, 3)}MB_")
+                    tempfn = "_".join(tempf.name.split("_")[:-1])
+                    matches = tempf.parent.rglob(f"{tempfn}*")
+                    if matches:
+                        red(f"Found file {matches[0]} that was already compressed, skipping this compression.")
+                        file = matches[0]
+                    else:
+                        red(f"Compressing file now.")
+                        audio = AudioSegment.from_mp3(file)
+                        audio.export(tempf.name, format="mp3", bitrate="40k")
+                        file = Path(tempf.name)
+                    self.to_split[i] = file.name
 
                     fsize = file.stat().st_size / 1024 / 1024
                     whi(f"File size of {file} is now {round(fsize, 3)}Mb")
