@@ -130,14 +130,14 @@ class AudioSplitter:
                 fsize = file.stat().st_size / 1024 / 1024
                 while fsize >= 19:
                     red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb.")
-                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + f"_compressed_because_{round(fsize, 3)}MB_")
-                    tempfn = "_".join(tempf.name.split("_")[:-1])
-                    matches = tempf.parent.rglob(f"{tempfn}*")
+                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + f"_compressed_because_{round(fsize, 3)}_MB_")
+                    tempfn = "_MB_".join(tempf.name.split("/")[-1].split("_MB_")[:-1])
+                    matches = [m for m in Path(tempf.name).parent.iterdir() if m.stat().st_size > 0 and tempfn in m.name]
                     if matches:
                         red(f"Found file {matches[0]} that was already compressed, skipping this compression.")
                         file = matches[0]
                     else:
-                        red(f"Compressing file now.")
+                        red(f"Compressing now: {file}")
                         audio = AudioSegment.from_mp3(file)
                         audio.export(tempf.name, format="mp3", bitrate="40k")
                         file = Path(tempf.name)
