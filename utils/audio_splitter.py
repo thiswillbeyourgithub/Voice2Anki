@@ -509,7 +509,10 @@ class AudioSplitter:
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        n_retry = 10
+        if not second_pass:
+            n_retry = 10
+        else:
+            n_retry = 1
         failed = True
         for iter_retry in range(n_retry):
             try:
@@ -520,7 +523,7 @@ class AudioSplitter:
                         language=self.language,
                         model="large-v3",
                         repo="fast",
-                        batch_size=max(n_retry - iter_retry * 2, 1),
+                        batch_size=1,
                         )
                 failed = False
                 break
