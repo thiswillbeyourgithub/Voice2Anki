@@ -141,7 +141,7 @@ class AudioSplitter:
                         audio = AudioSegment.from_mp3(file)
                         audio.export(tempf.name, format="mp3", bitrate="40k")
                         file = Path(tempf.name)
-                    self.to_split[i] = file.name
+                    self.to_split[i] = str(file.absolute())
 
                     fsize = file.stat().st_size / 1024 / 1024
                     whi(f"File size of {file} is now {round(fsize, 3)}Mb")
