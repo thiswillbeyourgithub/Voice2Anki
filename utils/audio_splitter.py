@@ -653,6 +653,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="larg
                     "language": language,
                     "timestamp": "word",
                     "diarise_audio": False,
+                    "batch_size": 1,
                     },
                 )
 
