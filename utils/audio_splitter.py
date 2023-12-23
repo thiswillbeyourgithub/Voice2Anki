@@ -151,28 +151,7 @@ class AudioSplitter:
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
 
-                n_retry = 10
-                failed = True
-                for iter_retry in range(n_retry):
-                    try:
-                        transcript = self.run_whisper(file, model="large-v3", repo="fast")
-                        failed = False
-                        break
-                    except Exception as err:
-                        red(f"#{iter_retry + 1}/{n_retry}: Error when calling run_whisper: '{err}'")
-
-                if failed:
-                    red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
-                    for iter_retry in range(n_retry):
-                        try:
-                            transcript = self.run_whisper(file, model="large-v2", repo="hnesk")
-                            failed = False
-                            break
-                        except Exception as err:
-                            red(f"#{iter_retry + 1}/{n_retry}: Error when calling run_whisper: '{err}'")
-
-                assert not failed, (f"Failed to get transcript.")
-
+                transcript = self.run_whisper(file, second_pass=False)
                 times_to_keep, metadata = self.split_one_transcript(transcript, False)
                 whi("Text segments metadata:")
                 for i, t in enumerate(metadata):
@@ -243,7 +222,7 @@ class AudioSplitter:
                 # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                 # whi("Saved")
 
-                transcript = self.run_whisper(tempf.name, model="large-v3", repo="fast", second_pass=True)
+                transcript = self.run_whisper(tempf.name, second_pass=True)
                 sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
@@ -522,25 +501,51 @@ class AudioSplitter:
 
         return times_to_keep, metadata
 
-    def run_whisper(self, audio_path, model, repo, second_pass=False):
+    def run_whisper(self, audio_path, second_pass):
         if not second_pass:
             whi(f"Running whisper on {audio_path}")
+
+        # hash used for the caching so that it does not depend on the path
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        try:
-            transcript = whisper_splitter(
-                    audio_path=str(audio_path),
-                    audio_hash=audio_hash,
-                    prompt=self.prompt,
-                    language=self.language,
-                    model=model,
-                    repo=repo,
-                    )
-            # TODO handle case where sound too long, must be cut
-        except Exception as err:
-            red(f"Exception when running whisper of {repo} - {model}: '{err}'")
-            raise
+        n_retry = 10
+        failed = True
+        for iter_retry in range(n_retry):
+            try:
+                transcript = whisper_splitter(
+                        audio_path=str(audio_path),
+                        audio_hash=audio_hash,
+                        prompt=self.prompt,
+                        language=self.language,
+                        model="large-v3",
+                        repo="fast",
+                        batch_size=n_retry - iter_retry,
+                        )
+                failed = False
+                break
+            except Exception as err:
+                red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with Fast Whisper large-v3: '{err}'")
+
+        if failed:
+            red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
+            for iter_retry in range(n_retry):
+                try:
+                    transcript = whisper_splitter(
+                            audio_path=str(audio_path),
+                            audio_hash=audio_hash,
+                            prompt=self.prompt,
+                            language=self.language,
+                            model="large-v2",
+                            repo="hnesk",
+                            batch_size=None,
+                            )
+                    failed = False
+                    break
+                except Exception as err:
+                    red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with hnesk large-v2: '{err}'")
+
+        assert not failed, "Failed to get transcript."
 
         return transcript
 
@@ -639,9 +644,9 @@ class AudioSplitter:
         os.system(cmd)
 
 
-@stt_cache.cache(ignore=["audio_path"])
-def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="large-v2"):
-    whi("Starting replicate (meaning cache is not used)")
+@stt_cache.cache(ignore=["audio_path", "batch_size"])
+def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batch_size):
+    whi(f"Starting replicate (meaning cache is not used). Model={model} Rep={repo}")
     start = time.time()
     if repo == "fast":
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
@@ -655,7 +660,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="larg
                     "language": language,
                     "timestamp": "word",
                     "diarise_audio": False,
-                    "batch_size": 1,
+                    "batch_size": batch_size,
                     },
                 )
 
