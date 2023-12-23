@@ -21,7 +21,7 @@ import openai
 from openai.error import RateLimitError
 from pathlib import Path
 
-from .anki_utils import add_to_anki, audio_to_anki
+from .anki_utils import add_to_anki, audio_to_anki, sync_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout
 from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
@@ -51,6 +51,9 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 # llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
+
+# trigger a sync on startup to test if anki is running and with ankiconnect enabled
+sync_anki()
 
 @trace
 def pop_buffer():
