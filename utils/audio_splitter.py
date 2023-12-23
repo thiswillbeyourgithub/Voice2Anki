@@ -514,22 +514,21 @@ class AudioSplitter:
         else:
             n_retry = 1
         failed = True
-        if second_pass:
-            for iter_retry in range(n_retry):
-                try:
-                    transcript = whisper_splitter(
-                            audio_path=str(audio_path),
-                            audio_hash=audio_hash,
-                            prompt=self.prompt,
-                            language=self.language,
-                            model="large-v3",
-                            repo="fast",
-                            batch_size=1,
-                            )
-                    failed = False
-                    break
-                except Exception as err:
-                    red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with Fast Whisper large-v3: '{err}'")
+        # for iter_retry in range(n_retry):
+        #     try:
+        #         transcript = whisper_splitter(
+        #                 audio_path=str(audio_path),
+        #                 audio_hash=audio_hash,
+        #                 prompt=self.prompt,
+        #                 language=self.language,
+        #                 model="large-v3",
+        #                 repo="fast",
+        #                 batch_size=1,
+        #                 )
+        #         failed = False
+        #         break
+        #     except Exception as err:
+        #         red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with Fast Whisper large-v3: '{err}'")
 
         if failed:
             red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
