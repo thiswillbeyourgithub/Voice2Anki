@@ -406,13 +406,14 @@ class AudioSplitter:
         times_to_keep = [[0, duration]]
         previous_start = -1
         previous_end = -1
-        metadata = [{"text": "", "start": 0, "end": duration, "status": ""}]
+        metadata = [{"text": "", "start": 0, "end": duration, "status": "", "repo": transcript["repo"], "modelname": transcript["modelname"]}]
         for iter_seg, segment in enumerate(tqdm(transcript["segments"], unit="segment", desc="parsing", disable=True if second_pass else False)):
 
-            metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
-            metadata[-1]["avg_logprob"] = segment["avg_logprob"]
-            metadata[-1]["compression_ratio"] = segment["compression_ratio"]
-            metadata[-1]["temperature"] = segment["temperature"]
+            if segment["repo"] != "fast":
+                metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
+                metadata[-1]["avg_logprob"] = segment["avg_logprob"]
+                metadata[-1]["compression_ratio"] = segment["compression_ratio"]
+                metadata[-1]["temperature"] = segment["temperature"]
 
             st = segment["start"]
             ed = segment["end"]
@@ -431,16 +432,17 @@ class AudioSplitter:
                 continue
 
             # low speech probability
-            nsprob = segment["no_speech_prob"]
-            if nsprob >= 0.9:
-                red(f"No speech probability is {nsprob}%>90% so ignored. Text was '{text}'")
-                metadata[-1]["status"] = "No speech"
-                continue
+            if segment["repo"] != "fast":
+                nsprob = segment["no_speech_prob"]
+                if nsprob >= 0.9:
+                    red(f"No speech probability is {nsprob}%>90% so ignored. Text was '{text}'")
+                    metadata[-1]["status"] = "No speech"
+                    continue
 
-            if segment["temperature"] == 1 and nsprob >= 0.4:
-                red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored. Text was '{text}'")
-                metadata[-1]["status"] = "No speech at high temp"
-                continue
+                if segment["temperature"] == 1 and nsprob >= 0.4:
+                    red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored. Text was '{text}'")
+                    metadata[-1]["status"] = "No speech at high temp"
+                    continue
 
             assert st >= previous_start, "Output from whisper contains overlapping segments"
             assert ed >= previous_end, "Output from whisper contains overlapping segments"
@@ -467,7 +469,7 @@ class AudioSplitter:
                         metadata[-1]["status"] = "Kept"
 
                         times_to_keep.append([w["end"], duration])
-                        metadata.append({"text": "", "start": w["end"], "end": duration, "status": ""})
+                        metadata.append({"text": "", "start": w["end"], "end": duration, "status": "", "repo": transcript["repo"], "modelname": transcript["modelname"]})
                         not_matched = False
                         break
                 if not_matched:
@@ -657,6 +659,14 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="larg
                     },
                 )
 
+        # fix the format to have the same type as hnesk and collectiveai
+        transcript["segments"] = transcript["chunks"]
+        transcript["transcription"] = transcript["text"]
+        del transcript["chunks"], transcript["text"]
+        for iter_chunk, chunk in enumerate(transcript["segments"]):
+            transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
+            transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
+
     elif repo == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
         # https://github.com/collectiveai-team/whisper-wordtimestamps/
@@ -692,6 +702,10 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="larg
                 )
     else:
         raise ValueError(repo)
+
+    transcript["modelname"] = model
+    transcript["repo"] = repo
+
     whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
 
