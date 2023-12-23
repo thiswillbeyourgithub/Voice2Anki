@@ -666,6 +666,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model="larg
         for iter_chunk, chunk in enumerate(transcript["segments"]):
             transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
             transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
+            del transcript["segments"][iter_chunk]["timestamp"]
 
     elif repo == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
