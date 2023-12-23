@@ -520,7 +520,7 @@ class AudioSplitter:
                         language=self.language,
                         model="large-v3",
                         repo="fast",
-                        batch_size=n_retry - iter_retry,
+                        batch_size=max(n_retry - iter_retry * 2, 1),
                         )
                 failed = False
                 break
@@ -646,7 +646,7 @@ class AudioSplitter:
 
 @stt_cache.cache(ignore=["audio_path", "batch_size"])
 def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batch_size):
-    whi(f"Starting replicate (meaning cache is not used). Model={model} Rep={repo}")
+    whi(f"Starting replicate (meaning cache is not used). Model={model} Repo={repo} Batch_size={batch_size}")
     start = time.time()
     if repo == "fast":
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
@@ -672,7 +672,9 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
             transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
             transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
             del transcript["segments"][iter_chunk]["timestamp"]
+
             transcript["segments"][iter_chunk]["words"] = [transcript["segments"][iter_chunk]]
+            transcript["segments"][iter_chunk]["words"]["word"] = chunk["text"]
 
     elif repo == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
