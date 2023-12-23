@@ -154,44 +154,59 @@ def audio_to_anki(audio_mp3, queue):
 
 #@Timeout(10)
 @trace
-def get_card_status(txt_chatgpt_cloz):
-    """return True or False depending on if the card written in
+def get_card_status(txt_chatgpt_cloz, return_bool=False):
+    """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
 
     cloz = cloze_editor(txt_chatgpt_cloz)
-    cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
+    cloz = cloz.replace("\"", "\\\"")
 
-    if not cloz:
-        return gr.Button("EMPTY")
+    if not cloz.strip():
+        if return_bool:
+            return False
+        else:
+            return gr.Button("EMPTY")
 
     if "#####" in cloz:  # multiple cards
+        assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = []
-        for sp in splits:
-            cloz = cloze_editor(sp)
-            cloz = re.sub(r"{{c\d+::.*?}}", "", cloz).strip()
-            cloz = cloz.replace("\"", "\\\"")
-            val = _call_anki(action="findCards", query=f"added:7 body:\"*{cloz}*\"")
-            vals.append(bool(val))
+        vals = [get_card_status(sp, return_bool=True) for sp in splits]
 
         if all(vals):
-            return gr.Button("Added")
+            if return_bool:
+                return True
+            else:
+                return gr.Button("Added")
         else:
             s = sum([bool(b) for b in vals])
             n = len(vals)
-            return gr.Button(f"MISSING {n-s}/{n}", variant="primary")
+            if return_bool:
+                return False
+            else:
+                return gr.Button(f"MISSING {n-s}/{n}", variant="primary")
 
     else:
-        cloz = cloz.replace("\"", "\\\"")
-        query = f"added:7 body:\"*{cloz}*\""
+        cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
+        cloz = [cl.strip() for cl in cloz if cl.strip()]
+        assert cloz
+        query = ""
+        for cl in cloz:
+            query += f" body:\"*{cl}*\""
+        query = query.strip()
         state = _call_anki(
                 action="findCards",
                 query=query,
                 )
         if state:
-            return gr.Button("Added")
+            if return_bool:
+                return True
+            else:
+                return gr.Button("Added")
         else:
-            return gr.Button("MISSING", variant="primary")
+            if return_bool:
+                return False
+            else:
+                return gr.Button("MISSING", variant="primary")
 
 
 @trace
