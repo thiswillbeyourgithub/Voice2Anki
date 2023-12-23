@@ -145,9 +145,9 @@ class AudioSplitter:
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
                 n_retry = 10
+                failed = True
                 for iter_retry in range(n_retry):
                     try:
-                        failed = True
                         transcript = self.run_whisper(file, model="large-v2", repo="hnesk")
                         failed = False
                         break
