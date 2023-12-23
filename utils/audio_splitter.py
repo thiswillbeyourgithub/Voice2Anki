@@ -144,15 +144,19 @@ class AudioSplitter:
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
             if self.stop_source == "replicate":
-                try:
-                    transcript = self.run_whisper(file, model="large-v3", repo="fast")
-                except Exception as err:
-                    red(f"Error when transcribing, trying with collectiveai: '{err}'")
+                n_retry = 10
+                for iter_retry in range(n_retry):
                     try:
-                        transcript = self.run_whisper(file, model="large-v2", repo="collectiveai")
+                        failed = True
+                        transcript = self.run_whisper(file, model="large-v2", repo="hnesk")
+                        failed = False
+                        break
                     except Exception as err:
-                        red(f"Error when transcribing, trying with a smaller model: '{err}'")
-                        transcript = self.run_whisper(file, model="medium", repo="collectiveai")
+                        red(f"#{iter_retry + 1}/{n_retry}: Error when calling run_whisper: '{err}'")
+                if failed:
+                    red(f"Failed more than {n_retry} times to get transcript, retrying with medium model.")
+                    transcript = self.run_whisper(file, model="medium", repo="hnesk")
+
                 times_to_keep, metadata = self.split_one_transcript(transcript, False)
                 whi("Text segments metadata:")
                 for i, t in enumerate(metadata):
