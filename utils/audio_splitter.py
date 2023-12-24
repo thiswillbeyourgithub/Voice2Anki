@@ -507,20 +507,20 @@ class AudioSplitter:
         if second_pass:
             latest_kept_i = 0
             word_limit = 3
-            for i, te in enumerate(metadata):
-                if times_to_keep[i] is None:
+            for iter_meta, met in enumerate(metadata):
+                if times_to_keep[iter_meta] is None:
                     continue
-                start, end = times_to_keep[i]
-                metadata[iter_ttk]["n_words"] = len(te["text"].split(" "))
-                if metadata[iter_ttk]["n_words"] <= word_limit:
+                start, end = times_to_keep[iter_meta]
+                metadata[iter_meta]["n_words"] = len(met["text"].split(" "))
+                if metadata[iter_meta]["n_words"] <= word_limit:
 
                     times_to_keep[latest_kept_i][1] = end
                     metadata[latest_kept_i]["end"] = end
 
-                    times_to_keep[i] = None
-                    metadata[iter_ttk]["status"] += "Low nwords"
+                    times_to_keep[iter_meta] = None
+                    metadata[iter_meta]["status"] += "Low nwords"
                 else:
-                    latest_kept_i = i
+                    latest_kept_i = iter_meta
             nbefore = len(times_to_keep)
             nafter = len([t for t in times_to_keep if t is not None])
             whi(f"    Removed {nafter-nbefore}/{nbefore} splits with less than {word_limit} words")
