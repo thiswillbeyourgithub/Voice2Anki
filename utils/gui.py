@@ -123,12 +123,13 @@ with gr.Blocks(
                                 min_length=2,
                                 container=True,
                                 show_label=True,
-                                #scale=1,
+                                scale=0,
                                 elem_id="Audio_component_Voice2Anki",
                                 elem_classes="Audio_component_Voice2Anki",
                                 #min_width=300,
                                 editable=False,
                                 )
+                        audio_corrector_txt = gr.Textbox(value=None, label="Edit via GPT-4", scale=2)
                         auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False)
                         semiauto_btn = gr.Button(
                                 value="1+2",
@@ -532,8 +533,14 @@ with gr.Blocks(
     # audio
     audio_corrector.stop_recording(
             fn=audio_edit,
-            inputs=[audio_corrector, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
-            outputs=[txt_chatgpt_cloz, audio_corrector],
+            inputs=[audio_corrector, audio_corrector_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
+            outputs=[txt_chatgpt_cloz, audio_corrector, audio_corrector_txt],
+            show_progress=False,
+            )
+    audio_corrector_txt.submit(
+            fn=audio_edit,
+            inputs=[audio_corrector, audio_corrector_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context],
+            outputs=[txt_chatgpt_cloz, audio_corrector, audio_corrector_txt],
             show_progress=False,
             )
 

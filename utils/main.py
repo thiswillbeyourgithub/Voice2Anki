@@ -762,17 +762,22 @@ def dirload_splitted_last(
             )[-1]
 
 @trace
-def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
+def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
     """function called by a microphone. It will use whisper to transcribe
     your voice. Then use the instructions in your voice to modify the
     output from chatgpt."""
 
-    instructions = transcribe(
-            audio,
-            txt_whisp_prompt="Instruction: ",
-            txt_whisp_lang=txt_whisp_lang,
-            sld_whisp_temp=0,
-            )
+    assert (audio is None and audio_txt) or (audio is not None and audio_txt is None), f"Can't give both audio and text to AudioEdit"
+    if not audio_txt:
+        red("Transcribing audio for audio_edit.")
+        instructions = transcribe(
+                audio,
+                txt_whisp_prompt="Instruction: ",
+                txt_whisp_lang=txt_whisp_lang,
+                sld_whisp_temp=0,
+                )
+    else:
+        instructions = audio_txt
 
     sys_prompt = dedent("""
     You receive an anki flashcard created from an audio transcript. Your answer must be the same flashcard after applying modifications mentionned in the instructions.
@@ -903,7 +908,7 @@ def audio_edit(audio, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_c
     if reason.lower() != "stop":
         red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
 
-    return cloz, None
+    return cloz, None, None
 
 @trace
 def gather_threads(thread_keys):
