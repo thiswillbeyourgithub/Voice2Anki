@@ -727,11 +727,18 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=False,
                         ).then(
-                                fn=None,
-                                js=hide_some_components,
-                                queue=False,
-                                show_progress=False,
-                                )
+                                fn=get_card_status,
+                                inputs=[txt_chatgpt_cloz],
+                                outputs=[update_status_btn],
+                                # queue=True,
+                                # preprocess=False,
+                                # postprocess=False,
+                                ).then(
+                                        fn=None,
+                                        js=hide_some_components,
+                                        queue=False,
+                                        show_progress=False,
+                                        )
 
     # send to whisper
     transcript_btn.click(
