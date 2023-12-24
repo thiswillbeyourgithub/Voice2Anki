@@ -774,7 +774,14 @@ with gr.Blocks(
                     fn=lambda: False,
                     outputs=[check_marked],
                     show_progress=False,
-                    )
+                    ).then(
+                            fn=get_card_status,
+                            inputs=[txt_chatgpt_cloz],
+                            outputs=[update_status_btn],
+                            # queue=True,
+                            # preprocess=False,
+                            # postprocess=False,
+                            )
 
     # 1+2
     semiauto_btn.click(
