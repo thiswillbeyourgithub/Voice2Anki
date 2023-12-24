@@ -666,6 +666,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
     whi(f"Starting replicate (meaning cache is not used). Model={model} Repo={repo} Batch_size={batch_size}")
     start = time.time()
     if repo == "fast":
+        raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
         # https://github.com/chenxwh/insanely-fast-whisper
         transcript = replicate.run(
