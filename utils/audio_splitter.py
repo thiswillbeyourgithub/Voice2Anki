@@ -139,7 +139,8 @@ class AudioSplitter:
                     else:
                         red(f"Compressing now: {file}")
                         audio = AudioSegment.from_mp3(file)
-                        audio.export(tempf.name, format="mp3", bitrate="35k")
+                        bitrate = audio.frame_rate // 1000
+                        audio.export(tempf.name, format="mp3", bitrate=f"{bitrate * 2 // 3}k")
                         file = Path(tempf.name)
                     self.to_split[i] = str(file.absolute())
 
