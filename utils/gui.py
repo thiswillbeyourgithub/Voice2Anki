@@ -83,7 +83,7 @@ with gr.Blocks(
                     dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50)
 
                 # image
-                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="none", height="20%", container=True, min_width=50)
+                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="20%", container=True, min_width=50)
                 with gr.Group():
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
