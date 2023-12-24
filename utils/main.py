@@ -1094,19 +1094,18 @@ def to_anki(
     for cl in clozes:
         cl = cl.strip()
         if "\n" in cl:
-            whi("Replaced newlines in clozes")
             cl = cl.replace("\n", "<br/>")
-            try:
-                res = add_to_anki(
-                        body=cl,
-                        source=txt_source,
-                        note_metadata=metadata,
-                        tags=new_tags,
-                        deck_name=txt_deck)
-            except Exception as err:
-                red(f"Error when adding to anki: '{cl}': '{err}'")
-                res = err
-            results.append(res)
+        try:
+            res = add_to_anki(
+                    body=cl,
+                    source=txt_source,
+                    note_metadata=metadata,
+                    tags=new_tags,
+                    deck_name=txt_deck)
+        except Exception as err:
+            red(f"Error when adding to anki: '{cl}': '{err}'")
+            res = err
+        results.append(res)
         whi(f"* {cl}")
 
     results = [str(r) for r in results if str(r).isdigit()]
