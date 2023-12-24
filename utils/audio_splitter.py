@@ -505,6 +505,7 @@ class AudioSplitter:
 
         # remove almost no words if large model was used
         if second_pass:
+            latest_kept_i = 0
             word_limit = 3
             for i, te in enumerate(metadata):
                 if times_to_keep[i] is None:
