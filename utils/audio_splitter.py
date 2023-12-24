@@ -487,7 +487,9 @@ class AudioSplitter:
         for iter_ttk, (start, end) in enumerate(times_to_keep):
             metadata[iter_ttk]["duration"] = end - start
             if end - start < time_limit:
-                assert times_to_keep[latest_kept_i][1] <= end, "overlapping audio"
+                # sometimes for very short segments, start and end are so
+                # close that they overlap
+                assert times_to_keep[latest_kept_i][1] - end <= 0.1, "overlapping audio"
                 times_to_keep[latest_kept_i][1] = end
                 metadata[latest_kept_i]["end"] = end
 
