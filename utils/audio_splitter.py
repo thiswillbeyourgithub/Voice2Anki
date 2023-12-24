@@ -504,17 +504,25 @@ class AudioSplitter:
             whi(f"Kept {nafter}/{nbefore} splits when removing those <{time_limit}s")
 
         # remove almost no words if large model was used
-        # if second_pass:
-        #     word_limit = 3
-        #     for i, te in enumerate(metadata):
-        #         te = te["text"]
-        #         metadata[iter_ttk]["n_words"] = len(te.split(" "))
-        #         if metadata[iter_ttk]["n_words"] <= word_limit:
-        #             times_to_keep[i] = None
-        #             metadata[iter_ttk]["status"] += "Low nwords"
-        #     nbefore = len(times_to_keep)
-        #     nafter = len([t for t in times_to_keep if t is not None])
-        #     whi(f"    Removed {nafter-nbefore}/{nbefore} splits with less than {word_limit} words")
+        if second_pass:
+            word_limit = 3
+            for i, te in enumerate(metadata):
+                if times_to_keep[i] is None:
+                    continue
+                start, end = times_to_keep[i]
+                metadata[iter_ttk]["n_words"] = len(te["text"].split(" "))
+                if metadata[iter_ttk]["n_words"] <= word_limit:
+
+                    times_to_keep[latest_kept_i][1] = end
+                    metadata[latest_kept_i]["end"] = end
+
+                    times_to_keep[i] = None
+                    metadata[iter_ttk]["status"] += "Low nwords"
+                else:
+                    latest_kept_i = i
+            nbefore = len(times_to_keep)
+            nafter = len([t for t in times_to_keep if t is not None])
+            whi(f"    Removed {nafter-nbefore}/{nbefore} splits with less than {word_limit} words")
 
         assert len(times_to_keep) == len(metadata), "invalid lengths"
 
