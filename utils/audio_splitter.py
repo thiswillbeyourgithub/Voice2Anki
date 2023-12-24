@@ -412,13 +412,13 @@ class AudioSplitter:
             else:
                 metadata[-1]["n_pass"] = 2
 
-            # impossibly short token
-            if ed - st <= 0.05:
-                red(f"Too short segment is ignored: {ed-st}s (text was '{text}')")
-                metadata[-1]["status"] = "Too short"
-                continue
-
             if transcript["repo"] != "fast":
+                # impossibly short token
+                if ed - st <= 0.05:
+                    red(f"Too short segment is ignored: {ed-st}s (text was '{text}')")
+                    metadata[-1]["status"] = "Too short"
+                    continue
+
                 # store whisper metadata
                 metadata[-1]["no_speech_prob"] = segment["no_speech_prob"]
                 metadata[-1]["avg_logprob"] = segment["avg_logprob"]
