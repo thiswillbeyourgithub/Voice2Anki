@@ -338,6 +338,7 @@ class AudioSplitter:
             # times_to_keep[-1][1] = len(audio_o) / 1000 / self.spf
             # times_to_keep[0][0] = 0
 
+            ignored = None
             for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
@@ -350,6 +351,14 @@ class AudioSplitter:
                     continue
 
                 start_cut, end_cut = val
+
+                # assemble all ignored audios as one single slice too
+                if ignored is None:
+                    ignored = audio_o[0: start_cut*1000]
+                else:
+                    ignored += audio_o[prev_end: start_cut*1000]
+                prev_end = end_cut
+
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
@@ -358,6 +367,13 @@ class AudioSplitter:
                 #     continue
                 whi(f"Saving sliced to {out_file}")
                 sliced.export(out_file, format="mp3")
+
+            whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
+            ignored = self.trim_silences(ignored)
+            whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
+            out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+2:03d}_IGNORED.mp3"
+            assert not out_file.exists(), f"File {out_file} already exists!"
+            ignored.export(out_file, format="mp3")
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
             shutil.move(fileo, self.done_dir / fileo.name)
