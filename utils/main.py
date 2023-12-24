@@ -167,6 +167,7 @@ def thread_whisp_then_llm(
             txt_whisp_lang,
             sld_whisp_temp,
             )["text"]
+    txt_audio = txt_audio.replace(" Stop. ", "\n\n")
     with lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
