@@ -340,7 +340,7 @@ class AudioSplitter:
 
             for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
-                assert not out_file.exists(), f"file {out_file} already exists!"
+                assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
                     mf.write("\n")
