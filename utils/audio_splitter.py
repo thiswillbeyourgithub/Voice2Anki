@@ -341,13 +341,18 @@ class AudioSplitter:
             ignored = AudioSegment.empty()
             prev_end = 0
             for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
-                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
+                if val is not None:
+                    time_markers = f"_{int(val[0])}s_to_{int(val[1])}s"
+                else:
+                    time_markers = ""
+                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
                     mf.write("\n")
                     metadata[iter_ttk]["file_path"] = str(out_file)
                     mf.write(json.dumps(metadata[iter_ttk], ensure_ascii=False))
+
                 if val is None:
                     continue
 
