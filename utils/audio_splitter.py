@@ -459,7 +459,7 @@ class AudioSplitter:
                 for stop in self.stop_list:
                     if re.search(stop, word):
                         # whi(f"Found {stop.pattern} in '{text}' ({st}->{ed})")
-                        times_to_keep[-1][1] = (w["start"] + w["end"]) / 2
+                        times_to_keep[-1][1] = w["end"]
                         metadata[-1]["end"] = times_to_keep[-1][1]
                         metadata[-1]["status"] = "Kept"
 
