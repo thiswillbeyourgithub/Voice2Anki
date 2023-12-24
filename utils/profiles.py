@@ -25,6 +25,7 @@ profile_keys = {
         "txt_keywords": {"default": "", "type": str},
         "sld_prio_weight": {"default": 1},
         "sld_keywords_weight": {"default": 1},
+        "sld_timestamp_weight": {"default": 1},
         "sld_pick_weight": {"default": 1},
         "txt_extra_source": {},
         "txt_openai_api_key": {},

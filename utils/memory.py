@@ -173,11 +173,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
 
-    timesorted_pr = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
+    candidate_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     assert not any(pr["role"] == "system" for pr in prev_prompts), "Found systel prompt in prompt_filter!"
 
     # better formatting by removing useless markup
-    for i, m in enumerate(timesorted_pr):
+    for i, m in enumerate(candidate_prompts):
         assert m["role"] == "user"
         assert "Context: '" not in m["content"] and "Transcript: '" not in m["content"], f"Invalid prompt: {m}"
 
@@ -186,21 +186,27 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     tkns = 0
     tkns += len(tokenize(default_system_prompt["content"]))  # system prompt
     tkns += new_prompt_len  # current question + message buffer
-    all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in timesorted_pr])
+    all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in candidate_prompts])
 
     # score based on priority. Closer to 1 means higher chances of being picked
-    max_prio = max([pr["priority"] for pr in timesorted_pr])
-    min_prio = min([pr["priority"] for pr in timesorted_pr])
-    for i, pr in enumerate(timesorted_pr):
-        timesorted_pr[i]["priority_score"] = (pr["priority"] - min_prio) / (max_prio - min_prio)
+    max_prio = max([pr["priority"] for pr in candidate_prompts])
+    min_prio = min([pr["priority"] for pr in candidate_prompts])
+    for i, pr in enumerate(candidate_prompts):
+        candidate_prompts[i]["priority_score"] = (pr["priority"] - min_prio) / (max_prio - min_prio)
+
+    # score based on timestamp. Closer to 1 means more recent so higher chances of being picked
+    max_tstp = max([pr["timestamp"] for pr in candidate_prompts])
+    min_tstp = min([pr["timestamp"] for pr in candidate_prompts])
+    for i, pr in enumerate(candidate_prompts):
+        candidate_prompts[i]["time_score"] = (pr["timestamp"] - min_tstp) / (max_tstp - min_tstp)
 
     # score based on keywords:
     if keywords:
         max_sim = [0, None]
         min_sim = [1, None]
-        for i, pr in enumerate(timesorted_pr):
+        for i, pr in enumerate(candidate_prompts):
             score = sum([1 if re.search(kw, pr["content"]) else 0 for kw in keywords])
-            timesorted_pr[i]["kw_score"] = score
+            candidate_prompts[i]["kw_score"] = score
             if score > max_sim[0]:
                 max_sim[0] = score
                 max_sim[1] = pr["content"]
@@ -209,15 +215,16 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 min_sim[1] = pr["content"]
 
         # scale from 0 to 1
-        for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["kw_score"] = (timesorted_pr[i]["kw_score"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+        for i, pr in enumerate(candidate_prompts):
+            candidate_prompts[i]["kw_score"] = (candidate_prompts[i]["kw_score"] - min_sim[0]) / (max_sim[0] - min_sim[0])
     else:
-        for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["kw_score"] = 1
+        for i, pr in enumerate(candidate_prompts):
+            candidate_prompts[i]["kw_score"] = 1
 
+    # score based on length or embedding similarity
     distances = []
     if shared.memory_metric == "length":
-        for i, pr in enumerate(timesorted_pr):
+        for i, pr in enumerate(candidate_prompts):
             tkn_len = pr["tkn_len_in"]
             # mean of A/B and B/A is (A**2*B**2)(2AB)
             dist = ((tkn_len ** 2) + (new_prompt_len ** 2)) / (2 * tkn_len * new_prompt_len)
@@ -226,7 +233,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             dist = abs(dist - 1)
             # now: 0 means same length and anything above means should not
             # be picked.
-            timesorted_pr[i]["length_dist"] = dist
+            candidate_prompts[i]["length_dist"] = dist
             distances.append(dist)
 
         max_dist = max(distances)
@@ -234,27 +241,27 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
         max_sim = [0, None]
         min_sim = [1, None]
-        for i, pr in enumerate(timesorted_pr):
+        for i, pr in enumerate(candidate_prompts):
             # make it so that the highest value is 1, lowest is 0 and
             # high means high chances of being selected
-            timesorted_pr[i]["length_dist"] = 1 - ((timesorted_pr[i]["length_dist"] - min_dist) / (max_dist - min_dist))
+            candidate_prompts[i]["length_dist"] = 1 - ((candidate_prompts[i]["length_dist"] - min_dist) / (max_dist - min_dist))
 
-            if timesorted_pr[i]["length_dist"] > max_sim[0]:
-                max_sim[0] = timesorted_pr[i]["length_dist"]
+            if candidate_prompts[i]["length_dist"] > max_sim[0]:
+                max_sim[0] = candidate_prompts[i]["length_dist"]
                 max_sim[1] = pr["content"]
-            if timesorted_pr[i]["length_dist"] < min_sim[0]:
-                min_sim[0] = timesorted_pr[i]["length_dist"]
+            if candidate_prompts[i]["length_dist"] < min_sim[0]:
+                min_sim[0] = candidate_prompts[i]["length_dist"]
                 min_sim[1] = pr["content"]
         whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
         whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
-        assert len(timesorted_pr) == len(distances), "Unexpected list length"
+        assert len(candidate_prompts) == len(distances), "Unexpected list length"
 
     elif shared.memory_metric == "embeddings":
         whi("Computing cosine similarity")
         max_sim = [0, None]
         min_sim = [1, None]
         new_prompt_vec = embedder(prompt_messages[-1]["content"], format="content")
-        for i, pr in enumerate(timesorted_pr):
+        for i, pr in enumerate(candidate_prompts):
 
             embedding = embedder(pr["content"], format="answer")
             embedding2 = embedder(pr["answer"], format="answer")
@@ -269,50 +276,54 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             if sim < min_sim[0]:
                 min_sim[0] = sim
                 min_sim[1] = pr["content"]
-            timesorted_pr[i]["content_sim"] = sim
+            candidate_prompts[i]["content_sim"] = sim
             distances.append(sim)
 
         whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
         whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
-        assert len(timesorted_pr) == len(distances), "Unexpected list length"
+        assert len(candidate_prompts) == len(distances), "Unexpected list length"
 
         # scale the distances
-        for i, pr in enumerate(timesorted_pr):
-            timesorted_pr[i]["content_sim"] = (pr["content_sim"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+        for i, pr in enumerate(candidate_prompts):
+            candidate_prompts[i]["content_sim"] = (pr["content_sim"] - min_sim[0]) / (max_sim[0] - min_sim[0])
 
     else:
         raise ValueError(shared.memory_metric)
 
-
     # combine score
     if shared.memory_metric == "embeddings":
-        score_key = "content_sim"
+        similarity_key = "content_sim"
     elif shared.memory_metric == "length":
-        score_key = "length_dist"
+        similarity_key = "length_dist"
 
     w = [
             shared.pv["sld_pick_weight"],
             shared.pv["sld_prio_weight"],
             shared.pv["sld_keywords_weight"],
+            shared.pv["sld_timestamp_weight"],
             ]
     pm_contents = [pr["content"].replace("<br/>", "\n") for pr in prompt_messages]
-    for i, pr in enumerate(timesorted_pr):
-        score = (pr[score_key] * w[0] + pr["priority_score"] * w[1] + pr["kw_score"] * w[2]) / sum(w)
-        timesorted_pr[i]["pick_score"] = score
+    for i, pr in enumerate(candidate_prompts):
+        score = pr[similarity_key] * w[0]
+        score += pr["priority_score"] * w[1]
+        score += pr["kw_score"] * w[2]
+        score += pr["time_score"] * w[3]
+        score /= sum(w)
+        candidate_prompts[i]["pick_score"] = score
         assert score >= 0 and score <= 1, f"invalid pick_score: {score}"
         if pr["content"] in pm_contents:
-            timesorted_pr[i] = None
-    timesorted_pr = [pr for pr in timesorted_pr if pr]
+            candidate_prompts[i] = None
+    candidate_prompts = [pr for pr in candidate_prompts if pr]
 
     # add by decreasing pick score
-    picksorted = sorted(timesorted_pr, key=lambda x: x["pick_score"], reverse=True)
+    picksorted = sorted(candidate_prompts, key=lambda x: x["pick_score"], reverse=True)
 
     output_pr = []  # each picked prompt will be added here
 
     exit_while = False
     cnt = 0
     max_iter = 50
-    while (not exit_while) and timesorted_pr:
+    while (not exit_while) and candidate_prompts:
         cnt += 1
         if cnt >= max_iter:
             red(f"Exited filtering loop after {cnt} iterations, have you added enough memories?")
