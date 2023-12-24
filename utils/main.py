@@ -239,7 +239,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
         thread.start()
         shared.running_threads["saving_whisper"].append(thread)
 
-        txt_audio = txt_audio.replace(" Stop. ", "\n\n")
+        txt_audio = txt_audio.replace(" Stop. ", "\n\n").strip()
 
         return txt_audio
     except Exception as err:
