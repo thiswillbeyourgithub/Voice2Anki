@@ -245,8 +245,8 @@ class AudioSplitter:
                         assert new_times[-1][0] == met["start"], "Inconsistency between metadata and times_to_keep"
                         assert new_times[-1][1] == met["end"], "Inconsistency between metadata and times_to_keep"
 
-                    prev_t0 = met["start"]
-                    prev_t1 = met["end"]
+                        prev_t0 = met["start"]
+                        prev_t1 = met["end"]
 
                 alterations[iter_ttk] = [new_times, sub_meta]
                 if [nt for nt in new_times if nt]:
