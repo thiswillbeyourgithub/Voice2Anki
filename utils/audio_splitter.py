@@ -682,16 +682,21 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
                 )
 
         # fix the format to have the same type as hnesk and collectiveai
-        transcript["segments"] = transcript["chunks"]
-        transcript["transcription"] = transcript["text"]
-        del transcript["chunks"], transcript["text"]
+        transcript["segments"] = transcript.pop("chunks")
+        transcript["transcription"] = transcript.pop("text")
+        # del transcript["chunks"], transcript["text"]
         for iter_chunk, chunk in enumerate(transcript["segments"]):
             transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
             transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
-            del transcript["segments"][iter_chunk]["timestamp"]
+            # del transcript["segments"][iter_chunk]["timestamp"]
 
-            transcript["segments"][iter_chunk]["words"] = [transcript["segments"][iter_chunk]]
-            transcript["segments"][iter_chunk]["words"][0]["word"] = chunk["text"]
+            transcript["segments"][iter_chunk]["words"] = [
+                    {
+                        "word": chunk["text"],
+                        "start": chunk["timestamp"][0],
+                        "end": chunk["timestamp"][1],
+                        }
+                    ]
 
     elif repo == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
