@@ -195,10 +195,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         candidate_prompts[i]["priority_score"] = (pr["priority"] - min_prio) / (max_prio - min_prio)
 
     # score based on timestamp. Closer to 1 means more recent so higher chances of being picked
-    max_tstp = max([pr["timestamp"] for pr in candidate_prompts])
-    min_tstp = min([pr["timestamp"] for pr in candidate_prompts])
+    times = sorted([pr["timestamp"] for pr in candidate_prompts])
     for i, pr in enumerate(candidate_prompts):
-        candidate_prompts[i]["time_score"] = (pr["timestamp"] - min_tstp) / (max_tstp - min_tstp)
+        candidate_prompts[i]["time_score"] = times.index(pr["timestamp"]) / len(times)
 
     # score based on keywords:
     if keywords:
