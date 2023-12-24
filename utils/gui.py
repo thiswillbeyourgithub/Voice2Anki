@@ -99,7 +99,6 @@ with gr.Blocks(
                 # rolls
                 with gr.Group():
                     with gr.Row():
-                        small_sync_check = gr.Button("Status", variant="secondary", min_width=20, scale=1)
                         rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
                         rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
 
@@ -437,14 +436,6 @@ with gr.Blocks(
             # show_progress=True,
             # every=2,
             # trigger_mode="once",
-            # preprocess=False,
-            # postprocess=False,
-            )
-    small_sync_check.click(
-            fn=get_card_status,
-            inputs=[txt_chatgpt_cloz],
-            outputs=[update_status_btn],
-            # queue=False,
             # preprocess=False,
             # postprocess=False,
             )
