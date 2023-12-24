@@ -433,31 +433,31 @@ with gr.Blocks(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
-            queue=False,
+            # queue=False,
             # show_progress=True,
             # every=2,
             # trigger_mode="once",
-            preprocess=False,
-            postprocess=False,
+            # preprocess=False,
+            # postprocess=False,
             )
     small_sync_check.click(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
-            queue=False,
-            preprocess=False,
-            postprocess=False,
+            # queue=False,
+            # preprocess=False,
+            # postprocess=False,
             )
     txt_chatgpt_cloz.change(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
-            queue=False,
+            # queue=False,
             # show_progress=True,
             # every=2,
             # trigger_mode="once",
-            preprocess=False,
-            postprocess=False,
+            # preprocess=False,
+            # postprocess=False,
             )
 
 
