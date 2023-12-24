@@ -1114,7 +1114,7 @@ def to_anki(
 
     if not len(results) == len(clozes):
         gather_threads(["audio_to_anki", "ocr"])
-        raise Exception(red(f"Some flashcards were not added:\n{'\n'.join(errors)}"))
+        raise Exception(red(f"Some flashcards were not added:{','.join(errors)}"))
     with threading.Lock():
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = True
 
