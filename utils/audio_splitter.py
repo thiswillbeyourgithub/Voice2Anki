@@ -338,7 +338,8 @@ class AudioSplitter:
             # times_to_keep[-1][1] = len(audio_o) / 1000 / self.spf
             # times_to_keep[0][0] = 0
 
-            ignored = None
+            ignored = AudioSegment.empty()
+            prev_end = 0
             for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
@@ -353,10 +354,7 @@ class AudioSplitter:
                 start_cut, end_cut = val
 
                 # assemble all ignored audios as one single slice too
-                if ignored is None:
-                    ignored = audio_o[0: start_cut*1000]
-                else:
-                    ignored += audio_o[prev_end: start_cut*1000]
+                ignored += audio_o[prev_end: start_cut*1000]
                 prev_end = end_cut
 
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
