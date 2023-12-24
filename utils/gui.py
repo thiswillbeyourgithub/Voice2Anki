@@ -601,17 +601,17 @@ with gr.Blocks(
                                 queue=False,
                                 show_progress=False,
                                 ).then(
-                                        fn=None,
-                                        js=hide_some_components,
-                                        queue=False,
-                                        show_progress=False,
+                                        fn=get_card_status,
+                                        inputs=[txt_chatgpt_cloz],
+                                        outputs=[update_status_btn],
+                                        # queue=True,
+                                        # preprocess=False,
+                                        # postprocess=False,
                                         ).then(
-                                                fn=get_card_status,
-                                                inputs=[txt_chatgpt_cloz],
-                                                outputs=[update_status_btn],
-                                                queue=True,
-                                                preprocess=False,
-                                                postprocess=False,
+                                                fn=None,
+                                                js=hide_some_components,
+                                                queue=False,
+                                                show_progress=False,
                                                 )
     rollaudio_123_btn.click(
             fn=roll_audio,
@@ -677,17 +677,17 @@ with gr.Blocks(
                                         outputs=[check_marked],
                                         show_progress=False,
                                         ).then(
-                                                fn=None,
-                                                js=hide_some_components,
-                                                queue=False,
-                                                show_progress=False,
+                                                fn=get_card_status,
+                                                inputs=[txt_chatgpt_cloz],
+                                                outputs=[update_status_btn],
+                                                # queue=True,
+                                                # preprocess=False,
+                                                # postprocess=False,
                                                 ).then(
-                                                        fn=get_card_status,
-                                                        inputs=[txt_chatgpt_cloz],
-                                                        outputs=[update_status_btn],
-                                                        queue=True,
-                                                        preprocess=False,
-                                                        postprocess=False,
+                                                        fn=None,
+                                                        js=hide_some_components,
+                                                        queue=False,
+                                                        show_progress=False,
                                                         )
 
     # clicking this button will load from a user directory the next sounds and
