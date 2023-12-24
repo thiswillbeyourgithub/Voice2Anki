@@ -544,8 +544,8 @@ class AudioSplitter:
         #     except Exception as err:
         #         red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with Fast Whisper large-v3: '{err}'")
 
-#        if failed:
-#            red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
+        # if failed:
+        #     red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
         for iter_retry in range(n_retry):
             try:
                 transcript = whisper_splitter(
