@@ -354,7 +354,7 @@ class AudioSplitter:
                 start_cut, end_cut = val
 
                 # assemble all ignored audios as one single slice too
-                ignored += audio_o[prev_end: start_cut*1000]
+                ignored += audio_o[prev_end*1000: start_cut*1000]
                 prev_end = end_cut
 
                 sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
