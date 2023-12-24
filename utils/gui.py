@@ -103,13 +103,6 @@ with gr.Blocks(
                         rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
                         rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
 
-                # 1/2/3
-                with gr.Group():
-                    with gr.Row():
-                        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-                        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-                        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
-
                 # 1+2 / 1+2+3
                 with gr.Accordion(open=False, label="Edit"):
                     with gr.Row():
@@ -138,6 +131,13 @@ with gr.Blocks(
                                 #min_width=50,
                                 visible=False,
                                 )
+
+                # 1/2/3
+                with gr.Group():
+                    with gr.Row():
+                        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
+                        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
+                        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
 
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark previous")
