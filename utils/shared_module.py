@@ -62,7 +62,7 @@ class SharedModule:
             ]
 
     message_buffer = []
-    max_message_buffer = 50
+    max_message_buffer = 20
 
     audio_slot_nb = 5
     future_gallery_slot_nb = 60
