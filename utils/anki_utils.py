@@ -181,7 +181,7 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
     if "#####" in cloz:  # multiple cards
         assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = asyncio.run(async_parallel_status(splits, return_bool=True)
+        vals = asyncio.run(async_parallel_status(splits, return_bool=True))
 
         if all(vals):
             if return_bool:
