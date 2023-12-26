@@ -1,3 +1,4 @@
+import asyncio
 import gradio as gr
 import re
 import threading
@@ -151,6 +152,16 @@ def audio_to_anki(audio_mp3, queue):
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
+async def async_status(*args, **kwargs):
+    loop = asyncio.get_running_loop()
+    try:
+        return await loop.run_in_executor(None, get_card_status, *args, **kwargs)
+    except Exception as err:
+        return err
+
+async def async_parallel_status(splits, *args, **kwargs):
+    tasks = [async_status(sp, *args, **kwargs) for sp in splits]
+    return await asyncio.gather(*tasks)
 
 @trace
 @Timeout(5)
@@ -170,7 +181,7 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
     if "#####" in cloz:  # multiple cards
         assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = [get_card_status(sp, return_bool=True) for sp in splits]
+        vals = asyncio.run(async_parallel_status(splits, return_bool=True)
 
         if all(vals):
             if return_bool:
