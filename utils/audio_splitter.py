@@ -438,7 +438,7 @@ class AudioSplitter:
                     metadata[-1]["status"] = "No speech"
                     continue
 
-                if segment["temperature"] == 1 and nsprob >= 0.4:
+                if segment["temperature"] == 1:
                     red(f"Temperature at 1 and no speech probability at {nsprob}%>40% so ignored. Text was '{text}'")
                     metadata[-1]["status"] = "No speech at high temp"
                     continue
