@@ -1115,8 +1115,8 @@ def to_anki(
         results.append(res)
         whi(f"* {cl}")
 
-    results = [str(r) for r in results if str(r).isdigit()]
     errors = [str(r) for r in results if not str(r).isdigit()]
+    results = [str(r) for r in results if str(r).isdigit()]
     shared.added_note_ids.append([int(r) for r in results])
 
     if not len(results) == len(clozes):
