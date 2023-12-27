@@ -269,10 +269,8 @@ with gr.Blocks(
                     fn=get_image,
                     inputs=[gal_],
                     outputs=[gal_],
-                    queue=False).success(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
-                            inputs=[gal_],
-                            )
+                    queue=False)
+
             # send image
             send_.click(
                     fn=lambda x: x,
@@ -290,10 +288,8 @@ with gr.Blocks(
             rst_.click(
                     fn=lambda: None,
                     outputs=[gal_],
-                    queue=False).then(
-                        fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
-                        inputs=[gal_],
-                        )
+                    queue=False)
+
             ocr_.click(
                     fn=ocr_image,
                     inputs=[gal_],
