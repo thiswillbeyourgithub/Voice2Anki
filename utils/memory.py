@@ -37,6 +37,7 @@ default_system_prompt = {
                               The answer must be reminiscent of the question (i.e. If the question starts by 'The types of cancer that' then the answer should start also by 'The types of cancer that'. Use common sense to make it easy to memorize.)
                               This conversation will contain examples of good flashcards. Pay attention to their format and structure and adhere to it as closely as possible.
                               If you can't accomplish the task, start your reply by 'Alfred:' followed by your issue and I'll help you right away.
+                              If the transcript contains acronyms, reuse them without defining them.
                               """).strip(),
             "timestamp": int(time.time()),
             "priority": -1,  # the only prompt that has priority of -1 is the system prompt
