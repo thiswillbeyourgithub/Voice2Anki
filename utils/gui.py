@@ -238,7 +238,8 @@ with gr.Blocks(
             with gr.Row(equal_height=False):
                 with gr.Column(scale=10):
                     gal_ = gr.Gallery(
-                        value=None,
+                        # value=None,
+                        value=shared.pv[f"future_gallery_{fg:03d}"],
                         label=f"Gallery {fg}",
                         columns=[2],
                         rows=[1],
