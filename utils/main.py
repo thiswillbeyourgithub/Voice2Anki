@@ -1115,7 +1115,7 @@ def to_anki(
         results.append(res)
         whi(f"* {cl}")
 
-    errors = [str(r) for r in results if not str(r).isdigit()]
+    errors = [f"#{results.index(r)+1}/{len(results)}: {r}" for r in results if not str(r).isdigit()]
     results = [str(r) for r in results if str(r).isdigit()]
     shared.added_note_ids.append([int(r) for r in results])
 
