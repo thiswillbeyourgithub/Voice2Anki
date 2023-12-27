@@ -1,9 +1,11 @@
 import gradio as gr
 import pandas as pd
 
+
 class SharedModule:
     """module used to store information from Voice2Anki.py to
     the main .py files"""
+    initialized = 0
     VERSION = 0.2
     memory_metric = None
     media_folder = None
@@ -98,8 +100,14 @@ class SharedModule:
 
     def reset(self):
         "used to reset the values when the gradio page is reloaded"
-        print("Resetting shared module.")
-        gr.Error("Resetting shared module.")
+        self.initialized += 1
+        if self.initialized == 1:
+            # the first init is triggered by loading the webpage, so
+            # the first time shouldn't do anything
+            return
+        elif self.initialized > 1:
+            p(f"Shared module initialized {self.initialized} times.")
+
         self.dirload_queue = pd.DataFrame(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
         self.latest_stt_used = None
@@ -117,6 +125,11 @@ class SharedModule:
         else:
             raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
 
+
+
+def p(message):
+    print(message)
+    gr.Error(message)
 
 
 shared = SharedModule()
