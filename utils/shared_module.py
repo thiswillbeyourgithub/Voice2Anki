@@ -1,3 +1,4 @@
+import gradio as gr
 import pandas as pd
 
 class SharedModule:
@@ -98,6 +99,7 @@ class SharedModule:
     def reset(self):
         "used to reset the values when the gradio page is reloaded"
         print("Resetting shared module.")
+        gr.Error("Resetting shared module.")
         self.dirload_queue = pd.DataFrame(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
         self.latest_stt_used = None
