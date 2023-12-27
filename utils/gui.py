@@ -272,9 +272,7 @@ with gr.Blocks(
                     outputs=[gallery],
                     preprocess=False,
                     postprocess=False,
-                    queue=False).success(
-                            fn=shared.pv.save_gallery,
-                            inputs=[gallery]
+                    queue=False).then(
                             ).then(
                                     fn=get_img_source,
                                     inputs=[gallery],
@@ -509,16 +507,19 @@ with gr.Blocks(
             outputs=[gallery],
             show_progress=False,
             queue=False,
-            ).success(
-                    fn=shared.pv.save_gallery,
-                    inputs=[gallery],
-                    show_progress=False,
-                    ).success(
-                            fn=get_img_source,
-                            inputs=[gallery],
-                            queue=False,
-                            show_progress=False,
-                            )
+                ).success(
+                        fn=get_img_source,
+                        inputs=[gallery],
+                        queue=False,
+                        show_progress=False,
+                        )
+
+    gallery.change(
+            fn=shared.pv.save_gallery,
+            inputs=[gallery],
+            show_progress=False,
+            )
+
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
