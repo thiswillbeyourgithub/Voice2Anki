@@ -68,7 +68,7 @@ class SharedModule:
     max_message_buffer = 20
 
     audio_slot_nb = 4
-    future_gallery_slot_nb = 60
+    future_gallery_slot_nb = 100
 
     dirload_queue_columns = [
             "n",
