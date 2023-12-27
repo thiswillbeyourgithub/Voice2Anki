@@ -322,7 +322,7 @@ with gr.Blocks(
                 outputs=[future_galleries[0][1]],
                 ).then(
                         fn=shared.pv.save_future_gallery_001,
-                        inputs=[None],
+                        inputs=[future_galleries[0][1]],
                         show_progress=False,
                         ).then(
                             fn=load_future_galleries,
