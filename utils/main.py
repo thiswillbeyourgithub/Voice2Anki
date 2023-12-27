@@ -425,7 +425,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @floatizer
 @trace
 @Timeout(180)
-@llm_cache.cache(ignore=["cache_mode"])
+@llm_cache.cache(ignore=["cache_mode", "sld_buffer"])
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
