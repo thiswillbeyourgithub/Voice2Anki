@@ -212,6 +212,7 @@ with gr.Blocks(
                 type="pandas",
                 label="Dirload queue",
                 interactive=False,
+                column_widths="5%",
                 )
 
 
