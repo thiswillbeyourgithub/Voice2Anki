@@ -382,14 +382,17 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, check_gpt4):
     whi("Recursively improving")
     if not txt_audio:
-        red("No audio transcripts found.")
+        gr.Error(red("No audio transcripts found."))
         return
     if not txt_chatgpt_outputstr:
-        red("No chatgpt output string found.")
+        gr.Error(red("No chatgpt output string found."))
         return
     if "\n" in txt_chatgpt_outputstr:
         whi("Replaced newlines in txt_chatgpt_outputstr")
         txt_chatgpt_outputstr = txt_chatgpt_outputstr.replace("\n", "<br/>")
+    if "#####" in txt_audio or "\n\n" in txt_audio:
+        gr.Error(red(f"You can't memorize a prompt that was automatically split."))
+        return
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
