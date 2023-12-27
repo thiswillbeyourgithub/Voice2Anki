@@ -82,14 +82,6 @@ with gr.Blocks(
                     rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
                     dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50)
 
-                # image
-                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", height="20%", container=True, min_width=50)
-                with gr.Group():
-                    with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
-                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
-                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
-
             with gr.Column(scale=5):
 
                 # whisper and chatgpt text output
@@ -162,6 +154,17 @@ with gr.Blocks(
                 with gr.Row():
                     roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                     flag_audio_btn = gr.Button(value="Flag audio", scale=0)
+
+                # image
+                with gr.Accordion(label="Main gallery", open=True):
+                    with gr.Row():
+                        with gr.Column():
+                            gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
+                            with gr.Group():
+                                with gr.Row():
+                                    rst_img_btn = gr.Button(value="Clear image", variant="secondary", min_width=50)
+                                    img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
 
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
