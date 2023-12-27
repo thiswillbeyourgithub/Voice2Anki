@@ -92,7 +92,7 @@ with gr.Blocks(
                 with gr.Group():
                     with gr.Row():
                         rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
-                        rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
+                        rollaudio_12_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
 
                 # 1+2 / 1+2+3
                 with gr.Accordion(open=False, label="Edit"):
@@ -581,47 +581,47 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=False,
+#                    ).success(
+#                        fn=alfred,
+#                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+#                        outputs=[txt_chatgpt_cloz],
+#                        queue=False,
+#                        preprocess=False,
+#                        postprocess=False,
                     ).success(
-                        fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
-                        outputs=[txt_chatgpt_cloz],
-                        queue=False,
-                        preprocess=False,
-                        postprocess=False,
-                        ).then(
-                                fn=dirload_splitted_last,
-                                inputs=[
-                                    roll_dirload_check,
-                                    txt_whisp_prompt,
-                                    txt_whisp_lang,
-                                    sld_whisp_temp,
+                            fn=dirload_splitted_last,
+                            inputs=[
+                                roll_dirload_check,
+                                txt_whisp_prompt,
+                                txt_whisp_lang,
+                                sld_whisp_temp,
 
-                                    txt_chatgpt_context,
-                                    txt_profile,
-                                    sld_max_tkn,
-                                    sld_temp,
-                                    sld_buffer,
-                                    check_gpt4,
-                                    txt_keywords,
-                                    ],
-                                outputs=[audio_slots[-1]],
-                                # preprocess=False,
-                                # postprocess=False,
-                                queue=False,
-                                show_progress=False,
-                                ).then(
-                                        fn=get_card_status,
-                                        inputs=[txt_chatgpt_cloz],
-                                        outputs=[update_status_btn],
-                                        # queue=True,
-                                        # preprocess=False,
-                                        # postprocess=False,
-                                        ).then(
-                                                fn=None,
-                                                js=hide_some_components,
-                                                queue=False,
-                                                show_progress=False,
-                                                )
+                                txt_chatgpt_context,
+                                txt_profile,
+                                sld_max_tkn,
+                                sld_temp,
+                                sld_buffer,
+                                check_gpt4,
+                                txt_keywords,
+                                ],
+                            outputs=[audio_slots[-1]],
+                            # preprocess=False,
+                            # postprocess=False,
+                            queue=False,
+                            show_progress=False,
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[update_status_btn],
+                                    # queue=True,
+                                    # preprocess=False,
+                                    # postprocess=False,
+                                    ).then(
+                                            fn=None,
+                                            js=hide_some_components,
+                                            queue=False,
+                                            show_progress=False,
+                                            )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
