@@ -333,7 +333,7 @@ with gr.Blocks(
                                                     inputs=[future_galleries[0][1]],
                                                     ).success(
                                                             fn=get_img_source,
-                                                            inputs=[future_galleries[1][1]],
+                                                            inputs=[future_galleries[2][1]],
                                                             queue=False,
                                                             )
 
