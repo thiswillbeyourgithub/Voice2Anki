@@ -257,19 +257,16 @@ with gr.Blocks(
                         rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
                         ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
 
-            # save if change
-            gal_.change(
-                    fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
-                    inputs=[gal_],
-                    show_progress=False,
-                    )
-
             # add image
             add_.click(
                     fn=get_image,
                     inputs=[gal_],
                     outputs=[gal_],
-                    queue=False)
+                    queue=False).then(
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                            inputs=[gal_],
+                            show_progress=False,
+                            )
 
             # send image
             send_.click(
@@ -279,6 +276,9 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=False).then(
+                            fn=shared.pv.save_gallery,
+                            inputs=[gallery],
+                            show_progress=False,
                             ).then(
                                     fn=get_img_source,
                                     inputs=[gallery],
@@ -288,8 +288,13 @@ with gr.Blocks(
             rst_.click(
                     fn=lambda: None,
                     outputs=[gal_],
-                    queue=False)
+                    queue=False).then(
+                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                            inputs=[gal_],
+                            show_progress=False,
+                            )
 
+            # ocr image
             ocr_.click(
                     fn=ocr_image,
                     inputs=[gal_],
@@ -298,6 +303,7 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     )
+
             future_galleries.append([rst_, gal_, send_, add_, ocr_])
 
         clear_fg_btn = gr.ClearButton(
@@ -310,28 +316,33 @@ with gr.Blocks(
                 fn=load_future_galleries,
                 outputs=[row[1] for row in future_galleries],
                 )
+
         roll_gall_btn.click(
                 fn=lambda: None,
                 outputs=[future_galleries[0][1]],
                 ).then(
-                    fn=load_future_galleries,
-                    outputs=[row[1] for row in future_galleries],
-                    ).then(
-                        fn=lambda x: x,
-                        inputs=[future_galleries[0][1]],
-                        outputs=[gallery],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=False,
-                        ).success(
-                                fn=get_img_source,
-                                inputs=[gallery],
+                        fn=shared.pv.save_future_gallery_001,
+                        inputs=[None],
+                        show_progress=False,
+                        ).then(
+                            fn=load_future_galleries,
+                            outputs=[row[1] for row in future_galleries],
+                            ).then(
+                                fn=lambda x: x,
+                                inputs=[future_galleries[0][1]],
+                                outputs=[gallery],
+                                preprocess=False,
+                                postprocess=False,
                                 queue=False,
                                 ).success(
                                         fn=get_img_source,
-                                        inputs=[future_galleries[1][1]],
+                                        inputs=[gallery],
                                         queue=False,
-                                        )
+                                        ).success(
+                                                fn=get_img_source,
+                                                inputs=[future_galleries[1][1]],
+                                                queue=False,
+                                                )
 
     # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
@@ -505,6 +516,10 @@ with gr.Blocks(
             outputs=[gallery],
             show_progress=False,
             queue=False,
+            .then(
+                fn=shared.pv.save_gallery,
+                inputs=[gallery],
+                show_progress=False,
                 ).success(
                         fn=get_img_source,
                         inputs=[gallery],
@@ -512,18 +527,16 @@ with gr.Blocks(
                         show_progress=False,
                         )
 
-    gallery.change(
-            fn=shared.pv.save_gallery,
-            inputs=[gallery],
-            show_progress=False,
-            )
-
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
             queue=False,
             show_progress=False,
-            )
+            ).then(
+                fn=shared.pv.save_gallery,
+                inputs=[gallery],
+                show_progress=False,
+                )
 
     # audio
     audio_corrector.stop_recording(
