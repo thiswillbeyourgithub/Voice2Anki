@@ -257,6 +257,13 @@ with gr.Blocks(
                         rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
                         ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
 
+            # save if change
+            gal_.change(
+                    fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                    inputs=[gal_],
+                    show_progress=False,
+                    )
+
             # add image
             add_.click(
                     fn=get_image,
