@@ -152,9 +152,9 @@ with gr.Blocks(
                         txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
                     with gr.Row():
-                        flag_audio_btn = gr.Button(value="Flag audio", scale=0)
-                        force_sound_processing_btn = gr.Button(value="Sound processing", scale=0)
-                        clear_llm_cache_btn = gr.Button(value="Clear LLM cache", scale=0)
+                        flag_audio_btn = gr.Button(value="Flag audio")
+                        force_sound_processing_btn = gr.Button(value="Sound processing")
+                        clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
 
                 # image
                 with gr.Accordion(label="Main gallery", open=True):
