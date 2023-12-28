@@ -330,24 +330,28 @@ with gr.Blocks(
                         inputs=[future_galleries[0][1]],
                         show_progress=False,
                         ).then(
-                            fn=load_future_galleries,
-                            outputs=[row[1] for row in future_galleries],
+                            fn=shared.pv.save_gallery,
+                            inputs=[gallery],
+                            show_progress=False,
                             ).then(
-                                fn=lambda x: x,
-                                inputs=[future_galleries[0][1]],
-                                outputs=[gallery],
-                                preprocess=False,
-                                postprocess=False,
-                                queue=False,
-                                ).success(
-                                        fn=get_img_source,
-                                        inputs=[gallery],
+                                    fn=load_future_galleries,
+                                    outputs=[row[1] for row in future_galleries],
+                                    ).then(
+                                        fn=lambda x: x,
+                                        inputs=[future_galleries[0][1]],
+                                        outputs=[gallery],
+                                        preprocess=False,
+                                        postprocess=False,
                                         queue=False,
                                         ).success(
                                                 fn=get_img_source,
-                                                inputs=[future_galleries[1][1]],
+                                                inputs=[gallery],
                                                 queue=False,
-                                                )
+                                                ).success(
+                                                        fn=get_img_source,
+                                                        inputs=[future_galleries[1][1]],
+                                                        queue=False,
+                                                        )
 
     # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
