@@ -1129,15 +1129,34 @@ def to_anki(
     whi("\n\n ------------------------------------- \n\n")
 
     # add the latest generated cards to the message bugger
-    if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and txt_chatgpt_cloz not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
-        shared.message_buffer.append(
-                {
-                    "unformatted_txt_audio": txt_audio,
-                    "unformatted_txt_chatgpt_cloz": txt_chatgpt_cloz,
-                    "question": transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio),
-                    "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
-                    }
-                )
+    if "\n\n" in txt_audio:
+        audio_split = txt_audio.split("\n\n")
+        audio_split = [a.strip() for a in audio_split if a.strip()]
+        if len(audio_split) != len(clozes):
+            red("No saving card to message buffer because the number of split in txt_audio is not the same as in clozes.")
+        else:
+            for aud, cl in zip(audio_split, clozes):
+                if aud not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and cl not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
+                    shared.message_buffer.append(
+                            {
+                                "unformatted_txt_audio": aud,
+                                "unformatted_txt_chatgpt_cloz": cl,
+                                "question": transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", aud),
+                                "answer": cl.replace("\n", "<br/>"),
+                                "was_split": True,
+                                }
+                            )
+    else:
+        if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and txt_chatgpt_cloz not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
+            shared.message_buffer.append(
+                    {
+                        "unformatted_txt_audio": txt_audio,
+                        "unformatted_txt_chatgpt_cloz": txt_chatgpt_cloz,
+                        "question": transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio),
+                        "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
+                        "was_split": False,
+                        }
+                    )
 
     # cap the number of messages
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
