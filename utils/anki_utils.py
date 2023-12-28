@@ -165,7 +165,7 @@ async def async_parallel_status(splits, *args, **kwargs):
 
 @trace
 @Timeout(5)
-def get_card_status(txt_chatgpt_cloz, return_bool=False):
+def get_card_status(txt_chatgpt_cloz):
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
 
@@ -173,28 +173,18 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
     cloz = cloz.replace("\"", "\\\"")
 
     if not cloz.strip():
-        if return_bool:
-            return False
-        else:
-            return gr.Button("EMPTY")
+        return "EMPTY"
 
     if "#####" in cloz:  # multiple cards
-        assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = asyncio.run(async_parallel_status(splits, True))
+        vals = asyncio.run(async_parallel_status(splits))
 
         if all(vals) and all(isinstance(v, bool) for v in vals):
-            if return_bool:
-                return True
-            else:
-                return gr.Button("Added")
+            return "Added"
         else:
             s = sum([bool(b) for b in vals])
             n = len(vals)
-            if return_bool:
-                return False
-            else:
-                return gr.Button(f"MISSING {n-s}/{n}", variant="primary")
+            return f"MISSING {n-s}/{n}"
 
     else:
         cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
@@ -209,15 +199,9 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
                 query=query,
                 )
         if state:
-            if return_bool:
-                return True
-            else:
-                return gr.Button("Added")
+            return "Added"
         else:
-            if return_bool:
-                return False
-            else:
-                return gr.Button("MISSING", variant="primary")
+            return "MISSING"
 
 
 @trace
