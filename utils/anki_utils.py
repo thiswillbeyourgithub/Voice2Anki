@@ -154,8 +154,8 @@ def audio_to_anki(audio_mp3, queue):
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
 
-#@Timeout(5)
 @trace
+@Timeout(5)
 async def get_card_status(txt_chatgpt_cloz, return_bool=False):
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""

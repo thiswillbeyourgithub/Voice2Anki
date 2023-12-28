@@ -224,37 +224,42 @@ def Timeout(limit):
         def decorator(func):
             return func
         return decorator
-    # create methods like "t30"  to wrap with a 30s timeout
+
     def decorator(func):
-        def wrapper(*args, **kwargs):
-            # return func(*args, **kwargs)  # for debugging
-            result = []
-            def appender(func, *args, **kwargs):
-                result.append(func(*args, **kwargs))
-            thread = threading.Thread(
-                    target=appender,
-                    args=[func] + list(args),
-                    kwargs=kwargs,
-                    daemon=False,
-                    )
-            thread.start()
+        if asyncio.iscoroutinefunction(func):
+            async def wrapper(*args, **kwargs):
+                async with asyncio.timeout(limit):
+                    return await func(*args, **kwargs)
+        else:
+            def wrapper(*args, **kwargs):
+                # return func(*args, **kwargs)  # for debugging
+                result = []
+                def appender(func, *args, **kwargs):
+                    result.append(func(*args, **kwargs))
+                thread = threading.Thread(
+                        target=appender,
+                        args=[func] + list(args),
+                        kwargs=kwargs,
+                        daemon=False,
+                        )
+                thread.start()
 
-            # add the thread in the shared module, this way we can empty
-            # the list to cut the timeout short
-            with shared.timeout_lock:
-                shared.running_threads["timeout"].append(thread)
+                # add the thread in the shared module, this way we can empty
+                # the list to cut the timeout short
+                with shared.timeout_lock:
+                    shared.running_threads["timeout"].append(thread)
 
-            start = time.time()
-            while shared.running_threads["timeout"] and thread.is_alive():
-                time.sleep(0.1)
-                if time.time() - start > limit:
-                    raise Exception(f"Reached timeout for {func} after {limit}s")
-            if not shared.running_threads["timeout"]:
-                raise Exception(f"Thread of func {func} was killed")
+                start = time.time()
+                while shared.running_threads["timeout"] and thread.is_alive():
+                    time.sleep(0.1)
+                    if time.time() - start > limit:
+                        raise Exception(f"Reached timeout for {func} after {limit}s")
+                if not shared.running_threads["timeout"]:
+                    raise Exception(f"Thread of func {func} was killed")
 
-            if not result:  # meaning an exception occured in the function
-                raise Exception(f"No result from {func} with args {args} {kwargs}")
-            else:
-                return result[0]
+                if not result:  # meaning an exception occured in the function
+                    raise Exception(f"No result from {func} with args {args} {kwargs}")
+                else:
+                    return result[0]
         return wrapper
     return decorator
