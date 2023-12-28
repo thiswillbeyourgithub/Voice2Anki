@@ -151,15 +151,15 @@ with gr.Blocks(
                         check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
                         txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
-                with gr.Row():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
-                    flag_audio_btn = gr.Button(value="Flag audio", scale=0)
-                    force_sound_processing_btn = gr.Button(value="Sound processing", scale=0)
+                    with gr.Row():
+                        flag_audio_btn = gr.Button(value="Flag audio", scale=0)
+                        force_sound_processing_btn = gr.Button(value="Sound processing", scale=0)
 
                 # image
                 with gr.Accordion(label="Main gallery", open=True):
                     with gr.Row():
                         with gr.Column():
+                            roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                             gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                             with gr.Group():
                                 with gr.Row():
