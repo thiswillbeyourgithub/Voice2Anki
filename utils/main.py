@@ -128,7 +128,6 @@ def thread_whisp_then_llm(
         sld_buffer,
         check_gpt4,
         txt_keywords,
-        lock,
         ):
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
@@ -167,12 +166,12 @@ def thread_whisp_then_llm(
             txt_whisp_lang,
             sld_whisp_temp,
             )["text"]
-    with lock:
+    with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
     cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
-    with lock:
+    with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
 
 @trace
@@ -213,10 +212,11 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
         txt_audio = transcript["text"]
         yel(f"\nWhisper transcript: {txt_audio}")
 
-        if shared.running_threads["saving_whisper"]:
-            shared.running_threads["saving_whisper"][-1].join()
-        while shared.running_threads["saving_whisper"]:
-            shared.running_threads["saving_whisper"].pop()
+        with shared.thread_lock:
+            if shared.running_threads["saving_whisper"]:
+                shared.running_threads["saving_whisper"][-1].join()
+            while shared.running_threads["saving_whisper"]:
+                shared.running_threads["saving_whisper"].pop()
         thread = threading.Thread(
                 target=store_to_db,
                 name="saving_whisper",
@@ -237,7 +237,8 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                     "db_name": "whisper"
                     })
         thread.start()
-        shared.running_threads["saving_whisper"].append(thread)
+        with shared.thread_lock:
+            shared.running_threads["saving_whisper"].append(thread)
 
         txt_audio = txt_audio.replace(" Stop. ", "\n\n").strip()
 
@@ -515,8 +516,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     # in case recur improv is called
     if model_to_use != shared.latest_llm_used:
-        with threading.Lock():
-            shared.latest_llm_used = model_to_use
+        shared.latest_llm_used = model_to_use
 
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     pv["total_llm_cost"] += tkn_cost_dol
@@ -543,7 +543,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     # add to the shared module the infonrmation of this card creation.
     # if a card is created then this will be added to the db to
     # create LORA fine tunes later on.
-    with threading.Lock():
+    with shared.db_lock:
         shared.llm_to_db_buffer[cloz] = json.dumps(
                 {
                     "type": "anki_card",
@@ -625,7 +625,7 @@ def dirload_splitted(
     for todo_file in sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x)):  # by oldest: key=lambda x: x.stat().st_ctime)
         todo_file = str(todo_file)
         if todo_file not in shared.dirload_queue.index:
-            with threading.Lock():
+            with shared.dirload_lock:
                 shared.dirload_queue.loc[todo_file, :] = False
                 shared.dirload_queue.loc[todo_file, "temp_path"] = None
                 shared.dirload_queue.loc[todo_file, "n"] = max_n + 1
@@ -642,7 +642,6 @@ def dirload_splitted(
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
     new_threads = []
-    lock = threading.Lock()
     todo_path = shared.dirload_queue[shared.dirload_queue["moved"] == False]
     todo_path = todo_path[todo_path["loaded"] == False]
     for path in todo_path.index.tolist()[:empty_slots]:
@@ -652,7 +651,7 @@ def dirload_splitted(
         assert (path.exists() and (to_temp).exists()), "unexpected sound location"
 
         to_temp = sound_preprocessing(to_temp)
-        with threading.Lock():
+        with shared.dirload_lock:
             shared.dirload_queue.loc[str(path), "temp_path"] = str(to_temp)
             shared.dirload_queue.loc[str(path), "sound_preprocessed"] = True
 
@@ -674,14 +673,13 @@ def dirload_splitted(
                         sld_buffer,
                         check_gpt4,
                         txt_keywords,
-                        lock,
                         ),
                 )
-            with threading.Lock():
+            with shared.dirload_lock:
                 shared.dirload_queue.loc[str(path), "transcribed"] = "started"
             thread.start()
             new_threads.append(thread)
-        with threading.Lock():
+        with shared.dirload_lock:
             shared.dirload_queue.loc[str(path), "loaded"] = True
 
     whi(f"Loading {len(sounds_to_load)} sounds from splitted")
@@ -694,13 +692,15 @@ def dirload_splitted(
             whi("Waiting for first transcription to finish")
             new_threads[0].join()
             whi("Finished first transcription.")
-            shared.running_threads["transcribing_audio"].extend(new_threads[1:])
+            with shared.thread_lock:
+                shared.running_threads["transcribing_audio"].extend(new_threads[1:])
         else:
             # the sound in the first slot was not loaded by this function so
             # not waiting for the transcription
-            shared.running_threads["transcribing_audio"].extend(new_threads)
+            with shared.thread_lock:
+                shared.running_threads["transcribing_audio"].extend(new_threads)
 
-    with threading.Lock():
+    with shared.dirload_lock:
         while len(shared.dirload_queue[shared.dirload_queue["loaded"] == True]) > shared.audio_slot_nb:
             p = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
             assert shared.dirload_queue.loc[p, "moved"] is False, f"File {p} was already moved"
@@ -936,7 +936,7 @@ def wait_for_queue(q, source, t=1):
 def kill_threads():
     """the threads in timeout are stored in the shared module, if they
     get replaced by None the threads will be ignored."""
-    with threading.Lock():
+    with shared.thread_lock:
         for k in shared.running_threads:
             n = sum([t.is_alive() for t in shared.running_threads[k]])
             if n >= 1:
@@ -977,10 +977,11 @@ def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
     else:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
         del shared.llm_to_db_buffer[closest_buffer_key]
-    if shared.running_threads["saving_chatgpt"]:
-        [t.join() for t in shared.running_threads["saving_chatgpt"]]
-    while shared.running_threads["saving_chatgpt"]:
-        shared.running_threads["saving_chatgpt"].pop()
+    with shared.thread_lock:
+        if shared.running_threads["saving_chatgpt"]:
+            [t.join() for t in shared.running_threads["saving_chatgpt"]]
+        while shared.running_threads["saving_chatgpt"]:
+            shared.running_threads["saving_chatgpt"].pop()
     thread = threading.Thread(
             target=store_to_db,
             name="saving_chatgpt",
@@ -988,7 +989,8 @@ def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "dictionnary": save_dict,
                 "db_name": "llm"})
     thread.start()
-    shared.running_threads["saving_whisper"].append(thread)
+    with shared.thread_lock:
+        shared.running_threads["saving_whisper"].append(thread)
 
 
 @trace
@@ -1037,7 +1039,8 @@ def to_anki(
                 args=(gallery, txt_source_queue)
                 )
         thread.start()
-        shared.running_threads["ocr"].append(thread)
+        with shared.thread_lock:
+            shared.running_threads["ocr"].append(thread)
 
     # send audio to anki
     audio_to_anki_queue = queue.Queue()
@@ -1046,7 +1049,8 @@ def to_anki(
             args=(audio_mp3_1, audio_to_anki_queue),
             )
     thread.start()
-    shared.running_threads["audio_to_anki"].append(thread)
+    with shared.thread_lock:
+        shared.running_threads["audio_to_anki"].append(thread)
 
     # send to anki
     metadata = rtoml.dumps(
@@ -1086,7 +1090,7 @@ def to_anki(
     if txt_extra_source.strip():
         txt_source += f"<br>{txt_extra_source}"
 
-    with threading.Lock():
+    with shared.dirload_lock:
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = "started"
 
     for cl in clozes:
@@ -1113,7 +1117,7 @@ def to_anki(
     if not len(results) == len(clozes):
         gather_threads(["audio_to_anki", "ocr"])
         raise Exception(red(f"Some flashcards were not added:{','.join(errors)}"))
-    with threading.Lock():
+    with shared.dirload_lock:
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = True
 
     whi("Finished adding card.\n\n")

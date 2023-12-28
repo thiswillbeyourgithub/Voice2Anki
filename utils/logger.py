@@ -48,19 +48,19 @@ def store_to_db(dictionnary, db_name):
     """
 
     Path("databases").mkdir(exist_ok=True)
-    conn = sqlite3.connect(f"./databases/{db_name}.db")
-    cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS dictionaries
-                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      data TEXT)''')
-
     data = zlib.compress(
             json.dumps(dictionnary, ensure_ascii=False).encode(),
             level=9,  # 1: fast but large, 9 slow but small
             )
-    cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
-    conn.commit()
-    conn.close()
+    with shared.db_lock:
+        conn = sqlite3.connect(f"./databases/{db_name}.db")
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS dictionaries
+                          (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          data TEXT)''')
+        cursor.execute("INSERT INTO dictionaries (data) VALUES (?)", (data,))
+        conn.commit()
+        conn.close()
     return True
 
 
@@ -228,7 +228,7 @@ def Timeout(limit):
 
             # add the thread in the shared module, this way we can empty
             # the list to cut the timeout short
-            with threading.Lock():
+            with shared.timeout_lock:
                 shared.running_threads["timeout"].append(thread)
 
             start = time.time()

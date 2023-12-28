@@ -1,3 +1,4 @@
+from threading import Lock
 import gradio as gr
 import pandas as pd
 
@@ -15,6 +16,10 @@ class SharedModule:
     disable_timeout = None
     compact_js = None
     pv = None
+    timeout_lock = Lock()
+    dirload_lock = Lock()
+    thread_lock = Lock()
+    db_lock = Lock()
 
     llm_price = {
             "gpt-3.5-turbo-1106": (0.001, 0.002),
