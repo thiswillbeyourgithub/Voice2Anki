@@ -1024,7 +1024,7 @@ def to_anki(
         raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
     # checks clozes validity
-    clozes = txt_chatgpt_cloz.split("#####")
+    clozes = [c.strip() for c in txt_chatgpt_cloz.split("#####") if c.strip()]
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
         raise Exception(red(f"Invalid cloze: '{txt_chatgpt_cloz}'"))
 
