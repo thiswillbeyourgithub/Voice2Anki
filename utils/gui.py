@@ -330,20 +330,20 @@ with gr.Blocks(
                         inputs=[future_galleries[0][1]],
                         show_progress=False,
                         ).then(
-                            fn=shared.pv.save_gallery,
-                            inputs=[gallery],
-                            show_progress=False,
-                            ).then(
-                                    fn=load_future_galleries,
-                                    outputs=[row[1] for row in future_galleries],
+                                fn=load_future_galleries,
+                                outputs=[row[1] for row in future_galleries],
+                                ).then(
+                                    fn=lambda x: x,
+                                    inputs=[future_galleries[0][1]],
+                                    outputs=[gallery],
+                                    preprocess=False,
+                                    postprocess=False,
+                                    queue=False,
                                     ).then(
-                                        fn=lambda x: x,
-                                        inputs=[future_galleries[0][1]],
-                                        outputs=[gallery],
-                                        preprocess=False,
-                                        postprocess=False,
-                                        queue=False,
-                                        ).success(
+                                        fn=shared.pv.save_gallery,
+                                        inputs=[gallery],
+                                        show_progress=False,
+                                        ).then(
                                                 fn=get_img_source,
                                                 inputs=[gallery],
                                                 queue=False,
