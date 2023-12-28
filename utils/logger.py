@@ -1,3 +1,4 @@
+import asyncio
 import threading
 import time
 import sqlite3
@@ -191,16 +192,28 @@ def trace(func):
     and for how long"""
     if shared.disable_tracing:
         return func
-    def wrapper(*args, **kwargs):
-        purp(f"-> Entering {func}")
-        t = time.time()
-        result = func(*args, **kwargs)
-        tt = time.time() - t
-        if tt > 0.5:
-            red(f"    Exiting {func} after {tt:.1f}s")
-        else:
-            purp(f"   Exiting {func} after {tt:.1f}s")
-        return result
+    if asyncio.iscoroutinefunction(func):
+        async def wrapper(*args, **kwargs):
+            purp(f"-> Entering {func}")
+            t = time.time()
+            result = await func(*args, **kwargs)
+            tt = time.time() - t
+            if tt > 0.5:
+                red(f"    Exiting {func} after {tt:.1f}s")
+            else:
+                purp(f"   Exiting {func} after {tt:.1f}s")
+            return result
+    else:
+        def wrapper(*args, **kwargs):
+            purp(f"-> Entering {func}")
+            t = time.time()
+            result = func(*args, **kwargs)
+            tt = time.time() - t
+            if tt > 0.5:
+                red(f"    Exiting {func} after {tt:.1f}s")
+            else:
+                purp(f"   Exiting {func} after {tt:.1f}s")
+            return result
     return wrapper
 
 
