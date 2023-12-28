@@ -50,7 +50,11 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 
 stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
-# llm_cache.clear()  # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
+
+@trace
+def clear_llm_cache():
+    # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
+    llm_cache.clear()
 
 # trigger a sync on startup to test if anki is running and with ankiconnect enabled
 sync_anki()
