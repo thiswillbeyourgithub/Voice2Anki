@@ -183,14 +183,14 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
         vals = asyncio.run(async_parallel_status(splits, True))
 
+        n = len(vals)
         if all(vals) and all(isinstance(v, bool) for v in vals):
             if return_bool:
                 return True
             else:
-                return "Added"
+                return f"Added {n}/{n}"
         else:
             s = sum([bool(b) for b in vals])
-            n = len(vals)
             if return_bool:
                 return False
             else:
