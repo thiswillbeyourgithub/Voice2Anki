@@ -6,7 +6,7 @@ from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitte
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories
-from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -154,6 +154,7 @@ with gr.Blocks(
                 with gr.Row():
                     roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
                     flag_audio_btn = gr.Button(value="Flag audio", scale=0)
+                    force_sound_processing_btn = gr.Button(value="Sound processing", scale=0)
 
                 # image
                 with gr.Accordion(label="Main gallery", open=True):
@@ -394,6 +395,12 @@ with gr.Blocks(
             fn=flag_audio,
             inputs=[txt_profile, txt_audio, txt_whisp_lang, txt_whisp_prompt, txt_chatgpt_cloz, txt_chatgpt_context, gallery],
             show_progress=False,
+            )
+    # force sound preprocessing for the first audio
+    force_sound_processing_btn.click(
+            fn=force_sound_processing,
+            inputs=[audio_slots[0]],
+            outputs=[audio_slots[0]],
             )
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(

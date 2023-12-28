@@ -176,6 +176,29 @@ def sound_preprocessing(audio_mp3_path):
     whi(f"Done preprocessing {audio_mp3_path} to {new_path}")
     return new_path
 
+@trace
+def force_sound_processing(audio_mp3_path):
+    assert audio_mp3_path is not None, "Received None in force_sound_processing"
+    audio_mp3_path = format_audio_component(audio_mp3_path)
+
+    # load from file
+    waveform, sample_rate = torchaudio.load(audio_mp3_path)
+
+    waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
+            waveform,
+            sample_rate,
+            shared.force_preprocess_sox_effects,
+            )
+
+    # write to file as wav
+    sf.write(str(audio_mp3_path), waveform.numpy().T, sample_rate, format='wav')
+    temp = AudioSegment.from_wav(audio_mp3_path)
+    new_path = Path(audio_mp3_path).parent / (Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix)
+    temp.export(new_path, format="mp3")
+
+    whi(f"Done forced preprocessing {audio_mp3_path} to {new_path}")
+    return new_path
+
 
 @trace
 def format_audio_component(audio):
