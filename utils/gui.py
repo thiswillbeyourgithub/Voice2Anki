@@ -410,14 +410,14 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             queue=False,
-            ).success(
-                    fn=alfred,
-                    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
-                    outputs=[txt_chatgpt_cloz],
-                    queue=False,
-                    preprocess=False,
-                    postprocess=False,
-                    )
+            )# .success(
+             #        fn=alfred,
+             #        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+             #        outputs=[txt_chatgpt_cloz],
+             #        queue=False,
+             #        preprocess=False,
+             #        postprocess=False,
+             #        )
 
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
