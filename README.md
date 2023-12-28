@@ -14,6 +14,7 @@
 
 ## Getting started
 * clone this repo
+* Make sure you have python 3.11 (needed for asyncio.timeout)
 * Install the dependencies: `python -m pip install -r requirements.txt`
 * Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
 * `python Voice2Anki.py --browser`
