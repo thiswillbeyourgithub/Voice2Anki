@@ -1,3 +1,4 @@
+from functools import partial
 import asyncio
 import gradio as gr
 import re
@@ -152,20 +153,10 @@ def audio_to_anki(audio_mp3, queue):
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
-async def async_status(*args, **kwargs):
-    loop = asyncio.get_running_loop()
-    try:
-        return await loop.run_in_executor(None, get_card_status, *args, **kwargs)
-    except Exception as err:
-        return err
 
-async def async_parallel_status(splits, *args, **kwargs):
-    tasks = [async_status(sp, *args, **kwargs) for sp in splits]
-    return await asyncio.gather(*tasks)
-
+#@Timeout(5)
 @trace
-@Timeout(5)
-def get_card_status(txt_chatgpt_cloz, return_bool=False):
+async def get_card_status(txt_chatgpt_cloz, return_bool=False):
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
 
@@ -181,7 +172,7 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
     if "#####" in cloz:  # multiple cards
         assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = asyncio.run(async_parallel_status(splits, True))
+        vals = await asyncio.gather(*[get_card_status(sp, True) for sp in splits])
 
         n = len(vals)
         if all(vals) and all(isinstance(v, bool) for v in vals):
@@ -204,9 +195,10 @@ def get_card_status(txt_chatgpt_cloz, return_bool=False):
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
-        state = _call_anki(
-                action="findCards",
-                query=query,
+        loop = asyncio.get_event_loop()
+        state = await loop.run_in_executor(
+                None,
+                partial(_call_anki, action="findCards", query=query)
                 )
         if state:
             if return_bool:
