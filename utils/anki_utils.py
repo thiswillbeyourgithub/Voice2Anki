@@ -242,6 +242,16 @@ def mark_previous_note():
             )
 
 
+@trace
+def get_anki_tags():
+    try:
+        return _call_anki(
+                action="getTags",
+                )
+    except Exception as err:
+        return red(f"Error when getting tags: {err}'")
+
+
 # load anki profile using ankipandas just to get the media folder
 if shared.media_folder:
     db_path = Path(shared.media_folder)

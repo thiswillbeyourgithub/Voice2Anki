@@ -3,7 +3,7 @@ import gradio as gr
 
 from .profiles import get_profiles, switch_profile
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
-from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
+from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags
 from .logger import get_log
 from .memory import recur_improv, display_price, show_memories, show_message_buffer
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio, force_sound_processing
@@ -176,7 +176,7 @@ with gr.Blocks(
         with gr.Row():
             txt_deck = gr.Textbox(value=shared.pv["txt_deck"], label="Deck name", max_lines=1, placeholder="anki deck, e.g. Perso::Lessons")
             txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
-        txt_tags = gr.Textbox(value=shared.pv["txt_tags"], label="Tags", lines=2, placeholder="anki tags, e.g. science::math::geometry university_lectures::01")
+        txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
         with gr.Row():
             txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
             txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
