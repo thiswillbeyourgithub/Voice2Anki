@@ -414,22 +414,22 @@ with gr.Blocks(
             inputs=[audio_slots[0]],
             outputs=[audio_slots[0]],
             )
-    # trigger transcription when first audio stops recording
-    audio_slots[0].stop_recording(
-            fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-            outputs=[txt_audio],
-            preprocess=False,
-            postprocess=False,
-            queue=False,
-            )# .success(
-             #        fn=alfred,
-             #        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
-             #        outputs=[txt_chatgpt_cloz],
-             #        queue=False,
-             #        preprocess=False,
-             #        postprocess=False,
-             #        )
+    # # trigger transcription when first audio stops recording
+    # audio_slots[0].stop_recording(
+    #         fn=transcribe,
+    #         inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+    #         outputs=[txt_audio],
+    #         preprocess=False,
+    #         postprocess=False,
+    #         queue=False,
+    #         )# .success(
+    #          #        fn=alfred,
+    #          #        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
+    #          #        outputs=[txt_chatgpt_cloz],
+    #          #        queue=False,
+    #          #        preprocess=False,
+    #          #        postprocess=False,
+    #          #        )
 
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
