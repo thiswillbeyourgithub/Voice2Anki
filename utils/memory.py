@@ -73,6 +73,7 @@ async def async_embedder(text, client):
         return await loop.run_in_executor(executor, embedder, text, client)
 
 @trace
+@embeddings_cache.cache(ignore=["client"])
 async def async_parallel_embedder(list_text, client):
     tasks = [async_embedder(sp, client) for sp in list_text]
     return await asyncio.gather(*tasks)
