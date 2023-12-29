@@ -255,7 +255,7 @@ def get_anki_tags():
 def get_decks():
     try:
         return _call_anki(
-                action="decknames",
+                action="deckNames",
                 )
     except Exception as err:
         return [red(f"Error when getting list of anki deck: {err}'")]
