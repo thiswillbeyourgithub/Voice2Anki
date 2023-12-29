@@ -153,8 +153,8 @@ def thread_whisp_then_llm(
     if shared.latest_stt_used != modelname:
         shared.latest_stt_used = modelname
 
-    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
-    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
+    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
     if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
         raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
 
@@ -452,8 +452,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             gr.Error(mess)
             return red(mess)
 
-    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
-    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
+    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
     if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
         raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
 
@@ -764,7 +764,7 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     your voice. Then use the instructions in your voice to modify the
     output from chatgpt."""
 
-    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
     if not shared.pv["txt_openai_api_key"]:
         raise Exception(red("No API key provided for OpenAI in the settings."))
 
