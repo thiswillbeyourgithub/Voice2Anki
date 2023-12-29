@@ -69,11 +69,8 @@ def embedder(text, client):
 
 async def async_embedder(text, client):
     loop = asyncio.get_running_loop()
-    try:
-        with ThreadPoolExecutor(max_workers=100) as executor:
-            return await loop.run_in_executor(executor, embedder, text, client)
-    except Exception as err:
-        return err
+    with ThreadPoolExecutor(max_workers=100) as executor:
+        return await loop.run_in_executor(executor, embedder, text, client)
 
 @trace
 async def async_parallel_embedder(list_text, client):
