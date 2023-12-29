@@ -457,6 +457,7 @@ def get_memories_df(profile):
     memories = load_prev_prompts(profile)
     for i in range(len(memories)):
         memories[i]["n"] = i + 1
+        del memories[i]["role"]
     return pd.DataFrame(memories).reset_index().set_index("n")
 
 @trace
