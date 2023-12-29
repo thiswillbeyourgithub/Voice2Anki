@@ -47,27 +47,6 @@ default_system_prompt = {
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
 
-# embeddings using sentence transformers:
-# from sentence_transformers import SentenceTransformer
-# from sentence_transformers.util import cosine_similarity as cos_sim
-# embedding_model_name = "paraphrase-multilingual-MiniLM-L12-v2"
-# embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
-# embed_model = SentenceTransformer(embedding_model_name)
-#
-# @embeddings_cache.cache
-# def embedder(text):
-#     red("Computing embedding of 1 memory")
-#     # remove the context before the transcript as well as the last '
-#     text = text.split("Transcript: '")
-#     if not len(text) == 2:
-#         raise Exception(text)
-#     text = text[1]
-#     if not text[-1] == "'":
-#         raise Exception(text)
-#     text = text[:-1]
-#
-#     return embed_model.encode([text], show_progress_bar=False).tolist()[0]
-
 # embeddings using ada2:
 embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
