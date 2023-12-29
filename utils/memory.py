@@ -51,6 +51,7 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 # embeddings using ada2:
 embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
+async_embeddings_cache = Memory(f"cache/async_{embedding_model_name}", verbose=0)
 
 @embeddings_cache.cache(ignore=["client"])
 def embedder(text, client):
@@ -73,7 +74,7 @@ async def async_embedder(text, client):
         return await loop.run_in_executor(executor, embedder, text, client)
 
 @trace
-@embeddings_cache.cache(ignore=["client"])
+@async_embeddings_cache.cache(ignore=["client"])
 async def async_parallel_embedder(list_text, client):
     tasks = [async_embedder(sp, client) for sp in list_text]
     return await asyncio.gather(*tasks)
@@ -247,12 +248,12 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         min_sim = [1, None]
 
         # get embeddings asynchronously
-        new_prompt_vec = embedder(prompt_messages[-1]["content"], shared.openai_client)
+        new_prompt_vec = embedder(text=prompt_messages[-1]["content"], client=shared.openai_client)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
         all_embeddings = asyncio.run(async_parallel_embedder(
-            to_embed,
-            shared.openai_client))
+            list_text=to_embed,
+            client=shared.openai_client))
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
