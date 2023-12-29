@@ -71,11 +71,10 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
 @embeddings_cache.cache
-def embedder(text, format):
+def embedder(text):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
     assert "Transcript: '" not in text
-    assert format in ["content", "answer"]
 
     # try to bias the embedder to focus on the structure
     text = f"Pay attention to the structure of  this text: '{text}'"
@@ -259,11 +258,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         whi("Computing cosine similarity")
         max_sim = [0, None]
         min_sim = [1, None]
-        new_prompt_vec = embedder(prompt_messages[-1]["content"], format="content")
+        new_prompt_vec = embedder(prompt_messages[-1]["content"])
         for i, pr in enumerate(candidate_prompts):
 
-            embedding = embedder(pr["content"], format="answer")
-            embedding2 = embedder(pr["answer"], format="answer")
+            embedding = embedder(pr["content"])
+            embedding2 = embedder(pr["answer"])
             sim = float(cosine_similarity(new_prompt_vec, embedding))
             sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5
