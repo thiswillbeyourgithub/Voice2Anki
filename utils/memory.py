@@ -11,7 +11,7 @@ import hashlib
 from joblib import Memory
 import tiktoken
 import openai
-from openai.embeddings_utils import cosine_similarity as cos_sim
+from sklearn.metrics.pairwise import cosine_similarity
 
 from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
@@ -264,8 +264,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
             embedding = embedder(pr["content"], format="answer")
             embedding2 = embedder(pr["answer"], format="answer")
-            sim = float(cos_sim(new_prompt_vec, embedding))
-            sim2 = float(cos_sim(new_prompt_vec, embedding2))
+            sim = float(cosine_similarity(new_prompt_vec, embedding))
+            sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5
             w2 = 1
             sim = (sim * 1 + sim2 * w2) / (w1 + w2)
