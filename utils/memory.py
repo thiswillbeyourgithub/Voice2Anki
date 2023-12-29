@@ -458,7 +458,7 @@ def show_memories(profile):
         for k, v in memory.items():
             if k in ["role", "hash"]:
                 continue
-            output[-1] += f"{k.upper()}: {indent(v, '        ').strip()}\n"
+            output[-1] += f"{k.upper()}: {indent(str(v), '        ').strip()}\n"
         output.append("")
     return "\n\n".join(output[:-1])
 
