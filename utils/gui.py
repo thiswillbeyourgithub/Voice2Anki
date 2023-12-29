@@ -618,6 +618,9 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     queue=False,
+                    ).then(
+                        lambda: None,
+                        outputs=[txt_chatgpt_cloz],
 #                    ).success(
 #                        fn=alfred,
 #                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
