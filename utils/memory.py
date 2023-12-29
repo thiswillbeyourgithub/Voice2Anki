@@ -70,8 +70,9 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 # embeddings using ada2:
 embedding_model_name = "text-embedding-ada-002"
 embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
-@embeddings_cache.cache
-def embedder(text):
+
+@embeddings_cache.cache(ignore=["client"])
+def embedder(text, client):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
     assert "Transcript: '" not in text
@@ -80,13 +81,13 @@ def embedder(text):
     text = f"Pay attention to the structure of  this text: '{text}'"
 
     try:
-        vec = openai.embeddings.create(
+        vec = client.embeddings.create(
                 model=embedding_model_name,
                 input=text,
                 encoding_format="float")
     except:
         time.sleep(1)
-        vec = openai.embeddings.create(
+        vec = client.embeddings.create(
                 model=embedding_model_name,
                 input=text,
                 encoding_format="float")
@@ -164,7 +165,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     whi("Filtering prompts")
     if not shared.pv["txt_openai_api_key"]:
         raise Exception(red("No API key provided for OpenAI in the settings."))
-    openai.api_key = shared.pv["txt_openai_api_key"].strip()
+    client = openai.OpenAI(shared.pv["txt_openai_api_key"].strip())
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
@@ -258,11 +259,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         whi("Computing cosine similarity")
         max_sim = [0, None]
         min_sim = [1, None]
-        new_prompt_vec = embedder(prompt_messages[-1]["content"])
+        new_prompt_vec = embedder(prompt_messages[-1]["content"], client)
         for i, pr in enumerate(candidate_prompts):
 
-            embedding = embedder(pr["content"])
-            embedding2 = embedder(pr["answer"])
+            embedding = embedder(pr["content"], client)
+            embedding2 = embedder(pr["answer"], client)
             sim = float(cosine_similarity(new_prompt_vec, embedding))
             sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5

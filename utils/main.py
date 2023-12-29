@@ -90,7 +90,7 @@ def whisper_cached(
     of the content is used instead."""
     red(f"Calling whisper because not in cache: {audio_path}")
     assert shared.pv["txt_openai_api_key"], f"Missing openai key, needed for whisper"
-    openai.api_key = shared.pv["txt_openai_api_key"].strip()
+    client = openai.OpenAI(shared.pv["txt_openai_api_key"].strip())
     assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
     try:
         cnt = 0
@@ -98,7 +98,7 @@ def whisper_cached(
             try:
                 cnt += 1
                 with open(audio_path, "rb") as audio_file:
-                    transcript = openai.Audio.transcribe(
+                    transcript = client.audio.transcriptions.create(
                         model=modelname,
                         file=audio_file,
                         prompt=txt_whisp_prompt,
