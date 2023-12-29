@@ -474,6 +474,8 @@ def load_prev_prompts(profile):
 
 def display_price(sld_max_tkn, llm_choice):
     price = shared.llm_price[llm_choice]
+    if isinstance(price, str):
+        return f"{${price} per second"
     price_adj = price[0] * 0.9 + price[1] * 0.1
     price_per_request = price_adj * sld_max_tkn / 1000
     price_per_dol = round(1 / price_per_request, 0)

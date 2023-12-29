@@ -522,7 +522,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if llm_choice != shared.latest_llm_used:
         shared.latest_llm_used = llm_choice
 
-    tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
+    if isinstance(model_price, list):
+        tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
+    else:
+        assert isinstance(model_price, str)
+        tkn_cost_dol = model_price * response._response_ms / 1000
     pv["total_llm_cost"] += tkn_cost_dol
 
     cloz = response["choices"][0]["message"]["content"]
@@ -553,6 +557,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "type": "anki_card",
                     "timestamp": time.time(),
                     "token_cost": tkn_cost,
+                    "dollar_cost": tkn_cost_dol
                     "temperature": temperature,
                     "LLM_context": txt_chatgpt_context,
                     "Voice2Anki_profile": pv.profile_name,
