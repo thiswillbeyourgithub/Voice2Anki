@@ -9,7 +9,7 @@
 * **Adapts to you** If a flashcard was not exactly like you wanted, correct it (manually or using your voice) then save it for the future and the LLM will use it for the next cards. You can save many examples like this as embeddings and keywords are used to find the most relevant example for your use case at each prompt.
 * You can specify anki tags, marks, deck etc.
 * If you supply one or several images, it will be OCR'ed then saved in the flashcard in a source field. A special algorithm is used to keep the formatting of the image in the OCR step.
-* Supports ChatGPT, GPT-4, and many more support can be added.
+* Supports ChatGPT, GPT-4, replicate models thanks to [litellm](https://docs.litellm.ai/), and many more support can be added.
 * Supports multiple profile. Making it handy for various use.
 
 ## Getting started
