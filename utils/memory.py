@@ -258,31 +258,23 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
         assert len(embeddings_contents) == len(embeddings_answers)
-
-        for i, pr in enumerate(candidate_prompts):
-            embedding = embeddings_contents[i]
-            embedding2 = embeddings_answers[i]
-            sim1 = float(cosine_similarity(new_prompt_vec, embedding))
-            sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
-            w1 = 5
-            w2 = 1
-            sim = (sim1 * w1 + sim2 * w2) / (w1 + w2)
-            if sim > max_sim[0]:
-                max_sim[0] = sim
-                max_sim[1] = pr["content"]
-            if sim < min_sim[0]:
-                min_sim[0] = sim
-                min_sim[1] = pr["content"]
-            candidate_prompts[i]["content_sim"] = sim
-            distances.append(sim)
+        sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
+        sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
+        w1, w2 = 5, 1
+        sim_combined = ((sim_content * w1 + sim_answer * w2) / (w1 + w2)).squeeze()
+        max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
+        min_sim = [sim_combined.min(), candidate_prompts[sim_combined.argmin()]["content"]]
+        distances = list(sim_combined).copy()
 
         whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
         whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
-        assert len(candidate_prompts) == len(distances), "Unexpected list length"
 
-        # scale the distances
-        for i, pr in enumerate(candidate_prompts):
-            candidate_prompts[i]["content_sim"] = (pr["content_sim"] - min_sim[0]) / (max_sim[0] - min_sim[0])
+        # scaling
+        sim_combined -= sim_combined.min()
+        sim_combined /= sim_combined.max()
+        for i in range(len(candidate_prompts)):
+            candidate_prompts[i]["content_sim"] = float(sim_combined[i].squeeze())
+        assert len(candidate_prompts) == len(distances), "Unexpected list length"
 
     else:
         raise ValueError(shared.memory_metric)
