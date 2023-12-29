@@ -164,8 +164,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     number of tokens for model"""
     whi("Filtering prompts")
     if not shared.pv["txt_openai_api_key"]:
-        gr.Error("No API key provided for OpenAI in the settings.")
-        raise Exception("No API key provided for OpenAI in the settings.")
+        raise Exception(red("No API key provided for OpenAI in the settings."))
     openai.api_key = shared.pv["txt_openai_api_key"].strip()
 
     if temperature != 0:
