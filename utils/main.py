@@ -1,3 +1,6 @@
+import os
+import litellm
+import openai
 import asyncio
 import cv2
 import pickle
@@ -17,8 +20,6 @@ from textwrap import dedent, indent
 import rtoml
 import time
 from datetime import datetime
-import openai
-from openai.error import RateLimitError
 from pathlib import Path
 
 from .anki_utils import add_to_anki, audio_to_anki, sync_anki
@@ -27,8 +28,6 @@ from .logger import red, whi, yel, store_to_db, trace, Timeout
 from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
-
-user_identifier = str(uuid.uuid4())
 
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
@@ -111,7 +110,7 @@ def whisper_cached(
                             raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
                 return transcript
-            except RateLimitError as err:
+            except openai.RateLimitError as err:
                 if cnt >= 5:
                     raise Exception(red(f"Cached whisper: RateLimitError >5: '{err}'"))
                 else:
@@ -151,10 +150,11 @@ def thread_whisp_then_llm(
     audio_mp3 = format_audio_component(audio_mp3)
     if shared.latest_stt_used != modelname:
         shared.latest_stt_used = modelname
-    if not shared.pv["txt_openai_api_key"]:
-        gr.Error("No API key provided for OpenAI in the settings.")
-        raise Exception("No API key provided for OpenAI in the settings.")
-    openai.api_key = shared.pv["txt_openai_api_key"].strip()
+
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
+    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
+    if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
+        raise Exception(red("No API key provided for either OpenAI or replicate in the settings.")
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -236,7 +236,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                         "Voice2Anki_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript,
-                        "model_name": f"OpenAI {modelname}",
+                        "model_name": modelname,
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "Voice2Anki_version": shared.VERSION,
                         },
@@ -449,10 +449,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         else:
             gr.Error(mess)
             return red(mess)
-    if not shared.pv["txt_openai_api_key"]:
-        gr.Error("No API key provided for OpenAI in the settings.")
-        raise Exception("No API key provided for OpenAI in the settings.")
-    openai.api_key = shared.pv["txt_openai_api_key"].strip()
+
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
+    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
+    if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
+        raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
 
     # automatically split repeated newlines as several distinct cards
     txt_audio = txt_audio.strip()
@@ -499,14 +500,13 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         try:
             whi("Asking ChatGPT")
             cnt += 1
-            response = openai.ChatCompletion.create(
+            response = litellm.completion(
                     model=llm_choice,
                     messages=formatted_messages,
                     temperature=temperature,
-                    user=user_identifier,
                     )
             break
-        except RateLimitError as err:
+        except (litellm.RateLimitError, openai.RateLimitError) as err:
             if cnt >= 2:
                 raise Exception(red("ChatGPT: too many retries."))
             red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
@@ -762,6 +762,13 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     your voice. Then use the instructions in your voice to modify the
     output from chatgpt."""
 
+    os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
+    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
+    if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
+        red("No API key provided for either OpenAI or replicate in the settings.")
+        raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
+
+
     assert (audio is None and audio_txt) or (audio is not None and audio_txt is None), f"Can't give both audio and text to AudioEdit"
     if not audio_txt:
         red("Transcribing audio for audio_edit.")
@@ -881,11 +888,10 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
 
     whi("Editing via ChatGPT:")
     whi(prompt)
-    response = openai.ChatCompletion.create(
+    response = litellm.completion(
             model=model_to_use,
             messages=messages,
             temperature=0,
-            user=user_identifier,
             )
 
     input_tkn_cost = response["usage"]["prompt_tokens"]
