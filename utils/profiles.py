@@ -29,6 +29,7 @@ profile_keys = {
         "sld_pick_weight": {"default": 1},
         "txt_extra_source": {},
         "txt_openai_api_key": {},
+        "txt_replicate_api_key": {},
         "gallery": {},
         "txt_deck": {},
         "txt_tags": {},
