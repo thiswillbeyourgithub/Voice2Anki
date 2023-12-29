@@ -246,14 +246,13 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         min_sim = [1, None]
 
         # get embeddings asynchronously
-        to_embed = [prompt_messages[-1]["content"]]
-        to_embed += [pr["content"] for pr in candidate_prompts]
+        new_prompt_vec = embedder(prompt_messages[-1]["content"], shared.openai_client)
+        to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
         all_embeddings = asyncio.run(async_parallel_embedder(
             to_embed,
             shared.openai_client))
-        assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
-        new_prompt_vec = all_embeddings.pop(0)
+        assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
         assert len(embeddings_contents) == len(embeddings_answers)
