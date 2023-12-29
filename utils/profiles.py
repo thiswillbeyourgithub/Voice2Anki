@@ -56,7 +56,7 @@ class ValueStorage:
         if profile == "latest":
             try:
                 with open(str(profile_path / "latest_profile.txt"), "r") as f:
-                    profile = f.read()
+                    profile = f.read().strip()
             except Exception as err:
                 red(f"Error when loading profile '{profile}': '{err}'")
                 profile = "default"
