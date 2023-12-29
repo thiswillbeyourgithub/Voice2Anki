@@ -22,7 +22,7 @@ def start_voice2formattedtext(
         media_folder=None,
         memory_metric="embeddings",
         disable_tracing=False,
-        disable_timeout=False,
+        disable_timeout=True,
         compact_js=True,
         port=7860,
         *args,
@@ -57,7 +57,7 @@ def start_voice2formattedtext(
     disable_tracing: bool, default False
         if True, disables the decorator that indicates which function were
         called
-    disable_timeout: bool, default False
+    disable_timeout: bool, default True
         if True, disables the decorator that creates a thread used for
         timeout of long functions
     compact_js: bool, default True
