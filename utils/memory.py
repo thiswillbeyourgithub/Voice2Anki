@@ -60,17 +60,10 @@ def embedder(text, client):
     # try to bias the embedder to focus on the structure
     text = f"Pay attention to the structure of  this text: '{text}'"
 
-    try:
-        vec = client.embeddings.create(
-                model=embedding_model_name,
-                input=text,
-                encoding_format="float")
-    except:
-        time.sleep(1)
-        vec = client.embeddings.create(
-                model=embedding_model_name,
-                input=text,
-                encoding_format="float")
+    vec = client.embeddings.create(
+            model=embedding_model_name,
+            input=text,
+            encoding_format="float")
     return np.array(vec.data[0].embedding).reshape(1, -1)
 
 async def async_embedder(text, client):
