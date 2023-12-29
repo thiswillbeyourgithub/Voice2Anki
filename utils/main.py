@@ -106,7 +106,7 @@ def whisper_cached(
                     if sld_whisp_temp == 0:
                         temps = [seg["temperature"] for seg in transcript["segments"]]
                         if sum(temps) / len(temps) == 1:
-                            raise Exception(f"Whisper increased temperature to maximum, probably because no words could be heard.")
+                            raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
                 return transcript
             except RateLimitError as err:
@@ -264,12 +264,12 @@ def flag_audio(
     """copy audio in slot #1 to the user_directory/flagged folder"""
     # move audio file
     if not (shared.dirload_queue["loaded"] == True).any():
-        raise Exception("No loaded files in shared.dirload_queue")
+        raise Exception(red("No loaded files in shared.dirload_queue"))
     aud = Path(shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name)
     assert aud.exists(), f"File not found: {aud}"
     new_filename = f"user_directory/flagged/{aud.name}"
     if Path(new_filename).exists():
-        raise Exception(f"Audio you're trying to flag already exists: {new_filename}")
+        raise Exception(red(f"Audio you're trying to flag already exists: {new_filename}"))
     shutil.copy2(aud, new_filename)
     red(f"Flagged {aud} to {new_filename}")
 
