@@ -1,4 +1,5 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 import gradio as gr
 import re
 from tqdm import tqdm
@@ -69,7 +70,8 @@ def embedder(text, client):
 async def async_embedder(text, client):
     loop = asyncio.get_running_loop()
     try:
-        return await loop.run_in_executor(None, embedder, text, client)
+        with ThreadPoolExecutor(max_workers=100) as executor:
+            return await loop.run_in_executor(executor, embedder, text, client)
     except Exception as err:
         return err
 
