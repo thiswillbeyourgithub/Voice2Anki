@@ -546,7 +546,10 @@ with gr.Blocks(
     txt_profile.submit(
             fn=switch_profile,
             inputs=[txt_profile],
-            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile])
+            outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile]
+            ).then(
+                    fn=shared.reset,
+                    )
 
     # load image then OCR it then save it to profile
     paste_image_event = img_btn.click(
