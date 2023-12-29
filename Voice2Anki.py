@@ -13,6 +13,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 def start_voice2formattedtext(
         print_db_then_exit=False,
+        nb_audio_slots=5,
         share=False,
         open_browser=False,
         debug=False,
@@ -35,6 +36,8 @@ def start_voice2formattedtext(
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
         Example value: "anki_whisper.db"
+    nb_audio_slots: int, default 5
+        Number of audio slot
     share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
@@ -107,6 +110,7 @@ def start_voice2formattedtext(
     else:
         server = None
 
+    shared.audio_slot_nb = nb_audio_slots
     shared.memory_metric = memory_metric
     shared.media_folder = media_folder
     shared.debug = debug
