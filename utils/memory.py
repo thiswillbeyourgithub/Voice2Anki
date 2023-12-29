@@ -7,7 +7,7 @@ import numpy as np
 import random
 import time
 from pathlib import Path
-from textwrap import dedent
+from textwrap import dedent, indent
 import json
 import hashlib
 from joblib import Memory
@@ -456,7 +456,9 @@ def show_memories(profile):
     output = [""]
     for memory in memories:
         for k, v in memory.items():
-            output[-1] += f"{k.upper()}: {v}\n"
+            if k in ["role", "hash"]:
+                continue
+            output[-1] += f"{k.upper()}: {indent(v, '        ').strip()}\n"
         output.append("")
     return "\n\n".join(output[:-1])
 
