@@ -107,7 +107,7 @@ def whisper_cached(
                         response_format="verbose_json",
                         )
                     if sld_whisp_temp == 0:
-                        temps = [seg["temperature"] for seg in transcript["segments"]]
+                        temps = [seg["temperature"] for seg in transcript.segments]
                         if sum(temps) / len(temps) == 1:
                             raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
@@ -237,7 +237,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                         "whisper_temperature": sld_whisp_temp,
                         "Voice2Anki_profile": pv.profile_name,
                         "transcribed_input": txt_audio,
-                        "full_whisper_output": transcript,
+                        "full_whisper_output": transcript.json(),
                         "model_name": modelname,
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "Voice2Anki_version": shared.VERSION,
@@ -562,6 +562,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "LLM_context": txt_chatgpt_context,
                     "Voice2Anki_profile": pv.profile_name,
                     "transcribed_input": txt_audio,
+                    "llm_output": response.json(),
                     "model_name": llm_choice,
                     "last_message_from_conversation": formatted_messages[-1],
                     "nb_of_message_in_conversation": len(formatted_messages),
