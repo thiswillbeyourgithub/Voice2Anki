@@ -156,7 +156,7 @@ def thread_whisp_then_llm(
     os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
     os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
     if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
-        raise Exception(red("No API key provided for either OpenAI or replicate in the settings.")
+        raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
