@@ -262,11 +262,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         for i, pr in enumerate(candidate_prompts):
             embedding = embeddings_contents[i]
             embedding2 = embeddings_answers[i]
-            sim = float(cosine_similarity(new_prompt_vec, embedding))
+            sim1 = float(cosine_similarity(new_prompt_vec, embedding))
             sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5
             w2 = 1
-            sim = (sim * 1 + sim2 * w2) / (w1 + w2)
+            sim = (sim1 * 1 + sim2 * w2) / (w1 + w2)
             if sim > max_sim[0]:
                 max_sim[0] = sim
                 max_sim[1] = pr["content"]
