@@ -457,3 +457,12 @@ def show_memories(profile):
             output[-1] += f"{k.upper()}: {v}\n"
         output.append("")
     return "\n\n".join(output[:-1])
+
+def show_message_buffer():
+    buffer = shared.message_buffer
+    output = ["[1]\n"]
+    for i, buf in enumerate(buffer[::-1]):
+        for k, v in buf.items():
+            output[-1] += f"{k.upper()}: {v}\n"
+        output.append(f"[{i+1}]\n")
+    return "\n\n".join(output[:-1])

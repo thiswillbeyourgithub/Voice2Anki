@@ -5,7 +5,7 @@ from .profiles import get_profiles, switch_profile
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note
 from .logger import get_log
-from .memory import recur_improv, display_price, show_memories
+from .memory import recur_improv, display_price, show_memories, show_message_buffer
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
 
@@ -206,6 +206,15 @@ with gr.Blocks(
         txt_memories = gr.Textbox(
                 value="",
                 label="Saved memories",
+                lines=1000,
+                max_lines=1000,
+                interactive=False,
+                placeholder="this string should never appear")
+
+    with gr.Tab(label="Message buffer") as tab_buffer:
+        txt_buffer = gr.Textbox(
+                value="",
+                label="Message buffer",
                 lines=1000,
                 max_lines=1000,
                 interactive=False,
@@ -435,13 +444,21 @@ with gr.Blocks(
     tab_logging.select(fn=get_log, outputs=[output_elem])
     logging_reload.click(fn=get_log, outputs=[output_elem])
 
-    # load memories only if clickes
+    # load memories only if clicked
     tab_memories.select(
             fn=show_memories,
             inputs=[txt_profile],
             outputs=[txt_memories],
             show_progress=False,
             )
+
+    # load message buffer only if clicked
+    tab_buffer.select(
+            fn=show_message_buffer,
+            outputs=[txt_buffer],
+            show_progress=False,
+            )
+
 
     # mark the previous card
     mark_previous.click(
