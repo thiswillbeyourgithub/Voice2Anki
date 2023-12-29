@@ -200,7 +200,7 @@ def force_sound_processing(audio_mp3_path):
     return new_path
 
 
-@trace
+# @trace
 def format_audio_component(audio):
     """to make the whole UI faster and avoid sending multiple slightly
     differently processed audio to whisper: preprocessing and postprocessing
