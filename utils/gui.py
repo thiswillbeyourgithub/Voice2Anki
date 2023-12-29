@@ -202,23 +202,24 @@ with gr.Blocks(
             logging_reload = gr.Button(value="Refresh")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
-    with gr.Tab(label="Memories") as tab_memories:
-        txt_memories = gr.Textbox(
-                value="",
-                label="Saved memories",
-                lines=1000,
-                max_lines=1000,
-                interactive=False,
-                placeholder="this string should never appear")
+    with gr.Tab(label="Memories & Buffer"):
+        with gr.Tab(label="Memories") as tab_memories:
+            txt_memories = gr.Textbox(
+                    value="",
+                    label="Saved memories",
+                    lines=1000,
+                    max_lines=1000,
+                    interactive=False,
+                    placeholder="this string should never appear")
 
-    with gr.Tab(label="Message buffer") as tab_buffer:
-        txt_buffer = gr.Textbox(
-                value="",
-                label="Message buffer",
-                lines=1000,
-                max_lines=1000,
-                interactive=False,
-                placeholder="this string should never appear")
+        with gr.Tab(label="Message buffer") as tab_buffer:
+            txt_buffer = gr.Textbox(
+                    value="",
+                    label="Message buffer",
+                    lines=1000,
+                    max_lines=1000,
+                    interactive=False,
+                    placeholder="this string should never appear")
 
     with gr.Tab(label="Dirload Queue") as tab_dirload_queue:
         queue_df = gr.Dataframe(
