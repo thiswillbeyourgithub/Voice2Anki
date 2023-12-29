@@ -165,7 +165,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     whi("Filtering prompts")
     if not shared.pv["txt_openai_api_key"]:
         raise Exception(red("No API key provided for OpenAI in the settings."))
-    client = openai.OpenAI(shared.pv["txt_openai_api_key"].strip())
+    client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
