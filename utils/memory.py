@@ -349,7 +349,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         if exit_while:
             break
 
-    red(f"Tokens of the kept prompts: {tkns} (of all prompts: {all_tkns} tokens)")
+    red(f"Tokens of the kept prompts after {cnt} iterations: {tkns} (of all prompts: {all_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
     output_pr = sorted(output_pr, key=lambda x: x["pick_score"])
