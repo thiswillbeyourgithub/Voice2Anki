@@ -98,11 +98,17 @@ class ValueStorage:
         if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
             return False
         if isinstance(a, list):
+            if not isinstance(b, list):
+                return False
+            if len(a) != len(b):
+                return False
             for i in range(len(a)):
                 if not self.__check_equality(a[i], b[i]):
                     return False
             return True
         if isinstance(a, dict):
+            if not isinstance(b, dict):
+                return False
             for k in b:
                 if k not in a:
                     return False
