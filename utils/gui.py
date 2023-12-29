@@ -149,8 +149,8 @@ with gr.Blocks(
                                 sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
 
                     with gr.Row():
-                        check_gpt4 = gr.Checkbox(value=shared.pv["check_gpt4"], interactive=True, label="Use GPT4?", show_label=True, scale=0)
-                        txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["check_gpt4"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
+                        llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False, info="TODO test")
+                        txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
                     with gr.Row():
                         flag_audio_btn = gr.Button(value="Flag audio")
@@ -423,7 +423,7 @@ with gr.Blocks(
             queue=False,
             )# .success(
              #        fn=alfred,
-             #        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+             #        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
              #        outputs=[txt_chatgpt_cloz],
              #        queue=False,
              #        preprocess=False,
@@ -485,7 +485,7 @@ with gr.Blocks(
     # display pricing then save values
     sld_max_tkn.change(
             fn=display_price,
-            inputs=[sld_max_tkn, check_gpt4],
+            inputs=[sld_max_tkn, llm_choice],
             outputs=[txt_price],
             show_progress=False,
             ).then(
@@ -493,14 +493,14 @@ with gr.Blocks(
                     inputs=[sld_max_tkn],
                     show_progress=False,
                     )
-    check_gpt4.change(
+    llm_choice.change(
             fn=display_price,
-            inputs=[sld_max_tkn, check_gpt4],
+            inputs=[sld_max_tkn, llm_choice],
             outputs=[txt_price],
             show_progress=False,
             ).success(
-                    fn=shared.pv.save_check_gpt4,
-                    inputs=[check_gpt4],
+                    fn=shared.pv.save_llm_choice,
+                    inputs=[llm_choice],
                     show_progress=False,
                     )
 
@@ -601,7 +601,7 @@ with gr.Blocks(
                     queue=False,
 #                    ).success(
 #                        fn=alfred,
-#                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+#                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
 #                        outputs=[txt_chatgpt_cloz],
 #                        queue=False,
 #                        preprocess=False,
@@ -619,7 +619,7 @@ with gr.Blocks(
                                 sld_max_tkn,
                                 sld_temp,
                                 sld_buffer,
-                                check_gpt4,
+                                llm_choice,
                                 txt_keywords,
                                 ],
                             outputs=[audio_slots[-1]],
@@ -657,7 +657,7 @@ with gr.Blocks(
                     queue=False,
                     ).success(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
@@ -698,7 +698,7 @@ with gr.Blocks(
                                                 sld_max_tkn,
                                                 sld_temp,
                                                 sld_buffer,
-                                                check_gpt4,
+                                                llm_choice,
                                                 txt_keywords,
                                                 ],
                                             outputs=[audio_slots[-1]],
@@ -740,7 +740,7 @@ with gr.Blocks(
                 sld_max_tkn,
                 sld_temp,
                 sld_buffer,
-                check_gpt4,
+                llm_choice,
                 txt_keywords,
                 ] + audio_slots,
             outputs=audio_slots,
@@ -755,7 +755,7 @@ with gr.Blocks(
                     queue=False,
                     ).success(
                         fn=alfred,
-                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
                         outputs=[txt_chatgpt_cloz],
                         queue=False,
                         preprocess=False,
@@ -787,7 +787,7 @@ with gr.Blocks(
     # send to chatgpt
     chatgpt_btn.click(
             fn=alfred,
-            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
             outputs=[txt_chatgpt_cloz],
             queue=False,
             preprocess=False,
@@ -834,7 +834,7 @@ with gr.Blocks(
             queue=False,
             ).success(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
@@ -871,7 +871,7 @@ with gr.Blocks(
             queue=False,
             ).success(
                 fn=alfred,
-                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, check_gpt4, txt_keywords],
+                inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
@@ -907,7 +907,7 @@ with gr.Blocks(
                 txt_chatgpt_cloz,
                 txt_chatgpt_context,
                 sld_improve,
-                check_gpt4,
+                llm_choice,
                 ],
             preprocess=False,
             postprocess=False,

@@ -130,7 +130,7 @@ def thread_whisp_then_llm(
         max_token,
         temperature,
         sld_buffer,
-        check_gpt4,
+        llm_choice,
         txt_keywords,
         ):
     """run whisper on the audio and return nothing. This is used to cache in
@@ -174,7 +174,7 @@ def thread_whisp_then_llm(
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
-    cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=True)
+    cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=True)
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
 
@@ -302,7 +302,7 @@ def flag_audio(
 
 
 @trace
-def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode):
+def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode):
     """used to prepare the prompts for alfred call. This is a distinct
     function to make it callable by the cached function too."""
     # don't print when using cache
@@ -403,7 +403,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
+        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode)
 
     assert tkns <= 15700, f"Too many tokens: {tkns}"
 
@@ -431,7 +431,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @trace
 @Timeout(180)
 @llm_cache.cache(ignore=["cache_mode", "sld_buffer"])
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode=False):
+def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
@@ -470,11 +470,11 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             gr.Error(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
             txt_audio = splits[0]
         else:
-            answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode))
+            answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode))
             assert len(answers) == len(splits), "Unexpected length"
             return "\n#####\n".join(answers).strip()
 
-    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, check_gpt4, txt_keywords, cache_mode)
+    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
@@ -489,12 +489,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         dupli = [dp for dp in contents if contents.count(dp) > 1]
         raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}")
 
-    if not check_gpt4:
-        model_to_use = "gpt-3.5-turbo-1106"
-    else:
-        model_to_use = "gpt-4-1106-preview"
-    model_price = shared.llm_price[model_to_use]
-    whi(f"Will use model {model_to_use}")
+    model_price = shared.llm_price[llm_choice]
+    whi(f"Will use model {llm_choice}")
 
     cnt = 0
     while True:
@@ -502,7 +498,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             whi("Asking ChatGPT")
             cnt += 1
             response = openai.ChatCompletion.create(
-                    model=model_to_use,
+                    model=llm_choice,
                     messages=formatted_messages,
                     temperature=temperature,
                     user=user_identifier,
@@ -519,8 +515,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     tkn_cost = [input_tkn_cost, output_tkn_cost]
 
     # in case recur improv is called
-    if model_to_use != shared.latest_llm_used:
-        shared.latest_llm_used = model_to_use
+    if llm_choice != shared.latest_llm_used:
+        shared.latest_llm_used = llm_choice
 
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     pv["total_llm_cost"] += tkn_cost_dol
@@ -557,7 +553,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "LLM_context": txt_chatgpt_context,
                     "Voice2Anki_profile": pv.profile_name,
                     "transcribed_input": txt_audio,
-                    "model_name": model_to_use,
+                    "model_name": llm_choice,
                     "last_message_from_conversation": formatted_messages[-1],
                     "nb_of_message_in_conversation": len(formatted_messages),
                     "system_prompt": default_system_prompt["content"],
@@ -584,7 +580,7 @@ def dirload_splitted(
         max_token,
         temperature,
         sld_buffer,
-        check_gpt4,
+        llm_choice,
         txt_keywords,
 
         *audios,
@@ -675,7 +671,7 @@ def dirload_splitted(
                         max_token,
                         temperature,
                         sld_buffer,
-                        check_gpt4,
+                        llm_choice,
                         txt_keywords,
                         ),
                 )
@@ -735,7 +731,7 @@ def dirload_splitted_last(
         max_token,
         temperature,
         sld_buffer,
-        check_gpt4,
+        llm_choice,
         txt_keywords,
         ):
     """wrapper for dirload_splitted to only load the last slot. This is faster
@@ -752,7 +748,7 @@ def dirload_splitted_last(
             max_token,
             temperature,
             sld_buffer,
-            check_gpt4,
+            llm_choice,
             txt_keywords,
 
             *audios,

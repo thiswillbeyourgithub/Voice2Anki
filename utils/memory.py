@@ -379,7 +379,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
 
 @trace
-def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, check_gpt4):
+def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, llm_choice):
     whi("Recursively improving")
     if not txt_audio:
         gr.Error(red("No audio transcripts found."))
@@ -448,11 +448,8 @@ def load_prev_prompts(profile):
     return prev_prompts
 
 
-def display_price(sld_max_tkn, check_gpt4):
-    if check_gpt4:
-        price = shared.llm_price["gpt-4-1106-preview"]
-    else:
-        price = shared.llm_price["gpt-3.5-turbo-1106"]
+def display_price(sld_max_tkn, llm_choice):
+    price = shared.llm_price[llm_choice]
     price_adj = price[0] * 0.9 + price[1] * 0.1
     price_per_request = price_adj * sld_max_tkn / 1000
     price_per_dol = round(1 / price_per_request, 0)

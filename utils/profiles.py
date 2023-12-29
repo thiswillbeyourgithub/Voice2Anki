@@ -19,7 +19,7 @@ profile_keys = {
         "txt_whisp_prompt": {},
         "total_llm_cost": {"default": 0, "type": float},
         "dirload_check": {"default": False},
-        "check_gpt4": {"default": True},
+        "llm_choice": {"default": "gpt-4-1106-preview"},
         "sld_whisp_temp": {"default": 0, "type": float},
         "message_buffer": {"default": [], "type": list},
         "txt_keywords": {"default": "", "type": str},
