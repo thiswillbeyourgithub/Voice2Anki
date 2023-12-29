@@ -302,7 +302,7 @@ def flag_audio(
 
 
 @trace
-def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode):
+def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, cache_mode):
     """used to prepare the prompts for alfred call. This is a distinct
     function to make it callable by the cached function too."""
     # don't print when using cache
@@ -403,7 +403,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode)
+        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords, cache_mode)
 
     assert tkns <= 15700, f"Too many tokens: {tkns}"
 
@@ -474,7 +474,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             assert len(answers) == len(splits), "Unexpected length"
             return "\n#####\n".join(answers).strip()
 
-    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode)
+    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, cache_mode)
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
