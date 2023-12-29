@@ -1097,7 +1097,7 @@ def to_anki(
         txt_source += audio_html
 
     # anki tags
-    new_tags = txt_tags.split(" ") + [f"WhisperToAnki::{today}"]
+    new_tags = txt_tags + [f"WhisperToAnki::{today}"]
     if check_marked:
         new_tags += ["marked"]
     if "<img" not in txt_source:
