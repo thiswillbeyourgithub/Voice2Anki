@@ -525,7 +525,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if isinstance(model_price, list):
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     else:
-        assert isinstance(model_price, str)
+        assert isinstance(model_price, float)
         tkn_cost_dol = model_price * response._response_ms / 1000
     pv["total_llm_cost"] += tkn_cost_dol
 
