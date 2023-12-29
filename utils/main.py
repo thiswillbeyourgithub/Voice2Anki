@@ -522,7 +522,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     if llm_choice != shared.latest_llm_used:
         shared.latest_llm_used = llm_choice
 
-    if isinstance(model_price, list):
+    if isinstance(model_price, tuple):
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     else:
         assert isinstance(model_price, float)
