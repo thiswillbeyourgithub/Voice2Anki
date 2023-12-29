@@ -50,6 +50,7 @@ class ValueStorage:
     @trace
     def __init__(self, profile="latest"):
 
+        profile = profile.strip()
         self.profile_keys = profile_keys
 
         if profile == "latest":
