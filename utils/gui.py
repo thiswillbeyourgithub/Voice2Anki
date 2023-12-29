@@ -221,148 +221,149 @@ with gr.Blocks(
                     interactive=False,
                     placeholder="this string should never appear")
 
-    with gr.Tab(label="Dirload Queue") as tab_dirload_queue:
-        queue_df = gr.Dataframe(
-                value=shared.dirload_queue,
-                type="pandas",
-                label="Dirload queue",
-                interactive=False,
-                column_widths="5%",
-                )
+    with gr.Tab(label="Queues"):
+        with gr.Tab(label="Future galleries") as tab_galleries:
 
+            with gr.Row():
+                with gr.Column():
+                    source_txt_btn = gr.Button("OCR the main gallery")
+                    source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
+                    source_txt_btn.click(
+                            fn=ocr_image,
+                            inputs=[gallery],
+                            outputs=[source_txt],
+                            queue=False,
+                            preprocess=False,
+                            postprocess=False,
+                            )
 
-    with gr.Tab(label="Future galleries") as tab_galleries:
+            load_fg_btn = gr.Button(value="Load future galleries")
 
-        with gr.Row():
-            with gr.Column():
-                source_txt_btn = gr.Button("OCR the main gallery")
-                source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
-                source_txt_btn.click(
+            future_galleries = []
+
+            for fg in range(1, shared.future_gallery_slot_nb + 1):
+                with gr.Row(equal_height=False):
+                    with gr.Column(scale=10):
+                        gal_ = gr.Gallery(
+                            # value=None,
+                            value=shared.pv[f"future_gallery_{fg:03d}"],
+                            label=f"Gallery {fg}",
+                            columns=[2],
+                            rows=[1],
+                            object_fit="scale-down",
+                            # height=100,
+                            # min_width=50,
+                            container=True,
+                            show_download_button=True,
+                            preview=False,
+                            )
+                    with gr.Column(scale=0):
+                        send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=50, scale=10)
+                        add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=50, scale=10)
+                        with gr.Row():
+                            rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
+                            ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
+
+                # add image
+                add_.click(
+                        fn=get_image,
+                        inputs=[gal_],
+                        outputs=[gal_],
+                        queue=False).then(
+                                fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                                inputs=[gal_],
+                                show_progress=False,
+                                )
+
+                # send image
+                send_.click(
+                        fn=lambda x: x,
+                        inputs=[gal_],
+                        outputs=[gallery],
+                        preprocess=False,
+                        postprocess=False,
+                        queue=False).then(
+                                fn=shared.pv.save_gallery,
+                                inputs=[gallery],
+                                show_progress=False,
+                                ).then(
+                                        fn=get_img_source,
+                                        inputs=[gallery],
+                                        queue=False,
+                                        )
+                # reset image
+                rst_.click(
+                        fn=lambda: None,
+                        outputs=[gal_],
+                        queue=False).then(
+                                fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                                inputs=[gal_],
+                                show_progress=False,
+                                )
+
+                # ocr image
+                ocr_.click(
                         fn=ocr_image,
-                        inputs=[gallery],
+                        inputs=[gal_],
                         outputs=[source_txt],
                         queue=False,
                         preprocess=False,
                         postprocess=False,
                         )
 
-        load_fg_btn = gr.Button(value="Load future galleries")
+                future_galleries.append([rst_, gal_, send_, add_, ocr_])
 
-        future_galleries = []
-
-        for fg in range(1, shared.future_gallery_slot_nb + 1):
-            with gr.Row(equal_height=False):
-                with gr.Column(scale=10):
-                    gal_ = gr.Gallery(
-                        # value=None,
-                        value=shared.pv[f"future_gallery_{fg:03d}"],
-                        label=f"Gallery {fg}",
-                        columns=[2],
-                        rows=[1],
-                        object_fit="scale-down",
-                        # height=100,
-                        # min_width=50,
-                        container=True,
-                        show_download_button=True,
-                        preview=False,
-                        )
-                with gr.Column(scale=0):
-                    send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=50, scale=10)
-                    add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=50, scale=10)
-                    with gr.Row():
-                        rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
-                        ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
-
-            # add image
-            add_.click(
-                    fn=get_image,
-                    inputs=[gal_],
-                    outputs=[gal_],
-                    queue=False).then(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
-                            inputs=[gal_],
-                            show_progress=False,
-                            )
-
-            # send image
-            send_.click(
-                    fn=lambda x: x,
-                    inputs=[gal_],
-                    outputs=[gallery],
-                    preprocess=False,
-                    postprocess=False,
-                    queue=False).then(
-                            fn=shared.pv.save_gallery,
-                            inputs=[gallery],
-                            show_progress=False,
-                            ).then(
-                                    fn=get_img_source,
-                                    inputs=[gallery],
-                                    queue=False,
-                                    )
-            # reset image
-            rst_.click(
-                    fn=lambda: None,
-                    outputs=[gal_],
-                    queue=False).then(
-                            fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
-                            inputs=[gal_],
-                            show_progress=False,
-                            )
-
-            # ocr image
-            ocr_.click(
-                    fn=ocr_image,
-                    inputs=[gal_],
-                    outputs=[source_txt],
-                    queue=False,
-                    preprocess=False,
-                    postprocess=False,
+            clear_fg_btn = gr.ClearButton(
+                    components=[elem[1] for elem in future_galleries],
+                    value="Empty all (not saved)",
+                    variant="primary",
                     )
 
-            future_galleries.append([rst_, gal_, send_, add_, ocr_])
+            load_fg_btn.click(
+                    fn=load_future_galleries,
+                    outputs=[row[1] for row in future_galleries],
+                    )
 
-        clear_fg_btn = gr.ClearButton(
-                components=[elem[1] for elem in future_galleries],
-                value="Empty all (not saved)",
-                variant="primary",
-                )
-
-        load_fg_btn.click(
-                fn=load_future_galleries,
-                outputs=[row[1] for row in future_galleries],
-                )
-
-        roll_gall_btn.click(
-                fn=lambda: [None, None],
-                outputs=[future_galleries[0][1], gallery],
-                ).then(
-                        fn=shared.pv.save_future_gallery_001,
-                        inputs=[future_galleries[0][1]],
-                        show_progress=False,
-                        ).then(
-                                fn=load_future_galleries,
-                                outputs=[row[1] for row in future_galleries],
-                                ).then(
-                                    fn=lambda x: x,
-                                    inputs=[future_galleries[0][1]],
-                                    outputs=[gallery],
-                                    preprocess=False,
-                                    postprocess=False,
-                                    queue=False,
+            roll_gall_btn.click(
+                    fn=lambda: [None, None],
+                    outputs=[future_galleries[0][1], gallery],
+                    ).then(
+                            fn=shared.pv.save_future_gallery_001,
+                            inputs=[future_galleries[0][1]],
+                            show_progress=False,
+                            ).then(
+                                    fn=load_future_galleries,
+                                    outputs=[row[1] for row in future_galleries],
                                     ).then(
-                                        fn=shared.pv.save_gallery,
-                                        inputs=[gallery],
-                                        show_progress=False,
+                                        fn=lambda x: x,
+                                        inputs=[future_galleries[0][1]],
+                                        outputs=[gallery],
+                                        preprocess=False,
+                                        postprocess=False,
+                                        queue=False,
                                         ).then(
-                                                fn=get_img_source,
-                                                inputs=[gallery],
-                                                queue=False,
-                                                ).success(
-                                                        fn=get_img_source,
-                                                        inputs=[future_galleries[1][1]],
-                                                        queue=False,
-                                                        )
+                                            fn=shared.pv.save_gallery,
+                                            inputs=[gallery],
+                                            show_progress=False,
+                                            ).then(
+                                                    fn=get_img_source,
+                                                    inputs=[gallery],
+                                                    queue=False,
+                                                    ).success(
+                                                            fn=get_img_source,
+                                                            inputs=[future_galleries[1][1]],
+                                                            queue=False,
+                                                            )
+
+        with gr.Tab(label="Dirload Queue") as tab_dirload_queue:
+            queue_df = gr.Dataframe(
+                    value=shared.dirload_queue,
+                    type="pandas",
+                    label="Dirload queue",
+                    interactive=False,
+                    column_widths="5%",
+                    )
+
 
     # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
