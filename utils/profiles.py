@@ -86,7 +86,7 @@ class ValueStorage:
         # create methods like "save_gallery" to save the gallery to the profile
         for key in self.profile_keys:
             def create_save_method(key):
-                @trace
+                #@trace
                 def save_method(value):
                     self.__setitem__(key, value)
                 return save_method
