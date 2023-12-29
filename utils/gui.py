@@ -172,7 +172,7 @@ with gr.Blocks(
     with gr.Tab(label="Settings"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
         with gr.Row():
-            txt_profile = gr.Textbox(value=shared.pv.profile_name, placeholder=",".join(get_profiles()), label="Profile")
+            txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
         with gr.Row():
             txt_deck = gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True)
             txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
@@ -543,7 +543,7 @@ with gr.Blocks(
     txt_replicate_api_key.change(fn=shared.pv.save_txt_replicate_api_key, inputs=[txt_replicate_api_key], show_progress=False)
 
     # change profile and load previous data
-    txt_profile.submit(
+    txt_profile.change(
             fn=switch_profile,
             inputs=[txt_profile],
             outputs=[txt_deck, txt_tags, txt_chatgpt_context, txt_whisp_prompt, txt_whisp_lang, gallery, audio_slots[0], txt_audio, txt_chatgpt_cloz, txt_profile]

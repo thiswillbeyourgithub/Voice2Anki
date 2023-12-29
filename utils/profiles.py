@@ -269,6 +269,8 @@ def worker_setitem(in_queue):
 @trace
 def get_profiles():
     profiles = [str(p.name) for p in profile_path.iterdir()]
+    if "latest_profile.txt" in profiles:
+        profiles.remove("latest_profile.txt")
     assert profiles, "Empty list of profiles"
     return profiles
 
