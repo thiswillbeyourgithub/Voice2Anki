@@ -249,7 +249,16 @@ def get_anki_tags():
                 action="getTags",
                 )
     except Exception as err:
-        return red(f"Error when getting tags: {err}'")
+        return red(f"Error when getting list of anki tags: {err}'")
+
+@trace
+def get_decks():
+    try:
+        return _call_anki(
+                action="decknames",
+                )
+    except Exception as err:
+        return [red(f"Error when getting list of anki deck: {err}'")]
 
 
 # load anki profile using ankipandas just to get the media folder
