@@ -500,7 +500,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
     cnt = 0
     while True:
         try:
-            whi("Asking ChatGPT")
+            whi("Asking LLM")
             cnt += 1
             response = litellm.completion(
                     model=llm_choice,
@@ -510,7 +510,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             break
         except (litellm.RateLimitError, openai.RateLimitError) as err:
             if cnt >= 2:
-                raise Exception(red("ChatGPT: too many retries."))
+                raise Exception(red("LLM: too many retries."))
             red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
             time.sleep(2 * cnt)
 
@@ -542,7 +542,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
-        red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
+        red(f"LLM's reason to stop was not 'stop' but '{reason}'")
 
     # add to the shared module the infonrmation of this card creation.
     # if a card is created then this will be added to the db to
@@ -565,9 +565,9 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "Voice2Anki_version": shared.VERSION,
                     })
 
-    yel(f"\n\nChatGPT answer:\n{cloz}\n\n")
-    whi(f"ChatGPT cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
-    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    yel(f"\n\nLLM answer:\n{cloz}\n\n")
+    whi(f"LLM cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
+    red(f"Total LLM cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
     return cloz
 
@@ -762,7 +762,7 @@ def dirload_splitted_last(
 def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
     """function called by a microphone. It will use whisper to transcribe
     your voice. Then use the instructions in your voice to modify the
-    output from chatgpt."""
+    output from LLM."""
 
     os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
     if not shared.pv["txt_openai_api_key"]:
@@ -883,10 +883,10 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
                 }
             ]
 
-    model_to_use = "gpt-4-1106-preview"
+    model_to_use = "openai/gpt-4-1106-preview"
     model_price = shared.llm_price[model_to_use]
 
-    whi("Editing via ChatGPT:")
+    whi(f"Editing via {model_to_use}:")
     whi(prompt)
     response = litellm.completion(
             model=model_to_use,
@@ -902,12 +902,12 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n").strip()  # for cosmetic purposes in the textbox
 
-    yel(f"\n\nChatGPT answer:\n{cloz}\n\n")
-    red(f"Total ChatGPT cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    yel(f"\n\nLLM answer:\n{cloz}\n\n")
+    red(f"Total LLM cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
-        red(f"ChatGPT's reason to stop was not 'stop' but '{reason}'")
+        red(f"LLM's reason to stop was not 'stop' but '{reason}'")
 
     return cloz, None, None
 
