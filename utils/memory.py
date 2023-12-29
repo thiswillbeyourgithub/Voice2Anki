@@ -1,3 +1,4 @@
+import pandas as pd
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import gradio as gr
@@ -451,22 +452,16 @@ def display_price(sld_max_tkn, llm_choice):
     message += f"\nRequests per $1: {price_per_dol:.1f} req"
     return message
 
-def show_memories(profile):
+@trace
+def get_memories_df(profile):
     memories = load_prev_prompts(profile)
-    output = [""]
-    for memory in memories:
-        for k, v in memory.items():
-            if k in ["role", "hash"]:
-                continue
-            output[-1] += f"{k.upper()}: {indent(str(v), '        ').strip()}\n"
-        output.append("")
-    return "\n\n".join(output[:-1])
+    for i in range(len(memories)):
+        memories[i]["n"] = i + 1
+    return pd.Dataframe(memories).reset_index().set_index("n")
 
-def show_message_buffer():
+@trace
+def get_message_buffer_df():
     buffer = shared.message_buffer
-    output = ["[1]\n"]
-    for i, buf in enumerate(buffer[::-1]):
-        for k, v in buf.items():
-            output[-1] += f"{k.upper()}: {v}\n"
-        output.append(f"[{i+2}]\n")
-    return "\n\n".join(output[:-1])
+    for i in range(len(buffer)):
+        buffer[i]["n"] = i + 1
+    return pd.DataFrame(buffer).reset_index().set_index("n")

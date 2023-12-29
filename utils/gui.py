@@ -5,7 +5,7 @@ from .profiles import get_profiles, switch_profile
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log
-from .memory import recur_improv, display_price, show_memories, show_message_buffer
+from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
 
@@ -204,22 +204,20 @@ with gr.Blocks(
 
     with gr.Tab(label="Memories & Buffer"):
         with gr.Tab(label="Memories") as tab_memories:
-            txt_memories = gr.Textbox(
-                    value="",
+            df_memories = gr.Dataframe(
                     label="Saved memories",
-                    lines=1000,
-                    max_lines=1000,
+                    value=None,
                     interactive=False,
-                    placeholder="this string should never appear")
+                    column_widths="5%",
+                    )
 
         with gr.Tab(label="Message buffer") as tab_buffer:
-            txt_buffer = gr.Textbox(
-                    value="",
+            df_buffer = gr.Dataframe(
                     label="Message buffer",
-                    lines=1000,
-                    max_lines=1000,
+                    value=None,
                     interactive=False,
-                    placeholder="this string should never appear")
+                    column_widths="5%",
+                    )
 
     with gr.Tab(label="Queues"):
         with gr.Tab(label="Future galleries") as tab_galleries:
@@ -409,6 +407,18 @@ with gr.Blocks(
             fn=lambda: shared.dirload_queue.sort_index().reset_index().set_index("n").reset_index(),
             outputs=[queue_df],
             )
+    # load memories only if clicked
+    tab_memories.select(
+            fn=lambda: get_memories_df,
+            outputs=[df_memories],
+            )
+    # load message buffer only if clicked
+    tab_buffer.select(
+            fn=get_message_buffer_df,
+            outputs=[df_buffer],
+            show_progress=False,
+            )
+
     # copy audio to flag button
     flag_audio_btn.click(
             fn=flag_audio,
@@ -445,21 +455,6 @@ with gr.Blocks(
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
     logging_reload.click(fn=get_log, outputs=[output_elem])
-
-    # load memories only if clicked
-    tab_memories.select(
-            fn=show_memories,
-            inputs=[txt_profile],
-            outputs=[txt_memories],
-            show_progress=False,
-            )
-
-    # load message buffer only if clicked
-    tab_buffer.select(
-            fn=show_message_buffer,
-            outputs=[txt_buffer],
-            show_progress=False,
-            )
 
 
     # mark the previous card
