@@ -84,10 +84,12 @@ def whisper_cached(
         txt_whisp_lang,
         sld_whisp_temp,
         ):
-    """this is a call to openai's whisper. It's called as soon as the
+    """this is a call to OpenAI's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
     red(f"Calling whisper because not in cache: {audio_path}")
+    assert shared.pv["txt_openai_api_key"], f"Missing openai key, needed for whisper"
+    openai.api_key = shared.pv["txt_openai_api_key"].strip()
     assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
     try:
         cnt = 0
