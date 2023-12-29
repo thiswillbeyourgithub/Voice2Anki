@@ -452,7 +452,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         if cache_mode:
             return red(mess)
         else:
-            gr.Error(mess)
+            # gr.Error(mess)
             return red(mess)
 
     os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
