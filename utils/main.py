@@ -31,6 +31,8 @@ from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_templ
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
+litellm.set_verbose = shared.debug
+
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
 unsplitted_dir = Path("./user_directory/unsplitted")
