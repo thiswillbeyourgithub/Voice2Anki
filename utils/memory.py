@@ -464,5 +464,5 @@ def show_message_buffer():
     for i, buf in enumerate(buffer[::-1]):
         for k, v in buf.items():
             output[-1] += f"{k.upper()}: {v}\n"
-        output.append(f"[{i+1}]\n")
+        output.append(f"[{i+2}]\n")
     return "\n\n".join(output[:-1])
