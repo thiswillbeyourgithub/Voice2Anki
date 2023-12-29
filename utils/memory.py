@@ -101,6 +101,7 @@ async def async_embedder(text, client):
     except Exception as err:
         return err
 
+@trace
 async def async_parallel_embedder(list_text, client):
     tasks = [async_embedder(sp, client) for sp in list_text]
     return await asyncio.gather(*tasks)
