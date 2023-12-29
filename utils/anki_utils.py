@@ -173,6 +173,7 @@ async def get_card_status(txt_chatgpt_cloz, return_bool=False):
         assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
         vals = await asyncio.gather(*[get_card_status(sp, True) for sp in splits])
+        # vals = [get_card_status(sp, True) for sp in splits]
 
         n = len(vals)
         if all(vals) and all(isinstance(v, bool) for v in vals):
@@ -200,6 +201,7 @@ async def get_card_status(txt_chatgpt_cloz, return_bool=False):
                 None,
                 partial(_call_anki, action="findCards", query=query)
                 )
+        # state = _call_anki(action="findCards", query=query)
         if state:
             if return_bool:
                 return True
