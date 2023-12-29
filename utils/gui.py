@@ -409,7 +409,8 @@ with gr.Blocks(
             )
     # load memories only if clicked
     tab_memories.select(
-            fn=lambda: get_memories_df,
+            fn=get_memories_df,
+            inputs=[txt_profile],
             outputs=[df_memories],
             )
     # load message buffer only if clicked
