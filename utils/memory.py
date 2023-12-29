@@ -73,11 +73,15 @@ async def async_embedder(text, client):
     with ThreadPoolExecutor(max_workers=100) as executor:
         return await loop.run_in_executor(executor, embedder, text, client)
 
-@trace
-@async_embeddings_cache.cache(ignore=["client"])
 async def async_parallel_embedder(list_text, client):
     tasks = [async_embedder(sp, client) for sp in list_text]
     return await asyncio.gather(*tasks)
+
+@trace
+@async_embeddings_cache.cache(ignore=["client"])
+def cached_sync_async_embedder(list_text, client):
+    return asyncio.run(async_parallel_embedder(list_text, client))
+
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
@@ -251,9 +255,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         new_prompt_vec = embedder(text=prompt_messages[-1]["content"], client=shared.openai_client)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = asyncio.run(async_parallel_embedder(
-            list_text=to_embed,
-            client=shared.openai_client))
+        all_embeddings = cached_sync_async_embedder(to_embed, shared.openai_client)
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
