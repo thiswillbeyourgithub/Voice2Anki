@@ -665,12 +665,8 @@ with gr.Blocks(
                         postprocess=False,
                         queue=False,
                         ).success(
-                                fn=get_card_status,
-                                inputs=[txt_chatgpt_cloz],
+                                fn=lambda: "Rolling",
                                 outputs=[update_status_btn],
-                                # queue=True,
-                                # preprocess=False,
-                                # postprocess=False,
                                 ).success(
                                         fn=to_anki,
                                         inputs=[
@@ -708,7 +704,7 @@ with gr.Blocks(
                                             # postprocess=False,
                                             queue=False,
                                             show_progress=False,
-                                            ).success(
+                                            ).then(
                                                     fn=lambda: False,
                                                     outputs=[check_marked],
                                                     show_progress=False,
