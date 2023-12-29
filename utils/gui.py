@@ -148,7 +148,7 @@ with gr.Blocks(
                                 sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
 
                     with gr.Row():
-                        llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False, info="TODO test")
+                        llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False)
                         txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
                     with gr.Row():
