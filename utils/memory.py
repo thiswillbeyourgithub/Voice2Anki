@@ -457,7 +457,7 @@ def get_memories_df(profile):
     memories = load_prev_prompts(profile)
     for i in range(len(memories)):
         memories[i]["n"] = i + 1
-    return pd.Dataframe(memories).reset_index().set_index("n")
+    return pd.DataFrame(memories).reset_index().set_index("n")
 
 @trace
 def get_message_buffer_df():
