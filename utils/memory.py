@@ -411,6 +411,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
                 "timestamp": int(time.time()),
                 "priority": priority,
                 "answer": answer,
+                "llm_choice": llm_choice,  # can be different than llm_model because of cache
                 "llm_model": shared.latest_llm_used,
                 "tts_model": shared.latest_stt_used,
                 "tkn_len_in": tkn_len_in,
