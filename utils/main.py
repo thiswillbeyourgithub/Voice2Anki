@@ -173,7 +173,7 @@ def thread_whisp_then_llm(
             txt_whisp_prompt,
             txt_whisp_lang,
             sld_whisp_temp,
-            )["text"]
+            ).text
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
@@ -217,7 +217,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                 )
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
-        txt_audio = transcript["text"]
+        txt_audio = transcript.text
         yel(f"\nWhisper transcript: {txt_audio}")
 
         with shared.thread_lock:
