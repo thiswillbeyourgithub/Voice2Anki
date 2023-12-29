@@ -279,7 +279,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         all_embeddings = asyncio.run(async_parallel_embedder(
             to_embed,
             client))
-        assert len(all_embeddings) == 2 * len(candidate_prompts)
+        assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
         new_prompt_vec = all_embeddings.pop(0)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
