@@ -324,8 +324,8 @@ with gr.Blocks(
                 )
 
         roll_gall_btn.click(
-                fn=lambda: None,
-                outputs=[future_galleries[0][1]],
+                fn=lambda: [None, None],
+                outputs=[future_galleries[0][1], gallery],
                 ).then(
                         fn=shared.pv.save_future_gallery_001,
                         inputs=[future_galleries[0][1]],
