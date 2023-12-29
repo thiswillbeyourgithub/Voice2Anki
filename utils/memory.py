@@ -1,3 +1,4 @@
+import asyncio
 import gradio as gr
 import re
 from tqdm import tqdm
@@ -92,6 +93,17 @@ def embedder(text, client):
                 input=text,
                 encoding_format="float")
     return np.array(vec.data[0].embedding).reshape(1, -1)
+
+async def async_embedder(text, client):
+    loop = asyncio.get_running_loop()
+    try:
+        return await loop.run_in_executor(None, embedder, text, client)
+    except Exception as err:
+        return err
+
+async def async_parallel_embedder(list_text, client):
+    tasks = [async_embedder(sp, client) for sp in list_text]
+    return await asyncio.gather(*tasks)
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
@@ -259,11 +271,23 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         whi("Computing cosine similarity")
         max_sim = [0, None]
         min_sim = [1, None]
-        new_prompt_vec = embedder(prompt_messages[-1]["content"], client)
-        for i, pr in enumerate(candidate_prompts):
 
-            embedding = embedder(pr["content"], client)
-            embedding2 = embedder(pr["answer"], client)
+        # get embeddings asynchronously
+        to_embed = [prompt_messages[-1]["content"]]
+        to_embed += [pr["content"] for pr in candidate_prompts]
+        to_embed += [pr["answer"] for pr in candidate_prompts]
+        all_embeddings = asyncio.run(async_parallel_embedder(
+            to_embed,
+            client))
+        assert len(all_embeddings) == 2 * len(candidate_prompts)
+        new_prompt_vec = all_embeddings.pop(0)
+        embeddings_contents = all_embeddings[:len(candidate_prompts)]
+        embeddings_answers = all_embeddings[len(candidate_prompts):]
+        assert len(embeddings_contents) == len(embeddings_answers)
+
+        for i, pr in enumerate(candidate_prompts):
+            embedding = embeddings_contents[i]
+            embedding2 = embeddings_answers[i]
             sim = float(cosine_similarity(new_prompt_vec, embedding))
             sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5
