@@ -765,10 +765,8 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     output from chatgpt."""
 
     os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"]
-    os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"]
-    if not shared.pv["txt_openai_api_key"] and not shared.pv["txt_replicate_api_key"]:
-        red("No API key provided for either OpenAI or replicate in the settings.")
-        raise Exception(red("No API key provided for either OpenAI or replicate in the settings."))
+    if not shared.pv["txt_openai_api_key"]:
+        raise Exception(red("No API key provided for OpenAI in the settings."))
 
 
     assert (audio is None and audio_txt) or (audio is not None and audio_txt is None), f"Can't give both audio and text to AudioEdit"
