@@ -91,7 +91,7 @@ def embedder(text, client):
                 model=embedding_model_name,
                 input=text,
                 encoding_format="float")
-    return vec["data"][0]["embedding"]
+    return vec.data[0].embedding
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
