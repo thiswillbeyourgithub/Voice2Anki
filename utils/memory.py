@@ -81,13 +81,13 @@ def embedder(text, format):
     text = f"Pay attention to the structure of  this text: '{text}'"
 
     try:
-        vec = openai.Embedding.create(
+        vec = openai.embeddings.create(
                 model=embedding_model_name,
                 input=text,
                 encoding_format="float")
     except:
         time.sleep(1)
-        vec = openai.Embedding.create(
+        vec = openai.embeddings.create(
                 model=embedding_model_name,
                 input=text,
                 encoding_format="float")
