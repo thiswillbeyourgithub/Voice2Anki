@@ -20,6 +20,7 @@ class SharedModule:
     dirload_lock = Lock()
     thread_lock = Lock()
     db_lock = Lock()
+    openai_client = None
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),

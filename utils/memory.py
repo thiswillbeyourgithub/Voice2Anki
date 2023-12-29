@@ -177,7 +177,8 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     whi("Filtering prompts")
     if not shared.pv["txt_openai_api_key"]:
         raise Exception(red("No API key provided for OpenAI in the settings."))
-    client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
+    if shared.openai_client is None:
+        shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
@@ -278,7 +279,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         to_embed += [pr["answer"] for pr in candidate_prompts]
         all_embeddings = asyncio.run(async_parallel_embedder(
             to_embed,
-            client))
+            shared.openai_client))
         assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
         new_prompt_vec = all_embeddings.pop(0)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
