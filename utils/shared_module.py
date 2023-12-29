@@ -7,7 +7,7 @@ class SharedModule:
     """module used to store information from Voice2Anki.py to
     the main .py files"""
     initialized = 0
-    VERSION = 0.3
+    VERSION = 1.0
     memory_metric = None
     media_folder = None
     anki_media = None
