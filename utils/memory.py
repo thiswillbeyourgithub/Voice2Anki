@@ -266,7 +266,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             sim2 = float(cosine_similarity(new_prompt_vec, embedding2))
             w1 = 5
             w2 = 1
-            sim = (sim1 * 1 + sim2 * w2) / (w1 + w2)
+            sim = (sim1 * w1 + sim2 * w2) / (w1 + w2)
             if sim > max_sim[0]:
                 max_sim[0] = sim
                 max_sim[1] = pr["content"]
