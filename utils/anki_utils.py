@@ -249,7 +249,7 @@ def get_anki_tags():
                 action="getTags",
                 )
     except Exception as err:
-        return red(f"Error when getting list of anki tags: {err}'")
+        return [red(f"Error when getting list of anki tags: {err}'")]
 
 @trace
 def get_decks():
