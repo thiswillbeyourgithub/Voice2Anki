@@ -557,7 +557,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "type": "anki_card",
                     "timestamp": time.time(),
                     "token_cost": tkn_cost,
-                    "dollar_cost": tkn_cost_dol
+                    "dollar_cost": tkn_cost_dol,
                     "temperature": temperature,
                     "LLM_context": txt_chatgpt_context,
                     "Voice2Anki_profile": pv.profile_name,
