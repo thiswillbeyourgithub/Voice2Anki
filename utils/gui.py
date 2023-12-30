@@ -161,7 +161,7 @@ with gr.Blocks(
                                 with gr.Row():
                                     rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50)
                                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
-                            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True)
+                            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Roll from queues", show_label=True, scale=0)
