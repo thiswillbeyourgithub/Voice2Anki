@@ -293,6 +293,18 @@ def get_profiles():
 
 @trace
 def switch_profile(profile):
+    # output is [
+    #         txt_deck,
+    #         txt_tags,
+    #         txt_chatgpt_context,
+    #         txt_whisp_prompt,
+    #         txt_whisp_lang,
+    #         gallery,
+    #         audio_slots[0],
+    #         txt_audio,
+    #         txt_chatgpt_cloz,
+    #         txt_profile]
+
     if profile is None or profile.strip() == "" or "/" in profile or not profile.replace("_", "").replace("-", "").isalpha():
         red("Invalid profile name, must be alphanumeric (although it can include _ and -)")
         return [
