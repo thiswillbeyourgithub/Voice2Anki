@@ -28,7 +28,15 @@ document.querySelector('body').classList.add('dark');
 }"""
 
 css = """
-#BigTabV2A-button { flex-grow:1 !important; };
+/* Make tabs take all the width */
+#BigTabV2A-button { flex-grow:1 !important; }
+
+/* remove source selector */
+#Audio_component_Voice2Anki > div.component-wrapper > div.controls > select {display: none !important; flex-grow:0 !important;}
+
+/* remove some sound controls */
+#Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.control-wrapper {display: none !important; flex-grow:0 !important;}
+#Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
 """.strip()
 
 if shared.widen_screen:
