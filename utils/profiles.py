@@ -34,8 +34,8 @@ profile_keys = {
         "txt_deck": {},
         "txt_tags": {},
         }
-for i in range(1, shared.future_gallery_slot_nb + 1):
-    profile_keys[f"future_gallery_{i:03d}"] = {}
+for i in range(1, shared.queued_gallery_slot_nb + 1):
+    profile_keys[f"queued_gallery_{i:03d}"] = {}
 
 for k in profile_keys:
     if "default" not in profile_keys[k]:
@@ -152,7 +152,7 @@ class ValueStorage:
                 return self.cache_values[key]
 
         kp = key + ".pickle"
-        if key.startswith("future_gallery_"):
+        if key.startswith("queued_gallery_"):
             kf = self.p / "queues" / "galleries" / kp
         else:
             kf = self.p / kp
@@ -179,7 +179,7 @@ class ValueStorage:
                     if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
                         red(f"Error when loading {kf}: unexpected value for loaded value")
                         return None
-                if (key == "gallery" or key.startswith("future_gallery_")) and new is not None:
+                if (key == "gallery" or key.startswith("queued_gallery_")) and new is not None:
                     if not isinstance(new, list):
                         new = [im.image.path for im in new.root]
             if "type" in self.profile_keys[key]:
@@ -236,7 +236,7 @@ class ValueStorage:
             try:
                 if item is None or item is False or (bool(item) is False):
                     kp = key + ".pickle"
-                    if key.startswith("future_gallery_"):
+                    if key.startswith("queued_gallery_"):
                         kf = self.p / "queues" / "galleries" / kp
                     else:
                         kf = self.p / kp
@@ -252,7 +252,7 @@ def worker_setitem(in_queue):
     while True:
         profile, key, item, out_queue = in_queue.get()
         kp = key + ".pickle"
-        if key.startswith("future_gallery_"):
+        if key.startswith("queued_gallery_"):
             kf = profile / "queues" / "galleries" / kp
         else:
             kf = profile / kp

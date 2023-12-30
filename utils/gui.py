@@ -6,7 +6,7 @@ from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitte
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df
-from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_future_galleries, create_audio_compo, roll_audio, force_sound_processing
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -241,14 +241,14 @@ with gr.Blocks(
 
             load_fg_btn = gr.Button(value="Load future galleries")
 
-            future_galleries = []
+            queued_galleries = []
 
-            for fg in range(1, shared.future_gallery_slot_nb + 1):
+            for fg in range(1, shared.queued_gallery_slot_nb + 1):
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=10):
                         gal_ = gr.Gallery(
                             # value=None,
-                            value=shared.pv[f"future_gallery_{fg:03d}"],
+                            value=shared.pv[f"queued_gallery_{fg:03d}"],
                             label=f"Gallery {fg}",
                             columns=[2],
                             rows=[1],
@@ -272,7 +272,7 @@ with gr.Blocks(
                         inputs=[gal_],
                         outputs=[gal_],
                         queue=False).then(
-                                fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                                fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
                                 inputs=[gal_],
                                 show_progress=False,
                                 )
@@ -298,7 +298,7 @@ with gr.Blocks(
                         fn=lambda: None,
                         outputs=[gal_],
                         queue=False).then(
-                                fn=getattr(shared.pv, f"save_future_gallery_{fg:03d}"),
+                                fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
                                 inputs=[gal_],
                                 show_progress=False,
                                 )
@@ -313,32 +313,32 @@ with gr.Blocks(
                         postprocess=False,
                         )
 
-                future_galleries.append([rst_, gal_, send_, add_, ocr_])
+                queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
             clear_fg_btn = gr.ClearButton(
-                    components=[elem[1] for elem in future_galleries],
+                    components=[elem[1] for elem in queued_galleries],
                     value="Empty all (not saved)",
                     variant="primary",
                     )
 
             load_fg_btn.click(
-                    fn=load_future_galleries,
-                    outputs=[row[1] for row in future_galleries],
+                    fn=load_queued_galleries,
+                    outputs=[row[1] for row in queued_galleries],
                     )
 
             roll_gall_btn.click(
                     fn=lambda: [None, None],
-                    outputs=[future_galleries[0][1], gallery],
+                    outputs=[queued_galleries[0][1], gallery],
                     ).then(
-                            fn=shared.pv.save_future_gallery_001,
-                            inputs=[future_galleries[0][1]],
+                            fn=shared.pv.save_queued_gallery_001,
+                            inputs=[queued_galleries[0][1]],
                             show_progress=False,
                             ).then(
-                                    fn=load_future_galleries,
-                                    outputs=[row[1] for row in future_galleries],
+                                    fn=load_queued_galleries,
+                                    outputs=[row[1] for row in queued_galleries],
                                     ).then(
                                         fn=lambda x: x,
-                                        inputs=[future_galleries[0][1]],
+                                        inputs=[queued_galleries[0][1]],
                                         outputs=[gallery],
                                         preprocess=False,
                                         postprocess=False,
@@ -353,7 +353,7 @@ with gr.Blocks(
                                                     queue=False,
                                                     ).success(
                                                             fn=get_img_source,
-                                                            inputs=[future_galleries[1][1]],
+                                                            inputs=[queued_galleries[1][1]],
                                                             queue=False,
                                                             )
 
