@@ -36,7 +36,6 @@ litellm.set_verbose = shared.debug
 splitted_dir = Path("./user_directory/splitted")
 done_dir = Path("./user_directory/done")
 unsplitted_dir = Path("./user_directory/unsplitted")
-tmp_dir = Path("/tmp/gradio")
 
 
 Path("user_directory").mkdir(exist_ok=True)
@@ -660,7 +659,7 @@ def dirload_splitted(
     todo_path = todo_path[todo_path["loaded"] == False]
     for path in todo_path.index.tolist()[:empty_slots]:
         path = Path(path)
-        to_temp = tmp_dir / path.name
+        to_temp = shared.tmp_dir / path.name
         shutil.copy2(path, to_temp)
         assert (path.exists() and (to_temp).exists()), "unexpected sound location"
 

@@ -1,3 +1,5 @@
+import tempfile
+from pathlib import Path
 from threading import Lock
 import gradio as gr
 import pandas as pd
@@ -21,6 +23,8 @@ class SharedModule:
     thread_lock = Lock()
     db_lock = Lock()
     openai_client = None
+
+    tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
