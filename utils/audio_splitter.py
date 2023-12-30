@@ -21,10 +21,13 @@ from pydub.silence import detect_leading_silence, split_on_silence
 
 from logger import whi, yel, red
 from shared_module import shared
+from profiles import ValueStorage
+
+shared.pv = ValueStorage()
 
 # replicate has to be imported after the api is loader
-assert Path("REPLICATE_API_KEY.txt").exists(), "No api key found. Create a file REPLICATE8API_KEY.txt and paste your openai API key inside"
-os.environ["REPLICATE_API_TOKEN"] = str(Path("REPLICATE_API_KEY.txt").read_text()).strip()
+assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile}. You must open Voice2Anki.py and set it in the settings."
+os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
 import replicate
 
 stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=1)
