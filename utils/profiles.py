@@ -282,7 +282,7 @@ def worker_setitem(in_queue):
                     raise Exception(f"Error when setting {kf}: '{err}'")
 
 
-@trace
+# @trace
 def get_profiles():
     profiles = [str(p.name) for p in profile_path.iterdir()]
     if "latest_profile.txt" in profiles:

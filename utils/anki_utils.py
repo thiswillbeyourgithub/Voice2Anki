@@ -242,7 +242,7 @@ def mark_previous_note():
             )
 
 
-@trace
+# @trace
 def get_anki_tags():
     try:
         return _call_anki(
@@ -251,7 +251,7 @@ def get_anki_tags():
     except Exception as err:
         return [red(f"Error when getting list of anki tags: {err}'")]
 
-@trace
+# @trace
 def get_decks():
     try:
         return _call_anki(
