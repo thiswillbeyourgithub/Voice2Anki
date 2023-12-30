@@ -1087,12 +1087,12 @@ def to_anki(
         txt_source += audio_html
 
     # anki tags
-    new_tags = txt_tags + [f"WhisperToAnki::{today}"]
+    new_tags = txt_tags + [f"Voice2Anki::{today}"]
     if check_marked:
         new_tags += ["marked"]
     if "<img" not in txt_source:
         # if no image in source: add a tag to find them easily later on
-        new_tags += ["WhisperToAnki::no_img_in_source"]
+        new_tags += ["Voice2Anki::no_img_in_source"]
 
     if txt_extra_source.strip():
         txt_source += f"<br>{txt_extra_source}"
