@@ -46,7 +46,7 @@ class AudioSplitter:
 
             stop_source="replicate",
 
-            unsplitted_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_untouched"),
+            untouched_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_untouched"),
             splitted_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_splits"),
             done_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_done"),
 
@@ -56,13 +56,53 @@ class AudioSplitter:
             remove_silence=True,
             silence_method="torchaudio",
             compress_if_too_large=True,
+            h=False,
+            help=False,
             ):
-        self.unsp_dir = Path(unsplitted_dir)
+        """
+        prompt: str
+            prompt used to guide whisper
+        stop_list: list, default [' stop', ' top']
+            list of strings that when found will trigger the audio splitting.
+        language: str, default fr
+        n_todo: int, default 1
+            number of files to split by default. Can be used to only process
+            a certain batch.
+        stop_source: str, default 'replicate'
+            if 'local_json', then an output from whispercpp is expected. This
+            is not yet implemented. The idea is to be able to do the audio
+            splitting locally using whispercpp instead of relying on replicate.
+        untouched_dir: str or Path, default  to profiles/PROFILE/queues/audio_untouched
+        splitted_dir: see untouched_dir
+        done_dir: see untouched_dir
+        trim_splitted_silence: bool, default False
+            if True, will try to remove leading and ending silence of each
+            audio split before exporting them. This can cause problems with
+            words being cut so I disabled it by default. If the file after
+            trimming is unexpectedly short, the trimming will be ignored. This
+            is so that loud splits that don't contain silence are not botched.
+        global_slowdown_factor float, default 1.0
+            if lower than 1.0, then the long audio will be slowed down before
+            processing. This can help whisper.
+        silence_method, str, default 'torchaudio'
+            can be any of 'torchaudio', 'pydub' or 'sox_cli'
+            * 'torchaudio' works using the sox filters present in utils/shared_module.py
+            * 'sox_cli' only works on linux and needs sox installed
+            * 'pydub' is excrutiatingly slow
+        compress_if_too_large: bool, default True
+            if a file is larger than 19MB, it will be compressed iteratively
+            to mp3 with lower and lower bitrate until the size is below 19MB.
+            This is because some replicate backends seem to refuse file of
+            20MB after trying for several minutes.
+        """
+        if h or help:
+            return help(self)
+        self.unsp_dir = Path(untouched_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
         self.metadata_file = self.sp_dir / "metadata.txt"
         assert silence_method in ["sox_cli", "pydub", "torchaudio"], "invalid silence_method"
-        assert self.unsp_dir.exists(), "missing unsplitted dir"
+        assert self.unsp_dir.exists(), "missing untouched dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
 
