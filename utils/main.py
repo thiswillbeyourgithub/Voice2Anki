@@ -53,6 +53,7 @@ sync_anki()
 def pop_buffer():
     "remove the latest card from message buffer"
     removed = shared.message_buffer.pop(-1)
+    shared.pv["message_buffer"] = shared.message_buffer
     red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
 
 def floatizer(func):
