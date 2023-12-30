@@ -239,16 +239,16 @@ with gr.Blocks(
                             postprocess=False,
                             )
 
-            load_fg_btn = gr.Button(value="Load future galleries")
+            load_qg_btn = gr.Button(value="Load future galleries")
 
             queued_galleries = []
-            for fg in range(1, shared.queued_gallery_slot_nb + 1):
+            for qg in range(1, shared.queued_gallery_slot_nb + 1):
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=10):
                         gal_ = gr.Gallery(
                             # value=None,
-                            value=shared.pv[f"queued_gallery_{fg:03d}"],
-                            label=f"Gallery {fg}",
+                            value=shared.pv[f"queued_gallery_{qg:03d}"],
+                            label=f"Gallery {qg}",
                             columns=[2],
                             rows=[1],
                             object_fit="scale-down",
@@ -267,7 +267,7 @@ with gr.Blocks(
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
 
-            load_fg_btn.click(
+            load_qg_btn.click(
                     fn=load_queued_galleries,
                     outputs=[row[1] for row in queued_galleries],
                     )
@@ -502,15 +502,15 @@ with gr.Blocks(
                 )
 
     # queued gallery
-    for fg_cnt, fg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
-        rst_, gal_, send_, add_, ocr_ = queued_galleries[fg_cnt]
+    for qg_cnt, qg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
+        rst_, gal_, send_, add_, ocr_ = queued_galleries[qg_cnt]
         # add image
         add_.click(
                 fn=get_image,
                 inputs=[gal_],
                 outputs=[gal_],
                 queue=False).then(
-                        fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
+                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
                         show_progress=False,
                         )
@@ -536,7 +536,7 @@ with gr.Blocks(
                 fn=lambda: None,
                 outputs=[gal_],
                 queue=False).then(
-                        fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
+                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
                         show_progress=False,
                         )
