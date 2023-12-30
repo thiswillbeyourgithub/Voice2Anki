@@ -26,28 +26,6 @@ document.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
 document.querySelector('body').classList.add('dark');
 }
 }"""
-if shared.compact_js:
-    hide_some_components = """
-    () => {
-    const hideElements = (selector) => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(el => {
-        el.style.setProperty('display', 'none', 'important');
-      });
-    }
-    try {
-        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-7hmw24 > div.controls.svelte-nq0yvd > select');
-    } catch(e) {};
-    try {
-        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.control-wrapper.svelte-t8ovdf')
-    } catch(e) {};
-    try {
-        hideElements('#Audio_component_Voice2Anki > div.component-wrapper.svelte-1n70sxb > div.controls.svelte-t8ovdf > div.settings-wrapper.svelte-t8ovdf')
-    } catch(e) {};
-    }
-    """
-else:
-    hide_some_components = None
 
 css = """
 #BigTabV2A-button { flex-grow:1 !important; };
@@ -603,11 +581,7 @@ with gr.Blocks(
             postprocess=False,
             queue=False,
             show_progress=False,
-            ).then(
-                    fn=None,
-                    js=hide_some_components,
-                    show_progress=False,
-                    )
+            )
 
     rollaudio_12_btn.click(
             fn=roll_audio,
@@ -662,12 +636,7 @@ with gr.Blocks(
                                     # queue=True,
                                     # preprocess=False,
                                     # postprocess=False,
-                                    ).then(
-                                            fn=None,
-                                            js=hide_some_components,
-                                            queue=False,
-                                            show_progress=False,
-                                            )
+                                    )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -741,12 +710,7 @@ with gr.Blocks(
                                                             # queue=True,
                                                             # preprocess=False,
                                                             # postprocess=False,
-                                                            ).then(
-                                                                    fn=None,
-                                                                    js=hide_some_components,
-                                                                    queue=False,
-                                                                    show_progress=False,
-                                                                    )
+                                                            )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use Voice2Anki on the computer but record the audio
@@ -791,12 +755,7 @@ with gr.Blocks(
                                 # queue=True,
                                 # preprocess=False,
                                 # postprocess=False,
-                                ).then(
-                                        fn=None,
-                                        js=hide_some_components,
-                                        queue=False,
-                                        show_progress=False,
-                                        )
+                                )
 
     # send to whisper
     transcript_btn.click(
@@ -938,22 +897,9 @@ with gr.Blocks(
             queue=False,
             show_progress=False,
             )
-    gr.on(
-            triggers=[
-                # rollaudio_12_btn.click,
-                # rollaudio_123_btn.click,
-                dark_mode_btn.click,
-                sync_btn.click,
-                ],
-            js=hide_some_components,
-            fn=None,
-            queue=False,
-            show_progress=False,
-            )
 
     demo.load(
             fn=shared.reset,
-            js=hide_some_components,
             show_progress=False,
             )
     if shared.pv.profile_name == "default":

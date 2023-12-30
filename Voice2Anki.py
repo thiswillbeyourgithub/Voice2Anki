@@ -24,7 +24,6 @@ def start_voice2formattedtext(
         memory_metric="embeddings",
         disable_tracing=False,
         disable_timeout=True,
-        compact_js=True,
         widen_screen=True,
         port=7860,
         *args,
@@ -64,9 +63,6 @@ def start_voice2formattedtext(
     disable_timeout: bool, default True
         if True, disables the decorator that creates a thread used for
         timeout of long functions
-    compact_js: bool, default True
-        if True, will regularly run a js code to disable some controls from
-        the audio components that can be too large for mobile device.
     widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
         for some widen screens, but very handy for mobile and tablet use.
@@ -120,7 +116,6 @@ def start_voice2formattedtext(
     shared.debug = debug
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
-    shared.compact_js = compact_js
     shared.widen_screen = widen_screen
 
     from utils.gui import demo

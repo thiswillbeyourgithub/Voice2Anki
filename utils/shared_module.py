@@ -19,7 +19,6 @@ class SharedModule:
     debug = None
     disable_tracing = None
     disable_timeout = None
-    compact_js = None
     widen_screen = None
     pv = None
     timeout_lock = Lock()
