@@ -46,9 +46,9 @@ class AudioSplitter:
 
             stop_source="replicate",
 
-            unsplitted_dir="./user_directory/unsplitted",
-            splitted_dir="./user_directory/splitted",
-            done_dir="./user_directory/done",
+            unsplitted_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_untouched"),
+            splitted_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_splits"),
+            done_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_done"),
 
             trim_splitted_silence=False,
             global_slowdown_factor=1.0,
