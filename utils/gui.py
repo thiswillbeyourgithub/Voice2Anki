@@ -49,7 +49,7 @@ if shared.compact_js:
 else:
     hide_some_components = None
 
-if shared.wide_screen:
+if shared.widen_screen:
     css = ".app.svelte-182fdeq.svelte-182fdeq { max-width: 100%; }"
 else:
     css = None

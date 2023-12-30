@@ -25,7 +25,7 @@ def start_voice2formattedtext(
         disable_tracing=False,
         disable_timeout=True,
         compact_js=True,
-        wide_screen=True,
+        widen_screen=True,
         port=7860,
         *args,
         **kwargs
@@ -67,9 +67,9 @@ def start_voice2formattedtext(
     compact_js: bool, default True
         if True, will regularly run a js code to disable some controls from
         the audio components that can be too large for mobile device.
-    wide_screen: bool, default True
+    widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
-        for some wide screens, but very handy for mobile and tablet use.
+        for some widen screens, but very handy for mobile and tablet use.
     """
     if "help" in kwargs or "h" in args:
         return help(start_voice2formattedtext)
@@ -121,7 +121,7 @@ def start_voice2formattedtext(
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
     shared.compact_js = compact_js
-    shared.wide_screen = wide_screen
+    shared.widen_screen = widen_screen
 
     from utils.gui import demo
 
