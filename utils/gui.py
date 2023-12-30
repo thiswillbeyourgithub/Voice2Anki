@@ -36,6 +36,10 @@ css = """
 
 /* remove volume and speed controls */
 #Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.control-wrapper {display: none !important; flex-grow:0 !important;}
+
+/* remove reset cursor button */
+#Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.settings-wrapper > button:nth-child(1) {display: none !important; flex-grow:0 !important;}
+
 /* remove clipping controls
 #Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
 */
