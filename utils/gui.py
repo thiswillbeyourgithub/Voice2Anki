@@ -30,8 +30,9 @@ document.querySelector('body').classList.add('dark');
 css = """
 #BigTabV2A-button { flex-grow:1 !important; };
 """.strip()
+
 if shared.widen_screen:
-    css += "\n.app.svelte-182fdeq.svelte-182fdeq { max-width: 100%; };"
+    css += "\n.app { max-width: 100% !important; }"
 
 with gr.Blocks(
         analytics_enabled=False,
