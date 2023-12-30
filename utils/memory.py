@@ -135,9 +135,13 @@ def check_prompts(prev_prompts):
 
         # keep only the expected keys
         keys = [k for k in mess.keys() if k in expected_mess_keys]
+        to_del = []
         for k in prev_prompts[i]:
             if k not in keys:
-                del prev_prompts[i][k]
+                to_del.append(k)
+        for dele in to_del:
+            red(f"Removed unexpected key from prompt: {dele}")
+            del prev_prompts[i][dele]
 
         # make sure it's stripped
         prev_prompts[i]["content"] = dedent(prev_prompts[i]["content"]).strip()
