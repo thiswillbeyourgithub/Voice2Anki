@@ -202,7 +202,7 @@ with gr.Blocks(
             logging_reload = gr.Button(value="Refresh")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
-    with gr.Tab(label="Memories & Buffer"):
+    with gr.Tab(label="Memories & Buffer") as tab_memories_and_buffer:
         with gr.Tab(label="Memories") as tab_memories:
             df_memories = gr.Dataframe(
                     label="Saved memories",
@@ -408,6 +408,11 @@ with gr.Blocks(
             outputs=[queue_df],
             )
     # load memories only if clicked
+    tab_memories_and_buffer.select(
+            fn=get_memories_df,
+            inputs=[txt_profile],
+            outputs=[df_memories],
+            )
     tab_memories.select(
             fn=get_memories_df,
             inputs=[txt_profile],
