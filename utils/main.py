@@ -33,13 +33,6 @@ from .profiles import ValueStorage
 
 litellm.set_verbose = shared.debug
 shared.pv = ValueStorage()
-shared.splitted_dir = Path("profiles/" + shared.pv.profile_name + "/queues/audio_splits")
-shared.done_dir = Path("profiles/" + shared.pv.profile_name + "/queues/audio_done")
-shared.unsplitted_dir = Path("profiles/" + shared.pv.profile_name + "/queues/audio_untouched")
-for dirs in [shared.splitted_dir, shared.done_dir, shared.unsplitted_dir]:
-    if not dirs.exists():
-        red(f"Created directory {dirs}")
-        dirs.mkdir()
 shared.message_buffer = shared.pv["message_buffer"]
 
 d = datetime.today()
