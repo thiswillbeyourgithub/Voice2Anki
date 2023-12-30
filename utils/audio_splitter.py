@@ -98,13 +98,13 @@ class AudioSplitter:
 
         if profile is None:
             shared.pv = ValueStorage()
-            profile = shared.pv.profile
+            profile = shared.pv.profile_name
         else:
             shared.pv = ValueStorage(profile)
-        red(f"Will use profile {shared.pv.profile}")
+        red(f"Will use profile {shared.pv.profile_name}")
 
         # replicate has to be imported after the api is loader
-        assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile}. You must open Voice2Anki.py and set it in the settings."
+        assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile_name}. You must open Voice2Anki.py and set it in the settings."
         os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
         import replicate
 
