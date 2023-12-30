@@ -455,6 +455,9 @@ def display_price(sld_max_tkn, llm_choice):
 @trace
 def get_memories_df(profile):
     memories = load_prev_prompts(profile)
+    if not memories:
+        gr.Warning(f"No memories found for profile {profile}")
+        return pd.DataFrame()
     for i in range(len(memories)):
         memories[i]["n"] = i + 1
         del memories[i]["role"]
@@ -463,6 +466,9 @@ def get_memories_df(profile):
 @trace
 def get_message_buffer_df():
     buffer = shared.message_buffer
+    if not buffer:
+        gr.Warning("No message buffer found")
+        return pd.DataFrame()
     for i in range(len(buffer)):
         buffer[i]["n"] = i + 1
     return pd.DataFrame(buffer).reset_index().set_index("n")
