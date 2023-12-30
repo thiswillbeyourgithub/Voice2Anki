@@ -48,7 +48,11 @@ if shared.compact_js:
     """
 else:
     hide_some_components = None
-css = ".app.svelte-182fdeq.svelte-182fdeq { max-width: 100%; }"
+
+if shared.wide_screen:
+    css = ".app.svelte-182fdeq.svelte-182fdeq { max-width: 100%; }"
+else:
+    css = None
 
 
 with gr.Blocks(
