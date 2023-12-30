@@ -463,7 +463,7 @@ with gr.Blocks(
                     )
 
     # load image then OCR it then save it to profile
-    paste_image_event = img_btn.click(
+    img_btn.click(
             fn=get_image,
             inputs=[gallery],
             outputs=[gallery],
