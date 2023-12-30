@@ -266,11 +266,6 @@ with gr.Blocks(
                             ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
-            clear_fg_btn = gr.ClearButton(
-                    components=[elem[1] for elem in queued_galleries],
-                    value="Empty all (not saved)",
-                    variant="primary",
-                    )
 
             load_fg_btn.click(
                     fn=load_queued_galleries,
