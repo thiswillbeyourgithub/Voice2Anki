@@ -91,7 +91,6 @@ with gr.Blocks(
                                 show_label=True,
                                 scale=0,
                                 elem_id="Audio_component_Voice2Anki",
-                                elem_classes="Audio_component_Voice2Anki",
                                 #min_width=300,
                                 editable=False,
                                 )

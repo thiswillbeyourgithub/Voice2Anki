@@ -252,7 +252,6 @@ def create_audio_compo():
             show_download_button=True,
             waveform_options={"show_controls": False, "show_recording_waveform": False},
             elem_id="Audio_component_Voice2Anki",
-            elem_classes="Audio_component_Voice2Anki",
             # min_width=10,
             editable=False,
             )
