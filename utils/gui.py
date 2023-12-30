@@ -357,11 +357,11 @@ with gr.Blocks(
                                                             queue=False,
                                                             )
 
-        with gr.Tab(label="Dirload Queue") as tab_dirload_queue:
+        with gr.Tab(label="Queued audio") as tab_dirload_queue:
             queue_df = gr.Dataframe(
                     value=shared.dirload_queue,
                     type="pandas",
-                    label="Dirload queue",
+                    label="Queued audio",
                     interactive=False,
                     column_widths="5%",
                     )
