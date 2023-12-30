@@ -145,11 +145,7 @@ class SharedModule:
     def reset(self):
         "used to reset the values when the gradio page is reloaded"
         self.initialized += 1
-        if self.initialized == 1:
-            # the first init is triggered by loading the webpage, so
-            # the first time shouldn't do anything
-            return
-        elif self.initialized > 1:
+        if self.initialized > 1:
             p(f"Shared module initialized {self.initialized} times.")
 
         self.dirload_queue = pd.DataFrame(columns=self.dirload_queue_columns).set_index("path")
