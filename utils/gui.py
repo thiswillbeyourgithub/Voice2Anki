@@ -174,7 +174,7 @@ with gr.Blocks(
                             txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
 
     with gr.Tab(label="Settings"):
-        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="'Roll' from dirload", show_label=True, scale=0)
+        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Roll from queues", show_label=True, scale=0)
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
         with gr.Row():
