@@ -98,6 +98,8 @@ def whisper_cached(
                         )
                     if sld_whisp_temp == 0:
                         temps = [seg["temperature"] for seg in transcript.segments]
+                        if not transcript.segments:
+                            raise Exception(f"No audio segment found in {audio_path}")
                         if sum(temps) / len(temps) == 1:
                             raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
