@@ -7,7 +7,6 @@ utils/__pycache__/*
 __pycache__/*
 
 
-*API_KEY.txt
 user_directory/
 utils/author_cloze_editor.py
 utils/ssl/*pem
