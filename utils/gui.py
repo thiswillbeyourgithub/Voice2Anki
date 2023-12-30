@@ -224,7 +224,7 @@ with gr.Blocks(
                     )
 
     with gr.Tab(label="Queues"):
-        with gr.Tab(label="Future galleries") as tab_galleries:
+        with gr.Tab(label="Queued galleries") as tab_galleries:
 
             with gr.Row():
                 with gr.Column():
