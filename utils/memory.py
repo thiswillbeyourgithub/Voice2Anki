@@ -47,7 +47,7 @@ default_system_prompt = {
             }
 
 
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash", "llm_choice"]
 
 # embeddings using ada2:
 embedding_model_name = "text-embedding-ada-002"
