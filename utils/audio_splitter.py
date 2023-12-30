@@ -23,13 +23,6 @@ from logger import whi, yel, red
 from shared_module import shared
 from profiles import ValueStorage
 
-shared.pv = ValueStorage()
-
-# replicate has to be imported after the api is loader
-assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile}. You must open Voice2Anki.py and set it in the settings."
-os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
-import replicate
-
 stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=1)
 
 d = datetime.today()
@@ -38,7 +31,8 @@ today = f"{d.day:02d}_{d.month:02d}"
 class AudioSplitter:
     def __init__(
             self,
-            prompt,
+            prompt=None,
+            profile=None,
 
             stop_list=[" stop", " top"],
             language="fr",
@@ -46,9 +40,9 @@ class AudioSplitter:
 
             stop_source="replicate",
 
-            untouched_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_untouched"),
-            splitted_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_splits"),
-            done_dir=Path("profiles/" + shared.pv.profile + "/queues/audio_done"),
+            untouched_dir=None,
+            splitted_dir=None,
+            done_dir=None,
 
             trim_splitted_silence=False,
             global_slowdown_factor=1.0,
@@ -60,8 +54,12 @@ class AudioSplitter:
             help=False,
             ):
         """
-        prompt: str
-            prompt used to guide whisper
+        prompt: str, default None
+            prompt used to guide whisper. None to disable
+        profile: str, default None
+            name of the profile to use when looking for the audio to split
+            as well as the replicate API key.
+            if None, will use the latest_profile used by Voice2Anki
         stop_list: list, default [' stop', ' top']
             list of strings that when found will trigger the audio splitting.
         language: str, default fr
@@ -97,6 +95,25 @@ class AudioSplitter:
         """
         if h or help:
             return help(self)
+
+        if profile is None:
+            shared.pv = ValueStorage()
+            profile = shared.pv.profile
+        else:
+            shared.pv = ValueStorage(profile)
+        red(f"Will use profile {shared.pv.profile}")
+
+        # replicate has to be imported after the api is loader
+        assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile}. You must open Voice2Anki.py and set it in the settings."
+        os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
+        import replicate
+
+        if untouched_dir is None:
+            untouched_dir = f"profiles/{profile}/queues/audio_untouched"
+        if splitted_dir is None:
+            splitted_dir = f"profiles/{profile}/queues/audio_splits"
+        if done_dir is None:
+            done_dir = f"profiles/{profile}/queues/audio_done"
         self.unsp_dir = Path(untouched_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
