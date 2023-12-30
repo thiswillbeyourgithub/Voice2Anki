@@ -152,7 +152,10 @@ class ValueStorage:
                 return self.cache_values[key]
 
         kp = key + ".pickle"
-        kf = self.p / kp
+        if key.startswith("future_gallery_"):
+            kf = self.p / "queues" / "galleries" / kp
+        else:
+            kf = self.p / kp
 
         if kf.exists():
             if key == "message_buffer":
@@ -233,7 +236,10 @@ class ValueStorage:
             try:
                 if item is None or item is False or (bool(item) is False):
                     kp = key + ".pickle"
-                    kf = self.p / kp
+                    if key.startswith("future_gallery_"):
+                        kf = self.p / "queues" / "galleries" / kp
+                    else:
+                        kf = self.p / kp
                     if kf.exists():
                         red(f"Deleting file {kf}")
                         kf.unlink()
@@ -246,7 +252,10 @@ def worker_setitem(in_queue):
     while True:
         profile, key, item, out_queue = in_queue.get()
         kp = key + ".pickle"
-        kf = profile / kp
+        if key.startswith("future_gallery_"):
+            kf = profile / "queues" / "galleries" / kp
+        else:
+            kf = profile / kp
 
         kf.unlink(missing_ok=True)
 
