@@ -52,9 +52,6 @@ else:
 css = """
 #BigTabV2A-button { flex-grow:1 !important; };
 """.strip()
-##BigTabV2A { flex-grow:1 !important; };
-#.BigTabV2Aclass { flex-grow:1 !important; };
-#.BigTabV2A-buttonclass { flex-grow:1 !important; };
 if shared.widen_screen:
     css += "\n.app.svelte-182fdeq.svelte-182fdeq { max-width: 100%; };"
 
@@ -71,7 +68,7 @@ with gr.Blocks(
         sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
         update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True)
 
-    with gr.Tab(label="Main", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass"):
+    with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
         with gr.Row():
 
@@ -176,7 +173,7 @@ with gr.Blocks(
                                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
                             txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=False)
 
-    with gr.Tab(label="Settings", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass"):
+    with gr.Tab(label="Settings", elem_id="BigTabV2A"):
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Roll from queues", show_label=True, scale=0)
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
@@ -204,13 +201,13 @@ with gr.Blocks(
         with gr.Row():
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
 
-    with gr.Tab(label="Logging", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass") as tab_logging:
+    with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
         with gr.Column():
             logging_reload = gr.Button(value="Refresh")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
-    with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass") as tab_memories_and_buffer:
-        with gr.Tab(label="Memories") as tab_memories:
+    with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A") as tab_memories_and_buffer:
+        with gr.Tab(label="Memories", elem_id="BigTabV2A") as tab_memories:
             df_memories = gr.Dataframe(
                     label="Saved memories",
                     value=None,
@@ -218,7 +215,7 @@ with gr.Blocks(
                     column_widths="5%",
                     )
 
-        with gr.Tab(label="Message buffer") as tab_buffer:
+        with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
             df_buffer = gr.Dataframe(
                     label="Message buffer",
                     value=None,
@@ -226,8 +223,8 @@ with gr.Blocks(
                     column_widths="5%",
                     )
 
-    with gr.Tab(label="Queues", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass"):
-        with gr.Tab(label="Queued galleries") as tab_galleries:
+    with gr.Tab(label="Queues", elem_id="BigTabV2A"):
+        with gr.Tab(label="Queued galleries", elem_id="BigTabV2A") as tab_galleries:
 
             with gr.Row():
                 with gr.Column():
@@ -275,7 +272,7 @@ with gr.Blocks(
                     outputs=[row[1] for row in queued_galleries],
                     )
 
-        with gr.Tab(label="Queued audio") as tab_dirload_queue:
+        with gr.Tab(label="Queued audio", elem_id="BigTabV2A") as tab_dirload_queue:
             queue_df = gr.Dataframe(
                     value=shared.dirload_queue,
                     type="pandas",
@@ -285,7 +282,7 @@ with gr.Blocks(
                     )
 
 
-    # with gr.Tab(label="Files", elem_id="BigTabV2A", elem_classes="BigTabV2Aclass") as tab_files:
+    # with gr.Tab(label="Files", elem_id="BigTabV2A") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
     #         fex_done = gr.FileExplorer(
     #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_done",
