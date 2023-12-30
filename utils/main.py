@@ -33,7 +33,6 @@ from .profiles import ValueStorage
 
 litellm.set_verbose = shared.debug
 shared.pv = ValueStorage()
-pv = shared.pv
 shared.splitted_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_splits")
 shared.done_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_done")
 shared.unsplitted_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_untouched")
@@ -41,7 +40,7 @@ for dirs in [shared.splitted_dir, shared.done_dir, shared.unsplitted_dir]:
     if not dirs.exists():
         red(f"Created directory {dirs}")
         dirs.mkdir()
-shared.message_buffer = pv["message_buffer"]
+shared.message_buffer = shared.pv["message_buffer"]
 
 d = datetime.today()
 today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
@@ -233,7 +232,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                         "whisper_language": txt_whisp_lang,
                         "whisper_context": txt_whisp_prompt,
                         "whisper_temperature": sld_whisp_temp,
-                        "Voice2Anki_profile": pv.profile_name,
+                        "Voice2Anki_profile": shared.pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript.json(),
                         "model_name": modelname,
@@ -526,7 +525,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
         assert isinstance(model_price, float)
         duration = response["ended"] - response["started"]
         tkn_cost_dol = model_price * duration / 1000
-    pv["total_llm_cost"] += tkn_cost_dol
+    shared.pv["total_llm_cost"] += tkn_cost_dol
 
     cloz = response["choices"][0]["message"]["content"]
     # for cosmetic purposes in the textbox
@@ -559,7 +558,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "dollar_cost": tkn_cost_dol,
                     "temperature": temperature,
                     "LLM_context": txt_chatgpt_context,
-                    "Voice2Anki_profile": pv.profile_name,
+                    "Voice2Anki_profile": shared.pv.profile_name,
                     "transcribed_input": txt_audio,
                     "llm_output": response.json(),
                     "model_name": llm_choice,
@@ -571,8 +570,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     })
 
     yel(f"\n\nLLM answer:\n{cloz}\n\n")
-    whi(f"LLM cost: {pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
-    red(f"Total LLM cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    whi(f"LLM cost: {shared.pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
+    red(f"Total LLM cost so far: ${shared.pv['total_llm_cost']:.4f} (not counting whisper)")
 
     return cloz
 
@@ -903,12 +902,12 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     output_tkn_cost = response["usage"]["completion_tokens"]
 
     tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-    pv["total_llm_cost"] += tkn_cost_dol
+    shared.pv["total_llm_cost"] += tkn_cost_dol
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n").strip()  # for cosmetic purposes in the textbox
 
     yel(f"\n\nLLM answer:\n{cloz}\n\n")
-    red(f"Total LLM cost so far: ${pv['total_llm_cost']:.4f} (not counting whisper)")
+    red(f"Total LLM cost so far: ${shared.pv['total_llm_cost']:.4f} (not counting whisper)")
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
@@ -1169,7 +1168,7 @@ def to_anki(
 
     # cap the number of messages
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
-    pv["message_buffer"] = shared.message_buffer
+    shared.pv["message_buffer"] = shared.message_buffer
 
     Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio)
 
