@@ -32,19 +32,15 @@ from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
 litellm.set_verbose = shared.debug
-
-splitted_dir = Path("./user_directory/splitted")
-done_dir = Path("./user_directory/done")
-unsplitted_dir = Path("./user_directory/unsplitted")
-
-
-Path("user_directory").mkdir(exist_ok=True)
-splitted_dir.mkdir(exist_ok=True)
-unsplitted_dir.mkdir(exist_ok=True)
-done_dir.mkdir(exist_ok=True)
-
 shared.pv = ValueStorage()
 pv = shared.pv
+shared.splitted_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_splits")
+shared.done_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_done")
+shared.unsplitted_dir = Path("profiles/" + shared.pv.profile + "/queues/audio_untouched")
+for dirs in [shared.splitted_dir, shared.done_dir, shared.unsplitted_dir]:
+    if not dirs.exists():
+        red(f"Created directory {dirs}")
+        dirs.mkdir()
 shared.message_buffer = pv["message_buffer"]
 
 d = datetime.today()

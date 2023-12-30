@@ -25,6 +25,9 @@ class SharedModule:
     openai_client = None
 
     tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
+    splitted_dir = None
+    done_dir = None
+    unsplitted_dir = None
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
