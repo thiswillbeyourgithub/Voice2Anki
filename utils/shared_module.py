@@ -20,6 +20,7 @@ class SharedModule:
     disable_tracing = None
     disable_timeout = None
     compact_js = None
+    wide_screen = None
     pv = None
     timeout_lock = Lock()
     dirload_lock = Lock()
