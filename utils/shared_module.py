@@ -4,6 +4,9 @@ from threading import Lock
 import gradio as gr
 import pandas as pd
 
+# used to print in red
+col_red = "\033[91m"
+col_rst = "\033[0m"
 
 class SharedModule:
     """module used to store information from Voice2Anki.py to
@@ -168,7 +171,7 @@ class SharedModule:
 
 
 def p(message):
-    print(message)
+    print(col_red + message + col_rst)
     gr.Error(message)
 
 
