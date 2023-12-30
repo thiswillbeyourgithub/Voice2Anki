@@ -290,7 +290,7 @@ with gr.Blocks(
     # with gr.Tab(label="Files") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
     #         fex_done = gr.FileExplorer(
-    #                 root=f"profiles/{shared.pv.profile}/queues/audio_done",
+    #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_done",
     #                 label="Done",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
@@ -298,7 +298,7 @@ with gr.Blocks(
     #                 )
     #     with gr.Accordion(label="Splitted", open=False):
     #         fex_splitted = gr.FileExplorer(
-    #                 root=f"profiles/{shared.pv.profile}/queues/audio_splits",
+    #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_splits",
     #                 label="Splitted",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
@@ -306,7 +306,7 @@ with gr.Blocks(
     #                 )
     #     with gr.Accordion(label="Unsplitted", open=False):
     #         fex_unsplitted = gr.FileExplorer(
-    #                 root=f"profiles/{shared.pv.profile}/queues/audio_untouched",
+    #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_untouched",
     #                 label="Unsplitted",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",
@@ -314,7 +314,7 @@ with gr.Blocks(
     #                 )
     #     with gr.Accordion(label="Flagged", open=False):
     #         fex_flagged = gr.FileExplorer(
-    #                 root=f"profiles/{shared.pv.profile}/queues/flagged",
+    #                 root=f"profiles/{shared.pv.profile_name}/queues/flagged",
     #                 label="Flagged",
     #                 interactive=True,
     #                 # ignore_glob="**/.st*",

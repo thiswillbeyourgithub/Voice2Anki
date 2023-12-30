@@ -162,9 +162,9 @@ class SharedModule:
         self.pv.running_tasks = {k: None for k in self.pv.profile_keys}
         self.pv.cache_values = {k: None for k in self.pv.profile_keys}
 
-        self.splitted_dir = Path("profiles/" + self.pv.profile + "/queues/audio_splits")
-        self.done_dir = Path("profiles/" + self.pv.profile + "/queues/audio_done")
-        self.unsplitted_dir = Path("profiles/" + self.pv.profile + "/queues/audio_untouched")
+        self.splitted_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_splits")
+        self.done_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_done")
+        self.unsplitted_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_untouched")
         for dirs in [self.splitted_dir, self.done_dir, self.unsplitted_dir]:
             if not dirs.exists():
                 p(f"Created directory {dirs}")
