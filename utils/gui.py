@@ -242,7 +242,6 @@ with gr.Blocks(
             load_fg_btn = gr.Button(value="Load future galleries")
 
             queued_galleries = []
-
             for fg in range(1, shared.queued_gallery_slot_nb + 1):
                 with gr.Row(equal_height=False):
                     with gr.Column(scale=10):
@@ -265,54 +264,6 @@ with gr.Blocks(
                         with gr.Row():
                             rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
                             ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
-
-                # add image
-                add_.click(
-                        fn=get_image,
-                        inputs=[gal_],
-                        outputs=[gal_],
-                        queue=False).then(
-                                fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
-                                inputs=[gal_],
-                                show_progress=False,
-                                )
-
-                # send image
-                send_.click(
-                        fn=lambda x: x,
-                        inputs=[gal_],
-                        outputs=[gallery],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=False).then(
-                                fn=shared.pv.save_gallery,
-                                inputs=[gallery],
-                                show_progress=False,
-                                ).then(
-                                        fn=get_img_source,
-                                        inputs=[gallery],
-                                        queue=False,
-                                        )
-                # reset image
-                rst_.click(
-                        fn=lambda: None,
-                        outputs=[gal_],
-                        queue=False).then(
-                                fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
-                                inputs=[gal_],
-                                show_progress=False,
-                                )
-
-                # ocr image
-                ocr_.click(
-                        fn=ocr_image,
-                        inputs=[gal_],
-                        outputs=[source_txt],
-                        queue=False,
-                        preprocess=False,
-                        postprocess=False,
-                        )
-
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
             clear_fg_btn = gr.ClearButton(
@@ -325,37 +276,6 @@ with gr.Blocks(
                     fn=load_queued_galleries,
                     outputs=[row[1] for row in queued_galleries],
                     )
-
-            roll_gall_btn.click(
-                    fn=lambda: [None, None],
-                    outputs=[queued_galleries[0][1], gallery],
-                    ).then(
-                            fn=shared.pv.save_queued_gallery_001,
-                            inputs=[queued_galleries[0][1]],
-                            show_progress=False,
-                            ).then(
-                                    fn=load_queued_galleries,
-                                    outputs=[row[1] for row in queued_galleries],
-                                    ).then(
-                                        fn=lambda x: x,
-                                        inputs=[queued_galleries[0][1]],
-                                        outputs=[gallery],
-                                        preprocess=False,
-                                        postprocess=False,
-                                        queue=False,
-                                        ).then(
-                                            fn=shared.pv.save_gallery,
-                                            inputs=[gallery],
-                                            show_progress=False,
-                                            ).then(
-                                                    fn=get_img_source,
-                                                    inputs=[gallery],
-                                                    queue=False,
-                                                    ).success(
-                                                            fn=get_img_source,
-                                                            inputs=[queued_galleries[1][1]],
-                                                            queue=False,
-                                                            )
 
         with gr.Tab(label="Queued audio") as tab_dirload_queue:
             queue_df = gr.Dataframe(
@@ -585,6 +505,87 @@ with gr.Blocks(
                 inputs=[gallery],
                 show_progress=False,
                 )
+
+    # queued gallery
+    for fg_cnt, fg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
+        rst_, gal_, send_, add_, ocr_ = queued_galleries[fg_cnt]
+        # add image
+        add_.click(
+                fn=get_image,
+                inputs=[gal_],
+                outputs=[gal_],
+                queue=False).then(
+                        fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
+                        inputs=[gal_],
+                        show_progress=False,
+                        )
+
+        # send image
+        send_.click(
+                fn=lambda x: x,
+                inputs=[gal_],
+                outputs=[gallery],
+                preprocess=False,
+                postprocess=False,
+                queue=False).then(
+                        fn=shared.pv.save_gallery,
+                        inputs=[gallery],
+                        show_progress=False,
+                        ).then(
+                                fn=get_img_source,
+                                inputs=[gallery],
+                                queue=False,
+                                )
+        # reset image
+        rst_.click(
+                fn=lambda: None,
+                outputs=[gal_],
+                queue=False).then(
+                        fn=getattr(shared.pv, f"save_queued_gallery_{fg:03d}"),
+                        inputs=[gal_],
+                        show_progress=False,
+                        )
+
+        # ocr image
+        ocr_.click(
+                fn=ocr_image,
+                inputs=[gal_],
+                outputs=[source_txt],
+                queue=False,
+                preprocess=False,
+                postprocess=False,
+                )
+
+    roll_gall_btn.click(
+            fn=lambda: [None, None],
+            outputs=[queued_galleries[0][1], gallery],
+            ).then(
+                    fn=shared.pv.save_queued_gallery_001,
+                    inputs=[queued_galleries[0][1]],
+                    show_progress=False,
+                    ).then(
+                            fn=load_queued_galleries,
+                            outputs=[row[1] for row in queued_galleries],
+                            ).then(
+                                fn=lambda x: x,
+                                inputs=[queued_galleries[0][1]],
+                                outputs=[gallery],
+                                preprocess=False,
+                                postprocess=False,
+                                queue=False,
+                                ).then(
+                                    fn=shared.pv.save_gallery,
+                                    inputs=[gallery],
+                                    show_progress=False,
+                                    ).then(
+                                            fn=get_img_source,
+                                            inputs=[gallery],
+                                            queue=False,
+                                            ).success(
+                                                    fn=get_img_source,
+                                                    inputs=[queued_galleries[1][1]],
+                                                    queue=False,
+                                                    )
 
     # audio
     audio_corrector.stop_recording(
