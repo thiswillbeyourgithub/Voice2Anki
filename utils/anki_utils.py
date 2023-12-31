@@ -1,5 +1,6 @@
 from functools import partial
 import asyncio
+import aiohttp
 import gradio as gr
 import re
 import threading
@@ -83,26 +84,52 @@ def add_to_anki(
         red("Done creating notetype")
         return add_to_anki(body, source, note_metadata, tags, deck_name)
 
+@trace
+async def anki_request_async(url, request):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=request) as response:
+            data = await response.json()
+            return data
+
 
 def _call_anki(action, **params):
     """ bridge between local python libraries and AnnA Companion addon
     (a fork from anki-connect) """
+
+    if "async_mode" in params:
+        use_async = True
+        del params["async_mode"]
+    else:
+        use_async = False
+
     def request_wrapper(action, **params):
         return {'action': action, 'params': params, 'version': 6}
 
     requestJson = json.dumps(request_wrapper(action, **params)
                              ).encode('utf-8')
 
-    try:
-        response = json.load(urllib.request.urlopen(
-            urllib.request.Request(
-                'http://localhost:8765',
-                requestJson)))
-    except (ConnectionRefusedError, urllib.error.URLError) as e:
-        red(f"{str(e)}: is Anki open and 'AnkiConnect' "
-            "enabled? Firewall issue?")
-        raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                        "addon' enabled? Firewall issue?")
+    if not use_async:
+        try:
+            response = json.load(urllib.request.urlopen(
+                urllib.request.Request(
+                    'http://localhost:8765',
+                    requestJson)))
+        except (ConnectionRefusedError, urllib.error.URLError) as e:
+            red(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                "enabled? Firewall issue?")
+            raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                            "addon' enabled? Firewall issue?")
+    else:
+        try:
+            response = anki_request_async(
+                    url='http://localhost:8765',
+                    request=requestJson)
+        except Exception as e:
+            red(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                "enabled? Firewall issue?")
+            raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                            "addon' enabled? Firewall issue?")
+
 
     if len(response) != 2:
         red('response has an unexpected number of fields')
