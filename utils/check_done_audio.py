@@ -41,14 +41,30 @@ class DoneAudioChecker:
         done_list = sorted([p for p in self.done_dir.iterdir()])
         whi(f"Found {len(done_list)} files in {self.done_dir}")
 
-        media_list = sorted([p for p in anki_media.iterdir() if p.name.startswith("Voice2FormattedText")])
+        # get the list of audio files in anki collection that were
+        # created by Voice2Anki
+        media_list = sorted(
+                [
+                    p
+                    for p in anki_media.iterdir()
+                    if (
+                        # older names of Voice2Anki
+                        p.name.startswith("Voice2FormattedText")
+                        or p.name.startswith("WhisperToAnki")
+                        or p.name.startswith("Voice2Anki")
+                        )
+                    ])
+
+        # get the suffix list of each file in anki media
         suffix_list = set(p.suffix for p in anki_media.iterdir())
+
+        # restrict found anki media to those that have the right suffix
         media_dict = {}
         for m in media_list:
             for suffix in suffix_list:
                 if suffix == m.suffix:
                     name = "_".join(m.name.split("_")[2:])
-                    name = name.replace("-0-100", "")
+                    name = name.replace("-0-100", "").replace(".mp3_", "_")
                     if suffix in media_dict:
                         media_dict[suffix].append(name)
                     else:
@@ -57,6 +73,8 @@ class DoneAudioChecker:
                     break
 
 
+        # for each audio found in the done folder, check that it is found
+        # in the media folder
         print("\n\n")
         issues = {}
         for p in tqdm(done_list, desc="Checking"):
@@ -67,7 +85,7 @@ class DoneAudioChecker:
                 name = name.replace(".mp3", "", 1)
             if name not in media_dict[suffix]:
                 audio = AudioSegment.from_mp3(p)
-                if len(audio) <= 5000:
+                if len(audio) <= 1000:
                     whi(f"Ignored {p.name} (too short)")
                 else:
                     red(f"ISSUE {p.name}")
