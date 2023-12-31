@@ -14,6 +14,12 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 def start_voice2formattedtext(
         print_db_then_exit=False,
         nb_audio_slots=5,
+
+        enable_gallery=True,
+        enable_queued_gallery=True,
+        enable_flagging=True,
+        enable_dirload=True,
+
         share=False,
         open_browser=False,
         debug=False,
@@ -38,6 +44,14 @@ def start_voice2formattedtext(
         Example value: "anki_whisper.db"
     nb_audio_slots: int, default 5
         Number of audio slot
+    enable_gallery: bool, default True
+        if False, hides the gallery components
+    enable_queued_gallery: bool, default True
+        if False, hides the queued gallery components
+    enable_flagging: bool, default True
+        if False, disable flagging
+    enable_dirload: bool, default True
+        if False, disalbe dirload
     share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
@@ -117,6 +131,16 @@ def start_voice2formattedtext(
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
     shared.widen_screen = widen_screen
+    if enable_gallery is False:
+        enable_queued_gallery = False
+    shared.enable_gallery = enable_gallery
+    shared.enable_queued_gallery = enable_queued_gallery
+    shared.enable_flagging = enable_flagging
+    shared.enable_dirload = enable_dirload
+
+    if shared.enable_queued_gallery is False:
+        shared.queued_gallery_slot_nb = 2  # load less elements as they
+        # will be hidden anyway
 
     from utils.gui import demo
 

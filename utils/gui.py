@@ -195,25 +195,26 @@ with gr.Blocks(
                         txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
                     with gr.Row():
-                        flag_audio_btn = gr.Button(value="Flag audio")
+                        flag_audio_btn = gr.Button(value="Flag audio", visible=shared.enable_flagging)
                         force_sound_processing_btn = gr.Button(value="Sound processing")
                         clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
                         pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
 
                 # image
-                with gr.Accordion(label="Main gallery", open=True):
+                with gr.Accordion(label="Main gallery", open=True, visible=shared.enable_gallery):
                     with gr.Row():
                         with gr.Column():
-                            roll_gall_btn = gr.Button(value="Roll gallery", min_width=50)
-                            gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
+                            roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=all([shared.enable_gallery, shared.enable_queued_gallery]))
+                            gallery = gr.Gallery(value=shared.pv["gallery"] if shared.enable_gallery else None, label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                             with gr.Group():
                                 with gr.Row():
                                     rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50)
                                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
-                            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
+
+                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A"):
-        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Roll from queues", show_label=True, scale=0)
+        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, scale=0, visible=shared.enable_dirload)
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
         with gr.Row():
@@ -265,7 +266,7 @@ with gr.Blocks(
     with gr.Tab(label="Queues", elem_id="BigTabV2A"):
         with gr.Tab(label="Queued galleries", elem_id="BigTabV2A") as tab_galleries:
 
-            with gr.Row():
+            with gr.Row(visible=shared.enable_queued_gallery):
                 with gr.Column():
                     source_txt_btn = gr.Button("OCR the main gallery")
                     source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
@@ -278,15 +279,15 @@ with gr.Blocks(
                             postprocess=False,
                             )
 
-            load_qg_btn = gr.Button(value="Load future galleries")
+            load_qg_btn = gr.Button(value="Load future galleries", visible=shared.enable_queued_gallery)
 
             queued_galleries = []
             for qg in range(1, shared.queued_gallery_slot_nb + 1):
-                with gr.Row(equal_height=False):
+                with gr.Row(equal_height=False, visible=shared.enable_queued_gallery):
                     with gr.Column(scale=10):
                         gal_ = gr.Gallery(
                             # value=None,
-                            value=shared.pv[f"queued_gallery_{qg:03d}"],
+                            value=shared.pv[f"queued_gallery_{qg:03d}"] if shared.enable_queued_gallery else None,
                             label=f"Gallery {qg}",
                             columns=[2],
                             rows=[1],
@@ -313,11 +314,12 @@ with gr.Blocks(
 
         with gr.Tab(label="Queued audio", elem_id="BigTabV2A") as tab_dirload_queue:
             queue_df = gr.Dataframe(
-                    value=shared.dirload_queue,
+                    value=shared.dirload_queue if shared.enable_dirload else None,
                     type="pandas",
                     label="Queued audio",
                     interactive=False,
                     column_widths="5%",
+                    visible=shared.enable_dirload
                     )
 
 
