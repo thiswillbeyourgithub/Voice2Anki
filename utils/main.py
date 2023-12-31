@@ -294,6 +294,7 @@ def flag_audio(
             "txt_chatgpt_cloz": txt_chatgpt_cloz,
             "txt_chatgpt_context": txt_chatgpt_context,
             "gallery": gallery,
+            "request_information": shared.request,
             }
     with open(f"user_directory/flagged/{aud.name}.pickle", "wb") as f:
         pickle.dump(to_save, f)
