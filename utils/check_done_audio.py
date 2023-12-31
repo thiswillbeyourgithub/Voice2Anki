@@ -64,26 +64,93 @@ class DoneAudioChecker:
             for suffix in suffix_list:
                 if suffix == m.suffix:
                     name = "_".join(m.name.split("_")[2:])
-                    name = name.replace("-0-100", "").replace(".mp3_", "_")
-                    if suffix in media_dict:
-                        media_dict[suffix].append(name)
+                    name = name.replace("-0-100", "").replace(".mp3_", "_").replace("_processed", "")
+
+                    if not name.strip():
+                        red(f"Ignored media file as irrelevant: {m}")
                     else:
-                        media_dict[suffix] = [name]
-                    print(media_dict[suffix][-1])
+                        if suffix in media_dict:
+                            media_dict[suffix].append(name)
+                        else:
+                            media_dict[suffix] = [name]
+                        whi(f"Keeping {name}")
                     break
 
+        # get the list of timestamp in done folder
+        timestamps_p = {}
+        p_timestamps = {}
+        to_ignore = []
+        for p in tqdm(done_list, desc="Getting timestamps"):
+            sp = p.name.split("_")
+            stamps = [t for t in sp if t.isdigit() and (t.startswith("16") or t.startswith("17")) and len(t) == 10]
+            if not stamps:
+                red(f"Ignored done file as no timestamp: {p}")
+                to_ignore.append(p)
+                continue
+            assert len(stamps) == 1
+
+            stamp = stamps[0]
+            if stamp in timestamps_p:
+                timestamps_p[stamp].append(p)
+            else:
+                timestamps_p[stamp] = [p]
+            p_timestamps[p.name] = stamp
+
+        done_list = [d for d in done_list if d not in to_ignore]
+
+        # get the list of timestamp in media folder
+        timestamps_m = {}
+        m_timestamps = {}
+        red(f"Getting timestamps of media folder")
+        for suffix in media_dict:
+            to_ignore = []
+            for p in media_dict[suffix]:
+                sp = p.split("_")
+                stamps = [t for t in sp if t.isdigit() and (t.startswith("16") or t.startswith("17")) and len(t) == 10]
+                if not stamps:
+                    red(f"Ignored media file as no timestamp: {p}")
+                    to_ignore.append(p)
+                    continue
+                assert len(stamps) == 1
+
+                stamp = stamps[0]
+                if stamp in timestamps_m:
+                    timestamps_m[stamp].append(p)
+                else:
+                    timestamps_m[stamp] = [p]
+                m_timestamps[p] = stamp
+            for ig in to_ignore:
+                media_dict[suffix].remove(ig)
+
+        for stamp, done_files in tqdm(timestamps_p.items(), desc="Checking timestamps"):
+            if stamp in timestamps_m:
+                for f in done_files:
+                    name = f.name
+                    if name.count("mp3") > 1:
+                        name = name.replace(".mp3_", "_")
+                    name = name.replace("_processed", "")
+                    if name not in timestamps_m[stamp]:
+                        red(f"Not found in media: {f.name} : {timestamps_m[stamp]}")
+            else:
+                red(f"No timestamp in media: {done_files}")
+
+        breakpoint()
 
         # for each audio found in the done folder, check that it is found
         # in the media folder
-        print("\n\n")
+        whi("\n\n")
         issues = {}
         for p in tqdm(done_list, desc="Checking"):
             suffix = p.suffix
             name = p.name.replace("-0-100", "")
             name = name.replace(" ", "_")
-            if name.count(".mp3") > 1:
-                name = name.replace(".mp3", "", 1)
+            # if name.count(".mp3") > 1:
+            #     name = name.replace(".mp3", "", 1)
             if name not in media_dict[suffix]:
+                stamp = p_timestamps[p.name]
+
+                # todo: gather the timestamps of the files in media
+
                 audio = AudioSegment.from_mp3(p)
                 if len(audio) <= 1000:
                     whi(f"Ignored {p.name} (too short)")
