@@ -28,13 +28,12 @@ assert anki_media.exists(), "Media folder not found!"
 class DoneAudioChecker:
     def __init__(
             self,
-            unsplitted_dir="./user_directory/unsplitted",
-            splitted_dir="./user_directory/splitted",
-            done_dir="./user_directory/done",
+            profile,
             ):
-        self.unsp_dir = Path(unsplitted_dir)
-        self.sp_dir = Path(splitted_dir)
-        self.done_dir = Path(done_dir)
+        profile = Path("./profiles/" + profile)
+        self.unsp_dir = profile / "queues/audio_untouched"
+        self.sp_dir = profile / "queues/audio_splits"
+        self.done_dir = profile / "queues/audio_done"
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
