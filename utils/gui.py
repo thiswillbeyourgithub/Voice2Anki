@@ -66,14 +66,12 @@ function shortcuts(e) {
             document.getElementById("toankibtn").click();
         }
         else {
-            if (!(e.shiftKey)) {
-                alert(`Unrecognized shortcut: ${e.key}`);
-            }
+            alert(`Unrecognized shortcut: ${e.key}`);
             }
 
         }
 }
-document.addEventListener('keydown', shortcuts, false);
+document.addEventListener('keypress', shortcuts, false);
 </script>
 """
 
