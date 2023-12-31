@@ -234,6 +234,7 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
                         "model_name": modelname,
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "Voice2Anki_version": shared.VERSION,
+                        "request_information": shared.request,
                         },
                     "db_name": "whisper"
                     })
@@ -563,6 +564,7 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
                     "system_prompt": default_system_prompt["content"],
                     "cloze": cloz,
                     "Voice2Anki_version": shared.VERSION,
+                    "request_information": shared.request,
                     })
 
     yel(f"\n\nLLM answer:\n{cloz}\n\n")
@@ -981,6 +983,7 @@ def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
                 "system_prompt": default_system_prompt["content"],
                 "cloze": txt_chatgpt_cloz,
                 "Voice2Anki_version": shared.VERSION,
+                "request_information": shared.request,
                 }
     else:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
@@ -1070,6 +1073,7 @@ def to_anki(
                 "tts_used": shared.latest_stt_used,
                 "version": shared.VERSION,
                 "timestamp": time.time(),
+                "user-agent": shared.request["user-agent"],
                 }, pretty=True)
     results = []
 

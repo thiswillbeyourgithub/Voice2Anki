@@ -27,6 +27,8 @@ class SharedModule:
     db_lock = Lock()
     openai_client = None
 
+    request = None
+
     tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
     splitted_dir = None
     done_dir = None
@@ -141,7 +143,7 @@ class SharedModule:
 
     added_note_ids = []
 
-    def reset(self):
+    def reset(self, request: gr.Request):
         "used to reset the values when the gradio page is reloaded"
         self.initialized += 1
         if self.initialized > 1:
@@ -156,6 +158,12 @@ class SharedModule:
         self.added_note_ids = []
         self.pv.running_tasks = {k: None for k in self.pv.profile_keys}
         self.pv.cache_values = {k: None for k in self.pv.profile_keys}
+        self.request = {
+                "user-agent": request.headers["user-agent"],
+                "headers": request.headers,
+                "IP adress:": f"{request.client.host}:{request.client.port}",
+                "query_params": request.query_params,
+                }
 
         self.splitted_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_splits")
         self.done_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_done")
