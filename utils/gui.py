@@ -27,6 +27,56 @@ document.querySelector('body').classList.add('dark');
 }
 }"""
 
+shortcut_js = """
+<script>
+function shortcuts(e) {
+    // the switch is so that keypress are ignored if an input element is
+    // in focus
+    var event = document.all ? window.event : e;
+    switch (e.target.tagName.toLowerCase()) {
+        case "input":
+        case "textarea":
+        //case "select":
+        //case "button":
+        break;
+
+        default:
+        if (e.code == "KeyS" && e.shiftKey) {
+            document.getElementById("syncankibtn").click();
+        }
+        else if (e.code == "KeyN" && e.shiftKey) {
+            document.getElementById("darkmodebtn").click();
+        }
+        else if (e.key == "s") {
+            document.getElementById("cardstatusbtn").click();
+        }
+        else if (e.key == "f") {
+            document.getElementById("llmfeedbackbtn").click();
+        }
+        else if (e.key == "m") {
+            document.getElementById("markpreviousbtn").click();
+        }
+        else if (e.key == "1" && e.shiftKey) {
+            document.getElementById("transcribebtn").click();
+        }
+        else if (e.key == "2" && e.shiftKey) {
+            document.getElementById("transcriptbtn").click();
+        }
+        else if (e.key == "3" && e.shiftKey) {
+            document.getElementById("toankibtn").click();
+        }
+        else {
+            if (!(e.shiftKey)) {
+                alert(`Unrecognized shortcut: ${e.key}`);
+            }
+            }
+
+        }
+}
+document.addEventListener('keydown', shortcuts, false);
+</script>
+"""
+
 css = """
 /* Make tabs take all the width */
 #BigTabV2A-button { flex-grow:1 !important; }
@@ -51,13 +101,14 @@ with gr.Blocks(
         title=f"Voice2Anki V{shared.VERSION}",
         theme=theme,
         css=css,
+        head=shortcut_js,
         ) as demo:
 
     with gr.Row():
         gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=3, interactive=True)
-        dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0)
-        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0)
-        update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True)
+        dark_mode_btn = gr.Button("Dark Mode", variant="secondary", scale=0, elem_id="darkmodebtn")
+        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="syncankibtn")
+        update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
@@ -119,17 +170,17 @@ with gr.Blocks(
                 # 1/2/3
                 with gr.Group():
                     with gr.Row():
-                        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary")
-                        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary")
-                        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary")
+                        transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="transcribebtn")
+                        chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="transcriptbtn")
+                        anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="toankibtn")
 
                 with gr.Row():
-                    mark_previous = gr.Button(value="Mark previous")
+                    mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
 
                 with gr.Row():
                     sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
-                    improve_btn = gr.Button(value="LLM Feedback", variant="secondary")
+                    improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="llmfeedbackbtn")
 
                 # quick settings
                 with gr.Accordion(label="Quick settings", open=False):
