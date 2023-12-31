@@ -11,7 +11,7 @@ col_rst = "\033[0m"
 class SharedModule:
     """module used to store information from Voice2Anki.py to
     the main .py files"""
-    initialized = 0
+    # things that are not changed when self.reset is called
     VERSION = 1.0
     memory_metric = None
     media_folder = None
@@ -20,19 +20,11 @@ class SharedModule:
     disable_tracing = None
     disable_timeout = None
     widen_screen = None
-    pv = None
     timeout_lock = Lock()
     dirload_lock = Lock()
     thread_lock = Lock()
     db_lock = Lock()
     openai_client = None
-
-    request = None
-
-    tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
-    splitted_dir = None
-    done_dir = None
-    unsplitted_dir = None
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
@@ -109,7 +101,6 @@ class SharedModule:
             # ["norm"],
             ]
 
-    message_buffer = []
     max_message_buffer = 20
 
     audio_slot_nb = None
@@ -126,6 +117,18 @@ class SharedModule:
             "ankified",
             "moved",
             ]
+
+    # things that are reset on self.reset
+    pv = None
+    initialized = 0
+    request = None
+
+    tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
+    splitted_dir = None
+    done_dir = None
+    unsplitted_dir = None
+
+    message_buffer = []
     dirload_queue = pd.DataFrame(columns=dirload_queue_columns).set_index("path")
 
     llm_to_db_buffer = {}
