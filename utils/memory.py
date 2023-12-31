@@ -476,3 +476,10 @@ def get_message_buffer_df():
     for i in range(len(buffer)):
         buffer[i]["n"] = i + 1
     return pd.DataFrame(buffer).reset_index().set_index("n")
+
+@trace
+def get_dirload_df():
+    df = shared.dirload_queue
+    # make sure that the index 'n' appears first
+    df = df.reset_index().set_index("n").reset_index()
+    return df

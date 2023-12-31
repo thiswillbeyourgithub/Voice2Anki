@@ -5,7 +5,7 @@ from .profiles import get_profiles, switch_profile
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log
-from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df
+from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
 
@@ -314,7 +314,7 @@ with gr.Blocks(
 
         with gr.Tab(label="Queued audio", elem_id="BigTabV2A") as tab_dirload_queue:
             queue_df = gr.Dataframe(
-                    value=shared.dirload_queue if shared.enable_dirload else None,
+                    value=None,
                     type="pandas",
                     label="Queued audio",
                     interactive=False,
@@ -364,7 +364,7 @@ with gr.Blocks(
 
     # reload df
     tab_dirload_queue.select(
-            fn=lambda: shared.dirload_queue.sort_index().reset_index().set_index("n").reset_index(),
+            fn=get_dirload_df,
             outputs=[queue_df],
             )
     # load memories only if clicked
