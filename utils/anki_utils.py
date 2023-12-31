@@ -168,7 +168,7 @@ def audio_to_anki(audio_mp3, queue):
             content = audio_file.read()
         audio_hash = hashlib.md5(content).hexdigest()
         audio_file_name = str(Path(audio_mp3).name).replace(" ", "_").replace("/", "").replace(".mp3", "")
-        audio_path = anki_media / f"Voice2Anki_{audio_hash}_{audio_file_name}.mp3"
+        audio_path = anki_media / f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
         else:
