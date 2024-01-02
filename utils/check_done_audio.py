@@ -156,7 +156,7 @@ class DoneAudioChecker:
         missing_long = []
         for m in tqdm(missing, desc="Checking length"):
             audio = AudioSegment.from_mp3(m)
-            if len(audio) <= 1000:
+            if len(audio) <= 2000:
                 whi(f"Ignored {m.name} (too short)")
             else:
                 red(f"Long missing ({len(audio)//1000}s): {m.name}")
