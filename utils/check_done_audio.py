@@ -27,6 +27,7 @@ class DoneAudioChecker:
             self,
             profile,
             anki_profile,
+            exclude_list=None,
             ):
         profile = Path("./profiles/" + profile)
         self.unsp_dir = profile / "queues/audio_untouched"
@@ -75,13 +76,15 @@ class DoneAudioChecker:
         suffix_list = set(p.suffix for p in anki_media.iterdir())
 
         # remove some old wrongly formatted files
-        exclude_list = ["myasthenie", "parkinson"]
-        to_remove = []
-        for exc in exclude_list:
-            for file in done_list:
-                if exc in file.name:
-                    to_remove.append(file)
-        done_list = [d for d in done_list if d not in to_remove]
+        if exclude_list is not None:
+            assert isinstance(exclude_list, list) and exclude_list, "exclude_list must be a list"
+
+            to_remove = []
+            for exc in exclude_list:
+                for file in done_list:
+                    if exc in file.name:
+                        to_remove.append(file)
+            done_list = [d for d in done_list if d not in to_remove]
 
         # restrict found anki media to those that have the right suffix
         media_dict = {}
