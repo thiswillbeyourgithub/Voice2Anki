@@ -1,11 +1,13 @@
+import hashlib
 from tqdm import tqdm
 import time
 from pathlib import Path
 import ankipandas as akp
 import fire
 from pydub import AudioSegment
+from joblib import Memory
 
-from logger import red, whi, trace
+from logger import red, whi
 
 try:
     db_path = akp.find_db(user="Main")
@@ -13,6 +15,8 @@ except Exception as err:
     red(f"Exception when trying to find anki collection: '{err}'")
     db_path = akp.Collection().path
 red(f"WhisperToAnki will use anki collection found at {db_path}")
+
+audio_length_cache = Memory("cache/audio_length_checker", verbose=0)
 
 # check that akp will not go in trash
 if "trash" in str(db_path).lower():
@@ -24,6 +28,14 @@ if "trash" in str(db_path).lower():
     time.sleep(1)
 anki_media = Path(db_path).parent / "collection.media"
 assert anki_media.exists(), "Media folder not found!"
+
+def hasher(text):
+    return hashlib.sha256(text.encode()).hexdigest()[:10]
+
+@audio_length_cache.cache(ignore=["path"])
+def get_audio_length(path, filehash):
+    audio = AudioSegment.from_mp3(path)
+    return len(audio)
 
 class DoneAudioChecker:
     def __init__(
@@ -155,11 +167,14 @@ class DoneAudioChecker:
         # for each missing, check if it's very short
         missing_long = []
         for m in tqdm(missing, desc="Checking length"):
-            audio = AudioSegment.from_mp3(m)
-            if len(audio) <= 2000:
+            with open(m, "rb") as audio_file:
+                content = audio_file.read()
+            audio_hash = hashlib.md5(content).hexdigest()
+            le = get_audio_length(m, audio_hash)
+            if le <= 2500:
                 whi(f"Ignored {m.name} (too short)")
             else:
-                red(f"Long missing ({len(audio)//1000}s): {m.name}")
+                red(f"Long missing ({le//1000}s): {m.name}")
                 missing_long.append(m)
 
         breakpoint()
