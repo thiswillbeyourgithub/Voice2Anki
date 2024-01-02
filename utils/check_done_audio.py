@@ -170,7 +170,7 @@ class DoneAudioChecker:
             with open(m, "rb") as audio_file:
                 content = audio_file.read()
             audio_hash = hashlib.md5(content).hexdigest()
-            le = get_audio_length(m, audio_hash)
+            le = get_audio_length(m.absolute(), audio_hash)
             if le <= 2500:
                 whi(f"Ignored {m.name} (too short)")
             else:
