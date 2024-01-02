@@ -122,6 +122,9 @@ class DoneAudioChecker:
             for ig in to_ignore:
                 media_dict[suffix].remove(ig)
 
+        # check for each file of done if it's among the files with the
+        # same timestamp in the media folder
+        missing = []
         for stamp, done_files in tqdm(timestamps_p.items(), desc="Checking timestamps"):
             if stamp in timestamps_m:
                 for f in done_files:
@@ -131,34 +134,20 @@ class DoneAudioChecker:
                     name = name.replace("_processed", "")
                     if name not in timestamps_m[stamp]:
                         red(f"Not found in media: {f.name} : {timestamps_m[stamp]}")
+                        missing.append(f)
             else:
                 red(f"No timestamp in media: {done_files}")
 
-        breakpoint()
-
-        # for each audio found in the done folder, check that it is found
-        # in the media folder
-        whi("\n\n")
-        issues = {}
-        for p in tqdm(done_list, desc="Checking"):
-            suffix = p.suffix
-            name = p.name.replace("-0-100", "")
-            name = name.replace(" ", "_")
-            # if name.count(".mp3") > 1:
-            #     name = name.replace(".mp3", "", 1)
-            if name not in media_dict[suffix]:
-                stamp = p_timestamps[p.name]
-
-                # todo: gather the timestamps of the files in media
-
-                audio = AudioSegment.from_mp3(p)
-                if len(audio) <= 1000:
-                    whi(f"Ignored {p.name} (too short)")
-                else:
-                    red(f"ISSUE {p.name}")
-                    issues[p.name] = audio
+        # for each missing, check if it's very short
+        missing_long = []
+        for m in tqdm(missing, desc="Checking length"):
+            audio = AudioSegment.from_mp3(m)
+            if len(audio) <= 1000:
+                whi(f"Ignored {m.name} (too short)")
             else:
-                whi(f"Ignored {p.name} (found)")
+                red(f"Long missing ({len(audio)//1000}s): {m.name}")
+                missing_long.append(m)
+
         breakpoint()
 
 
