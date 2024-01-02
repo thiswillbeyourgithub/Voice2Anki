@@ -101,7 +101,7 @@ class DoneAudioChecker:
         # get the list of timestamp in media folder
         timestamps_m = {}
         m_timestamps = {}
-        red(f"Getting timestamps of media folder")
+        red("Getting timestamps of media folder")
         for suffix in media_dict:
             to_ignore = []
             for p in media_dict[suffix]:
