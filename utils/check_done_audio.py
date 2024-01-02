@@ -38,7 +38,7 @@ class DoneAudioChecker:
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
 
-        done_list = sorted([p for p in self.done_dir.iterdir()])
+        done_list = sorted([p for p in self.done_dir.iterdir()], key=lambda x: x.stat().st_ctime)
         whi(f"Found {len(done_list)} files in {self.done_dir}")
 
         # get the list of audio files in anki collection that were
@@ -53,7 +53,7 @@ class DoneAudioChecker:
                         or p.name.startswith("WhisperToAnki")
                         or p.name.startswith("Voice2Anki")
                         )
-                    ])
+                    ], key=lambda x: x.stat().st_ctime)
 
         # get the suffix list of each file in anki media
         suffix_list = set(p.suffix for p in anki_media.iterdir())
