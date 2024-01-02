@@ -67,13 +67,13 @@ class DoneAudioChecker:
                     name = name.replace("-0-100", "").replace(".mp3_", "_").replace("_processed", "")
 
                     if not name.strip():
-                        red(f"Ignored media file as irrelevant: {m}")
+                        red(f"Ignored media file as irrelevant: {m.name}")
                     else:
                         if suffix in media_dict:
                             media_dict[suffix].append(name)
                         else:
                             media_dict[suffix] = [name]
-                        whi(f"Keeping {name}")
+                        # whi(f"Keeping {name}")
                     break
 
         # get the list of timestamp in done folder
