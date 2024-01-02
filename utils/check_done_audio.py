@@ -1,3 +1,4 @@
+import shutil
 import hashlib
 from tqdm import tqdm
 import time
@@ -177,7 +178,12 @@ class DoneAudioChecker:
                 red(f"Long missing ({le//1000}s): {m.name}")
                 missing_long.append(m)
 
-        breakpoint()
+        # copy the weird files for further manual inspection
+        weirds = Path("weirds")
+        weirds.mkdir(exist_ok=True)
+        for m in missing_long:
+            shutil.copy2(m.absolute(), weirds / m.name)
+            red(f"Copied {m}")
 
 
 if __name__ == "__main__":
