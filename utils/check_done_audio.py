@@ -58,6 +58,15 @@ class DoneAudioChecker:
         # get the suffix list of each file in anki media
         suffix_list = set(p.suffix for p in anki_media.iterdir())
 
+        # remove some old wrongly formatted files
+        exclude_list = ["myasthenie", "parkinson"]
+        to_remove = []
+        for exc in exclude_list:
+            for file in done_list:
+                if exc in file.name:
+                    to_remove.append(file)
+        done_list = [d for d in done_list if d not in to_remove]
+
         # restrict found anki media to those that have the right suffix
         media_dict = {}
         for m in media_list:
