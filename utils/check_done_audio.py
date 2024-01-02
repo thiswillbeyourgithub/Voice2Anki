@@ -10,28 +10,12 @@ from joblib import Memory
 
 from logger import red, whi
 
-try:
-    db_path = akp.find_db(user="Main")
-except Exception as err:
-    red(f"Exception when trying to find anki collection: '{err}'")
-    db_path = akp.Collection().path
-red(f"WhisperToAnki will use anki collection found at {db_path}")
-
-audio_length_cache = Memory("cache/audio_length_checker", verbose=0)
-
-# check that akp will not go in trash
-if "trash" in str(db_path).lower():
-    red("Ankipandas seems to have "
-        "found a collection that might be located in "
-        "the trash folder. If that is not your intention "
-        "cancel now. Waiting 10s for you to see this "
-        "message before proceeding.")
-    time.sleep(1)
-anki_media = Path(db_path).parent / "collection.media"
-assert anki_media.exists(), "Media folder not found!"
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
+
+
+audio_length_cache = Memory("cache/audio_length_checker", verbose=0)
 
 @audio_length_cache.cache(ignore=["path"])
 def get_audio_length(path, filehash):
@@ -42,6 +26,7 @@ class DoneAudioChecker:
     def __init__(
             self,
             profile,
+            anki_profile,
             ):
         profile = Path("./profiles/" + profile)
         self.unsp_dir = profile / "queues/audio_untouched"
@@ -50,6 +35,24 @@ class DoneAudioChecker:
         assert self.unsp_dir.exists(), "missing unsplitted dir"
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
+
+        try:
+            db_path = akp.find_db(user=anki_profile)
+        except Exception as err:
+            red(f"Exception when trying to find anki collection for profile {anki_profile}: '{err}'")
+            db_path = akp.Collection(anki_profile).path
+        red(f"Voice2Anki will use anki collection found at {db_path}")
+
+        # check that akp will not go in trash
+        if "trash" in str(db_path).lower():
+            red("Ankipandas seems to have "
+                "found a collection that might be located in "
+                "the trash folder. If that is not your intention "
+                "cancel now. Waiting 10s for you to see this "
+                "message before proceeding.")
+            time.sleep(1)
+        anki_media = Path(db_path).parent / "collection.media"
+        assert anki_media.exists(), "Media folder not found!"
 
         done_list = sorted([p for p in self.done_dir.iterdir()], key=lambda x: x.stat().st_ctime, reverse=True)
         whi(f"Found {len(done_list)} files in {self.done_dir}")
