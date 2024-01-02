@@ -124,9 +124,9 @@ class DoneAudioChecker:
 
                 stamp = stamps[0]
                 if stamp in timestamps_m:
-                    timestamps_m[stamp].append(p)
+                    timestamps_m[stamp].append(p.replace(stamp, ""))
                 else:
-                    timestamps_m[stamp] = [p]
+                    timestamps_m[stamp] = [p.replace(stamp, "")]
                 m_timestamps[p] = stamp
             for ig in to_ignore:
                 media_dict[suffix].remove(ig)
@@ -135,17 +135,22 @@ class DoneAudioChecker:
         # same timestamp in the media folder
         missing = []
         for stamp, done_files in tqdm(timestamps_p.items(), desc="Checking timestamps"):
-            if stamp in timestamps_m:
-                for f in done_files:
-                    name = f.name
-                    if name.count("mp3") > 1:
-                        name = name.replace(".mp3_", "_")
-                    name = name.replace("_processed", "")
-                    if name not in timestamps_m[stamp]:
-                        red(f"Not found in media: {f.name} : {timestamps_m[stamp]}")
-                        missing.append(f)
-            else:
-                red(f"No timestamp in media: {done_files}")
+            for f in done_files:
+                name = f.name
+                if name.count("mp3") > 1:
+                    name = name.replace(".mp3_", "_")
+                name = name.replace("_processed", "")
+                name = name.replace(stamp, "")
+                name = name.replace(" ", "_")
+                really_missing = True
+                for t in range(-10, 11, 1):
+                    nt = str(int(stamp) + t)
+                    if nt in timestamps_m and name in timestamps_m[nt]:
+                        really_missing = False
+                        break
+                if really_missing:
+                    red(f"Not found in media: {f.name}")
+                    missing.append(f)
 
         # for each missing, check if it's very short
         missing_long = []
