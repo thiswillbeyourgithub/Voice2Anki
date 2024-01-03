@@ -1,4 +1,3 @@
-import time
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile
