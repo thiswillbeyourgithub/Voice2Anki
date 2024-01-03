@@ -28,7 +28,7 @@ file_handler = handlers.RotatingFileHandler(
         log_file,
         mode='a',
         maxBytes=1000000,
-        backupCount=4,
+        backupCount=100,
         encoding=None,
         delay=0,
         )
