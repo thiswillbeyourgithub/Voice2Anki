@@ -1079,6 +1079,10 @@ def to_anki(
                 }, pretty=True)
     results = []
 
+    # mention in the metadata the original mp3 name
+    if not shared.dirload_queue.empty:
+        metadata["original_mp3_path"] = shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "path"]
+
     whi("Sending to anki:")
 
     # sending sound file to anki media
