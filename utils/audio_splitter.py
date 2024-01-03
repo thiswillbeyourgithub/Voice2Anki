@@ -1,3 +1,4 @@
+import uuid
 import textwrap
 import json
 import torchaudio
@@ -406,7 +407,8 @@ class AudioSplitter:
                     time_markers = f"_{int(val[0])}s_to_{int(val[1])}s"
                 else:
                     time_markers = ""
-                out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
+                rand = str(uuid.uuid4()).split("-")[0]
+                out_file = self.sp_dir / f"{int(time.time())}_{rand}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
