@@ -1075,6 +1075,7 @@ def to_anki(
                 "version": shared.VERSION,
                 "timestamp": time.time(),
                 "user-agent": shared.request["user-agent"],
+                "temp_mp3_path": str(audio_mp3_1),
                 }, pretty=True)
     results = []
 
