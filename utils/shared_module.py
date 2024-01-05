@@ -29,6 +29,7 @@ class SharedModule:
     enable_queued_gallery = None
     enable_flagging = None
     enable_dirload = None
+    anki_notetype = None
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
@@ -181,6 +182,7 @@ class SharedModule:
             if not dirs.exists():
                 p(f"Created directory {dirs}")
                 dirs.mkdir()
+        self.anki_notetype = None
 
     def __setattr__(self, name, value):
         "forbid creation of new attributes."

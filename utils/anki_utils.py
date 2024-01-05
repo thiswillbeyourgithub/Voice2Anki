@@ -86,46 +86,18 @@ def call_anki(action, **params):
 
 
 @trace
-def add_note_to_anki(
-        body,
-        source,
-        source_extra,
-        source_audio,
-        note_metadata,
-        tags,
-        deck_name="Default",
-        ):
-    """create a new cloze directly in anki"""
-    assert isinstance(tags, list), "tags have to be a list"
-    model_name = False
-
-    body = cloze_editor(body)
-
-    if "Clozolkor" in call_anki(action="modelNames"):
-        model_name = "Clozolkor"
+def check_anki_models():
+    """checks for notetype in anki, if no appropriate model is found, create
+    one"""
+    models = call_anki(action="modelNames")
+    if "Clozolkor" in models:
+        shared.anki_notetype = "Clozolkor"
+    elif "Voice2Anki" in models:
+        shared.anki_notetype = "Voice2Anki"
     else:
-        if "Voice2Anki" in call_anki(action="modelNames"):
-            model_name = "Voice2Anki"
-    if model_name:
-        res = call_anki(
-                action="addNote",
-                note={
-                    "deckName": deck_name,
-                    "modelName": model_name,
-                    "fields": {
-                        "body": body,
-                        "source": source,
-                        "source_extra": source_extra,
-                        "souce_audio": source_audio,
-                        "GPToAnkiMetadata": note_metadata,
-                        },
-                    "tags": tags,
-                    "options": {"allowDuplicate": False}})
-        return res
-    else:
+        gr.Error(red("Anki does not contain a notetype 'Voice2Anki' nor 'Clozolkor', creating it."))
         # create note type model that has the right fields
-        red("No notetype 'Voice2Anki' nor 'Clozolkor' found, creating 'Voice2Anki'")
-        res = call_anki(
+        call_anki(
                 action="createModel",
                 modelName="Voice2Anki",
                 inOrderFields=["body", "source", "source_extra", "source_audio", "GPToAnkiMetadata"],
@@ -137,8 +109,43 @@ def add_note_to_anki(
                         },
                     ],
                 )
-        red("Done creating notetype")
-        return add_note_to_anki(body, source, source_extra, source_audio, note_metadata, tags, deck_name)
+        gr.Error(red("Done creating notetype 'Voice2Anki'"))
+        shared.anki_notetype = "Voice2Anki"
+    red(f"Anki notetype detected: '{shared.anki_notetype}'")
+
+@trace
+def add_note_to_anki(
+        body,
+        source,
+        source_extra,
+        source_audio,
+        note_metadata,
+        tags,
+        deck_name="Default",
+        ):
+    """create a new cloze directly in anki"""
+    assert isinstance(tags, list), "tags have to be a list"
+    if not shared.anki_notetype:
+        check_anki_models()
+    model_name = shared.anki_notetype
+
+    body = cloze_editor(body)
+
+    res = call_anki(
+            action="addNote",
+            note={
+                "deckName": deck_name,
+                "modelName": model_name,
+                "fields": {
+                    "body": body,
+                    "source": source,
+                    "source_extra": source_extra,
+                    "souce_audio": source_audio,
+                    "GPToAnkiMetadata": note_metadata,
+                    },
+                "tags": tags,
+                "options": {"allowDuplicate": False}})
+    return res
 
 
 @trace
