@@ -25,10 +25,10 @@ class SharedModule:
     thread_lock = Lock()
     db_lock = Lock()
     openai_client = None
-    enable_gallery = None,
-    enable_queued_gallery = None,
-    enable_flagging = None,
-    enable_dirload = None,
+    enable_gallery = None
+    enable_queued_gallery = None
+    enable_flagging = None
+    enable_dirload = None
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
