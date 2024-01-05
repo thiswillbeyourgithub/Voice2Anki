@@ -94,14 +94,6 @@ def add_to_anki(
 
     if "Clozolkor" in call_anki(action="modelNames"):
         model_name = "Clozolkor"
-        other_fields = {
-                "header": "",
-                "hint": "",
-                "more": "",
-                "source_extra": "",
-                "teacher": "",
-                "Nearest_neighbors": "",
-                }
     else:
         if "WhisperToAnki" in call_anki(action="modelNames"):
             model_name = "WhisperToAnki"
@@ -115,7 +107,6 @@ def add_to_anki(
                         "body": body,
                         "source": source,
                         "GPToAnkiMetadata": note_metadata,
-                        **other_fields,
                         },
                     "tags": tags,
                     "options": {"allowDuplicate": False}})
