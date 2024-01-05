@@ -1116,13 +1116,12 @@ def to_anki(
     # metadata should reflect that. Or the number differ and each cloze
     # will be treated as if it was created from the same input text
     metadatas = [metadata for i in clozes]
-    if "\n\n" in txt_audio.strip():
-        audio_split = txt_audio.split("\n\n")
-        audio_split = [a.strip() for a in audio_split if a.strip()]
-        if len(audio_split) == len(clozes):
-            red("Each cloze will be assigned to the corresponding txt_audio section.")
-            for i in range(len(metadatas)):
-                metadatas[i]["transcripted_text"] = audio_split[i]
+    audio_split = txt_audio.split("\n\n")
+    audio_split = [a.strip() for a in audio_split if a.strip()]
+    if len(audio_split) > 1 and len(audio_split) == len(clozes):
+        red("Each cloze will be assigned to the corresponding txt_audio section.")
+        for i in range(len(metadatas)):
+            metadatas[i]["transcripted_text"] = audio_split[i]
 
     results = add_note_to_anki(
             bodies=clozes,
@@ -1147,10 +1146,8 @@ def to_anki(
 
     whi("\n\n ------------------------------------- \n\n")
 
-    # add the latest generated cards to the message bugger
-    if "\n\n" in txt_audio:
-        audio_split = txt_audio.split("\n\n")
-        audio_split = [a.strip() for a in audio_split if a.strip()]
+    # add the latest generated cards to the message buffer
+    if len(audio_split) > 1:
         if len(audio_split) != len(clozes):
             red("No saving card to message buffer because the number of split in txt_audio is not the same as in clozes.")
         else:
