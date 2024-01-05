@@ -1111,12 +1111,25 @@ def to_anki(
     with shared.dirload_lock:
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = "started"
 
+    # if the txt_audio contains multiple cloze, either the number of created
+    # cloze correspond to the number of sections in txt_audio, then the
+    # metadata should reflect that. Or the number differ and each cloze
+    # will be treated as if it was created from the same input text
+    metadatas = [metadata for i in clozes]
+    if "\n\n" in txt_audio.strip():
+        audio_split = txt_audio.split("\n\n")
+        audio_split = [a.strip() for a in audio_split if a.strip()]
+        if len(audio_split) == len(clozes):
+            red("Each cloze will be assigned to the corresponding txt_audio section.")
+            for i in range(len(metadatas)):
+                metadatas[i]["transcripted_text"] = audio_split[i]
+
     results = add_note_to_anki(
-            bodies=[cl.strip.replace("\n", "<br/>") for cl in clozes],
+            bodies=clozes,
             source=txt_source,
             source_extra=txt_extra_source,
             source_audio=audio_html,
-            note_metadata=metadata,
+            notes_metadata=metadatas,
             tags=new_tags,
             deck_name=txt_deck)
 

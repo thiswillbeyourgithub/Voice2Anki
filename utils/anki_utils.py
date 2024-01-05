@@ -119,7 +119,7 @@ def add_note_to_anki(
         source,
         source_extra,
         source_audio,
-        note_metadata,
+        notes_metadata,
         tags,
         deck_name="Default",
         ):
@@ -134,7 +134,7 @@ def add_note_to_anki(
                 "deckName": deck_name,
                 "modelName": model_name,
                 "fields": {
-                    "body": cloze_editor(body),
+                    "body": cloze_editor(body).strip().replace("\n", "<br>"),
                     "source": source,
                     "source_extra": source_extra,
                     "souce_audio": source_audio,
@@ -142,7 +142,7 @@ def add_note_to_anki(
                     },
                 "tags": tags,
                 "options": {"allowDuplicate": False},
-                } for body in bodies
+                } for body, note_metadata in zip(bodies, notes_metadata)
             ]
 
 
