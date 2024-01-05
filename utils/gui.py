@@ -212,7 +212,7 @@ with gr.Blocks(
 
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
-    with gr.Tab(label="Settings", elem_id="BigTabV2A"):
+    with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, scale=0, visible=shared.enable_dirload)
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
@@ -382,6 +382,17 @@ with gr.Blocks(
             fn=get_message_buffer_df,
             outputs=[df_buffer],
             show_progress=False,
+            )
+
+    # reload tags and deck list when clicking on settings:
+    def reload_tags_decks():
+        return {
+                txt_tags: gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True),
+                txt_deck: gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True),
+                }
+    tab_settings.select(
+            fn=reload_tags_decks,
+            outputs=[txt_tags, txt_deck],
             )
 
     # copy audio to flag button
