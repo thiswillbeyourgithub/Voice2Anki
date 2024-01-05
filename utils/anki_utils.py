@@ -327,8 +327,10 @@ if __name__ == "__main__":
     print(
             add_note_to_anki(
                 body="{{c1::test}}",
-                source="truc",
+                source="test",
                 note_metadata="",
+                source_extra="",
+                source_audio="",
                 tags=["test"],
                 deck_name="Default"
                 )
