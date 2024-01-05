@@ -88,7 +88,6 @@ def add_to_anki(
     """create a new cloze directly in anki"""
     assert isinstance(tags, list), "tags have to be a list"
     model_name = False
-    other_fields = {}
 
     body = cloze_editor(body)
 
