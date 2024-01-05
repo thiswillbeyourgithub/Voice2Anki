@@ -18,7 +18,7 @@ from .media import format_audio_component
 
 try:
     from .author_cloze_editor import cloze_editor
-except:
+except Exception:
     def cloze_editor(cloze):
         return cloze
 
