@@ -1111,28 +1111,18 @@ def to_anki(
     with shared.dirload_lock:
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = "started"
 
-    for cl in clozes:
-        cl = cl.strip()
-        if "\n" in cl:
-            cl = cl.replace("\n", "<br/>")
-        try:
-            res = add_note_to_anki(
-                    body=cl,
-                    source=txt_source,
-                    source_extra=txt_extra_source,
-                    source_audio=audio_html,
-                    note_metadata=metadata,
-                    tags=new_tags,
-                    deck_name=txt_deck)
-        except Exception as err:
-            red(f"Error when adding to anki: '{cl}': '{err}'")
-            res = err
-        results.append(res)
-        whi(f"* {cl}")
+    results = add_note_to_anki(
+            bodies=[cl.strip.replace("\n", "<br/>") for cl in clozes],
+            source=txt_source,
+            source_extra=txt_extra_source,
+            source_audio=audio_html,
+            note_metadata=metadata,
+            tags=new_tags,
+            deck_name=txt_deck)
 
     errors = [f"#{results.index(r)+1}/{len(results)}: {r}" for r in results if not str(r).isdigit()]
-    results = [str(r) for r in results if str(r).isdigit()]
-    shared.added_note_ids.append([int(r) for r in results])
+    results = [r for r in results if str(r).isdigit()]
+    shared.added_note_ids.append(results)
 
     if not len(results) == len(clozes):
         gather_threads(["audio_to_anki", "ocr"])

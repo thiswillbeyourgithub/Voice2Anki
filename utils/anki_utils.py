@@ -115,7 +115,7 @@ def check_anki_models():
 
 @trace
 def add_note_to_anki(
-        body,
+        bodies,
         source,
         source_extra,
         source_audio,
@@ -129,22 +129,27 @@ def add_note_to_anki(
         check_anki_models()
     model_name = shared.anki_notetype
 
-    body = cloze_editor(body)
-
-    res = call_anki(
-            action="addNote",
-            note={
+    notes = [
+            {
                 "deckName": deck_name,
                 "modelName": model_name,
                 "fields": {
-                    "body": body,
+                    "body": cloze_editor(body),
                     "source": source,
                     "source_extra": source_extra,
                     "souce_audio": source_audio,
                     "GPToAnkiMetadata": note_metadata,
                     },
                 "tags": tags,
-                "options": {"allowDuplicate": False}})
+                "options": {"allowDuplicate": False},
+                } for body in bodies
+            ]
+
+
+    res = call_anki(
+            action="addNotes",
+            notes=notes,
+            )
     return res
 
 
