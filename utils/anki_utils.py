@@ -96,8 +96,8 @@ def add_to_anki(
     if "Clozolkor" in call_anki(action="modelNames"):
         model_name = "Clozolkor"
     else:
-        if "WhisperToAnki" in call_anki(action="modelNames"):
-            model_name = "WhisperToAnki"
+        if "Voice2Anki" in call_anki(action="modelNames"):
+            model_name = "Voice2Anki"
     if model_name:
         res = call_anki(
                 action="addNote",
@@ -116,10 +116,10 @@ def add_to_anki(
         return res
     else:
         # create note type model that has the right fields
-        red("No notetype WhisperToAnki nor Clozolkor found, creating WhisperToAnki")
+        red("No notetype 'Voice2Anki' nor 'Clozolkor' found, creating 'Voice2Anki'")
         res = call_anki(
                 action="createModel",
-                modelName="WhisperToAnki",
+                modelName="Voice2Anki",
                 inOrderFields=["body", "source", "source_extra", "source_audio", "GPToAnkiMetadata"],
                 isCloze=True,
                 cardTemplates=[
@@ -294,7 +294,7 @@ else:
         red(f"Exception when trying to find anki collection: '{err}'")
         db_path = akp.Collection().path
 
-red(f"WhisperToAnki will use anki collection found at {db_path}")
+red(f"Voice2Anki will use anki collection found at {db_path}")
 
 # check that akp will not go in trash
 if "trash" in str(db_path).lower():
