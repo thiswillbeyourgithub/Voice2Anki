@@ -22,7 +22,7 @@
     * `--authentication` enables the authentication panel. user/password have to be edited in `Voice2Anki.py`.
     * `--localnetwork` to make the interface accessible to your local network. Use `ifconfig` to figure out your local IP adress and connect to it using `https://[IP]:7860` (don't forget the http**s** ). You can use that to make it accessible from the global internet if you configure port forwarding from your router. Otherwise it's only accessible from the computer.
     * `--debug` to increase verbosity.
-    * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use WhisperToAnki on mobile but can have privacy and security implications.
+    * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use Voice2Anki on mobile but can have privacy and security implications.
 * open your browser at the URL shown in the output.
 * The first thing to do is to enter a profile name in the `profile` field. This will automatically fill the other fields with the latest value. Then also go enter the API key.
 

@@ -115,7 +115,7 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True):
                     ocr = ocr.replace("\"", "").replace("'", "")
                     ocr = f"title=\"{ocr}\" "
 
-                newsource = f'<img src="{new.name}" {ocr}type="made_by_WhisperToAnki">'
+                newsource = f'<img src="{new.name}" {ocr}type="made_by_Voice2Anki">'
 
                 # only add if not duplicate, somehow
                 if newsource not in source:
