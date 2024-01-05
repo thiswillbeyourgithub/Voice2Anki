@@ -1093,9 +1093,7 @@ def to_anki(
 
     # gather text from the source image(s)
     if not txt_source:
-        txt_source = wait_for_queue(txt_source_queue, "txt_source") + audio_html
-    else:
-        txt_source += audio_html
+        txt_source = wait_for_queue(txt_source_queue, "txt_source")
 
     # anki tags
     new_tags = txt_tags + [f"Voice2Anki::{today}"]
@@ -1105,8 +1103,10 @@ def to_anki(
         # if no image in source: add a tag to find them easily later on
         new_tags += ["Voice2Anki::no_img_in_source"]
 
-    if txt_extra_source.strip():
-        txt_source += f"<br>{txt_extra_source}"
+    if txt_extra_source is None:
+        txt_extra_source = ""
+    else:
+        txt_extra_source = txt_extra_source.strip()
 
     with shared.dirload_lock:
         shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = "started"
@@ -1119,6 +1119,8 @@ def to_anki(
             res = add_to_anki(
                     body=cl,
                     source=txt_source,
+                    source_extra=txt_extra_source,
+                    source_audio=audio_html,
                     note_metadata=metadata,
                     tags=new_tags,
                     deck_name=txt_deck)

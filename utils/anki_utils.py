@@ -81,6 +81,8 @@ def call_anki(action, **params):
 def add_to_anki(
         body,
         source,
+        source_extra,
+        source_audio,
         note_metadata,
         tags,
         deck_name="Default",
@@ -105,6 +107,8 @@ def add_to_anki(
                     "fields": {
                         "body": body,
                         "source": source,
+                        "source_extra": source_extra,
+                        "souce_audio": source_audio,
                         "GPToAnkiMetadata": note_metadata,
                         },
                     "tags": tags,
@@ -116,17 +120,17 @@ def add_to_anki(
         res = call_anki(
                 action="createModel",
                 modelName="WhisperToAnki",
-                inOrderFields=["body", "source", "GPToAnkiMetadata"],
+                inOrderFields=["body", "source", "source_extra", "source_audio", "GPToAnkiMetadata"],
                 isCloze=True,
                 cardTemplates=[
                     {
                         "Front": "{{cloze:body}}",
-                        "Back": "{{cloze:body}}<br><br>{{source}}",
+                        "Back": "{{cloze:body}}<br><br>{{source}}<br>{{source_extra}}<br>{{source_audio}}",
                         },
                     ],
                 )
         red("Done creating notetype")
-        return add_to_anki(body, source, note_metadata, tags, deck_name)
+        return add_to_anki(body, source, source_extra, source_audio, note_metadata, tags, deck_name)
 
 @trace
 async def anki_request_async(url, request):
@@ -164,7 +168,7 @@ def audio_to_anki(audio_mp3, queue):
             shutil.copy2(audio_mp3, audio_path)
             assert (audio_path).exists(), "audio file not found in anki media!"
 
-        html = f"</br>[sound:{audio_path.name}]"
+        html = f"[sound:{audio_path.name}]"
         queue.put(html)
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
