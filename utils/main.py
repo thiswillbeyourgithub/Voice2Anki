@@ -1041,10 +1041,10 @@ def to_anki(
 
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
-    txt_source = ""
+    txt_source = None
     if gallery is None or len(gallery) == 0:
         red("you should probably specify an image in source")
-        txt_source = "<br>"
+        txt_source = ""
     else:
         thread = threading.Thread(
                 target=get_img_source,
@@ -1092,7 +1092,7 @@ def to_anki(
         raise Exception(f"Error in audio_html: '{audio_html}'")
 
     # gather text from the source image(s)
-    if not txt_source:
+    if txt_source is None:
         txt_source = wait_for_queue(txt_source_queue, "txt_source")
 
     # anki tags
