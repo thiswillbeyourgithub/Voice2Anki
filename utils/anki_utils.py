@@ -78,7 +78,7 @@ def call_anki(action, **params):
 
 
 @trace
-def add_to_anki(
+def add_note_to_anki(
         body,
         source,
         source_extra,
@@ -130,7 +130,7 @@ def add_to_anki(
                     ],
                 )
         red("Done creating notetype")
-        return add_to_anki(body, source, source_extra, source_audio, note_metadata, tags, deck_name)
+        return add_note_to_anki(body, source, source_extra, source_audio, note_metadata, tags, deck_name)
 
 @trace
 async def anki_request_async(url, request):
@@ -140,7 +140,7 @@ async def anki_request_async(url, request):
             return data
 
 @trace
-def audio_to_anki(audio_mp3, queue):
+def add_audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
         audio_mp3 = format_audio_component(audio_mp3)
@@ -311,7 +311,7 @@ shared.anki_media = anki_media
 
 if __name__ == "__main__":
     print(
-            add_to_anki(
+            add_note_to_anki(
                 body="{{c1::test}}",
                 source="truc",
                 note_metadata="",

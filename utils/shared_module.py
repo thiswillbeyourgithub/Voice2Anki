@@ -143,7 +143,7 @@ class SharedModule:
             "saving_chatgpt": [],
             "saving_whisper": [],
             "transcribing_audio": [],
-            "audio_to_anki": [],
+            "add_audio_to_anki": [],
             "ocr": [],
             "timeout": [],
             }

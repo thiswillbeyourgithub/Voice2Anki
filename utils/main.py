@@ -24,7 +24,7 @@ import joblib
 import litellm
 import openai
 
-from .anki_utils import add_to_anki, audio_to_anki, sync_anki
+from .anki_utils import add_note_to_anki, add_audio_to_anki, sync_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout
 from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
@@ -1055,14 +1055,14 @@ def to_anki(
             shared.running_threads["ocr"].append(thread)
 
     # send audio to anki
-    audio_to_anki_queue = queue.Queue()
+    add_audio_to_anki_queue = queue.Queue()
     thread = threading.Thread(
-            target=audio_to_anki,
-            args=(audio_mp3_1, audio_to_anki_queue),
+            target=add_audio_to_anki,
+            args=(audio_mp3_1, add_audio_to_anki_queue),
             )
     thread.start()
     with shared.thread_lock:
-        shared.running_threads["audio_to_anki"].append(thread)
+        shared.running_threads["add_audio_to_anki"].append(thread)
 
     # send to anki
     metadata = rtoml.dumps(
@@ -1086,9 +1086,9 @@ def to_anki(
     whi("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = wait_for_queue(audio_to_anki_queue, "audio_to_anki")
+    audio_html = wait_for_queue(add_audio_to_anki_queue, "add_audio_to_anki")
     if "Error" in audio_html:  # then out is an error message and not the source
-        gather_threads(["audio_to_anki", "ocr"])
+        gather_threads(["add_audio_to_anki", "ocr"])
         raise Exception(f"Error in audio_html: '{audio_html}'")
 
     # gather text from the source image(s)
@@ -1116,7 +1116,7 @@ def to_anki(
         if "\n" in cl:
             cl = cl.replace("\n", "<br/>")
         try:
-            res = add_to_anki(
+            res = add_note_to_anki(
                     body=cl,
                     source=txt_source,
                     source_extra=txt_extra_source,
