@@ -11,7 +11,7 @@ Path("./cache").mkdir(exist_ok=True)
 os.environ["PYTHONTRACEMALLOC"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
-def start_voice2formattedtext(
+def start_Voice2Anki(
         print_db_then_exit=False,
         nb_audio_slots=5,
 
@@ -82,7 +82,7 @@ def start_voice2formattedtext(
         for some widen screens, but very handy for mobile and tablet use.
     """
     if "help" in kwargs or "h" in args:
-        return help(start_voice2formattedtext)
+        return help(start_Voice2Anki)
 
     if isinstance(print_db_then_exit, str):
         db_list = [str(f.name) for f in Path("./databases/").rglob("*db")]
@@ -173,4 +173,4 @@ def start_voice2formattedtext(
             )
 
 if __name__ == "__main__":
-    instance = fire.Fire(start_voice2formattedtext)
+    instance = fire.Fire(start_Voice2Anki)

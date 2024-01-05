@@ -1067,7 +1067,7 @@ def to_anki(
     # send to anki
     metadata = rtoml.dumps(
             {
-                "author": "Voice2FormattedText",
+                "author": "Voice2Anki",
                 "transcripted_text": txt_audio,
                 "chatgpt_context": txt_chatgpt_context,
                 "llm_used": shared.latest_llm_used,

@@ -15,7 +15,7 @@ import json
 try:
     from .shared_module import shared
 except:
-    # needed when calling audio_splitter instead of Voice2FormattedText
+    # needed when calling audio_splitter instead of Voice2Anki
     from shared_module import shared
 
 Path("utils/logs").mkdir(exist_ok=True)
