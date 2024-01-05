@@ -23,7 +23,7 @@ except Exception:
         return cloze
 
 
-def _call_anki(action, **params):
+def call_anki(action, **params):
     """ bridge between local python libraries and AnnA Companion addon
     (a fork from anki-connect) """
 
@@ -92,7 +92,7 @@ def add_to_anki(
 
     body = cloze_editor(body)
 
-    if "Clozolkor" in _call_anki(action="modelNames"):
+    if "Clozolkor" in call_anki(action="modelNames"):
         model_name = "Clozolkor"
         other_fields = {
                 "header": "",
@@ -103,10 +103,10 @@ def add_to_anki(
                 "Nearest_neighbors": "",
                 }
     else:
-        if "WhisperToAnki" in _call_anki(action="modelNames"):
+        if "WhisperToAnki" in call_anki(action="modelNames"):
             model_name = "WhisperToAnki"
     if model_name:
-        res = _call_anki(
+        res = call_anki(
                 action="addNote",
                 note={
                     "deckName": deck_name,
@@ -123,7 +123,7 @@ def add_to_anki(
     else:
         # create note type model that has the right fields
         red("No notetype WhisperToAnki nor Clozolkor found, creating WhisperToAnki")
-        res = _call_anki(
+        res = call_anki(
                 action="createModel",
                 modelName="WhisperToAnki",
                 inOrderFields=["body", "source", "GPToAnkiMetadata"],
@@ -225,9 +225,9 @@ async def get_card_status(txt_chatgpt_cloz, return_bool=False):
         loop = asyncio.get_event_loop()
         state = await loop.run_in_executor(
                 None,
-                partial(_call_anki, action="findCards", query=query)
+                partial(call_anki, action="findCards", query=query)
                 )
-        # state = _call_anki(action="findCards", query=query)
+        # state = call_anki(action="findCards", query=query)
         if state:
             if return_bool:
                 return True
@@ -243,7 +243,7 @@ async def get_card_status(txt_chatgpt_cloz, return_bool=False):
 @trace
 def sync_anki():
     "trigger anki synchronization"
-    sync_output = _call_anki(action="sync")
+    sync_output = call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
         f"Error during sync?: '{sync_output}'")
     # time.sleep(1)  # wait for sync to finish, just in case
@@ -262,7 +262,7 @@ def mark_previous_note():
     if not shared.added_note_ids:
         raise Exception(red("No card ids found."))
     pc = shared.added_note_ids[-1]
-    _call_anki(
+    call_anki(
             action="addTags",
             notes=pc,
             tags="marked",
@@ -272,7 +272,7 @@ def mark_previous_note():
 # @trace
 def get_anki_tags():
     try:
-        return _call_anki(
+        return call_anki(
                 action="getTags",
                 )
     except Exception as err:
@@ -282,7 +282,7 @@ def get_anki_tags():
 # @trace
 def get_decks():
     try:
-        return _call_anki(
+        return call_anki(
                 action="deckNames",
                 )
     except Exception as err:
