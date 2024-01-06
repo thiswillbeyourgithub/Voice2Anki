@@ -158,10 +158,11 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
     whi("Filtering prompts")
-    if not shared.pv["txt_openai_api_key"]:
-        raise Exception(red("No API key provided for OpenAI in the settings."))
-    if shared.openai_client is None:
-        shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
+    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_mistral_api_key"]):
+        raise Exception(red("No API key provided for OpenAI or Mistral in the settings."))
+    if shared.pv["txt_openai_api_key"]:
+        if shared.openai_client is None:
+            shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")

@@ -1,3 +1,4 @@
+import os
 import json
 import cv2
 import threading
@@ -30,6 +31,7 @@ profile_keys = {
         "txt_extra_source": {},
         "txt_openai_api_key": {},
         "txt_replicate_api_key": {},
+        "txt_mistral_api_key": {},
         "gallery": {},
         "txt_deck": {},
         "txt_tags": {},
@@ -195,6 +197,14 @@ class ValueStorage:
 
         if key not in self.profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
+
+        # update the api key right away
+        if key == "txt_openai_api_key":
+            os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
+        elif key == "txt_replicate_api_key":
+            os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
+        elif key == "txt_mistral_api_key":
+            os.environ["MISTRAL_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
 
         if not self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
