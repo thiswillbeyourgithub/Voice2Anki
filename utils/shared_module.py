@@ -184,9 +184,9 @@ class SharedModule:
 
         self.request = {
                 "user-agent": request.headers["user-agent"],
-                "headers": request.headers,
-                "IP adress:": f"{request.client.host}:{request.client.port}",
-                "query_params": request.query_params,
+                "headers": dict(request.headers),
+                "IP adress": f"{request.client.host}:{request.client.port}",
+                "query_params": request.query_params._dict,
                 }
 
         self.splitted_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_splits")
