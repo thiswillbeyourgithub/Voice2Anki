@@ -14,6 +14,7 @@ from joblib import Memory
 import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
+from tqdm import tqdm
 
 from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
@@ -53,32 +54,58 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
+def async_cache(memory, *margs, **mkargs):
+    """ source: https://github.com/joblib/joblib/issues/889 """
+    def outer_wrapper(func):
+        cached_func = memory.cache(func, *margs, **mkargs)
+        async def inner_wrapper(*args, **kwargs):
+            func_id, args_id = cached_func._get_output_identifiers(*args, **kwargs)
+            path = [func_id, args_id]
+
+            if not cached_func._is_in_cache_and_valid(path=path):
+                output = await func(*args, **kwargs)
+                cached_func.store_backend.dump_item(path, output, verbose=cached_func._verbose)
+
+            result = cached_func.store_backend.load_item(path=path)
+
+            return result
+
+        return inner_wrapper
+
+    return outer_wrapper
+
 
 async def async_embedder(text):
-    red("Computing embedding of 1 memory")
+    red(f"Computing embedding of '{text}'")
     # remove the context before the transcript as well as the last '
     assert "Transcript: '" not in text
 
     # try to bias the embedder to focus on the structure
-    text = f"Pay attention to the structure of  this text: '{text}'"
+    text2 = f"Pay attention to the structure of  this text: '{text}'"
 
     vec = await litellm.aembedding(
             model=shared.pv["embed_choice"],
-            input=[text],
+            input=[text2],
             )
-    return np.array(vec.data[0]["embedding"]).reshape(1, -1)
+    return (text, np.array(vec.data[0]["embedding"]).reshape(1, -1))
 
 
 async def async_parallel_embedder(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
-    cached_async_embedder = mem.cache(async_embedder)
+    cached_async_embedder = async_cache(mem)(async_embedder)
     tasks = [cached_async_embedder(sp) for sp in list_text]
-    return await asyncio.gather(*tasks)
+    results = [await out for out in tqdm(asyncio.as_completed(tasks), desc="Async embedding")]
+    # reorder the results so that each embedding is at the index of the corresponding text
+    results = sorted(results, key=lambda x: list_text.index(x[0]))
+    assert results[0][0] == list_text[0]
+    return [res[1] for res in results]
 
 
 @trace
 def sync_async_embedder(list_text):
-    return asyncio.run(async_parallel_embedder(list_text))
+    list_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
+    cached_async_parallel_embedder = async_cache(list_embed_mem)(async_parallel_embedder)
+    return asyncio.run(cached_async_parallel_embedder(list_text))
 
 
 @trace
@@ -251,16 +278,15 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         min_sim = [1, None]
 
         # get the embedding for prompt
-        list_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
-        cached_embedder = list_embed_mem.cache(sync_async_embedder)
-        new_prompt_vec = cached_embedder(list_text=[prompt_messages[-1]["content"]])
+        new_prompt_vec = sync_async_embedder(list_text=[prompt_messages[-1]["content"]])[0]
 
         # get the embedding for all memories in another way (because this way
         # we get all embeddings from the memories in a single call, provided the
         # memories.json file hasn't changed since)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = cached_embedder(list_text=to_embed)
+        to_embed = to_embed[:20]
+        all_embeddings = sync_async_embedder(list_text=to_embed)
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
