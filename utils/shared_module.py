@@ -42,6 +42,11 @@ class SharedModule:
             "mistral/mistral-small": (0.6 / 1000 * 1.09, 1.8 / 1000 * 1.09),
             "mistral/mistral-medium": (2.5 / 1000 * 1.09, 7.5 / 1000 * 1.09),
             }
+    # embeddings are so cheap I don't even count the number of tokens
+    embedding_models = [
+            "openai/text-embedding-ada-002",
+            "mistral/mistral-embed",
+            ]
 
     # sox effect when loading a sound
     preprocess_sox_effects = [

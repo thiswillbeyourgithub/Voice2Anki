@@ -19,6 +19,7 @@ profile_keys = {
         "total_llm_cost": {"default": 0, "type": float},
         "dirload_check": {"default": False},
         "llm_choice": {"default": [i for i in shared.llm_price.keys()][0]},
+        "embed_choice": {"default": shared.embedding_models[0]},
         "sld_whisp_temp": {"default": 0, "type": float},
         "message_buffer": {"default": [], "type": list},
         "txt_keywords": {"default": "", "type": str},

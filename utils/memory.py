@@ -12,7 +12,7 @@ import json
 import hashlib
 from joblib import Memory
 import tiktoken
-import openai
+import litellm
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .logger import whi, red, yel, trace, Timeout
@@ -48,13 +48,7 @@ default_system_prompt = {
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash", "llm_choice"]
 
-# embeddings using ada2:
-embedding_model_name = "text-embedding-ada-002"
-embeddings_cache = Memory(f"cache/{embedding_model_name}", verbose=0)
-async_embeddings_cache = Memory(f"cache/async_{embedding_model_name}", verbose=0)
-
-@embeddings_cache.cache(ignore=["client"])
-def embedder(text, client):
+def embedder(text):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
     assert "Transcript: '" not in text
@@ -62,25 +56,24 @@ def embedder(text, client):
     # try to bias the embedder to focus on the structure
     text = f"Pay attention to the structure of  this text: '{text}'"
 
-    vec = client.embeddings.create(
-            model=embedding_model_name,
-            input=text,
-            encoding_format="float")
+    vec = litellm.embedding(
+            model=shared.pv["embed_choice"],
+            input=[text],
+            )
     return np.array(vec.data[0].embedding).reshape(1, -1)
 
-async def async_embedder(text, client):
+async def async_embedder(text):
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor(max_workers=100) as executor:
-        return await loop.run_in_executor(executor, embedder, text, client)
+        return await loop.run_in_executor(executor, embedder, text)
 
-async def async_parallel_embedder(list_text, client):
-    tasks = [async_embedder(sp, client) for sp in list_text]
+async def async_parallel_embedder(list_text):
+    tasks = [async_embedder(sp) for sp in list_text]
     return await asyncio.gather(*tasks)
 
 @trace
-@async_embeddings_cache.cache(ignore=["client"])
-def cached_sync_async_embedder(list_text, client):
-    return asyncio.run(async_parallel_embedder(list_text, client))
+def sync_async_embedder(list_text):
+    return asyncio.run(async_parallel_embedder(list_text))
 
 
 def hasher(text):
@@ -157,11 +150,10 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
     whi("Filtering prompts")
-    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_mistral_api_key"]):
-        raise Exception(red("No API key provided for OpenAI or Mistral in the settings."))
-    if shared.pv["txt_openai_api_key"]:
-        if shared.openai_client is None:
-            shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
+    if "mistral" in shared.pv["embed_choice"] and not shared.pv["txt_mistral_api_key"]:
+        raise Exception("You want to use Mistral for embeddings but haven't supplied an API key in the settings.")
+    elif "openai" in shared.pv["embed_choice"] and not shared.pv["txt_openai_api_key"]:
+        raise Exception("You want to use OpenAI for embeddings but haven't supplied an API key in the settings.")
 
     if temperature != 0:
         whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
@@ -256,11 +248,19 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         max_sim = [0, None]
         min_sim = [1, None]
 
-        # get embeddings asynchronously
-        new_prompt_vec = embedder(text=prompt_messages[-1]["content"], client=shared.openai_client)
+        # get the embedding for prompt synchronously
+        embed_mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
+        cached_embedder = embed_mem.cache(embedder)
+        new_prompt_vec = cached_embedder(text=prompt_messages[-1]["content"])
+
+        # get the embedding for all memories asynchronously (because this way
+        # we get all embeddings from the memories in a single call, provided the
+        # memories.json file hasn't changed since)
+        async_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
+        cached_sync_async_embedder = async_embed_mem.cache(sync_async_embedder, verbose=1)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = cached_sync_async_embedder(to_embed, shared.openai_client)
+        all_embeddings = cached_sync_async_embedder(to_embed)
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
