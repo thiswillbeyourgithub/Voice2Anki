@@ -1,3 +1,4 @@
+from limiter import Limiter
 import pandas as pd
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -14,7 +15,7 @@ from joblib import Memory
 import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
-from tqdm import tqdm
+import tqdm.asyncio
 
 from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
@@ -92,17 +93,45 @@ async def async_embedder(text):
 
 async def async_parallel_embedder(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
+    cache_checker = mem.cache(async_embedder).check_call_in_cache
     cached_async_embedder = async_cache(mem)(async_embedder)
-    tasks = [cached_async_embedder(sp) for sp in list_text]
-    results = [await out for out in tqdm(asyncio.as_completed(tasks), desc="Async embedding")]
+    limited_cached_async_embedder = Limiter(
+            rate=5,
+            consume=2,
+            capacity=5,
+            )(cached_async_embedder)
+    sub_list = [t for t in list_text if not cache_checker(t)]
+
+    # everything in cache
+    if not sub_list:
+        red("Everything already in cache")
+        text_embeddings = [await cached_async_embedder(t) for t in list_text]
+        return [res[1] for res in text_embeddings]
+
+    if len(list_text) > 1:
+        present = len(list_text) - len(sub_list)
+        red(f"Embeddings present in cache: {present}/{len(list_text)}")
+
+    tasks = [limited_cached_async_embedder(sp) for sp in sub_list]
+    results = [await out for out in tqdm.asyncio.tqdm.as_completed(tasks)]
+
     # reorder the results so that each embedding is at the index of the corresponding text
-    results = sorted(results, key=lambda x: list_text.index(x[0]))
-    assert results[0][0] == list_text[0]
-    return [res[1] for res in results]
+    results = sorted(results, key=lambda x: sub_list.index(x[0]))
+
+    # add the results gotten from the cache to have the right order
+    all_results = []
+    for i in range(len(list_text)):
+        if list_text[i] in sub_list:
+            all_results.append(results[i])
+        else:
+            all_results.append(await cached_async_embedder(list_text[i]))
+    assert all_results[0][0] == list_text[0]
+    assert all_results[-1][0] == list_text[-1]
+    return [res[1] for res in all_results]
 
 
 @trace
-def sync_async_embedder(list_text):
+def embedder(list_text):
     list_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
     cached_async_parallel_embedder = async_cache(list_embed_mem)(async_parallel_embedder)
     return asyncio.run(cached_async_parallel_embedder(list_text))
@@ -278,15 +307,14 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         min_sim = [1, None]
 
         # get the embedding for prompt
-        new_prompt_vec = sync_async_embedder(list_text=[prompt_messages[-1]["content"]])[0]
+        new_prompt_vec = embedder(list_text=[prompt_messages[-1]["content"]])[0]
 
         # get the embedding for all memories in another way (because this way
         # we get all embeddings from the memories in a single call, provided the
         # memories.json file hasn't changed since)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        to_embed = to_embed[:20]
-        all_embeddings = sync_async_embedder(list_text=to_embed)
+        all_embeddings = embedder(list_text=to_embed)
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
