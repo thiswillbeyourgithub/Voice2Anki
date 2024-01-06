@@ -240,7 +240,7 @@ with gr.Blocks(
                 txt_replicate_api_key = gr.Textbox(value=shared.pv["txt_replicate_api_key"], label="Replicate API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
         with gr.Row():
-            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", scale=0)
+            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary")
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
         with gr.Column():
