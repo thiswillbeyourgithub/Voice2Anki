@@ -36,6 +36,11 @@ class SharedModule:
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
             "openai/gpt-4-1106-preview": (0.01, 0.03),
             # "replicate/kcaverly/dolphin-2.6-mixtral-8x7b-gguf:37491ecf805fbfc810720b8a5ff45901b148dcdef659d1fe1601118e619b3d6d": 0.000725,  # in $ per second
+
+            # mistral prices are in euros per 1M token
+            "mistral/mistral-tiny": (0.14 / 1000 * 1.09, 0.42 / 1000 * 1.09),
+            "mistral/mistral-small": (0.6 / 1000 * 1.09, 1.8 / 1000 * 1.09),
+            "mistral/mistral-medium": (2.5 / 1000 * 1.09, 7.5 / 1000 * 1.09),
             }
 
     # sox effect when loading a sound
