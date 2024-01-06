@@ -63,9 +63,12 @@ def embedder(text_list, result):
         assert len(text_list) == len(result)
         assert all(isinstance(a, np.ndarray) for a in result)
         return result
+    tkn_sum = 0
     red("Computing embedding of:")
     for i, t in enumerate(text_list):
         red(f"* {i+1}: {t}")
+        tkn_sum += len(tokenize(t))
+    red(f"Total token to embed: {tkn_sum}")
 
     vec = litellm.embedding(
             model=shared.pv["embed_choice"],
