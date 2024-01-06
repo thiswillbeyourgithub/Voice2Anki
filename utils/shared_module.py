@@ -180,7 +180,7 @@ class SharedModule:
 
         os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
         os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
-        os.environ["MISTRAL_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
+        os.environ["MISTRAL_API_KEY"] = shared.pv["txt_mistral_api_key"].strip()
 
         self.request = {
                 "user-agent": request.headers["user-agent"],
