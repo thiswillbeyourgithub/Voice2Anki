@@ -3,7 +3,6 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import gradio as gr
 import re
-from tqdm import tqdm
 import numpy as np
 import random
 import time

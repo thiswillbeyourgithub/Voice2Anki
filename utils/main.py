@@ -1,9 +1,7 @@
 import os
 import asyncio
 import pickle
-from tqdm import tqdm
 import re
-import uuid
 import Levenshtein as lev
 import shutil
 import queue

@@ -1,6 +1,5 @@
 import os
 import json
-import cv2
 import threading
 import queue
 import pickle
@@ -9,7 +8,6 @@ import numpy as np
 
 from .logger import whi, red, trace
 from .shared_module import shared
-from .media import rgb_to_bgr
 
 profile_keys = {
         "sld_max_tkn": {"default": 3500},
