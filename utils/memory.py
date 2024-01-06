@@ -75,7 +75,7 @@ def embedder(text_list, result):
 
 
 def embedder_wrapper(list_text):
-    mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
+    mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
     uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t], None)]
 
