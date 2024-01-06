@@ -61,7 +61,7 @@ def embedder(text):
             model=shared.pv["embed_choice"],
             input=[text],
             )
-    return np.array(vec.data[0].embedding).reshape(1, -1)
+    return np.array(vec.data[0]["embedding"]).reshape(1, -1)
 
 async def async_embedder(text):
     loop = asyncio.get_running_loop()
