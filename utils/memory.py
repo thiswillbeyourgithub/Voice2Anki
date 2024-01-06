@@ -49,7 +49,12 @@ default_system_prompt = {
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash", "llm_choice"]
 
-def embedder(text):
+
+def hasher(text):
+    return hashlib.sha256(text.encode()).hexdigest()[:10]
+
+
+async def async_embedder(text):
     red("Computing embedding of 1 memory")
     # remove the context before the transcript as well as the last '
     assert "Transcript: '" not in text
@@ -57,28 +62,24 @@ def embedder(text):
     # try to bias the embedder to focus on the structure
     text = f"Pay attention to the structure of  this text: '{text}'"
 
-    vec = litellm.embedding(
+    vec = await litellm.aembedding(
             model=shared.pv["embed_choice"],
             input=[text],
             )
     return np.array(vec.data[0]["embedding"]).reshape(1, -1)
 
-async def async_embedder(text):
-    loop = asyncio.get_running_loop()
-    with ThreadPoolExecutor(max_workers=100) as executor:
-        return await loop.run_in_executor(executor, embedder, text)
 
 async def async_parallel_embedder(list_text):
-    tasks = [async_embedder(sp) for sp in list_text]
+    mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
+    cached_async_embedder = mem.cache(async_embedder)
+    tasks = [cached_async_embedder(sp) for sp in list_text]
     return await asyncio.gather(*tasks)
+
 
 @trace
 def sync_async_embedder(list_text):
     return asyncio.run(async_parallel_embedder(list_text))
 
-
-def hasher(text):
-    return hashlib.sha256(text.encode()).hexdigest()[:10]
 
 @trace
 def check_prompts(prev_prompts):
@@ -249,19 +250,17 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         max_sim = [0, None]
         min_sim = [1, None]
 
-        # get the embedding for prompt synchronously
-        embed_mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
-        cached_embedder = embed_mem.cache(embedder)
-        new_prompt_vec = cached_embedder(text=prompt_messages[-1]["content"])
+        # get the embedding for prompt
+        list_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
+        cached_embedder = list_embed_mem.cache(sync_async_embedder)
+        new_prompt_vec = cached_embedder(list_text=[prompt_messages[-1]["content"]])
 
-        # get the embedding for all memories asynchronously (because this way
+        # get the embedding for all memories in another way (because this way
         # we get all embeddings from the memories in a single call, provided the
         # memories.json file hasn't changed since)
-        async_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
-        cached_sync_async_embedder = async_embed_mem.cache(sync_async_embedder, verbose=1)
         to_embed = [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = cached_sync_async_embedder(to_embed)
+        all_embeddings = cached_embedder(list_text=to_embed)
         assert len(all_embeddings) == 2 * len(candidate_prompts)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
