@@ -91,10 +91,24 @@ def embedder_wrapper(list_text):
         red(f"Embeddings present in cache: {present}/{len(list_text)}")
 
     # get the embeddings for the uncached values
-    results = cached_embedder(uncached_texts, None)
+    if "mistral" in shared.pv["embed_choice"]:
+        batch_size = 200
+    else:
+        batch_size = 1000
+    num_batches = len(uncached_texts) // batch_size
+    results = []
+    for i in range(num_batches):
+        batch = uncached_texts[i * batch_size: (i+1) * batch_size]
+        out = cached_embedder(batch, None)
 
-    # manually recache the values for each individual memory
-    [cached_embedder([t], [r]) for t, r in zip(uncached_texts, results)]
+        # manually recache the values for each individual memory
+        [cached_embedder([t], [r]) for t, r in zip(batch, out)]
+
+        # mistral is very rate limiting
+        if "mistral" in shared.pv["embed_choice"]:
+            time.sleep(2)
+
+        results.extend(out)
 
     # combine cached and uncached results in the right order
     to_return = []
