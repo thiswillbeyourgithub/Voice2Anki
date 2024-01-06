@@ -81,7 +81,7 @@ def embedder_wrapper(list_text):
 
     if not uncached_texts:
         red("Everything already in cache")
-        return [cached_embedder([t], None) for t in list_text]
+        return [cached_embedder([t], None)[0] for t in list_text]
 
     if len(uncached_texts) > 1:
         present = len(list_text) - len(uncached_texts)
@@ -99,10 +99,10 @@ def embedder_wrapper(list_text):
     cnt = 0
     for i in range(len(list_text)):
         if list_text[i] in uncached_texts:
-            to_return.append(next(it_results))
+            to_return.append(next(it_results)[0])
             cnt += 1
         else:
-            to_return.append(cached_embedder([list_text[i]], None))
+            to_return.append(cached_embedder([list_text[i]], None)[0])
     # make sure the list was emptied
     assert cnt == len(results)
     return to_return
@@ -284,8 +284,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         to_embed += [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
         all_embeddings = embedder_wrapper(to_embed)
+        assert all(isinstance(item, np.ndarray) for item in all_embeddings)
         assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
-        new_prompt_vec = all_embeddings.pop(0)
+        new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
         assert len(embeddings_contents) == len(embeddings_answers)
