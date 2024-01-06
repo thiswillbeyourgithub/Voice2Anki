@@ -1,7 +1,4 @@
-from limiter import Limiter
 import pandas as pd
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import gradio as gr
 import re
 import numpy as np
@@ -15,7 +12,6 @@ from joblib import Memory
 import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
-import tqdm.asyncio
 
 from .logger import whi, red, yel, trace, Timeout
 from .shared_module import shared
@@ -55,86 +51,61 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
-def async_cache(memory, *margs, **mkargs):
-    """ source: https://github.com/joblib/joblib/issues/889 """
-    def outer_wrapper(func):
-        cached_func = memory.cache(func, *margs, **mkargs)
-        async def inner_wrapper(*args, **kwargs):
-            func_id, args_id = cached_func._get_output_identifiers(*args, **kwargs)
-            path = [func_id, args_id]
+def embedder(text_list, result):
+    """compute the emebdding of 1 text
+    if result is not None, it is the embedding and returned right away. This
+    was done to allow caching individual embeddings while still making one batch
+    call to the embedder.
+    """
+    assert isinstance(text_list, list)
+    if result is not None:
+        assert isinstance(result, list)
+        assert len(text_list) == len(result)
+        assert all(isinstance(a, np.ndarray) for a in result)
+        return result
+    red("Computing embedding of:")
+    for i, t in enumerate(text_list):
+        red(f"* {i+1}: {t}")
 
-            if not cached_func._is_in_cache_and_valid(path=path):
-                output = await func(*args, **kwargs)
-                cached_func.store_backend.dump_item(path, output, verbose=cached_func._verbose)
-
-            result = cached_func.store_backend.load_item(path=path)
-
-            return result
-
-        return inner_wrapper
-
-    return outer_wrapper
-
-
-async def async_embedder(text):
-    red(f"Computing embedding of '{text}'")
-    # remove the context before the transcript as well as the last '
-    assert "Transcript: '" not in text
-
-    # try to bias the embedder to focus on the structure
-    text2 = f"Pay attention to the structure of  this text: '{text}'"
-
-    vec = await litellm.aembedding(
+    vec = litellm.embedding(
             model=shared.pv["embed_choice"],
-            input=[text2],
+            input=text_list,
             )
-    return (text, np.array(vec.data[0]["embedding"]).reshape(1, -1))
+    return [np.array(d["embedding"]).reshape(1, -1) for d in vec.data]
 
 
-async def async_parallel_embedder(list_text):
+def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=1)
-    cache_checker = mem.cache(async_embedder).check_call_in_cache
-    cached_async_embedder = async_cache(mem)(async_embedder)
-    limited_cached_async_embedder = Limiter(
-            rate=5,
-            consume=2,
-            capacity=5,
-            )(cached_async_embedder)
-    sub_list = [t for t in list_text if not cache_checker(t)]
+    cached_embedder = mem.cache(embedder, ignore=["result"])
+    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t], None)]
 
-    # everything in cache
-    if not sub_list:
+    if not uncached_texts:
         red("Everything already in cache")
-        text_embeddings = [await cached_async_embedder(t) for t in list_text]
-        return [res[1] for res in text_embeddings]
+        return [cached_embedder([t], None) for t in list_text]
 
-    if len(list_text) > 1:
-        present = len(list_text) - len(sub_list)
+    if len(uncached_texts) > 1:
+        present = len(list_text) - len(uncached_texts)
         red(f"Embeddings present in cache: {present}/{len(list_text)}")
 
-    tasks = [limited_cached_async_embedder(sp) for sp in sub_list]
-    results = [await out for out in tqdm.asyncio.tqdm.as_completed(tasks)]
+    # get the embeddings for the uncached values
+    results = cached_embedder(uncached_texts, None)
 
-    # reorder the results so that each embedding is at the index of the corresponding text
-    results = sorted(results, key=lambda x: sub_list.index(x[0]))
+    # manually recache the values for each individual memory
+    [cached_embedder([t], [r]) for t, r in zip(uncached_texts, results)]
 
-    # add the results gotten from the cache to have the right order
-    all_results = []
+    # combine cached and uncached results in the right order
+    to_return = []
+    it_results = iter(results)
+    cnt = 0
     for i in range(len(list_text)):
-        if list_text[i] in sub_list:
-            all_results.append(results[i])
+        if list_text[i] in uncached_texts:
+            to_return.append(next(it_results))
+            cnt += 1
         else:
-            all_results.append(await cached_async_embedder(list_text[i]))
-    assert all_results[0][0] == list_text[0]
-    assert all_results[-1][0] == list_text[-1]
-    return [res[1] for res in all_results]
-
-
-@trace
-def embedder(list_text):
-    list_embed_mem = Memory(f"cache/async_{shared.pv['embed_choice']}", verbose=1)
-    cached_async_parallel_embedder = async_cache(list_embed_mem)(async_parallel_embedder)
-    return asyncio.run(cached_async_parallel_embedder(list_text))
+            to_return.append(cached_embedder([list_text[i]], None))
+    # make sure the list was emptied
+    assert cnt == len(results)
+    return to_return
 
 
 @trace
@@ -306,16 +277,15 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         max_sim = [0, None]
         min_sim = [1, None]
 
-        # get the embedding for prompt
-        new_prompt_vec = embedder(list_text=[prompt_messages[-1]["content"]])[0]
-
         # get the embedding for all memories in another way (because this way
         # we get all embeddings from the memories in a single call, provided the
         # memories.json file hasn't changed since)
-        to_embed = [pr["content"] for pr in candidate_prompts]
+        to_embed = [prompt_messages[-1]["content"]]
+        to_embed += [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = embedder(list_text=to_embed)
-        assert len(all_embeddings) == 2 * len(candidate_prompts)
+        all_embeddings = embedder_wrapper(to_embed)
+        assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
+        new_prompt_vec = all_embeddings.pop(0)
         embeddings_contents = all_embeddings[:len(candidate_prompts)]
         embeddings_answers = all_embeddings[len(candidate_prompts):]
         assert len(embeddings_contents) == len(embeddings_answers)
