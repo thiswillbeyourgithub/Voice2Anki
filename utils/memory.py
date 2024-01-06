@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import pandas as pd
 import gradio as gr
 import re
@@ -92,13 +93,24 @@ def embedder_wrapper(list_text):
 
     # get the embeddings for the uncached values
     if "mistral" in shared.pv["embed_choice"]:
-        batch_size = 200
+        tkn_max = 12000  # their limit is 16384 but they don't
+        # use the same tokenizer maybe
     else:
-        batch_size = 1000
-    num_batches = len(uncached_texts) // batch_size
+        tkn_max = -1
+    batches = [[]]
+    tkn_cnt = 0
+    for t in uncached_texts:
+        new_tkn = len(tokenize(t))
+        if tkn_cnt + new_tkn < tkn_max:
+            batches[-1].append(t)
+            tkn_cnt += new_tkn
+        else:
+            batches.append([t])
+            tkn_cnt = 0
+
     results = []
-    for i in range(num_batches):
-        batch = uncached_texts[i * batch_size: (i+1) * batch_size]
+    for batch in tqdm(batches, desc="Embedding text", unit="batch"):
+        assert batch
         out = cached_embedder(batch, None)
 
         # manually recache the values for each individual memory
