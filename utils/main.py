@@ -144,8 +144,8 @@ def thread_whisp_then_llm(
     if shared.latest_stt_used != modelname:
         shared.latest_stt_used = modelname
 
-    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"]):
-        raise Exception(red("No API key provided for either OpenAI or replicate or Mistral in the settings."))
+    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
+        raise Exception(red("No API key provided for any LLM. Do it in the settings."))
 
     with open(audio_mp3, "rb") as f:
         audio_hash = hashlib.sha256(f.read()).hexdigest()
@@ -443,8 +443,8 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
             # gr.Error(mess)
             return red(mess)
 
-    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"]):
-        raise Exception(red("No API key provided for either OpenAI or replicate or Mistral in the settings."))
+    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
+        raise Exception(red("No API key provided for any LLM. Do it in the settings."))
 
     # automatically split repeated newlines as several distinct cards
     txt_audio = txt_audio.strip()
