@@ -80,7 +80,10 @@ def whisper_cached(
     assert shared.pv["txt_openai_api_key"], "Missing OpenAI key, needed for Whisper"
     if shared.openai_client is None:
         shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
-    assert "TRANSCRIPT" not in txt_whisp_prompt, "found TRANSCRIPT in txt_whisp_prompt"
+    if txt_whisp_prompt.strip() == "":
+        txt_whisp_prompt = None
+    if txt_whisp_lang.strip() == "":
+        txt_whisp_lang = None
     try:
         cnt = 0
         while True:
@@ -132,9 +135,6 @@ def thread_whisp_then_llm(
     if audio_mp3 is None:
         return
 
-    if txt_whisp_prompt is None:
-        return
-
     if txt_whisp_lang is None:
         return
 
@@ -179,11 +179,8 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
     if audio_mp3_1 is None:
         raise Exception(red("Error: None audio_mp3_1"))
 
-    if txt_whisp_prompt is None:
-        raise Exception(red("Error: None whisper prompt"))
-
     if txt_whisp_lang is None:
-        raise Exception(red("Error: None whisper language"))
+        red("Warning: None whisper language")
 
     modelname = "whisper-1"
     if shared.latest_stt_used != modelname:
@@ -771,7 +768,7 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
         red("Transcribing audio for audio_edit.")
         instructions = transcribe(
                 audio,
-                txt_whisp_prompt="Instruction: ",
+                txt_whisp_prompt=None,
                 txt_whisp_lang=txt_whisp_lang,
                 sld_whisp_temp=0,
                 )
