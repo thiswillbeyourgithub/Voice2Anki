@@ -198,16 +198,6 @@ class ValueStorage:
         if key not in self.profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
 
-        # update the api key right away
-        if key == "txt_openai_api_key":
-            os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
-        elif key == "txt_replicate_api_key":
-            os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
-        elif key == "txt_mistral_api_key":
-            os.environ["MISTRAL_API_KEY"] = shared.pv["txt_mistral_api_key"].strip()
-        elif key == "txt_openrouter_api_key":
-            os.environ["OPENROUTER_API_KEY"] = shared.pv["txt_openrouter_api_key"].strip()
-
         if not self.__check_equality(item, self.cache_values[key]):
             # make sure to wait for the previous setitem of the same key to finish
             prev_q = self.running_tasks[key]
@@ -227,10 +217,7 @@ class ValueStorage:
             if prev_q_val is not True:
                 assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
                 raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
-            if item == self.cache_values[key]:
-                # value might have changed during the execution
-                return
-            else:
+            if item != self.cache_values[key]:
                 # cast as required type
                 if "type" in self.profile_keys[key]:
                     item = self.profile_keys[key]["type"](item)
@@ -257,6 +244,16 @@ class ValueStorage:
                         kf.unlink()
             except Exception as err:
                 red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
+
+        # update the api key right away
+        if key == "txt_openai_api_key":
+            os.environ["OPENAI_API_KEY"] = item
+        elif key == "txt_replicate_api_key":
+            os.environ["REPLICATE_API_KEY"] = item
+        elif key == "txt_mistral_api_key":
+            os.environ["MISTRAL_API_KEY"] = item
+        elif key == "txt_openrouter_api_key":
+            os.environ["OPENROUTER_API_KEY"] = item
 
 def worker_setitem(in_queue):
     """continuously running worker that is used to save components value to
