@@ -628,7 +628,7 @@ def dirload_splitted(
         max_n = max(shared.dirload_queue["n"].values)
     else:
         max_n = 0
-    for todo_file in sorted([p for p in splitted_dir.rglob("*.mp3")], key=lambda x: str(x)):  # by oldest: key=lambda x: x.stat().st_ctime)
+    for todo_file in sorted([p for p in shared.splitted_dir.rglob("*.mp3")], key=lambda x: str(x)):  # by oldest: key=lambda x: x.stat().st_ctime)
         todo_file = str(todo_file)
         if todo_file not in shared.dirload_queue.index:
             with shared.dirload_lock:
@@ -714,7 +714,7 @@ def dirload_splitted(
             if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
                 gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
             red(f"Moving {p} to done_dir")
-            shutil.move(p, done_dir / Path(p).name)
+            shutil.move(p, shared.done_dir / Path(p).name)
             shared.dirload_queue.loc[p, "loaded"] = False
             shared.dirload_queue.loc[p, "moved"] = True
 
