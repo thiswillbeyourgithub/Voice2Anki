@@ -39,6 +39,7 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 
+
 @trace
 def clear_llm_cache():
     # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
@@ -46,6 +47,7 @@ def clear_llm_cache():
 
 # trigger a sync on startup to test if anki is running and with ankiconnect enabled
 sync_anki()
+
 
 @trace
 def pop_buffer():
@@ -61,6 +63,7 @@ def floatizer(func):
         kwargs = {k: float(v) if isinstance(v, int) else v for k, v in kwargs.items()}
         return func(*args, **kwargs)
     return wrapper
+
 
 @floatizer
 @trace
@@ -114,6 +117,7 @@ def whisper_cached(
                     time.sleep(2 * cnt)
     except Exception as err:
         raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
+
 
 @trace
 def thread_whisp_then_llm(
@@ -170,6 +174,7 @@ def thread_whisp_then_llm(
     cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=True)
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
+
 
 @trace
 def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
@@ -408,6 +413,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
 
     return formatted_messages
 
+
 async def async_alfred(*args, **kwargs):
     loop = asyncio.get_running_loop()
     try:
@@ -415,9 +421,11 @@ async def async_alfred(*args, **kwargs):
     except Exception as err:
         return err
 
+
 async def async_parallel_alfred(splits, *args, **kwargs):
     tasks = [async_alfred(sp, *args, **kwargs) for sp in splits]
     return await asyncio.gather(*tasks)
+
 
 @floatizer
 @trace
