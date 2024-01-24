@@ -183,6 +183,7 @@ class SharedModule:
         os.environ["OPENAI_API_KEY"] = self.pv["txt_openai_api_key"].strip()
         os.environ["REPLICATE_API_KEY"] = self.pv["txt_replicate_api_key"].strip()
         os.environ["MISTRAL_API_KEY"] = self.pv["txt_mistral_api_key"].strip()
+        os.environ["OPENROUTER_API_KEY"] = self.pv["txt_openrouter_api_key"].strip()
 
         self.request = {
                 "user-agent": request.headers["user-agent"],
