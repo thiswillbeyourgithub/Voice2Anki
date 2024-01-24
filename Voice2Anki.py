@@ -80,6 +80,8 @@ def start_Voice2Anki(
     widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
         for some widen screens, but very handy for mobile and tablet use.
+    port: int, default 7860
+        default port to use
     """
     if "help" in kwargs or "h" in args:
         return help(start_Voice2Anki)
