@@ -83,7 +83,7 @@ def start_Voice2Anki(
     port: int, default 7860
         default port to use
     """
-    if "help" in kwargs or "h" in args:
+    if "help" in kwargs or "h" in args or "usage" in kwargs:
         return help(start_Voice2Anki)
 
     if isinstance(print_db_then_exit, str):
