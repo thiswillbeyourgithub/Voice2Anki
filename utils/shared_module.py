@@ -180,9 +180,9 @@ class SharedModule:
         self.pv.running_tasks = {k: None for k in self.pv.profile_keys}
         self.pv.cache_values = {k: None for k in self.pv.profile_keys}
 
-        os.environ["OPENAI_API_KEY"] = shared.pv["txt_openai_api_key"].strip()
-        os.environ["REPLICATE_API_KEY"] = shared.pv["txt_replicate_api_key"].strip()
-        os.environ["MISTRAL_API_KEY"] = shared.pv["txt_mistral_api_key"].strip()
+        os.environ["OPENAI_API_KEY"] = self.pv["txt_openai_api_key"].strip()
+        os.environ["REPLICATE_API_KEY"] = self.pv["txt_replicate_api_key"].strip()
+        os.environ["MISTRAL_API_KEY"] = self.pv["txt_mistral_api_key"].strip()
 
         self.request = {
                 "user-agent": request.headers["user-agent"],
