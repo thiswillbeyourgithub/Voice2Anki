@@ -34,7 +34,9 @@ class SharedModule:
 
     llm_price = {
             "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
-            "openai/gpt-4-1106-preview": (0.01, 0.03),
+            "openai/gpt-3.5-turbo-0125": (0.0005, 0.0015),
+            "openai/gpt-4-0125-preview": (0.01, 0.03),
+
             # "replicate/kcaverly/dolphin-2.6-mixtral-8x7b-gguf:37491ecf805fbfc810720b8a5ff45901b148dcdef659d1fe1601118e619b3d6d": 0.000725,  # in $ per second
 
             # mistral prices are in euros per 1M token
