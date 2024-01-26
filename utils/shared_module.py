@@ -45,6 +45,8 @@ class SharedModule:
             "mistral/mistral-medium": (2.5 / 1000 * 1.09, 7.5 / 1000 * 1.09),
 
             "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.27 / 1000, 0.27 / 1000),
+            "openrouter/openchat/openchat-7b": (0, 0),
+
             }
     # embeddings are so cheap I don't even count the number of tokens
     embedding_models = [
