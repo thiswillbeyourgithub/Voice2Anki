@@ -51,6 +51,8 @@ class SharedModule:
     # embeddings are so cheap I don't even count the number of tokens
     embedding_models = [
             "openai/text-embedding-ada-002",
+            "openai/text-embedding-3-small",
+            "openai/text-embedding-3-large",
             "mistral/mistral-embed",
             ]
 
