@@ -20,8 +20,7 @@ import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
 
-from logger import whi, yel, red
-from shared_module import shared
+from logger import whi, yel, red, shared
 from profiles import ValueStorage
 
 stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=1)

@@ -6,8 +6,12 @@ import pickle
 from pathlib import Path
 import numpy as np
 
-from .logger import whi, red, trace
-from .shared_module import shared
+try:
+    from .logger import whi, red, trace
+    from .shared_module import shared
+except:
+    from logger import whi, red, trace
+    from shared_module import shared
 
 profile_keys = {
         "sld_max_tkn": {"default": 3500},
