@@ -11,6 +11,7 @@ python-Levenshtein>=0.21.0
 Levenshtein>=0.21.0
 sentence-transformers>=2.2.2
 ftfy>=6.1.1
+pyrubberband>=0.3.0
 
 # ocr mode
 joblib>=1.2.0
