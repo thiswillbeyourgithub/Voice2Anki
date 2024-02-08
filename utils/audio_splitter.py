@@ -123,7 +123,7 @@ class AudioSplitter:
         assert self.sp_dir.exists(), "missing splitted dir"
         assert self.done_dir.exists(), "missing done dir"
 
-        assert isinstance(prompt, (str, None)), "prompt argument should be string"
+        assert isinstance(prompt, (str, type(None))), "prompt argument should be string"
         assert isinstance(n_todo, (float, int)) and n_todo > 0, "n_todo should be a number greater than 0"
 
         self.prompt = prompt
