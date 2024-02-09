@@ -748,7 +748,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
         # https://github.com/chenxwh/insanely-fast-whisper
         transcript = replicate.run(
-                "vaibhavs10/incredibly-fast-whisper:65fa8e5a537c692838805dee5e8e845e4c8a70f909ba23b28434b7525b94020e",
+                "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
                 input={
                     "audio": open(audio_path, "rb"),
                     "task": "transcribe",
