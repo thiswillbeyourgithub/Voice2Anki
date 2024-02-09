@@ -564,11 +564,11 @@ class AudioSplitter:
         return times_to_keep, metadata
 
     def run_whisper(self, audio_path, second_pass):
+        audio_path = str(audio_path)
         if not second_pass:
             whi(f"Running whisper on {audio_path}")
 
         # hash used for the caching so that it does not depend on the path
-        audio_path=str(audio_path)
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
