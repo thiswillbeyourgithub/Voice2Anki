@@ -628,7 +628,7 @@ class AudioSplitter:
                     "batch_size": 1,
                     },
                 ]
-        for params in trial_dict:
+        for iparam, params in enumerate(trial_dict):
             for iter_retry in range(n_retry):
                 try:
                     transcript = whisper_splitter(
@@ -642,7 +642,7 @@ class AudioSplitter:
                     red(f"Successfuly translated using parameters: {json.dumps(params)}")
                     break
                 except Exception as err:
-                    red(f"#{iter_retry + 1}/{n_retry * len(trial_dict)}: Error when calling whisper_splitter with parameters:\n{json.dumps(params)}\nError: '{err}'")
+                    red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
             if not failed:
                 break
 
