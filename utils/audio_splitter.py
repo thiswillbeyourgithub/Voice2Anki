@@ -583,7 +583,7 @@ class AudioSplitter:
         if second_pass:
             n_retry = 1
         else:
-            n_retry = 5
+            n_retry = 3
         failed = True
         trial_dict = [
                 {
@@ -591,21 +591,21 @@ class AudioSplitter:
                     "repo": "hnesk",
                     "batch_size": None,
                     },
-                {
-                    "model": "large-v1",
-                    "repo": "hnesk",
-                    "batch_size": None,
-                    },
-                {
-                    "model": "medium",
-                    "repo": "hnesk",
-                    "batch_size": None,
-                    },
-                {
-                    "model": "large-v3",
-                    "repo": "fast",
-                    "batch_size": 1,
-                    },
+                # {
+                #     "model": "large-v1",
+                #     "repo": "hnesk",
+                #     "batch_size": None,
+                #     },
+                # {
+                #     "model": "medium",
+                #     "repo": "hnesk",
+                #     "batch_size": None,
+                #     },
+                # {
+                #     "model": "large-v3",
+                #     "repo": "fast",
+                #     "batch_size": 1,
+                #     },
                 ]
         for iparam, params in enumerate(trial_dict):
             for iter_retry in range(n_retry):
@@ -618,7 +618,8 @@ class AudioSplitter:
                             **params,
                             )
                     failed = False
-                    red(f"Successfuly translated using parameters: {json.dumps(params)}")
+                    if iter_retry > 0 or iparam > 0:
+                        red(f"Successfuly translated using parameters: {json.dumps(params)}")
                     break
                 except Exception as err:
                     red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
