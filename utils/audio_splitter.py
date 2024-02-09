@@ -568,6 +568,7 @@ class AudioSplitter:
             whi(f"Running whisper on {audio_path}")
 
         # hash used for the caching so that it does not depend on the path
+        audio_path=str(audio_path)
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
@@ -602,7 +603,7 @@ class AudioSplitter:
             for iter_retry in range(n_retry):
                 try:
                     transcript = whisper_splitter(
-                            audio_path=str(audio_path),
+                            audio_path=audio_path,
                             audio_hash=audio_hash,
                             prompt=self.prompt,
                             language=self.language,
