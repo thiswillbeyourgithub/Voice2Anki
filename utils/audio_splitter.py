@@ -748,6 +748,8 @@ class AudioSplitter:
 @stt_cache.cache(ignore=["audio_path", "batch_size"])
 def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batch_size):
     whi(f"Starting replicate (meaning cache is not used). Model={model} Repo={repo} Batch_size={batch_size}")
+    if not audio_path.startswith("http"):
+        audio_path = open(audio_path, "rb")
     start = time.time()
     if repo == "fast":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
@@ -756,7 +758,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
         transcript = replicate.run(
                 "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
                 input={
-                    "audio": open(audio_path, "rb"),
+                    "audio": audio_path,
                     "task": "transcribe",
                     "model": model,
                     "language": language,
@@ -790,7 +792,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
         transcript = replicate.run(
                 "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
                 input={
-                    "audio": open(audio_path, "rb"),
+                    "audio": audio_path,
                     "model": model,
                     "language": language,
                     "temperature": 0,
@@ -806,7 +808,7 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
         transcript = replicate.run(
                 "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
                 input={
-                    "audio": open(audio_path, "rb"),
+                    "audio": audio_path,
                     "model": model,
                     "language": language,
                     "temperature": 0,
