@@ -411,7 +411,18 @@ class AudioSplitter:
             ignored.export(out_file, format="mp3")
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
-            shutil.move(fileo, self.done_dir / fileo.name)
+            whi("Copying")
+            shutil.copy2(fileo, self.done_dir / (fileo.name + "temp"))
+            whi("Renaming")
+            shutil.move(
+                    self.done_dir / (fileo.name + "temp"),
+                    self.done_dir / fileo.name)
+            whi("Removing")
+            fileo.unlink(missing_ok=False)
+            whi("Done!")
+
+        red("All done!")
+        return
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
