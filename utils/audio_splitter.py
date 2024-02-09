@@ -20,6 +20,12 @@ import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
 import replicate
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from threading import Thread
+import requests
+import signal
 
 from logger import whi, yel, red, shared
 from profiles import ValueStorage
@@ -628,6 +634,8 @@ class AudioSplitter:
                     "batch_size": 1,
                     },
                 ]
+        fs = FileServer(str(audio_path))
+        breakpoint()
         for iparam, params in enumerate(trial_dict):
             for iter_retry in range(n_retry):
                 try:
@@ -826,6 +834,32 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
 
     whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
+
+class FileServer:
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+    def start(self):
+        def run_server(file_path):
+            app = FastAPI()
+
+            @app.get("/get-file")
+            async def get_file():
+                return FileResponse(file_path)
+
+            ip = requests.get('https://api.ipify.org').text
+            uvicorn.run(app, host="0.0.0.0", port=7960)
+        self.thread = Thread(target=run_server, args=[self.file_path])
+        self.thread.start()
+
+        ip = requests.get('https://api.ipify.org').text
+
+        return f"http://{ip}:8971/get-file"
+
+    def stop(self):
+        red("Stopping file server")
+        uvicorn.main.shutdown(server="default", signal=signal.SIGINT)
+        self.thread.join()
 
 if __name__ == "__main__":
     fire.Fire(AudioSplitter)
