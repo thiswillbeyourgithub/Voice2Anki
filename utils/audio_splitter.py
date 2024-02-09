@@ -280,13 +280,13 @@ class AudioSplitter:
                 prev_t1 = -1
                 new_times = []
                 for val, met in zip(sub_ttk, sub_meta):
-                    met["start"] = t0 + met["start"] * spf * self.g_spf
-                    met["end"] = t0 + met["end"] * spf * self.g_spf
+                    met["start"] = t0 + met["start"] * self.l_spf * self.g_spf
+                    met["end"] = t0 + met["end"] * self.l_spf * self.g_spf
                     assert met["start"] > prev_t0 and met["end"] >= prev_t1, "overlap"
                     if val is None:
                         new_times.append(val)
                     else:
-                        new_times.append([t0 + val[0] * spf * self.g_spf, t0 + val[1] * spf * self.g_spf])
+                        new_times.append([t0 + val[0] * self.l_spf * self.g_spf, t0 + val[1] * self.l_spf * self.g_spf])
                         assert new_times[-1][0] > prev_t0 and new_times[-1][1] >= prev_t1, "overlap"
                         assert new_times[-1][0] == met["start"], "Inconsistency between metadata and times_to_keep"
                         assert new_times[-1][1] == met["end"], "Inconsistency between metadata and times_to_keep"
