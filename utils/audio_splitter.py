@@ -570,83 +570,10 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(audio_path)
             min_limit = 10
-            ms_limit = 10 * 60 * 1000
             minutes = len(audio) / 1000 / 60
             if minutes > min_limit:
                 red(f"Audio is longer than {min_limit} minutes ({minutes:02f}min) so will split then merge.")
-                splits = [
-                        audio[i * ms_limit:(i+1) * ms_limit]
-                        for i in tqdm(range(len(audio) // ms_limit + 2), desc="splitting")
-                        if len(audio) >= i * ms_limit
-                        ]
-                tempfiles = [
-                        tempfile.NamedTemporaryFile(
-                            delete=False,
-                            prefix=Path(audio_path).stem + f"__{i+1}_").name
-                        for i in range(len(splits))]
-                def threaded_export(audio, path):
-                    audio.export(path, format="mp3")
-                joblib.Parallel(
-                        n_jobs=-1,
-                        backend="threading",
-                        )(
-                                joblib.delayed(threaded_export)(split, temp)
-                                for split, temp in zip(
-                                    splits,
-                                    tqdm(
-                                        tempfiles,
-                                        unit=f"{min_limit}min file",
-                                        desc="Exporting splits"
-                                        )
-                                    )
-                                )
-                assert all(Path(t).exists() for t in tempfiles), "missing temp files"
-
-                # run whisper on each split
-                def sub_whisper(path):
-                    return self.run_whisper(audio_path=path, second_pass=False)
-                tscripts = joblib.Parallel(
-                        n_jobs=-1,
-                        backend="threading",
-                        )(
-                                joblib.delayed(sub_whisper)(t)
-                                for t in tqdm(
-                                    tempfiles,
-                                    unit=f"{min_limit}min file",
-                                    desc="Treating long audio as splits"
-                                    )
-                                )
-
-                # merge the transcripts
-                transcript = tscripts[0]
-                offset = 0
-                for it, t in enumerate(tscripts[1:]):
-                    transcript["transcription"] += " " + t["transcription"]
-                    offset = (it + 1) * min_limit * 60
-                    segs = t["segments"]
-                    for iseg, seg in enumerate(segs):
-                        segs[iseg]["start"] += offset
-                        segs[iseg]["end"] += offset
-                        for iw, w in enumerate(segs[iseg]["words"]):
-                            segs[iseg]["words"][iw]["start"] += offset
-                            segs[iseg]["words"][iw]["end"] += offset
-
-                    # make sure to merge the transition
-                    transcript["segments"][-1]["end"] = segs[0]["end"]
-                    transcript["segments"][-1]["text"] += " " + segs[0]["text"]
-                    transcript["segments"][-1]["words"].extend(segs[0]["words"])
-
-                    # edit metadata
-                    if transcript["repo"] != "fast":
-                        transcript["segments"][-1]["no_speech_prob"] = min(segs[0]["no_speech_prob"], transcript["segments"][-1]["no_speech_prob"])
-                        transcript["segments"][-1]["avg_logprob"] = min(segs[0]["avg_logprob"], transcript["segments"][-1]["avg_logprob"])
-                        transcript["segments"][-1]["compression_ratio"] = min(segs[0]["compression_ratio"], transcript["segments"][-1]["compression_ratio"])
-                        transcript["segments"][-1]["temperature"] = min(segs[0]["temperature"], transcript["segments"][-1]["temperature"])
-
-                    segs.pop(0)
-                    transcript["segments"].extend(segs)
-
-                return transcript
+                return self.run_whisper_long(audio_path, audio, min_limit)
 
 
         # hash used for the caching so that it does not depend on the path
@@ -699,6 +626,95 @@ class AudioSplitter:
                 break
 
         assert not failed, "Failed to get transcript."
+
+        return transcript
+
+    def run_whisper_long(self, audio_path, audio, min_limit):
+        """for audio longer than some threshold (say 10 minutes) then in the
+        first pass it makes sense to split the audio, use multithreading to
+        transcribe it, then merge the transcripts (taking care of the
+        transition and offsets)
+        """
+        ms_limit = min_limit * 60 * 1000
+
+        # split the audio
+        splits = [
+                audio[i * ms_limit:(i+1) * ms_limit]
+                for i in tqdm(range(len(audio) // ms_limit + 2), desc="splitting")
+                if len(audio) >= i * ms_limit
+                ]
+
+        # creating temporary files
+        tempfiles = [
+                tempfile.NamedTemporaryFile(
+                    delete=False,
+                    prefix=Path(audio_path).stem + f"__{i+1}_").name
+                for i in range(len(splits))]
+
+        # multithreaded export as mp3
+        def threaded_export(audio, path):
+            audio.export(path, format="mp3")
+        joblib.Parallel(
+                n_jobs=-1,
+                backend="threading",
+                )(
+                        joblib.delayed(threaded_export)(split, temp)
+                        for split, temp in zip(
+                            splits,
+                            tqdm(
+                                tempfiles,
+                                unit=f"{min_limit}min file",
+                                desc="Exporting splits"
+                                )
+                            )
+                        )
+        assert all(Path(t).exists() for t in tempfiles), "missing temp files"
+
+        # run whisper on each split
+        def threaded_whisper(path):
+            return self.run_whisper(audio_path=path, second_pass=False)
+        tscripts = joblib.Parallel(
+                n_jobs=-1,
+                backend="threading",
+                )(
+                        joblib.delayed(threaded_whisper)(t)
+                        for t in tqdm(
+                            tempfiles,
+                            unit=f"{min_limit}min file",
+                            desc="Treating long audio as splits"
+                            )
+                        )
+
+        # merge the transcripts
+        transcript = tscripts[0]
+        offset = 0
+        for it, t in enumerate(tscripts[1:]):
+            transcript["transcription"] += " " + t["transcription"]
+            offset = (it + 1) * min_limit * 60
+
+            # offset the timestamps
+            segs = t["segments"]
+            for iseg, seg in enumerate(segs):
+                segs[iseg]["start"] += offset
+                segs[iseg]["end"] += offset
+                for iw, w in enumerate(segs[iseg]["words"]):
+                    segs[iseg]["words"][iw]["start"] += offset
+                    segs[iseg]["words"][iw]["end"] += offset
+
+            # make sure to merge the transition
+            transcript["segments"][-1]["end"] = segs[0]["end"]
+            transcript["segments"][-1]["text"] += " " + segs[0]["text"]
+            transcript["segments"][-1]["words"].extend(segs[0]["words"])
+
+            # edit metadata
+            if transcript["repo"] != "fast":
+                transcript["segments"][-1]["no_speech_prob"] = min(segs[0]["no_speech_prob"], transcript["segments"][-1]["no_speech_prob"])
+                transcript["segments"][-1]["avg_logprob"] = min(segs[0]["avg_logprob"], transcript["segments"][-1]["avg_logprob"])
+                transcript["segments"][-1]["compression_ratio"] = min(segs[0]["compression_ratio"], transcript["segments"][-1]["compression_ratio"])
+                transcript["segments"][-1]["temperature"] = min(segs[0]["temperature"], transcript["segments"][-1]["temperature"])
+
+            segs.pop(0)
+            transcript["segments"].extend(segs)
 
         return transcript
 
