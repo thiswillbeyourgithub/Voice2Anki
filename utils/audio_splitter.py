@@ -245,7 +245,7 @@ class AudioSplitter:
 
                 # take the suspicious segment, slow it down and
                 # re analyse it
-                sub_audio = audio_o[t0 * 1000 * self.spf:t1 * 1000 * self.spf]
+                sub_audio = audio_o[t0 * 1000 * self.g_spf:t1 * 1000 * self.g_spf]
                 tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
 
                 # sf and pyrb way:
@@ -280,13 +280,13 @@ class AudioSplitter:
                 prev_t1 = -1
                 new_times = []
                 for val, met in zip(sub_ttk, sub_meta):
-                    met["start"] = t0 + met["start"] * spf * self.spf
-                    met["end"] = t0 + met["end"] * spf * self.spf
+                    met["start"] = t0 + met["start"] * spf * self.g_spf
+                    met["end"] = t0 + met["end"] * spf * self.g_spf
                     assert met["start"] > prev_t0 and met["end"] >= prev_t1, "overlap"
                     if val is None:
                         new_times.append(val)
                     else:
-                        new_times.append([t0 + val[0] * spf * self.spf, t0 + val[1] * spf * self.spf])
+                        new_times.append([t0 + val[0] * spf * self.g_spf, t0 + val[1] * spf * self.g_spf])
                         assert new_times[-1][0] > prev_t0 and new_times[-1][1] >= prev_t1, "overlap"
                         assert new_times[-1][0] == met["start"], "Inconsistency between metadata and times_to_keep"
                         assert new_times[-1][1] == met["end"], "Inconsistency between metadata and times_to_keep"
@@ -377,11 +377,11 @@ class AudioSplitter:
                 prev_t0 = t0
                 prev_t1 = t1
 
-            assert [t for t in times_to_keep if t][-1][1] * 1000 * self.spf <= len(audio_o)
+            assert [t for t in times_to_keep if t][-1][1] * 1000 * self.g_spf <= len(audio_o)
             # # make sure to start at 0 and end at the end. Even though if
             # # it was removed from times_to_keep means that it
             # # contained no words
-            # times_to_keep[-1][1] = len(audio_o) / 1000 / self.spf
+            # times_to_keep[-1][1] = len(audio_o) / 1000 / self.g_spf
             # times_to_keep[0][0] = 0
 
             ignored = AudioSegment.empty()
@@ -409,7 +409,7 @@ class AudioSplitter:
                 ignored += audio_o[prev_end*1000: start_cut*1000]
                 prev_end = end_cut
 
-                sliced = audio_o[start_cut*1000 * self.spf:end_cut*1000 * self.spf]
+                sliced = audio_o[start_cut*1000 * self.g_spf:end_cut*1000 * self.g_spf]
                 if self.trim_splitted_silence:
                     sliced = self.trim_silences(sliced)
                 # if len(sliced) < 1000:
