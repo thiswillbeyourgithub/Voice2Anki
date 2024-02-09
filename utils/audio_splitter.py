@@ -47,6 +47,7 @@ class AudioSplitter:
 
             trim_splitted_silence=False,
             global_slowdown_factor=1.0,
+            second_pass_slowdown_factor=1.0,
 
             remove_silence=True,
             silence_method="torchaudio",
@@ -56,32 +57,46 @@ class AudioSplitter:
         """
         prompt: str, default None
             prompt used to guide whisper. None to disable
+
         profile: str, default None
             name of the profile to use when looking for the audio to split
             as well as the replicate API key.
             if None, will use the latest_profile used by Voice2Anki
+
         stop_list: list, default [' stop', ' top']
             list of strings that when found will trigger the audio splitting.
+
         language: str, default fr
+
         n_todo: int, default 1
             number of files to split by default. Can be used to only process
             a certain batch.
+
         stop_source: str, default 'replicate'
             if 'local_json', then an output from whispercpp is expected. This
             is not yet implemented. The idea is to be able to do the audio
             splitting locally using whispercpp instead of relying on replicate.
+
         untouched_dir: str or Path, default  to profiles/PROFILE/queues/audio_untouched
+
         splitted_dir: see untouched_dir
+
         done_dir: see untouched_dir
+
         trim_splitted_silence: bool, default False
             if True, will try to remove leading and ending silence of each
             audio split before exporting them. This can cause problems with
             words being cut so I disabled it by default. If the file after
             trimming is unexpectedly short, the trimming will be ignored. This
             is so that loud splits that don't contain silence are not botched.
+
         global_slowdown_factor float, default 1.0
             if lower than 1.0, then the long audio will be slowed down before
             processing. This can help whisper.
+
+        second_pass_slowdown_factor float, default 1.0
+            like global_slowdown_factor but for the second pass
+
         silence_method, str, default 'torchaudio'
             can be any of 'torchaudio', 'pydub' or 'sox_cli'
             * 'torchaudio' works using the sox filters present in utils/shared_module.py
@@ -129,7 +144,10 @@ class AudioSplitter:
         self.silence_method = silence_method
         assert global_slowdown_factor <= 1 and global_slowdown_factor > 0, (
                 "invalid value for global_slowdown_factor")
-        self.spf = global_slowdown_factor
+        assert second_pass_slowdown_factor <= 1 and second_pass_slowdown_factor > 0, (
+                "invalid value for second_pass_slowdown_factor")
+        self.g_spf = global_slowdown_factor
+        self.l_spf = second_pass_slowdown_factor
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -151,8 +169,8 @@ class AudioSplitter:
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
-        if self.spf != 1.0:
-            red(f"Global slowdown factor is '{self.spf}' so will slow down each audio file")
+        if self.g_spf != 1.0:
+            red(f"Global slowdown factor is '{self.g_spf}' so will slow down each audio file")
             assert self.stop_source != "local_json", (
                 "can't use local_json stop source and slowdown")
             for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Slowing down")):
@@ -164,18 +182,16 @@ class AudioSplitter:
                 audio.export(tempf.name, format="wav")
                 whi("  Stretching time of wav")
                 y, sr = sf.read(tempf.name)
-                y2 = pyrb.time_stretch(y, sr, self.spf)
+                y2 = pyrb.time_stretch(y, sr, self.g_spf)
                 whi("  Saving streched wav")
                 sf.write(tempf.name, y2, sr, format='wav')
                 sub_audio = AudioSegment.from_wav(tempf.name)
                 speed_ratio = len(sub_audio) / len(audio)
-                assert abs(1 - speed_ratio / self.spf) <= 0.0001, (
+                assert abs(1 - speed_ratio / self.g_spf) <= 0.0001, (
                     f"The slowdown factor is different than asked: '{speed_ratio}'")
                 whi("  Resaving as mp3")
                 sub_audio.export(tempf.name, format="mp3")
                 self.to_split[i] = tempf.name
-        else:
-            self.spf = 1
 
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
@@ -218,7 +234,6 @@ class AudioSplitter:
 
             whi("\nSecond pass")
             alterations = {}
-            spf = 1.0  # speed factor
             n = len(times_to_keep)
             for iter_ttk, val in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
                 if val is None:
@@ -236,12 +251,12 @@ class AudioSplitter:
                 # sf and pyrb way:
                 # we need to use sf and pyrb because
                 # pydub is buggingly slow to change the speedup
-                if spf != 1.0:
+                if self.l_spf != 1.0:
                     whi(f"{iter_print}Saving segment to {tempf.name} as wav")
                     sub_audio.export(tempf.name, format="wav")
                     # Stretching time
                     y, sr = sf.read(tempf.name)
-                    y2 = pyrb.time_stretch(y, sr, spf)
+                    y2 = pyrb.time_stretch(y, sr, self.l_spf)
                     # Saving as wav
                     sf.write(tempf.name, y2, sr, format='wav')
                     sub_audio = AudioSegment.from_wav(tempf.name)
