@@ -644,6 +644,12 @@ class AudioSplitter:
                 for i in tqdm(range(len(audio) // ms_limit + 2), desc="splitting")
                 if len(audio) >= i * ms_limit
                 ]
+        min_last = len(splits[-1]) / 1000 / 60
+        if min_last < 1:
+            # less than one minute, merge it with latest
+            red(f"Last audio split lasts {min_last:02f}min so merging with previous")
+            splits[-2] += splits[-1]
+            splits = splits[:-1]
 
         # creating temporary files
         tempfiles = [
