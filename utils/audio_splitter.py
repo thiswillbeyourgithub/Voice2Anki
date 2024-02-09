@@ -618,6 +618,11 @@ class AudioSplitter:
                     "batch_size": None,
                     },
                 {
+                    "model": "medium",
+                    "repo": "hnesk",
+                    "batch_size": None,
+                    },
+                {
                     "model": "large-v3",
                     "repo": "fast",
                     "batch_size": 1,
@@ -634,6 +639,7 @@ class AudioSplitter:
                             **params,
                             )
                     failed = False
+                    red(f"Successfuly translated using parameters: {json.dumps(params)}")
                     break
                 except Exception as err:
                     red(f"#{iter_retry + 1}/{n_retry * len(trial_dict)}: Error when calling whisper_splitter with parameters:\n{json.dumps(params)}\nError: '{err}'")
