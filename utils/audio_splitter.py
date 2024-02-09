@@ -602,43 +602,43 @@ class AudioSplitter:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
         if not second_pass:
-            n_retry = 10
+            n_retry = 5
         else:
             n_retry = 1
         failed = True
-        # for iter_retry in range(n_retry):
-        #     try:
-        #         transcript = whisper_splitter(
-        #                 audio_path=str(audio_path),
-        #                 audio_hash=audio_hash,
-        #                 prompt=self.prompt,
-        #                 language=self.language,
-        #                 model="large-v3",
-        #                 repo="fast",
-        #                 batch_size=1,
-        #                 )
-        #         failed = False
-        #         break
-        #     except Exception as err:
-        #         red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with Fast Whisper large-v3: '{err}'")
-
-        # if failed:
-        #     red(f"Failed more than {n_retry} times to get transcript, retrying with hnesk.")
-        for iter_retry in range(n_retry):
-            try:
-                transcript = whisper_splitter(
-                        audio_path=str(audio_path),
-                        audio_hash=audio_hash,
-                        prompt=self.prompt,
-                        language=self.language,
-                        model="large-v2",
-                        repo="hnesk",
-                        batch_size=None,
-                        )
-                failed = False
+        trial_dict = [
+                {
+                    "model": "large-v2",
+                    "repo": "hnesk",
+                    "batch_size": None,
+                    },
+                {
+                    "model": "large-v1",
+                    "repo": "hnesk",
+                    "batch_size": None,
+                    },
+                {
+                    "model": "large-v3",
+                    "repo": "fast",
+                    "batch_size": 1,
+                    },
+                ]
+        for params in trial_dict:
+            for iter_retry in range(n_retry):
+                try:
+                    transcript = whisper_splitter(
+                            audio_path=str(audio_path),
+                            audio_hash=audio_hash,
+                            prompt=self.prompt,
+                            language=self.language,
+                            **params,
+                            )
+                    failed = False
+                    break
+                except Exception as err:
+                    red(f"#{iter_retry + 1}/{n_retry * len(trial_dict)}: Error when calling whisper_splitter with parameters:\n{json.dumps(params)}\nError: '{err}'")
+            if not failed:
                 break
-            except Exception as err:
-                red(f"#{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with hnesk large-v2: '{err}'")
 
         assert not failed, "Failed to get transcript."
 
