@@ -811,7 +811,15 @@ class AudioSplitter:
         assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
 
         whi(f"Moving {file} to {self.done_dir} dir")
-        shutil.move(file, self.done_dir / file.name)
+        whi("Copying")
+        shutil.copy2(file, self.done_dir / (file.name + "temp"))
+        whi("Renaming")
+        shutil.move(
+                self.done_dir / (file.name + "temp"),
+                self.done_dir / file.name)
+        whi("Removing")
+        file.unlink(missing_ok=False)
+        whi("Done!")
 
         return new_filename
 
