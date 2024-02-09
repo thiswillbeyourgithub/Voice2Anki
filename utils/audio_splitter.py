@@ -235,6 +235,73 @@ class AudioSplitter:
             whi("\nSecond pass")
             alterations = {}
             n = len(times_to_keep)
+
+            # load all sub_audios and send them to whisper directly
+            # so that it is already cached for the loop just afterwards
+            sub_audios = [
+                    audio_o[val[0] * 1000 * self.g_spf:val[1] * 1000 * self.g_spf]
+                    if val is not None
+                    else None
+                    for val in times_to_keep
+                    ]
+            tempfiles = [
+                tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + f"__{i}_").name
+                if a is not None
+                else None
+                for i, a in enumerate(sub_audios)
+                ]
+
+            def threaded_export(audio, path):
+                if audio is None or path is None:
+                    assert audio is None and path is None
+                    return
+                if self.l_spf != 1.0:
+                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
+                    # sf and pyrb way:
+                    # we need to use sf and pyrb because
+                    # pydub is buggingly slow to change the speedup
+                    audio.export(tempf.name, format="wav")
+                    # Stretching time
+                    y, sr = sf.read(tempf.name)
+                    y2 = pyrb.time_stretch(y, sr, self.l_spf)
+                    # Saving as wav
+                    sf.write(tempf.name, y2, sr, format='wav')
+                    audio = AudioSegment.from_wav(tempf.name)
+
+                    # # pydub way:
+                    # whi(f"Saving segment to {tempf.name} as mp3")
+                    # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
+                    # whi("Saved")
+                audio.export(path, format="mp3")
+            joblib.Parallel(
+                    n_jobs=10,
+                    backend="threading",
+                    )(joblib.delayed(threaded_export)(sub, f)
+                        for sub, f in zip(
+                            tqdm(
+                                sub_audio,
+                                desc="Exporting before second pass",
+                                unit="mp3",
+                                )
+                            tempfiles,
+                            )]
+
+            # run whisper on each split
+            def threaded_whisper(path):
+                return self.run_whisper(audio_path=path, second_pass=True)
+            joblib.Parallel(
+                    n_jobs=-1,
+                    backend="threading",
+                    )(
+                            joblib.delayed(threaded_whisper)(tf)
+                            for tf in tqdm(
+                                tempfiles,
+                                unit="mp3",
+                                desc="Transcribing for second pass",
+                                )
+                            if tf is not None
+                            )
+            assert len(times_to_keep) == len(sub_audios), "Error when caching in advance sub audio"
             for iter_ttk, val in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
                 if val is None:
                     continue
@@ -243,32 +310,9 @@ class AudioSplitter:
                 dur = t1 - t0
                 whi(f"{iter_print}Text content before second pass: {metadata[iter_ttk]['text']}")
 
-                # take the suspicious segment, slow it down and
-                # re analyse it
-                sub_audio = audio_o[t0 * 1000 * self.g_spf:t1 * 1000 * self.g_spf]
-                tempf = tempfile.NamedTemporaryFile(delete=False, prefix=fileo.stem + "__")
-
-                # sf and pyrb way:
-                # we need to use sf and pyrb because
-                # pydub is buggingly slow to change the speedup
-                if self.l_spf != 1.0:
-                    whi(f"{iter_print}Saving segment to {tempf.name} as wav")
-                    sub_audio.export(tempf.name, format="wav")
-                    # Stretching time
-                    y, sr = sf.read(tempf.name)
-                    y2 = pyrb.time_stretch(y, sr, self.l_spf)
-                    # Saving as wav
-                    sf.write(tempf.name, y2, sr, format='wav')
-                    sub_audio = AudioSegment.from_wav(tempf.name)
-                # Resaving as mp3
-                sub_audio.export(tempf.name, format="mp3")
-
-                # # pydub way:
-                # whi(f"Saving segment to {tempf.name} as mp3")
-                # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
-                # whi("Saved")
-
-                transcript = self.run_whisper(tempf.name, second_pass=True)
+                tempf = tempfiles[iter_ttk]
+                assert tempf is not None
+                transcript = self.run_whisper(tempf, second_pass=True)
                 sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
@@ -297,7 +341,7 @@ class AudioSplitter:
                 alterations[iter_ttk] = [new_times, sub_meta]
                 if [nt for nt in new_times if nt]:
                     assert [nt for nt in new_times if nt][-1][-1] <= t1, "unexpected split timeline"
-                Path(tempf.name).unlink()
+                Path(tempf).unlink()
 
                 if len(sub_meta) > 1:
                     red(f"{iter_print}Segment was rescinded in those texts. Metadata:")
