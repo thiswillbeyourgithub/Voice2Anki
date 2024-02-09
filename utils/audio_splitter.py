@@ -50,7 +50,6 @@ class AudioSplitter:
 
             remove_silence=True,
             silence_method="torchaudio",
-            compress_if_too_large=True,
             h=False,
             help=False,
             ):
@@ -88,11 +87,6 @@ class AudioSplitter:
             * 'torchaudio' works using the sox filters present in utils/shared_module.py
             * 'sox_cli' only works on linux and needs sox installed
             * 'pydub' is excrutiatingly slow
-        compress_if_too_large: bool, default True
-            if a file is larger than 19MB, it will be compressed iteratively
-            to mp3 with lower and lower bitrate until the size is below 19MB.
-            This is because some replicate backends seem to refuse file of
-            20MB after trying for several minutes.
         """
         if h or help:
             return help(self)
@@ -133,7 +127,6 @@ class AudioSplitter:
         self.remove_silence = remove_silence
         self.trim_splitted_silence = trim_splitted_silence
         self.silence_method = silence_method
-        self.compress_if_too_large = compress_if_too_large
         assert global_slowdown_factor <= 1 and global_slowdown_factor > 0, (
                 "invalid value for global_slowdown_factor")
         self.spf = global_slowdown_factor
@@ -154,7 +147,7 @@ class AudioSplitter:
                     self.to_split[i] = new_filename
 
         # contains the original file path, while self.to_split will contain
-        # the path to the slowed down / compressed versions in /tmp
+        # the path to the slowed down versions in /tmp
         self.to_split_original = copy.deepcopy(self.to_split)
 
         # slow down a bit each audio
@@ -184,29 +177,6 @@ class AudioSplitter:
         else:
             self.spf = 1
 
-        # compressing if larger than 20mb
-        if self.compress_if_too_large:
-            for i, file in enumerate(tqdm(self.to_split, unit="file", desc="Compressing")):
-                fsize = file.stat().st_size / 1024 / 1024
-                while fsize >= 19:
-                    red(f"{file}'s size is {round(fsize, 3)}Mb which is >= 19Mb.")
-                    tempf = tempfile.NamedTemporaryFile(delete=False, prefix=file.stem + f"_compressed_because_{round(fsize, 3)}_MB_")
-                    tempfn = "_MB_".join(tempf.name.split("/")[-1].split("_MB_")[:-1])
-                    matches = [m for m in Path(tempf.name).parent.iterdir() if m.stat().st_size > 0 and tempfn in m.name]
-                    if matches:
-                        red(f"Found file {matches[0]} that was already compressed, skipping this compression.")
-                        file = matches[0]
-                    else:
-                        red(f"Compressing now: {file}")
-                        audio = AudioSegment.from_mp3(file)
-                        bitrate = audio.frame_rate // 1000
-                        audio.export(tempf.name, format="mp3", bitrate=f"{bitrate * 2 // 3}k")
-                        file = Path(tempf.name)
-                    self.to_split[i] = str(file.absolute())
-
-                    fsize = file.stat().st_size / 1024 / 1024
-                    whi(f"File size of {file} is now {round(fsize, 3)}Mb")
-
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
@@ -227,7 +197,7 @@ class AudioSplitter:
 
             audio = AudioSegment.from_mp3(file)
             fileo = self.to_split_original[iter_file]  # original file
-            audio_o = AudioSegment.from_mp3(fileo)  # original audio, without slowing down or compressing
+            audio_o = AudioSegment.from_mp3(fileo)  # original audio, without slowing down
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {fileo} as there is no cutting to do")
