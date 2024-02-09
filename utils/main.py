@@ -315,7 +315,7 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
     else:
         keywords = []
 
-    # load prompts from memory.json
+    # load prompts from memory.toml
     prev_prompts = load_prev_prompts(profile)
 
     # format the new prompt

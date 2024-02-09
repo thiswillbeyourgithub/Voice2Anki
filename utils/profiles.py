@@ -1,5 +1,5 @@
 import os
-import json
+import rtoml
 import threading
 import queue
 import pickle
@@ -167,9 +167,9 @@ class ValueStorage:
             if key == "message_buffer":
                 try:
                     with open(str(kf), "r") as f:
-                        new = json.load(f)
+                        new = rtoml.load(f)
                 except Exception as err:
-                    red(f"Error when loading message_buffer as json in pickle: '{err}'")
+                    red(f"Error when loading message_buffer as toml in pickle: '{err}'")
 
             else:
                 try:
@@ -275,10 +275,10 @@ def worker_setitem(in_queue):
         if key == "message_buffer":
             try:
                 with open(str(kf), "w") as f:
-                    json.dump(item, f, indent=4, ensure_ascii=False)
+                    rtoml.dump(item, f, pretty=True)
                 out_queue.put(True)
             except Exception as err:
-                out_queue.put(red(f"Error when saving message_buffer as json in pickle: '{err}'"))
+                out_queue.put(red(f"Error when saving message_buffer as rtoml in pickle: '{err}'"))
         else:
             try:
                 with open(str(kf), "w") as f:

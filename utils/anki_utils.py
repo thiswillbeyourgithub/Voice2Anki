@@ -1,3 +1,4 @@
+import rtoml
 from functools import partial
 import asyncio
 import aiohttp
@@ -138,7 +139,7 @@ def add_note_to_anki(
                     "source": source,
                     "source_extra": source_extra,
                     "souce_audio": source_audio,
-                    "GPToAnkiMetadata": note_metadata,
+                    "GPToAnkiMetadata": rtoml.dumps(note_metadata, pretty=True),
                     },
                 "tags": tags,
                 "options": {"allowDuplicate": False},
