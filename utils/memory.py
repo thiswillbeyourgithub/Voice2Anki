@@ -7,7 +7,7 @@ import random
 import time
 from pathlib import Path
 from textwrap import dedent, indent
-import rtoml
+import json
 import hashlib
 from joblib import Memory
 import tiktoken
@@ -308,7 +308,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 
         # get the embedding for all memories in another way (because this way
         # we get all embeddings from the memories in a single call, provided the
-        # memories.toml file hasn't changed since)
+        # memories.json file hasn't changed since)
         to_embed = [prompt_messages[-1]["content"]]
         to_embed += [pr["content"] for pr in candidate_prompts]
         to_embed += [pr["answer"] for pr in candidate_prompts]
@@ -475,8 +475,8 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 
         prev_prompts = check_prompts(prev_prompts)
 
-        with open(f"profiles/{txt_profile}/memories.toml", "w") as f:
-            rtoml.dump(prev_prompts, f, pretty=True)
+        with open(f"profiles/{txt_profile}/memories.json", "w") as f:
+            json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
         return
@@ -486,15 +486,15 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 @trace
 def load_prev_prompts(profile):
     assert Path("profiles/").exists(), "profile directory not found"
-    if Path(f"profiles/{profile}/memories.toml").exists():
-        with open(f"profiles/{profile}/memories.toml", "r") as f:
-            prev_prompts = rtoml.load(f)
+    if Path(f"profiles/{profile}/memories.json").exists():
+        with open(f"profiles/{profile}/memories.json", "r") as f:
+            prev_prompts = json.load(f)
         prev_prompts = check_prompts(prev_prompts)
     else:
         red(f"No memories in profile {profile} found, creating it")
         prev_prompts = check_prompts([default_system_prompt.copy()])
-        with open(f"profiles/{profile}/memories.toml", "w") as f:
-            rtoml.dump(prev_prompts, f, pretty=True)
+        with open(f"profiles/{profile}/memories.json", "w") as f:
+            json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
 
     return prev_prompts
 
