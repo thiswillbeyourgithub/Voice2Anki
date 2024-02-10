@@ -204,6 +204,19 @@ def add_audio_to_anki(audio_mp3, queue):
 async def get_card_status(txt_chatgpt_cloz, return_bool=False):
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
+    if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
+        red("Found flashcard_editor.py")
+        spec = importlib.util.spec_from_file_location(
+                "flashcard_editor.cloze_editor",
+                (shared.func_dir / "flashcard_editor.py").absolute()
+                )
+        editor_module = importlib.util.module_from_spec(spec)
+        sys.modules["editor_module"] = editor_module
+        spec.loader.exec_module(editor_module)
+        cloze_editor = editor_module.cloze_editor
+    else:
+        red("Not flashcard_editor.py found")
+        cloze_editor = lambda x: x
 
     cloz = cloze_editor(txt_chatgpt_cloz)
     cloz = cloz.replace("\"", "\\\"")
