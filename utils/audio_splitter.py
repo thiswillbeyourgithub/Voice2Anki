@@ -417,7 +417,7 @@ class AudioSplitter:
                 dur = t1 - t0
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
-                    red(f"Split #{iter_ttk}/{n} has too long duration even after second pass: {dur:02f}s.")
+                    red(f"Split #{iter_ttk}/{n} has too long duration even after second pass: {dur:.2f}s.")
                     red(f"metadata: {metadata[iter_ttk]}")
                 prev_t0 = t0
                 prev_t1 = t1
@@ -649,7 +649,7 @@ class AudioSplitter:
             min_limit = 10
             minutes = len(audio) / 1000 / 60
             if minutes > min_limit:
-                red(f"Audio is longer than {min_limit} minutes ({minutes:02f}min) so will split then merge.")
+                red(f"Audio is longer than {min_limit} minutes ({minutes:.1f}min) so will split then merge.")
                 return self.run_whisper_long(audio_path, audio, min_limit)
 
 
@@ -724,7 +724,7 @@ class AudioSplitter:
         min_last = len(splits[-1]) / 1000 / 60
         if min_last < 1:
             # less than one minute, merge it with latest
-            red(f"Last audio split lasts {min_last:02f}min so merging with previous")
+            red(f"Last audio split lasts {min_last:.2f}min so merging with previous")
             splits[-2] += splits[-1]
             splits = splits[:-1]
 
