@@ -665,28 +665,27 @@ def dirload_splitted(
 
         whi(f"Will load sound {to_temp}")
         sounds_to_load.append(to_temp)
-        if txt_whisp_prompt and txt_whisp_lang:
-            thread = threading.Thread(
-                target=thread_whisp_then_llm,
-                args=(
-                        to_temp,
-                        txt_whisp_prompt,
-                        txt_whisp_lang,
-                        sld_whisp_temp,
+        thread = threading.Thread(
+            target=thread_whisp_then_llm,
+            args=(
+                    to_temp,
+                    txt_whisp_prompt,
+                    txt_whisp_lang,
+                    sld_whisp_temp,
 
-                        txt_chatgpt_context,
-                        txt_profile,
-                        max_token,
-                        temperature,
-                        sld_buffer,
-                        llm_choice,
-                        txt_keywords,
-                        ),
-                )
-            with shared.dirload_lock:
-                shared.dirload_queue.loc[str(path), "transcribed"] = "started"
-            thread.start()
-            new_threads.append(thread)
+                    txt_chatgpt_context,
+                    txt_profile,
+                    max_token,
+                    temperature,
+                    sld_buffer,
+                    llm_choice,
+                    txt_keywords,
+                    ),
+            )
+        with shared.dirload_lock:
+            shared.dirload_queue.loc[str(path), "transcribed"] = "started"
+        thread.start()
+        new_threads.append(thread)
         with shared.dirload_lock:
             shared.dirload_queue.loc[str(path), "loaded"] = True
 
