@@ -1,3 +1,4 @@
+from datetime import datetime
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
@@ -1019,7 +1020,7 @@ with gr.Blocks(
     demo.load(
             fn=shared.reset,
             show_progress=False,
-            js=darkmode_js,  # darkmode by default
+            js=darkmode_js if (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
             ).then(
                     fn=load_user_chain,
                     inputs=btn_chains,
