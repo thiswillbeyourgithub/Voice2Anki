@@ -1,3 +1,4 @@
+from joblib import hash as jhash
 import asyncio
 import threading
 import time
@@ -263,3 +264,34 @@ def Timeout(limit):
                     return result[0]
         return wrapper
     return decorator
+
+def smartcache(func):
+    """used to decorate a function that is already decorated by a
+    joblib.Memory decorator. It stores the hash of the arguments in
+    shared.smartcache at the start of the run and removes it at the end.
+    If it already exists that means the cache is already computing the same
+    value so just wait for that to finish to avoid concurrent calls."""
+    assert "call_and_shelve" in dir(func), f"Func does not appear to be decorated by joblib: {func}"
+    def wrapper(*args, **kwargs):
+        h = jhash(jhash(args) + jhash(kwargs))
+        if h in shared.smartcache:
+            t = shared.smartcache[h]
+            red(f"Cache already ongoing for {func}. Hash={h}")
+            i = 0
+            while h in shared.smartcache:
+                time.sleep(0.1)
+                i += 1
+                if i % 10 == 0:
+                    delay = time.time() - t
+                    red(f"Waiting for {func} caching to finish for {delay:02f}s. Hash={h}")
+            return func(*args, **kwargs)
+        else:
+            with shared.thread_lock:
+                with shared.timeout_lock:
+                    shared.smartcache[h] = time.time()
+            result = func(*args, **kwargs)
+            with shared.thread_lock:
+                with shared.timeout_lock:
+                    del shared.smartcache[h]
+            return result
+    return wrapper

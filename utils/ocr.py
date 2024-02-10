@@ -7,7 +7,7 @@ import re
 from textwrap import dedent
 from joblib import Memory
 
-from .logger import yel, trace
+from .logger import yel, trace, smartcache
 
 memory = Memory("cache/ocr_cache", verbose=0)
 
@@ -26,6 +26,7 @@ tesse_config = "--oem 3 --psm 11 -c preserve_interword_spaces=1"
 
 
 @trace
+@smartcache
 @memory.cache
 def get_text(img_path: str):
     img = cv2.imread(img_path, flags=1)

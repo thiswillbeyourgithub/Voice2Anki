@@ -167,6 +167,7 @@ class SharedModule:
             "ocr": [],
             "timeout": [],
             }
+    smartcache = {}
 
     added_note_ids = []
 
@@ -182,6 +183,7 @@ class SharedModule:
         self.latest_llm_used = None
         for k in self.running_threads:
             self.running_threads[k] = []
+        self.smartcache = {}
         self.added_note_ids = []
         self.pv.running_tasks = {k: None for k in self.pv.profile_keys}
         self.pv.cache_values = {k: None for k in self.pv.profile_keys}

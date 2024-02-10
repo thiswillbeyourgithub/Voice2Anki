@@ -24,7 +24,7 @@ import openai
 
 from .anki_utils import add_note_to_anki, add_audio_to_anki, sync_anki
 from .shared_module import shared
-from .logger import red, whi, yel, store_to_db, trace, Timeout
+from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache
 from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
@@ -67,6 +67,7 @@ def floatizer(func):
 
 @floatizer
 @trace
+@smartcache
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
         audio_path,
@@ -430,6 +431,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @floatizer
 @trace
 @Timeout(180)
+@smartcache
 @llm_cache.cache(ignore=["cache_mode", "sld_buffer"])
 def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=False):
     "send the previous prompt and transcribed speech to the LLM"
