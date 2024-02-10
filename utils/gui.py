@@ -1,6 +1,6 @@
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile
+from .profiles import get_profiles, switch_profile, load_user_functions
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log
@@ -242,6 +242,24 @@ with gr.Blocks(
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
         with gr.Row():
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary")
+        with gr.Row():
+            code_user_flashcard_editor = gr.Code(
+                    value=None,
+                    language="python",
+                    lines=5,
+                    label="User flashcard editor function",
+                    interactive=False,
+                    show_label=True,
+                    )
+        with gr.Row():
+            code_user_chains = gr.Code(
+                    value=None,
+                    language="python",
+                    lines=5,
+                    label="User chains",
+                    interactive=False,
+                    show_label=True,
+                    )
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
         with gr.Column():
@@ -396,7 +414,10 @@ with gr.Blocks(
     tab_settings.select(
             fn=reload_tags_decks,
             outputs=[txt_tags, txt_deck],
-            )
+            ).then(
+                    fn=load_user_functions,
+                    outputs=[code_user_flashcard_editor, code_user_chains]
+                    )
 
     # copy audio to flag button
     flag_audio_btn.click(

@@ -150,6 +150,7 @@ class SharedModule:
     splitted_dir = None
     done_dir = None
     unsplitted_dir = None
+    func_dir = None
 
     message_buffer = []
     dirload_queue = pd.DataFrame(columns=dirload_queue_columns).set_index("path")

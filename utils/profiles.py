@@ -367,3 +367,56 @@ def switch_profile(profile):
             None,
             profile,
             ]
+
+
+def load_user_functions():
+    """ If the user profile directory contains a directory called "functions"
+    then functions can be loaded.
+    Currently supported use case are:
+
+    * If contains "flashcard_editor.py" then it will be loaded
+      to edit on the fly flashcards when they are sent to anki.
+      The idea is that it allows systematic change like removing accents or using
+      acronyms for example as this is sometimes hard to follow by LLMs. The
+      name of the function must be 'cloze_editor' take str as input and output
+      a string.
+    * If contains "chains.py" then must contain a dict 'chains' with as keys
+      'name' and 'chain'. The name is used to create buttons for the chain.
+      The chain must take as input a string and output a string.
+      The goal is to enable complex formating like turning quickly a table into
+      multiple flashcards.
+      When called, the input will be the transcripted text and the output
+      will be sent again to the transcript, so as to be an input to the
+      "transcript to cloze" workflow.
+    """
+    flashcard_editor = """
+# This contains the code in profile/USER/functions/flashcard_editor.py if
+# found. It must contain a function called cloze_editor that takes as input
+# a string and returns another string.
+# The idea is that it allows systematic change like removing accents or using
+# acronyms for example as this is sometimes hard to follow by LLMs
+"""
+    if [f
+        for f in shared.func_dir.iterdir()
+        if f.name.endswith("flashcard_editor.py")]:
+        red("Found flashcard_editor.py")
+        with open((shared.func_dir / "flashcard_editor.py").absolute(), "r") as f:
+            flashcard_editor += f.read()
+    chains = """
+# This contains the code in profile/USER/functions/chains.py if
+# found. It must contain a dict called chains with as keys 'name' and
+# 'chain'. The name is used to create buttons for the chain.
+# The chain must take as input a string and output a string.
+# The goal is to enable complex formating like turning quickly a table into
+# multiple flashcards.
+# When called, the input will be the transcripted text and the output
+# will be sent again to the transcript, so as to be an input to the
+# "transcript to cloze" workflow.
+"""
+    if [f
+        for f in shared.func_dir.iterdir()
+        if f.name.endswith("chains.py")]:
+        red("Found chains.py")
+        with open((shared.func_dir / "chains.py").absolute(), "r") as f:
+            chains += f.read()
+    return [flashcard_editor, chains]
