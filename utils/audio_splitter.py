@@ -279,7 +279,7 @@ class AudioSplitter:
                     )(joblib.delayed(threaded_export)(sub, f)
                         for sub, f in zip(
                             tqdm(
-                                sub_audio,
+                                sub_audios,
                                 desc="Exporting before second pass",
                                 unit="mp3",
                                 ),
