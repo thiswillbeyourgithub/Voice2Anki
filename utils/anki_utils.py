@@ -1,3 +1,4 @@
+import sys
 import importlib.util
 from functools import partial
 import asyncio
@@ -127,10 +128,14 @@ def add_note_to_anki(
 
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         red("Found flashcard_editor.py")
-        cloze_editor = importlib.util.spec_from_file_location(
+        spec = importlib.util.spec_from_file_location(
                 "flashcard_editor.cloze_editor",
                 (shared.func_dir / "flashcard_editor.py").absolute()
                 )
+        editor_module = importlib.util.module_from_spec(spec)
+        sys.modules["editor_module"] = editor_module
+        spec.loader.exec_module(editor_module)
+        cloze_editor = editor_module.cloze_editor
     else:
         red("Not flashcard_editor.py found")
         cloze_editor = lambda x: x
