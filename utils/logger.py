@@ -271,7 +271,6 @@ def smartcache(func):
     shared.smartcache at the start of the run and removes it at the end.
     If it already exists that means the cache is already computing the same
     value so just wait for that to finish to avoid concurrent calls."""
-    assert "call_and_shelve" in dir(func), f"Func does not appear to be decorated by joblib: {func}"
     def wrapper(*args, **kwargs):
         h = jhash(jhash(args) + jhash(kwargs))
         if h in shared.smartcache:
@@ -289,7 +288,13 @@ def smartcache(func):
             with shared.thread_lock:
                 with shared.timeout_lock:
                     shared.smartcache[h] = time.time()
-            result = func(*args, **kwargs)
+            try:
+                result = func(*args, **kwargs)
+            except:
+                with shared.thread_lock:
+                    with shared.timeout_lock:
+                        del shared.smartcache[h]
+                raise
             with shared.thread_lock:
                 with shared.timeout_lock:
                     del shared.smartcache[h]
