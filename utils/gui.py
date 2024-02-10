@@ -6,7 +6,7 @@ from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitte
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
-from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -117,9 +117,9 @@ with gr.Blocks(
         for i in range(audio_number):
             with gr.Row():
                 audio_mp3 = create_audio_compo(scale=1)
+                audio_slots.append(audio_mp3)
                 audio_slots_txt = gr.Textbox(lines=2, max_lines=5, container=False, interactive=False, scale=2)
-            audio_slots.append(audio_mp3)
-            audio_slots_txts.append(audio_slots_txt)
+                audio_slots_txts.append(audio_slots_txt)
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
             dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50)
@@ -1026,7 +1026,16 @@ with gr.Blocks(
                     fn=load_user_chain,
                     inputs=btn_chains,
                     outputs=btn_chains,
-                    )
+                    ).then(
+                            fn=update_audio_slots_txts,
+                            inputs=audio_slots_txts,
+                            outputs=audio_slots_txts,
+                            every=1.0,
+                            show_progress=False,
+                            postprocess=False,
+                            preprocess=False,
+                            trigger_mode="once",
+                            )
 
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")

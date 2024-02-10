@@ -273,3 +273,22 @@ def roll_audio(*slots):
         slots.append(audio_mp3)
 
     return slots
+
+
+def update_audio_slots_txts(*audio_slots_txts):
+    """ran frequently to update the content of the textbox of each pending
+    audio to display the transcription
+    """
+    try:
+        df = shared.dirload_queue
+        if df.empty:
+            return ["Empty df" for i in audio_slots_txts]
+        df = df[df["loaded"] == True]
+        if df.empty:
+            return ["Empty" for i in audio_slots_txts]
+        trans = df["transcribed"].tolist()
+        while len(trans) < len(audio_slots_txts):
+            trans.append("Pending?")
+        return trans
+    except Exception as err:
+        return [err for i in audio_slots_txts]
