@@ -242,7 +242,7 @@ def load_queued_galleries():
     return saved_fg
 
 
-def create_audio_compo():
+def create_audio_compo(scale=1):
     return gr.Microphone(
             type="filepath",
             format="mp3",
@@ -254,6 +254,7 @@ def create_audio_compo():
             elem_id="Audio_component_Voice2Anki",
             min_width="1%",
             editable=True,
+            scale=scale,
             )
 
 
