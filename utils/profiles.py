@@ -381,8 +381,8 @@ def load_user_functions():
       name of the function must be 'cloze_editor' take str as input and output
       a string.
     * If contains "chains.py" then must contain a dict 'chains' with as keys
-      'name' and 'chain'. The name is used to create buttons for the chain.
-      The chain must take as input a string and output a string.
+      'name' and 'func'. The name is used to create buttons for the chain.
+      The func must take as input a string and output a string.
       The goal is to enable complex formating like turning quickly a table into
       multiple flashcards.
       When called, the input will be the transcripted text and the output

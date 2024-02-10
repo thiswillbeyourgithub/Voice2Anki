@@ -1,9 +1,11 @@
+import sys
+import importlib.util
 import gradio as gr
 
 from .profiles import get_profiles, switch_profile, load_user_functions
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
-from .logger import get_log
+from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing
 from .shared_module import shared
@@ -92,6 +94,32 @@ css = """
 
 if shared.widen_screen:
     css += "\n.app { max-width: 100% !important; }"
+
+def call_user_chain(txt_audio, evt: gr.EventData):
+    if not any(ch for ch in shared.user_chains if ch is not None):
+        # load chains if not already done
+        red("Loading chains.py")
+        assert [f
+                for f in shared.func_dir.iterdir()
+                if f.name.endswith("chains.py")]
+        spec = importlib.util.spec_from_file_location(
+                "chains.chains",
+                (shared.func_dir / "chains.py").absolute()
+                )
+        chains = importlib.util.module_from_spec(spec)
+        sys.modules["chains"] = chains
+        spec.loader.exec_module(chains)
+        assert len(chains.chains) <= len(shared.user_chains), "Number of loaded chains is higher than number of buttons"
+
+        for i, chain in enumerate(chains.chains):
+            name, func = chain.items()
+            shared.user_chains[i] = chain
+
+        red("Done loading chains")
+    func = shared.user_chains[int(evt.target.value)-1]["func"]
+    txt_audio = func(txt_audio)
+    return txt_audio
+
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -211,6 +239,22 @@ with gr.Blocks(
                                     img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
 
                 txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
+
+                with gr.Row():
+                    btn_chains = []
+                    for i in range(len(shared.user_chains)):
+                        but = gr.Button(
+                                value=f"{i+1}",
+                                )
+                        btn_chains.append(but)
+                    for ch in btn_chains:
+                        ch.click(
+                                fn=call_user_chain,
+                                inputs=[txt_audio],
+                                outputs=[txt_audio],
+                                preprocess=False,
+                                postprocess=False,
+                                )
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
         roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, scale=0, visible=shared.enable_dirload)

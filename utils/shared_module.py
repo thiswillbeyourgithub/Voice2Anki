@@ -30,6 +30,7 @@ class SharedModule:
     enable_queued_gallery = None
     enable_flagging = None
     enable_dirload = None
+    user_chains = []
     anki_notetype = None
 
     llm_price = {
@@ -211,6 +212,7 @@ class SharedModule:
                 dirs.mkdir()
         self.func_dir = Path("profiles/" + self.pv.profile_name + "/functions")
         self.func_dir.mkdir(exist_ok=True)
+        self.user_chains = [None for i in self.user_chains]
         self.anki_notetype = None
 
     def __setattr__(self, name, value):
