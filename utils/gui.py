@@ -1018,6 +1018,7 @@ with gr.Blocks(
     demo.load(
             fn=shared.reset,
             show_progress=False,
+            js=darkmode_js,  # darkmode by default
             ).then(
                     fn=load_user_chain,
                     inputs=btn_chains,
