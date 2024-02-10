@@ -1,8 +1,6 @@
-import sys
-import importlib.util
 import gradio as gr
 
-from .profiles import get_profiles, switch_profile, load_user_functions
+from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log, red
@@ -94,32 +92,6 @@ css = """
 
 if shared.widen_screen:
     css += "\n.app { max-width: 100% !important; }"
-
-def call_user_chain(txt_audio, evt: gr.EventData):
-    if not any(ch for ch in shared.user_chains if ch is not None):
-        # load chains if not already done
-        red("Loading chains.py")
-        assert [f
-                for f in shared.func_dir.iterdir()
-                if f.name.endswith("chains.py")]
-        spec = importlib.util.spec_from_file_location(
-                "chains.chains",
-                (shared.func_dir / "chains.py").absolute()
-                )
-        chains = importlib.util.module_from_spec(spec)
-        sys.modules["chains"] = chains
-        spec.loader.exec_module(chains)
-        assert len(chains.chains) <= len(shared.user_chains), "Number of loaded chains is higher than number of buttons"
-
-        for i, chain in enumerate(chains.chains):
-            name, func = chain.items()
-            shared.user_chains[i] = chain
-
-        red("Done loading chains")
-    func = shared.user_chains[int(evt.target.value)-1]["func"]
-    txt_audio = func(txt_audio)
-    return txt_audio
-
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -242,9 +214,11 @@ with gr.Blocks(
 
                 with gr.Row():
                     btn_chains = []
-                    for i in range(len(shared.user_chains)):
+                    for i in range(5):
                         but = gr.Button(
-                                value=f"{i+1}",
+                                value=str(i),
+                                visible=False,
+                                elem_id=f"user_chain_btn #{i}",
                                 )
                         btn_chains.append(but)
                     for ch in btn_chains:
@@ -254,6 +228,7 @@ with gr.Blocks(
                                 outputs=[txt_audio],
                                 preprocess=False,
                                 postprocess=False,
+                                show_progress=False,
                                 )
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
@@ -1045,6 +1020,11 @@ with gr.Blocks(
     demo.load(
             fn=shared.reset,
             show_progress=False,
-            )
+            ).then(
+                    fn=load_user_chain,
+                    inputs=btn_chains,
+                    outputs=btn_chains,
+                    )
+
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")

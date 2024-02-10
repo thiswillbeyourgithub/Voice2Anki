@@ -4,7 +4,11 @@ import threading
 import queue
 import pickle
 from pathlib import Path
+import sys
+import importlib.util
 import numpy as np
+
+import gradio as gr
 
 try:
     from .logger import whi, red, trace
@@ -420,3 +424,44 @@ def load_user_functions():
         with open((shared.func_dir / "chains.py").absolute(), "r") as f:
             chains += f.read()
     return [flashcard_editor, chains]
+
+
+def load_user_chain(*buttons):
+    if shared.user_chains is not None:
+        return buttons
+    if not [f
+            for f in shared.func_dir.iterdir()
+            if f.name.endswith("chains.py")]:
+        red("No chains.py found")
+        return buttons
+    # load chains if not already done
+    buttons = list(buttons)
+    red("Loading chains.py")
+    spec = importlib.util.spec_from_file_location(
+            "chains.chains",
+            (shared.func_dir / "chains.py").absolute()
+            )
+    chains = importlib.util.module_from_spec(spec)
+    sys.modules["chains"] = chains
+    spec.loader.exec_module(chains)
+
+    shared.user_chains = []
+    assert len(chains.chains) <= len(buttons)
+    for i, chain in enumerate(chains.chains):
+        upd = gr.update(
+                visible=True,
+                value=chain["name"],
+                )
+        shared.user_chains.append(chain)
+        buttons[i] = upd
+
+    red("Done loading chains")
+    return buttons
+
+def call_user_chain(txt_audio, evt: gr.EventData):
+    i_ch = int(evt.target.elem_id.split("#")[1])
+    chain = shared.user_chains[i_ch]
+    assert chain is not None
+    func = trace(chain["func"])
+    txt_audio = func(txt_audio)
+    return [txt_audio]

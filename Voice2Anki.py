@@ -19,7 +19,6 @@ def start_Voice2Anki(
         enable_queued_gallery=True,
         enable_flagging=True,
         enable_dirload=True,
-        user_chains=3,
 
         share=False,
         open_browser=False,
@@ -53,9 +52,6 @@ def start_Voice2Anki(
         if False, disable flagging
     enable_dirload: bool, default True
         if False, disalbe dirload
-    user_chains: bool, default 3
-        Number of chains to load from profile/name/functions/chains.py
-        If 0: disable those buttons
     share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
@@ -143,7 +139,6 @@ def start_Voice2Anki(
     shared.enable_queued_gallery = enable_queued_gallery
     shared.enable_flagging = enable_flagging
     shared.enable_dirload = enable_dirload
-    shared.user_chains = [None for i in range(user_chains)]
 
     if shared.enable_queued_gallery is False:
         shared.queued_gallery_slot_nb = 2  # load less elements as they
