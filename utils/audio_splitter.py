@@ -288,8 +288,12 @@ class AudioSplitter:
 
             # run whisper on each split
             def threaded_whisper(path):
-                return self.run_whisper(audio_path=path, second_pass=True)
-            joblib.Parallel(
+                if path is None:
+                    return None
+                transcript = self.run_whisper(audio_path=path, second_pass=True)
+                Path(path).unlink()
+                return transcript
+            split_transcripts = joblib.Parallel(
                     n_jobs=-1,
                     backend="threading",
                     )(
@@ -299,7 +303,6 @@ class AudioSplitter:
                                 unit="mp3",
                                 desc="Transcribing for second pass",
                                 )
-                            if tf is not None
                             )
             assert len(times_to_keep) == len(sub_audios), "Error when caching in advance sub audio"
             for iter_ttk, val in enumerate(tqdm(times_to_keep, desc="Second pass", unit="mp3")):
@@ -310,9 +313,8 @@ class AudioSplitter:
                 dur = t1 - t0
                 whi(f"{iter_print}Text content before second pass: {metadata[iter_ttk]['text']}")
 
-                tempf = tempfiles[iter_ttk]
-                assert tempf is not None
-                transcript = self.run_whisper(tempf, second_pass=True)
+                transcript = split_transcripts[iter_ttk]
+                assert transcript is not None
                 sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
@@ -341,7 +343,6 @@ class AudioSplitter:
                 alterations[iter_ttk] = [new_times, sub_meta]
                 if [nt for nt in new_times if nt]:
                     assert [nt for nt in new_times if nt][-1][-1] <= t1, "unexpected split timeline"
-                Path(tempf).unlink()
 
                 if len(sub_meta) > 1:
                     red(f"{iter_print}Segment was rescinded in those texts. Metadata:")
