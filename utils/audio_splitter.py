@@ -284,7 +284,7 @@ class AudioSplitter:
                                 unit="mp3",
                                 )
                             tempfiles,
-                            )]
+                            ))
 
             # run whisper on each split
             def threaded_whisper(path):
