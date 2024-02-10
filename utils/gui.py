@@ -358,7 +358,8 @@ with gr.Blocks(
                     label="Queued audio",
                     interactive=False,
                     column_widths="5%",
-                    visible=shared.enable_dirload
+                    visible=shared.enable_dirload,
+                    wrap=True,
                     )
 
 
