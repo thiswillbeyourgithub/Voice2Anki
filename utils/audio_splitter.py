@@ -467,7 +467,7 @@ class AudioSplitter:
                 # make sure to wait at least 1.1s otherwise the order of
                 # the audio can be wrong because the timestamps are to
                 # the second
-                time.sleep(max(0, 1.1 - time.time() - begin_time))
+                time.sleep(max(0, 1.1 - (time.time() - begin_time)))
 
             whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
             ignored = self.trim_silences(ignored)
