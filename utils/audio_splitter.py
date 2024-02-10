@@ -282,7 +282,7 @@ class AudioSplitter:
                                 sub_audio,
                                 desc="Exporting before second pass",
                                 unit="mp3",
-                                )
+                                ),
                             tempfiles,
                             ))
 
