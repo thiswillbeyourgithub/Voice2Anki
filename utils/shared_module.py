@@ -206,6 +206,8 @@ class SharedModule:
             if not dirs.exists():
                 p(f"Created directory {dirs}")
                 dirs.mkdir()
+        self.func_dir = Path("profiles/" + self.pv.profile_name + "/functions")
+        self.func_dir.mkdir(exist_ok=True)
         self.anki_notetype = None
 
     def __setattr__(self, name, value):
