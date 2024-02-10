@@ -437,7 +437,7 @@ class AudioSplitter:
                 else:
                     time_markers = ""
                 rand = str(uuid.uuid4()).split("-")[0]
-                out_file = self.sp_dir / f"{int(time.time())}_{rand}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
+                out_file = self.sp_dir / f"{time.time():2f}_{rand}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
@@ -466,7 +466,7 @@ class AudioSplitter:
             whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
             ignored = self.trim_silences(ignored)
             whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
-            out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+2:03d}_IGNORED.mp3"
+            out_file = self.sp_dir / f"{time.time():2f}_{today}_{fileo.stem}_{iter_ttk+2:03d}_IGNORED.mp3"
             assert not out_file.exists(), f"File {out_file} already exists!"
             ignored.export(out_file, format="mp3")
 
