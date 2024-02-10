@@ -289,6 +289,7 @@ with gr.Blocks(
                     value=None,
                     interactive=False,
                     column_widths="5%",
+                    wrap=True,
                     )
 
         with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
@@ -297,6 +298,7 @@ with gr.Blocks(
                     value=None,
                     interactive=False,
                     column_widths="5%",
+                    wrap=True,
                     )
 
     with gr.Tab(label="Queues", elem_id="BigTabV2A"):
