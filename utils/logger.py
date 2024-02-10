@@ -190,7 +190,10 @@ purp = coloured_log("purple")
 
 def trace(func):
     """simple wrapper to use as decorator to print when a function is used
-    and for how long"""
+    and for how long.
+    Note: wrapping functions is not currently compatible with
+        gradio's evt: gr.EventData
+    """
     if shared.disable_tracing:
         return func
     if asyncio.iscoroutinefunction(func):
