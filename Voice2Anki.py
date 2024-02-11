@@ -13,7 +13,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 def start_Voice2Anki(
         print_db_then_exit=False,
-        nb_audio_slots=5,
+        nb_audio_slots=3,
 
         enable_gallery=True,
         enable_queued_gallery=True,
@@ -42,7 +42,7 @@ def start_Voice2Anki(
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
         Example value: "anki_whisper.db"
-    nb_audio_slots: int, default 5
+    nb_audio_slots: int, default 3
         Number of audio slot
     enable_gallery: bool, default True
         if False, hides the gallery components
