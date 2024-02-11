@@ -1099,18 +1099,17 @@ def to_anki(
         shared.running_threads["add_audio_to_anki"].append(thread)
 
     # send to anki
-    metadata = rtoml.dumps(
-            {
-                "author": "Voice2Anki",
-                "transcripted_text": txt_audio,
-                "chatgpt_context": txt_chatgpt_context,
-                "llm_used": shared.latest_llm_used,
-                "tts_used": shared.latest_stt_used,
-                "version": shared.VERSION,
-                "timestamp": time.time(),
-                "user-agent": shared.request["user-agent"],
-                "temp_mp3_path": str(audio_mp3_1),
-                }, pretty=True)
+    metadata = {
+            "author": "Voice2Anki",
+            "transcripted_text": txt_audio,
+            "chatgpt_context": txt_chatgpt_context,
+            "llm_used": shared.latest_llm_used,
+            "tts_used": shared.latest_stt_used,
+            "version": shared.VERSION,
+            "timestamp": time.time(),
+            "user-agent": shared.request["user-agent"],
+            "mp3": str(audio_mp3_1),
+            }
     results = []
 
     # mention in the metadata the original mp3 name
@@ -1162,7 +1161,7 @@ def to_anki(
             source=txt_source,
             source_extra=txt_extra_source,
             source_audio=audio_html,
-            notes_metadata=metadatas,
+            notes_metadata=rtoml.dumps(metadatas, pretty=True),
             tags=new_tags,
             deck_name=txt_deck)
 
