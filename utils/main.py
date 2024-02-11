@@ -135,6 +135,7 @@ def thread_whisp_then_llm(
         sld_buffer: int,
         llm_choice: str,
         txt_keywords: str,
+        prompt_management: str,
         ) -> None:
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
@@ -173,7 +174,7 @@ def thread_whisp_then_llm(
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
-    cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=True)
+    cloze = alfred(txt_audio, txt_chatgpt_context, txt_profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, prompt_management, cache_mode=True)
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
 
@@ -314,6 +315,7 @@ def pre_alfred(
         temperature: Union[float, int],
         sld_buffer: int,
         txt_keywords: str,
+        prompt_management: str,
         cache_mode: bool,
         ) -> List[dict]:
     """used to prepare the prompts for alfred call. This is a distinct
@@ -390,7 +392,7 @@ def pre_alfred(
             {"role": "system", "content": default_system_prompt["content"]}
             )
 
-    if shared.pv["prompt_management"] == "messages":
+    if prompt_management == "messages":
         # first way: add the examples one after the other
         # add the selected prompts
         for m in prev_prompts:
@@ -406,7 +408,7 @@ def pre_alfred(
         # add message buffer
         formatted_messages.extend(buffer_to_add)
 
-    elif shared.pv["prompt_management"] == "stuff":
+    elif prompt_management == "stuff":
         # second way: add the messages as example in the system prompt
         new = dedent("""
 
@@ -426,7 +428,7 @@ def pre_alfred(
         formatted_messages[-1]["content"] += new
 
     else:
-        raise ValueError(f"Invalid prompt managmenet: {shared.pv['prompt_management']}")
+        raise ValueError(f"Invalid prompt managmnet: {prompt_management}")
 
     # add the current prompt
     formatted_messages.append(new_prompt)
@@ -442,7 +444,7 @@ def pre_alfred(
     if tkns >= 15700:
         red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
-        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords, cache_mode)
+        return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
 
     assert tkns <= 15700, f"Too many tokens: {tkns}"
 
@@ -483,6 +485,7 @@ def alfred(
         sld_buffer: int,
         llm_choice: str,
         txt_keywords: str,
+        prompt_management: str,
         cache_mode: bool = False,
         ) -> str:
     "send the previous prompt and transcribed speech to the LLM"
@@ -522,11 +525,11 @@ def alfred(
             gr.Error(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
             txt_audio = splits[0]
         else:
-            answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode))
+            answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, prompt_management, cache_mode))
             assert len(answers) == len(splits), "Unexpected length"
             return "\n#####\n".join(answers).strip()
 
-    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, cache_mode)
+    formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
@@ -641,6 +644,7 @@ def dirload_splitted(
         sld_buffer: int,
         llm_choice: str,
         txt_keywords: str,
+        prompt_management: str,
 
         *audios: List,
         ) -> List[Union[dict, gr.Audio, str]]:
@@ -736,6 +740,7 @@ def dirload_splitted(
                     sld_buffer,
                     llm_choice,
                     txt_keywords,
+                    prompt_management,
                     ),
             )
         with shared.dirload_lock:
@@ -796,6 +801,8 @@ def dirload_splitted_last(
         sld_buffer: int,
         llm_choice: str,
         txt_keywords: str,
+
+        prompt_management: str,
         ) -> Union[str, gr.Audio, dict]:
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
