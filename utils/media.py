@@ -242,20 +242,22 @@ def load_queued_galleries():
     return saved_fg
 
 
-def create_audio_compo(scale=1):
-    return gr.Microphone(
-            type="filepath",
-            format="mp3",
-            value=None,
-            container=False,
-            show_share_button=False,
-            show_download_button=True,
-            waveform_options={"show_controls": False, "show_recording_waveform": False},
-            elem_id="Audio_component_Voice2Anki",
-            min_width="1%",
-            editable=True,
-            scale=scale,
-            )
+def create_audio_compo(**kwargs):
+    defaults = {
+            "type": "filepath",
+            "format": "mp3",
+            "value": None,
+            "container": False,
+            "show_share_button": False,
+            "show_download_button": True,
+            "waveform_options": {"show_controls": False, "show_recording_waveform": False},
+            "elem_id": "Audio_component_Voice2Anki",
+            "min_width": "1%",
+            "editable": True,
+            "scale": 1,
+            }
+    defaults.update(kwargs)
+    return gr.Microphone(**kwargs)
 
 
 @trace
