@@ -185,15 +185,16 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
         # create the right name
         audio_file_name = str(Path(audio_mp3).name).replace(" ", "_").replace("/", "").replace(".mp3", "")
 
-        # add hash to name only if missing
-        with open(audio_mp3, "rb") as audio_file:
-            content = audio_file.read()
-        audio_hash = hashlib.md5(content).hexdigest()[:10]
-        if audio_hash in audio_file_name:
-            red(f"Audio hash already in filename: {audio_file_name}")
-            audio_file_name = f"Voice2Anki_{audio_file_name}.mp3"
-        else:
-            audio_file_name = f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
+        # # add hash to name only if missing
+        # with open(audio_mp3, "rb") as audio_file:
+        #     content = audio_file.read()
+        # audio_hash = hashlib.md5(content).hexdigest()[:10]
+        # if audio_hash in audio_file_name:
+        #     red(f"Audio hash already in filename: {audio_file_name}")
+        #     audio_file_name = f"Voice2Anki_{audio_file_name}.mp3"
+        # else:
+        #     audio_file_name = f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
+        audio_file_name = f"Voice2Anki_{audio_file_name}.mp3"
 
         # if the name contains a timestamp, move it as the end
         # as it can take a lot of length and anki crops the names sometimes
