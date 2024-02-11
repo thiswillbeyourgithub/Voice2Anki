@@ -82,7 +82,7 @@ def embedder(text_list, result):
 def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool:
     try:
         assert all(isinstance(t, str) for t in list_text)
-        assert not (t for t in list_text if not t)
+        assert not any(not(t) for t in list_text), f"Invalid texts: {[t for t in list_text if not t]}"
         assert len(list_text) == len(list_embed), f"Incompatible length: {len(list_text)} vs {len(list_embed)}"
         assert all(isinstance(e, np.ndarray) for e in list_embed), f"Several types: {[type(e) for e in list_embed]}"
         assert all(e.shape == list_embed[0].shape for e in list_embed), f"Several shapes: {[e.shape for e in list_embed]}"
