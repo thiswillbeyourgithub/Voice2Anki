@@ -120,7 +120,7 @@ with gr.Blocks(
         for i in range(audio_number):
                 audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", show_label=True, render=False)
                 audio_slots.append(audio_mp3)
-                audio_slots_txt = gr.Textbox(lines=2, max_lines=5, container=False, interactive=False, scale=2, render=False)
+                audio_slots_txt = gr.Textbox(lines=2, max_lines=10, container=False, interactive=False, scale=2, render=False)
                 audio_slots_txts.append(audio_slots_txt)
         # rendering afterwards to reverse the order
         for aud, t in zip(audio_slots[::-1], audio_slots_txts[::-1]):
