@@ -26,7 +26,7 @@ def start_Voice2Anki(
         authentication=True,
         localnetwork=True,
         use_ssl=True,
-        media_folder=None,
+        anki_media_folder=None,
         memory_metric="embeddings",
         disable_tracing=False,
         disable_timeout=True,
@@ -66,7 +66,7 @@ def start_Voice2Anki(
     use_ssl: bool, default True
         if True, will use the ssl configuration specified in Voice2Anki.py
         Disable if share is used as self signed certificate mess with it.
-    media_folder: str, default None
+    anki_media_folder: str, default None
         optional anki media database location
     memory_metric: str, default "embeddings"
         if "length", will not use embeddings to improve the memory filtering
@@ -128,7 +128,7 @@ def start_Voice2Anki(
 
     shared.audio_slot_nb = nb_audio_slots
     shared.memory_metric = memory_metric
-    shared.anki_media = anki_media
+    shared.anki_media = anki_media_folder
     shared.debug = debug
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
