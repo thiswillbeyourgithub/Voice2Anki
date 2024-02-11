@@ -278,11 +278,6 @@ with gr.Blocks(
                     show_label=True,
                     )
 
-    with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
-        with gr.Column():
-            logging_reload = gr.Button(value="Refresh")
-            output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
-
     with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A") as tab_memories_and_buffer:
         with gr.Tab(label="Memories", elem_id="BigTabV2A") as tab_memories:
             df_memories = gr.Dataframe(
@@ -361,6 +356,11 @@ with gr.Blocks(
                     visible=shared.enable_dirload,
                     wrap=True,
                     )
+
+    with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
+        with gr.Column():
+            logging_reload = gr.Button(value="Refresh")
+            output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
 
     # with gr.Tab(label="Files", elem_id="BigTabV2A") as tab_files:
