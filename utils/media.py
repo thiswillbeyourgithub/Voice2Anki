@@ -1,3 +1,4 @@
+from typing import List, Union
 from pydub import AudioSegment
 import soundfile as sf
 from pathlib import Path
@@ -75,7 +76,7 @@ def get_image(gallery):
 
 
 @trace
-def check_source(source):
+def check_source(source: str) -> str:
     "makes sure the source is only an img"
     whi("Checking source")
     if source:
@@ -93,7 +94,7 @@ def check_source(source):
 
 #@Timeout(120)
 @trace
-def get_img_source(gallery, queue=queue.Queue(), use_html=True):
+def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
     whi("Getting source from image")
 
     try:
@@ -141,7 +142,7 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True):
         return queue.put(red(f"Error getting source: '{err}'"))
 
 @trace
-def ocr_image(gallery):
+def ocr_image(gallery) -> None:
     "use OCR to get the text of an image to display in a textbox"
     q = queue.Queue()
     get_img_source(gallery, q, use_html=False)
@@ -149,14 +150,13 @@ def ocr_image(gallery):
 
 
 # @trace
-def reset_gallery():
+def reset_gallery() -> None:
     whi("Reset images.")
     shared.pv["gallery"] = None
-    return None
 
 
 # @trace
-def reset_audio():
+def reset_audio() -> List[dict]:
     whi("Resetting all audio")
     return [gr.update(value=None, label=f"Audio #{i+1}") for i in range(shared.audio_slot_nb)]
 
@@ -188,7 +188,7 @@ def sound_preprocessing(audio_mp3_path):
     return new_path
 
 @trace
-def force_sound_processing(audio_mp3_path):
+def force_sound_processing(audio_mp3_path: Union[str, dict]) -> str:
     assert audio_mp3_path is not None, "Received None in force_sound_processing"
     audio_mp3_path = format_audio_component(audio_mp3_path)
 
@@ -212,7 +212,7 @@ def force_sound_processing(audio_mp3_path):
 
 
 # @trace
-def format_audio_component(audio):
+def format_audio_component(audio: Union[str, gr.Audio]) -> str:
     """to make the whole UI faster and avoid sending multiple slightly
     differently processed audio to whisper: preprocessing and postprocessing
     are disabled but this sometimes make the audio component output a dict
@@ -253,7 +253,7 @@ def load_queued_galleries():
     return saved_fg
 
 
-def create_audio_compo(**kwargs):
+def create_audio_compo(**kwargs) -> gr.Microphone:
     defaults = {
             "type": "filepath",
             "format": "mp3",
@@ -290,7 +290,7 @@ def roll_audio(*slots):
     return slots
 
 
-def update_audio_slots_txts(*audio_slots_txts):
+def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription
     """
