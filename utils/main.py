@@ -667,7 +667,7 @@ def dirload_splitted(
         sounds_to_load.append(
                 gr.update(
                     value=to_temp,
-                    label=to_temp,
+                    label=Path(to_temp).name,
                     )
                 )
         thread = threading.Thread(
