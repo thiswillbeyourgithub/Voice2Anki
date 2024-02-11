@@ -96,7 +96,7 @@ def embedder_wrapper(list_text):
         tkn_max = 12000  # their limit is 16384 but they don't
         # use the same tokenizer maybe
     else:
-        tkn_max = -1
+        tkn_max = np.inf
     batches = [[]]
     tkn_cnt = 0
     for t in uncached_texts:
@@ -110,7 +110,7 @@ def embedder_wrapper(list_text):
 
     results = []
     for batch in tqdm(batches, desc="Embedding text", unit="batch"):
-        assert batch
+        assert batch, f"Found empty batch. Batches: {batches}"
         out = cached_embedder(batch, None)
 
         # manually recache the values for each individual memory
