@@ -26,6 +26,7 @@ profile_keys = {
         "txt_whisp_prompt": {},
         "total_llm_cost": {"default": 0, "type": float},
         "dirload_check": {"default": False},
+        "prompt_management": {"default": "messages"},
         "llm_choice": {"default": [i for i in shared.llm_price.keys()][0]},
         "embed_choice": {"default": shared.embedding_models[0]},
         "sld_whisp_temp": {"default": 0, "type": float},

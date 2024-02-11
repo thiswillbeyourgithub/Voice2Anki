@@ -184,6 +184,8 @@ with gr.Blocks(
         # quick settings
         with gr.Accordion(label="Quick settings", open=False):
             with gr.Row():
+                prompt_managm_radio = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
+            with gr.Row():
                 with gr.Column(scale=10):
                     with gr.Row():
                         sld_max_tkn = gr.Number(minimum=500, maximum=15000, value=shared.pv["sld_max_tkn"], step=100.0, label="LLM avail. tkn.", scale=1)
@@ -234,7 +236,8 @@ with gr.Blocks(
                         )
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
-        roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, scale=0, visible=shared.enable_dirload)
+        with gr.Row():
+            roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, visible=shared.enable_dirload)
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
         with gr.Row():
@@ -548,6 +551,7 @@ with gr.Blocks(
     sld_buffer.change(fn=shared.pv.save_sld_buffer, inputs=[sld_buffer], show_progress=False)
     sld_temp.change(fn=shared.pv.save_sld_temp, inputs=[sld_temp], show_progress=False)
     roll_dirload_check.change(fn=shared.pv.save_dirload_check, inputs=[roll_dirload_check], show_progress=False)
+    prompt_managm_radio.change(fn=shared.pv.save_prompt_management, inputs=[prompt_managm_radio], show_progress=False)
     txt_tags.select(fn=shared.pv.save_txt_tags, inputs=[txt_tags], show_progress=False)
     txt_deck.select(fn=shared.pv.save_txt_deck, inputs=[txt_deck], show_progress=False)
     txt_chatgpt_context.change(fn=shared.pv.save_txt_chatgpt_context, inputs=[txt_chatgpt_context], show_progress=False)

@@ -374,19 +374,45 @@ def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, 
             0,
             {"role": "system", "content": default_system_prompt["content"]}
             )
-    # add the selected prompts
-    for m in prev_prompts:
-        formatted_messages.append(
-                {
-                    "role": m["role"],
-                    "content": m["content"],
-                    }
-                )
-        formatted_messages.append({
-            "role": "assistant",
-            "content": m["answer"]})
-    # add message buffer
-    formatted_messages.extend(buffer_to_add)
+
+    if shared.pv["prompt_management"] == "messages":
+        # first way: add the examples one after the other
+        # add the selected prompts
+        for m in prev_prompts:
+            formatted_messages.append(
+                    {
+                        "role": m["role"],
+                        "content": m["content"],
+                        }
+                    )
+            formatted_messages.append({
+                "role": "assistant",
+                "content": m["answer"]})
+        # add message buffer
+        formatted_messages.extend(buffer_to_add)
+
+    elif shared.pv["prompt_management"] == "stuff":
+        # second way: add the messages as example in the system prompt
+        new = dedent("""
+
+        Here are examples of input followed by the appropriate output:
+        """)
+        inputs = []
+        for m in prev_prompts:
+            inputs.append(f"INPUT: '{m['content']}'\nOUTPUT: '{m['answer']}'")
+        for m in buffer_to_add:
+            if m["role"] == "user":
+                inputs.append(f"INPUT: '{m['content']}'")
+            elif m["role"] == "assistant":
+                inputs[-1] += (f"\nOUTPUT: '{m['content']}'")
+            else:
+                raise ValueError(m["role"])
+        new += "'''\n" + "\n---\n".join(inputs) + "\n'''"
+        formatted_messages[-1]["content"] += new
+
+    else:
+        raise ValueError(f"Invalid prompt managmenet: {shared.pv['prompt_management']}")
+
     # add the current prompt
     formatted_messages.append(new_prompt)
 
