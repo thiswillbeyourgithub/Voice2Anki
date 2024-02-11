@@ -951,7 +951,8 @@ def wait_for_queue(q, source, t=1):
 @trace
 def kill_threads():
     """the threads in timeout are stored in the shared module, if they
-    get replaced by None the threads will be ignored."""
+    get replaced by None the threads will be ignored.
+    Also resets the smartcache"""
     with shared.thread_lock:
         for k in shared.running_threads:
             n = sum([t.is_alive() for t in shared.running_threads[k]])
@@ -960,6 +961,8 @@ def kill_threads():
             else:
                 whi(f"No thread to kill of {k}")
             shared.running_threads[k] = []
+        with shared.timeout_lock:
+            shared.smartcache.clear()
 
 
 @trace
