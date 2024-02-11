@@ -201,7 +201,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
         sp = [s for s in audio_file_name.split("_") if s.isdigit()]
         for tstamp in sp:
             date = datetime.fromtimestamp(int(tstamp))
-            if date.year > 1900 and date.year < 2030:
+            if date.year > 2010 and date.year < 2030:
                 audio_file_name = audio_file_name.replace(f"{tstamp}", "")
                 audio_file_name = Path(audio_file_name).stem + f"_{tstamp}.mp3"
                 audio_file_name = audio_file_name.replace("__", "_")
