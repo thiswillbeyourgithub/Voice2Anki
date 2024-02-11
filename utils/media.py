@@ -321,7 +321,7 @@ def roll_audio(*slots) -> List[dict]:
 
 def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
-    audio to display the transcription
+    audio to display the transcription and cloze
     """
     try:
         df = shared.dirload_queue
@@ -330,9 +330,17 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
         df = df[df["loaded"] == True]
         if df.empty:
             return ["Empty" for i in audio_slots_txts]
+
         trans = df["transcribed"].tolist()
         while len(trans) < len(audio_slots_txts):
             trans.append("Pending?")
-        return trans
+
+        alf = df["alfreded"].tolist()
+        while len(alf) < len(trans):
+            alf.append("Pending?")
+
+        output = [f"{t}\n-----\n{f}" for t, f in zip(trans, alf)]
+
+        return output
     except Exception as err:
         return [err for i in audio_slots_txts]
