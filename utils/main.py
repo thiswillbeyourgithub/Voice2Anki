@@ -1,3 +1,4 @@
+from typing import Union, List, Callable
 import os
 import asyncio
 import pickle
@@ -41,7 +42,7 @@ llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 
 
 @trace
-def clear_llm_cache():
+def clear_llm_cache() -> None:
     # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
     llm_cache.clear()
 
@@ -50,13 +51,13 @@ sync_anki()
 
 
 @trace
-def pop_buffer():
+def pop_buffer() -> None:
     "remove the latest card from message buffer"
     removed = shared.message_buffer.pop(-1)
     shared.pv["message_buffer"] = shared.message_buffer
     red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
 
-def floatizer(func):
+def floatizer(func: Callable) -> Callable:
     "used to cast the ints as float to make sure the cache is used"
     def wrapper(*args, **kwargs):
         args = [float(ar) if isinstance(ar, int) else ar for ar in args]
@@ -70,12 +71,12 @@ def floatizer(func):
 @smartcache
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
-        audio_path,
-        audio_hash,
-        modelname,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-        sld_whisp_temp,
+        audio_path: str,
+        audio_hash: str,
+        modelname: str,
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        sld_whisp_temp: Union[float, int],
         ):
     """this is a call to OpenAI's whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
@@ -123,18 +124,18 @@ def whisper_cached(
 @trace
 def thread_whisp_then_llm(
         audio_mp3,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-        sld_whisp_temp,
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        sld_whisp_temp: Union[float, int],
 
-        txt_chatgpt_context,
-        txt_profile,
-        max_token,
-        temperature,
-        sld_buffer,
-        llm_choice,
-        txt_keywords,
-        ):
+        txt_chatgpt_context: str,
+        txt_profile: str,
+        max_token: int,
+        temperature: Union[float, int],
+        sld_buffer: int,
+        llm_choice: str,
+        txt_keywords: str,
+        ) -> None:
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -178,7 +179,12 @@ def thread_whisp_then_llm(
 
 
 @trace
-def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
+def transcribe(
+        audio_mp3_1: Union[str, dict],
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        sld_whisp_temp: Union[float, int],
+        ) -> str:
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
@@ -250,14 +256,14 @@ def transcribe(audio_mp3_1, txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp):
 
 @trace
 def flag_audio(
-        txt_profile,
-        txt_audio,
-        txt_whisp_lang,
-        txt_whisp_prompt,
-        txt_chatgpt_cloz,
-        txt_chatgpt_context,
-        gallery,
-        ):
+        txt_profile: str,
+        txt_audio: str,
+        txt_whisp_lang: str,
+        txt_whisp_prompt: str,
+        txt_chatgpt_cloz: str,
+        txt_chatgpt_context: str,
+        gallery: Union[None, List, gr.Gallery],
+        ) -> None:
     """copy audio in slot #1 to the user_directory/flagged folder"""
     # move audio file
     if not (shared.dirload_queue["loaded"] == True).any():
@@ -300,7 +306,16 @@ def flag_audio(
 
 
 @trace
-def pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, cache_mode):
+def pre_alfred(
+        txt_audio: str,
+        txt_chatgpt_context: str,
+        profile: str,
+        max_token: int,
+        temperature: Union[float, int],
+        sld_buffer: int,
+        txt_keywords: str,
+        cache_mode: bool,
+        ) -> List[dict]:
     """used to prepare the prompts for alfred call. This is a distinct
     function to make it callable by the cached function too."""
     # don't print when using cache
@@ -459,7 +474,17 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @Timeout(180)
 @smartcache
 @llm_cache.cache(ignore=["cache_mode", "sld_buffer"])
-def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, cache_mode=False):
+def alfred(
+        txt_audio: str,
+        txt_chatgpt_context: str,
+        profile: str,
+        max_token: int,
+        temperature: Union[int, float],
+        sld_buffer: int,
+        llm_choice: str,
+        txt_keywords: str,
+        cache_mode: bool = False,
+        ) -> str:
     "send the previous prompt and transcribed speech to the LLM"
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
@@ -604,21 +629,21 @@ def alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_
 
 @trace
 def dirload_splitted(
-        checkbox,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-        sld_whisp_temp,
+        checkbox: bool,
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        sld_whisp_temp: Union[int, float],
 
-        txt_chatgpt_context,
-        txt_profile,
-        max_token,
-        temperature,
-        sld_buffer,
-        llm_choice,
-        txt_keywords,
+        txt_chatgpt_context: str,
+        txt_profile: str,
+        max_token: int,
+        temperature: Union[int, float],
+        sld_buffer: int,
+        llm_choice: str,
+        txt_keywords: str,
 
-        *audios,
-        ):
+        *audios: List,
+        ) -> List[Union[dict, gr.Audio, str]]:
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -759,19 +784,19 @@ def dirload_splitted(
 
 @trace
 def dirload_splitted_last(
-        checkbox,
-        txt_whisp_prompt,
-        txt_whisp_lang,
-        sld_whisp_temp,
+        checkbox: bool,
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        sld_whisp_temp: Union[int, float],
 
-        txt_chatgpt_context,
-        txt_profile,
-        max_token,
-        temperature,
-        sld_buffer,
-        llm_choice,
-        txt_keywords,
-        ):
+        txt_chatgpt_context: str,
+        txt_profile: str,
+        max_token: int,
+        temperature: Union[int, float],
+        sld_buffer: int,
+        llm_choice: str,
+        txt_keywords: str,
+        ) -> Union[str, gr.Audio, dict]:
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
@@ -793,7 +818,14 @@ def dirload_splitted_last(
             )[-1]
 
 @trace
-def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, txt_chatgpt_cloz, txt_chatgpt_context):
+def audio_edit(
+        audio: Union[str, dict],
+        audio_txt: str,
+        txt_audio: str,
+        txt_whisp_prompt: str,
+        txt_whisp_lang: str,
+        txt_chatgpt_cloz: str,
+        txt_chatgpt_context: str) -> str:
     """function called by a microphone. It will use whisper to transcribe
     your voice. Then use the instructions in your voice to modify the
     output from LLM."""
@@ -946,7 +978,7 @@ def audio_edit(audio, audio_txt, txt_audio, txt_whisp_prompt, txt_whisp_lang, tx
     return cloz, None, None
 
 @trace
-def gather_threads(thread_keys):
+def gather_threads(thread_keys: List[str]) -> None:
     n_running = {k: sum([t.is_alive() for t in threads]) for k, threads in shared.running_threads.items() if k == thread_keys}
     i = 0
     while sum(n_running.values()):
@@ -960,7 +992,7 @@ def gather_threads(thread_keys):
         time.sleep(0.1)
 
 @trace
-def wait_for_queue(q, source, t=1):
+def wait_for_queue(q: queue.Queue, source: str, t=1):
     "source : https://stackoverflow.com/questions/19206130/does-queue-get-block-main"
     start = time.time()
     while True:
@@ -975,7 +1007,7 @@ def wait_for_queue(q, source, t=1):
 
 
 @trace
-def kill_threads():
+def kill_threads() -> None:
     """the threads in timeout are stored in the shared module, if they
     get replaced by None the threads will be ignored.
     Also resets the smartcache"""
@@ -992,7 +1024,10 @@ def kill_threads():
 
 
 @trace
-def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
+def Voice2Anki_db_save(
+        txt_chatgpt_cloz: str,
+        txt_chatgpt_context: str,
+        txt_audio: str) -> None:
     """when an anki card is created, find the information about its creation
     in the shared module then save it to the db. It can be missing from the db
     if the result from alfred was loaded from cache for example."""
@@ -1041,16 +1076,16 @@ def Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio):
 
 @trace
 def to_anki(
-        audio_mp3_1,
-        txt_audio,
-        txt_chatgpt_cloz,
-        txt_chatgpt_context,
-        txt_deck,
-        txt_tags,
-        gallery,
-        check_marked,
-        txt_extra_source,
-        ):
+        audio_mp3_1: Union[dict, str],
+        txt_audio: str,
+        txt_chatgpt_cloz: str,
+        txt_chatgpt_context: str,
+        txt_deck: str,
+        txt_tags: List,
+        gallery: List,
+        check_marked: bool,
+        txt_extra_source: str,
+        ) -> None:
     "function called to do wrap it up and send to anki"
     whi("Entering to_anki")
     if not txt_audio:
@@ -1224,4 +1259,3 @@ def to_anki(
     Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio)
 
     gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
-    return
