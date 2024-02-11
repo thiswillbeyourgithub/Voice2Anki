@@ -140,6 +140,17 @@ with gr.Blocks(
                 rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
+        # 1/2/3
+        with gr.Group():
+            with gr.Row():
+                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="transcribebtn")
+                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="transcriptbtn")
+                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="toankibtn")
+
+        with gr.Row():
+            mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
+            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
+
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
             with gr.Row():
@@ -167,17 +178,6 @@ with gr.Blocks(
                         #min_width=50,
                         visible=False,
                         )
-
-        # 1/2/3
-        with gr.Group():
-            with gr.Row():
-                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="transcribebtn")
-                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="transcriptbtn")
-                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="toankibtn")
-
-        with gr.Row():
-            mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
-            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
 
         # quick settings
         with gr.Accordion(label="Quick settings", open=True):
