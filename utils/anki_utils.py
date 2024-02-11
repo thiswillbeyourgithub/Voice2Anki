@@ -148,7 +148,7 @@ def add_note_to_anki(
                 "deckName": deck_name,
                 "modelName": model_name,
                 "fields": {
-                    "body": cloze_editor(body).strip().replace("\n", "<br>"),
+                    "body": cloze_editor(body.strip().replace("\n", "<br>")),
                     "source": source,
                     "source_extra": source_extra,
                     "source_audio": source_audio,
