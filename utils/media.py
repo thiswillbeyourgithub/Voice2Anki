@@ -282,21 +282,27 @@ def roll_audio(*slots) -> List[dict]:
         return slots
 
     slots.pop(0)
+
     # update the name of each audio to its neighbour
     for i, s in enumerate(slots):
+        if s is None:
+            continue
         slots[i] = {
                 "__type__": "update",  # this is how gr.update works
                 "label": slots[i]["orig_name"],
                 "value": slots[i]["path"],
                 }
+    while None in slots:
+        slots.remove(None)
 
-    slots.append(
-            {
-                "__type__": "update",
-                "label": "New",
-                "value": None,
-                }
-            )
+    while len(slots) < shared.audio_slot_nb:
+        slots.append(
+                {
+                    "__type__": "update",
+                    "label": "New",
+                    "value": None,
+                    }
+                )
 
     return slots
 
