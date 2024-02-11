@@ -1,3 +1,4 @@
+from datetime import datetime
 import rtoml
 import sys
 import importlib.util
@@ -168,6 +169,7 @@ def add_note_to_anki(
 def add_audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
+        # get the right path
         if isinstance(audio_mp3, dict):
             test = shared.anki_media / audio_mp3["orig_name"]
             if test.exists():
@@ -176,24 +178,32 @@ def add_audio_to_anki(audio_mp3, queue):
                 audio_mp3 = format_audio_component(audio_mp3)
         else:
             audio_mp3 = format_audio_component(audio_mp3)
-        if not Path(audio_mp3).exists():
-            red(f"File {audio_mp3} not found, looking for the right file")
-            if (Path(audio_mp3).parent.parent / Path(audio_mp3).name).exists():
-                audio_mp3 = (Path(audio_mp3).parent.parent / Path(audio_mp3).name).absolute()
-                red(f"Right file found: '{audio_mp3}'")
-            else:
-                candidates = [str(p) for p in Path(audio_mp3).parent.iterdir()]
-                if len(candidates) != 1:
-                    raise Exception(f"Multiple candidate mp3 file: '{candidates}'")
-                else:
-                    audio_mp3 = candidates[0]
-                    red(f"Right file found: '{audio_mp3}'")
+        assert Path(audio_mp3).exists(), f"Missing {audio_mp3}"
 
+        # get hash of audio
         with open(audio_mp3, "rb") as audio_file:
             content = audio_file.read()
         audio_hash = hashlib.md5(content).hexdigest()[:10]
+
+        # create the right name
         audio_file_name = str(Path(audio_mp3).name).replace(" ", "_").replace("/", "").replace(".mp3", "")
-        audio_path = anki_media / f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
+        # add hash to name only if missing
+        if audio_hash in audio_file_name:
+            red(f"Audio hash already in filename: {audio_file_name}")
+        else:
+            audio_file_name = f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
+
+        # if the name contains a timestamp, move it as the end
+        # as it can take a lot of length and anki crops the names sometimes
+        sp = [s for s in audio_file_name.split("_") if s.is_digit()]
+        for tstamp in sp:
+            date = datetime.fromtimestamp(sp[0])
+            if date.year > 1900 and date.year < 2030:
+                audio_file_name = audio_file_name.replace(f"{tstamp}", "")
+                audio_file_name = Path(audio_file_name).stem + f"_{tstamp}.mp3"
+                audio_file_name = audio_file_name.replace("__", "_")
+
+        audio_path = anki_media / audio_file_name
         if (audio_path).exists():
             red(f"Audio hash already exists! {audio_path}")
         else:
