@@ -9,6 +9,15 @@ import pandas as pd
 col_red = "\033[91m"
 col_rst = "\033[0m"
 
+class DF(pd.DataFrame):
+    "Pandas DataFrame but forbid new column creation"
+    def __setitem__(self, key, value):
+        if key in self.columns:
+            super().__setitem__(key, value)
+        else:
+            raise ValueError("Adding new columns is not allowed")
+
+
 class SharedModule:
     """module used to store information from Voice2Anki.py to
     the main .py files"""
@@ -153,7 +162,7 @@ class SharedModule:
     func_dir = None
 
     message_buffer = []
-    dirload_queue = pd.DataFrame(columns=dirload_queue_columns).set_index("path")
+    dirload_queue = DF(columns=dirload_queue_columns).set_index("path")
 
     llm_to_db_buffer = {}
     latest_stt_used = None
@@ -177,7 +186,7 @@ class SharedModule:
         if self.initialized > 1:
             p(f"Shared module initialized {self.initialized} times.")
 
-        self.dirload_queue = pd.DataFrame(columns=self.dirload_queue_columns).set_index("path")
+        self.dirload_queue = DF(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
         self.latest_stt_used = None
         self.latest_llm_used = None
@@ -220,7 +229,7 @@ class SharedModule:
 
             # if the object is a df, make sure it replaces a df and
             # contains the same columns
-            if isinstance(value, pd.core.frame.DataFrame):
+            if isinstance(value, (pd.core.frame.DataFrame, DF)):
                 assert isinstance(getattr(self, name), pd.core.frame.DataFrame), name
                 assert sorted(value.columns.tolist()) == sorted(getattr(self, name).columns.tolist()), f"The new df has different columns: {name}"
             object.__setattr__(self, name, value)
