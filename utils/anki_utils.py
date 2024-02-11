@@ -322,8 +322,8 @@ def get_decks():
 
 
 # load anki profile using ankipandas just to get the media folder
-if shared.media_folder:
-    db_path = Path(shared.media_folder)
+if shared.anki_media:
+    db_path = Path(shared.anki_media)
     red(f"Using anki db_path found in argument: {db_path}")
 else:
     try:

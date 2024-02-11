@@ -128,7 +128,7 @@ def start_Voice2Anki(
 
     shared.audio_slot_nb = nb_audio_slots
     shared.memory_metric = memory_metric
-    shared.media_folder = media_folder
+    shared.anki_media = anki_media
     shared.debug = debug
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
