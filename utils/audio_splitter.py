@@ -516,7 +516,7 @@ class AudioSplitter:
         duration = transcript["segments"][-1]["end"]
         full_text = transcript["transcription"]
         if not second_pass:
-            whi(f"Duration: {duration}")
+            whi(f"Duration: {duration:.4f}")
             # note: duration is not the total recording duration but rather the
             # time of the end of the last pronounced word
             whi(f"Full text:\n'''\n{full_text}\n'''")
