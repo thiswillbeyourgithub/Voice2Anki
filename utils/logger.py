@@ -199,6 +199,7 @@ def trace(func):
     if asyncio.iscoroutinefunction(func):
         async def wrapper(*args, **kwargs):
             purp(f"-> Entering {func}")
+            # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             result = await func(*args, **kwargs)
             tt = time.time() - t
@@ -210,6 +211,7 @@ def trace(func):
     else:
         def wrapper(*args, **kwargs):
             purp(f"-> Entering {func}")
+            # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             result = func(*args, **kwargs)
             tt = time.time() - t
