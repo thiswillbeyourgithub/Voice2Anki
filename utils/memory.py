@@ -1,3 +1,4 @@
+from typing import List
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -78,6 +79,17 @@ def embedder(text_list, result):
     return [np.array(d["embedding"]).reshape(1, -1) for d in vec.data]
 
 
+def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool:
+    try:
+        assert all(isinstance(t, str) for t in list_text)
+        assert not (t for t in list_text if not t)
+        assert len(list_text) == len(list_embed), f"Incompatible length: {len(list_text)} vs {len(list_embed)}"
+        assert all(isinstance(e, np.ndarray) for e in list_embed), f"Several types: {[type(e) for e in list_embed]}"
+        assert all(e.shape == list_embed[0].shape for e in list_embed), f"Several shapes: {[e.shape for e in list_embed]}"
+    except Exception as err:
+        red(f"Error when checking validity of embeddings: {err}")
+        raise
+
 def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
@@ -85,7 +97,9 @@ def embedder_wrapper(list_text):
 
     if not uncached_texts:
         red("Everything already in cache")
-        return [cached_embedder([t], None)[0] for t in list_text]
+        out = [cached_embedder([t], None)[0] for t in list_text]
+        check_embeddings(list_text, out)
+        return out
 
     if len(uncached_texts) >= 1:
         present = len(list_text) - len(uncached_texts)
@@ -134,6 +148,7 @@ def embedder_wrapper(list_text):
             to_return.append(cached_embedder([list_text[i]], None)[0])
     # make sure the list was emptied
     assert cnt == len(results)
+    check_embeddings(list_text, to_return)
     return to_return
 
 
