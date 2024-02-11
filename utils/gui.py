@@ -183,7 +183,7 @@ with gr.Blocks(
             improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="llmfeedbackbtn")
 
         # quick settings
-        with gr.Accordion(label="Quick settings", open=False):
+        with gr.Accordion(label="Quick settings", open=True):
             with gr.Row():
                 prompt_managm_radio = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
             with gr.Row():
