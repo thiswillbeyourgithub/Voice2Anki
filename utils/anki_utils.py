@@ -149,7 +149,7 @@ def add_note_to_anki(
                     "source": source,
                     "source_extra": source_extra,
                     "souce_audio": source_audio,
-                    "GPToAnkiMetadata": rtoml.dumps(note_metadata, pretty=True),
+                    "GPToAnkiMetadata": rtoml.dumps(note_metadata, pretty=True).replace("\n", "<br>"),
                     },
                 "tags": tags,
                 "options": {"allowDuplicate": False},
