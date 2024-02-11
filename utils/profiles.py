@@ -11,10 +11,10 @@ import numpy as np
 import gradio as gr
 
 try:
-    from .logger import whi, red, trace
+    from .logger import whi, yel, red, trace
     from .shared_module import shared
 except:
-    from logger import whi, red, trace
+    from logger import whi, yel, red, trace
     from shared_module import shared
 
 profile_keys = {
@@ -437,7 +437,7 @@ def load_user_chain(*buttons):
         return buttons
     # load chains if not already done
     buttons = list(buttons)
-    red("Loading chains.py")
+    yel("Loading chains.py")
     spec = importlib.util.spec_from_file_location(
             "chains.chains",
             (shared.func_dir / "chains.py").absolute()
@@ -456,7 +456,6 @@ def load_user_chain(*buttons):
         shared.user_chains.append(chain)
         buttons[i] = upd
 
-    red("Done loading chains")
     return buttons
 
 def call_user_chain(txt_audio, evt: gr.EventData):
