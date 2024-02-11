@@ -664,7 +664,12 @@ def dirload_splitted(
             shared.dirload_queue.loc[str(path), "sound_preprocessed"] = True
 
         whi(f"Will load sound {to_temp}")
-        sounds_to_load.append(to_temp)
+        sounds_to_load.append(
+                gr.update(
+                    value=to_temp,
+                    label=to_temp,
+                    )
+                )
         thread = threading.Thread(
             target=thread_whisp_then_llm,
             args=(
