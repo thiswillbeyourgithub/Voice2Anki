@@ -436,9 +436,9 @@ class AudioSplitter:
                     time_markers = f"_{int(val[0])}s_to_{int(val[1])}s"
                 else:
                     time_markers = ""
-                rand = str(uuid.uuid4()).split("-")[0]
+
                 begin_time = time.time()
-                out_file = self.sp_dir / f"{int(time.time())}_{rand}_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
+                out_file = self.sp_dir / f"{int(time.time())}_HASH_{fileo.stem}_{iter_ttk+1:03d}{time_markers}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
@@ -464,6 +464,12 @@ class AudioSplitter:
                 whi(f"Saving sliced to {out_file}")
                 sliced.export(out_file, format="mp3")
 
+                # rename to replace HASH by its hash
+                with open(out_file, "rb") as f:
+                    h = hashlib.md5A(f.read()).hexdigest()[:10]
+                assert out_file.count("HASH") == 1, f"Unexpected name: {out_file}"
+                shutil.move(out_file, out_file.replace("HASH", h))
+
                 # make sure to wait at least 1.1s otherwise the order of
                 # the audio can be wrong because the timestamps are to
                 # the second
@@ -472,9 +478,15 @@ class AudioSplitter:
             whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
             ignored = self.trim_silences(ignored)
             whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
-            out_file = self.sp_dir / f"{int(time.time())}_{today}_{fileo.stem}_{iter_ttk+2:03d}_IGNORED.mp3"
+            out_file = self.sp_dir / f"{int(time.time())}_HASH_{fileo.stem}_{iter_ttk+2:03d}_IGNORED.mp3"
             assert not out_file.exists(), f"File {out_file} already exists!"
             ignored.export(out_file, format="mp3")
+
+            # rename to replace HASH by its hash
+            with open(out_file, "rb") as f:
+                h = hashlib.md5A(f.read()).hexdigest()[:10]
+            assert out_file.count("HASH") == 1, f"Unexpected name: {out_file}"
+            shutil.move(out_file, out_file.replace("HASH", h))
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
             whi("Copying")
