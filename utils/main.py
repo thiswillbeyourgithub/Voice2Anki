@@ -609,7 +609,7 @@ def dirload_splitted(
 
     if empty_slots == shared.audio_slot_nb:
         if not shared.dirload_queue.empty:
-            assert not (shared.dirload_queue["moved"] == False).all(), "shared.dirload_queue contains moved files even though you're loading all slots. This is suspiciou."
+            assert not (shared.dirload_queue["moved"] == False).all(), "shared.dirload_queue contains moved files even though you're loading all slots. This is suspicious."
 
     # check how many audio are needed
     whi(f"Number of empty sound slots: {empty_slots}")
