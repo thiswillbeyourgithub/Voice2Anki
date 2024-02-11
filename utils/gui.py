@@ -116,7 +116,7 @@ with gr.Blocks(
         audio_slots_txts = []
         for i in range(audio_number):
             with gr.Row():
-                audio_mp3 = create_audio_compo(scale=1)
+                audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", show_label=True)
                 audio_slots.append(audio_mp3)
                 audio_slots_txt = gr.Textbox(lines=2, max_lines=5, container=False, interactive=False, scale=2)
                 audio_slots_txts.append(audio_slots_txt)

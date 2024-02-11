@@ -255,6 +255,8 @@ def create_audio_compo(**kwargs):
             "min_width": "1%",
             "editable": True,
             "scale": 1,
+            "label": "Untitled",
+            "show_label": False,
             }
     defaults.update(kwargs)
     return gr.Microphone(**kwargs)
