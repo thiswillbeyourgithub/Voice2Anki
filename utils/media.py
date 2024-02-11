@@ -42,13 +42,24 @@ def get_image(gallery):
         if isinstance(gallery, list):
             out = []
             for im in gallery:
-                out.append(
-                        rgb_to_bgr(
-                            cv2.imread(
-                                im.image.path,
-                                flags=1)
+                if isinstance(im, tuple):
+                    assert Path(im[0]).exists(), f"Missing image from tuple {im}"
+                    assert im[1] is None, f"Unexpected tupe: {im}"
+                    out.append(
+                            rgb_to_bgr(
+                                cv2.imread(
+                                    im[0],
+                                    flags=1)
+                                )
                             )
-                        )
+                else:
+                    out.append(
+                            rgb_to_bgr(
+                                cv2.imread(
+                                    im.image.path,
+                                    flags=1)
+                                )
+                            )
             out += [decoded]
 
             whi("Loaded image from clipboard.")
