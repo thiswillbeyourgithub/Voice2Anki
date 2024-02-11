@@ -461,6 +461,8 @@ with gr.Blocks(
             fn=force_sound_processing,
             inputs=[audio_slots[0]],
             outputs=[audio_slots[0]],
+            preprocess=False,
+            postprocess=True,
             )
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(

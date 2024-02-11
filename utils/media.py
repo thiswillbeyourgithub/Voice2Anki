@@ -188,12 +188,11 @@ def sound_preprocessing(audio_mp3_path):
     return new_path
 
 @trace
-def force_sound_processing(audio_mp3_path: Union[str, dict]) -> str:
-    assert audio_mp3_path is not None, "Received None in force_sound_processing"
-    audio_mp3_path = format_audio_component(audio_mp3_path)
+def force_sound_processing(audio_mp3: dict) -> str:
+    assert audio_mp3 is not None, "Received None in force_sound_processing"
 
-    # load from file
-    waveform, sample_rate = torchaudio.load(audio_mp3_path)
+    audio_mp3 = format_audio_component(audio_mp3)
+    waveform, sample_rate = torchaudio.load(audio_mp3)
 
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
             waveform,
@@ -202,12 +201,12 @@ def force_sound_processing(audio_mp3_path: Union[str, dict]) -> str:
             )
 
     # write to file as wav
-    sf.write(str(audio_mp3_path), waveform.numpy().T, sample_rate, format='wav')
-    temp = AudioSegment.from_wav(audio_mp3_path)
-    new_path = Path(audio_mp3_path).parent / (Path(audio_mp3_path).stem + "_processed" + Path(audio_mp3_path).suffix)
+    sf.write(str(audio_mp3), waveform.numpy().T, sample_rate, format='wav')
+    temp = AudioSegment.from_wav(audio_mp3)
+    new_path = Path(audio_mp3).parent / (Path(audio_mp3).stem + "_fproc" + Path(audio_mp3).suffix)
     temp.export(new_path, format="mp3")
 
-    whi(f"Done forced preprocessing {audio_mp3_path} to {new_path}")
+    whi(f"Done forced preprocessing {audio_mp3} to {new_path}")
     return new_path
 
 
