@@ -467,7 +467,7 @@ class AudioSplitter:
                 # rename to replace HASH by its hash
                 with open(out_file, "rb") as f:
                     h = hashlib.md5(f.read()).hexdigest()[:10]
-                assert out_file.count("HASH") == 1, f"Unexpected name: {out_file}"
+                assert str(out_file).count("HASH") == 1, f"Unexpected name: {out_file}"
                 shutil.move(out_file, out_file.replace("HASH", h))
 
                 # make sure to wait at least 1.1s otherwise the order of
@@ -485,7 +485,7 @@ class AudioSplitter:
             # rename to replace HASH by its hash
             with open(out_file, "rb") as f:
                 h = hashlib.md5(f.read()).hexdigest()[:10]
-            assert out_file.count("HASH") == 1, f"Unexpected name: {out_file}"
+            assert str(out_file).count("HASH") == 1, f"Unexpected name: {out_file}"
             shutil.move(out_file, out_file.replace("HASH", h))
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
