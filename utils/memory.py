@@ -87,7 +87,7 @@ def embedder_wrapper(list_text):
         red("Everything already in cache")
         return [cached_embedder([t], None)[0] for t in list_text]
 
-    if len(uncached_texts) > 1:
+    if len(uncached_texts) >= 1:
         present = len(list_text) - len(uncached_texts)
         red(f"Embeddings present in cache: {present}/{len(list_text)}")
 
