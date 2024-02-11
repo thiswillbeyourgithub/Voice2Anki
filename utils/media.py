@@ -109,7 +109,11 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
                 decoded = cv2.imread(img.image.path, flags=1)
             except:
                 try:
-                    decoded = cv2.imread(img["image"]["path"], flags=1)
+                    path = img["image"]["path"]
+                    if path.startswith("http"):
+                        path = path.split("file=")[1]
+                        assert Path(path).exists(), f"missing path from url: {path}"
+                    decoded = cv2.imread(path, flags=1)
                 except:
                     # must be a tuple
                     assert isinstance(img, tuple), f"Invalid img type: {img}"

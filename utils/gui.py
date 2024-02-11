@@ -1088,7 +1088,7 @@ with gr.Blocks(
                             fn=update_audio_slots_txts,
                             inputs=audio_slots_txts,
                             outputs=audio_slots_txts,
-                            every=1.0,
+                            every=0.5,
                             show_progress=False,
                             postprocess=False,
                             preprocess=False,
