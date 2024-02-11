@@ -1,3 +1,4 @@
+from typing import Callable
 from joblib import hash as jhash
 import asyncio
 import threading
@@ -42,7 +43,8 @@ log.addHandler(file_handler)
 log_regex = re.compile(" ##.*?##")
 
 
-def store_to_db(dictionnary, db_name):
+
+def store_to_db(dictionnary: dict, db_name: str) -> bool:
     """
     take a dictionnary and add it to the sqlite db. This is used to store
     all interactions with LLM and can be used later to create a dataset for
@@ -145,7 +147,7 @@ def coloured_log(color_asked):
             return string
     return printer
 
-def get_log():
+def get_log() -> str:
     "frequently called: read the most recent log entries and display it in the output field"
     global last_log_content, latest_tail
     logcontent = []
@@ -188,7 +190,7 @@ yel = coloured_log("yellow")
 red = coloured_log("red")
 purp = coloured_log("purple")
 
-def trace(func):
+def trace(func: Callable) -> Callable:
     """simple wrapper to use as decorator to print when a function is used
     and for how long.
     Note: wrapping functions is not currently compatible with
@@ -223,15 +225,15 @@ def trace(func):
     return wrapper
 
 
-def Timeout(limit):
+def Timeout(limit: int) -> Callable:
     """wrapper to add a timeout to function. I had to use threading because
     signal could not be used outside of the main thread in gradio"""
     if shared.disable_timeout:
-        def decorator(func):
+        def decorator(func: Callable) -> Callable:
             return func
         return decorator
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         if asyncio.iscoroutinefunction(func):
             async def wrapper(*args, **kwargs):
                 async with asyncio.timeout(limit):
@@ -270,7 +272,7 @@ def Timeout(limit):
         return wrapper
     return decorator
 
-def smartcache(func):
+def smartcache(func: Callable) -> Callable:
     """used to decorate a function that is already decorated by a
     joblib.Memory decorator. It stores the hash of the arguments in
     shared.smartcache at the start of the run and removes it at the end.
