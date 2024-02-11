@@ -182,14 +182,13 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
             audio_mp3 = format_audio_component(audio_mp3)
         assert Path(audio_mp3).exists(), f"Missing {audio_mp3}"
 
-        # get hash of audio
+        # create the right name
+        audio_file_name = str(Path(audio_mp3).name).replace(" ", "_").replace("/", "").replace(".mp3", "")
+
+        # add hash to name only if missing
         with open(audio_mp3, "rb") as audio_file:
             content = audio_file.read()
         audio_hash = hashlib.md5(content).hexdigest()[:10]
-
-        # create the right name
-        audio_file_name = str(Path(audio_mp3).name).replace(" ", "_").replace("/", "").replace(".mp3", "")
-        # add hash to name only if missing
         if audio_hash in audio_file_name:
             red(f"Audio hash already in filename: {audio_file_name}")
             audio_file_name = f"Voice2Anki_{audio_file_name}.mp3"
