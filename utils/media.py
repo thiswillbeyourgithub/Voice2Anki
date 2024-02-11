@@ -147,7 +147,7 @@ def reset_gallery():
 # @trace
 def reset_audio():
     whi("Resetting all audio")
-    return None, None, None, None, None
+    return [gr.update(value=None, label=f"Audio #{i+1}") for i in range(shared.audio_slot_nb)]
 
 @trace
 def sound_preprocessing(audio_mp3_path):
