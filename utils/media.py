@@ -220,10 +220,11 @@ def format_audio_component(audio: Union[str, gr.Audio]) -> str:
         new_audio = audio["path"]
         if new_audio.startswith("http"):
             new_audio = new_audio.split("file=")[1]
-        whi(f"Preprocessed audio manually: '{audio}' -> '{new_audio}'")
+        # whi(f"Preprocessed audio manually: '{audio}' -> '{new_audio}'")
         audio = new_audio
     elif isinstance(audio, (str, type(Path()))):
-        whi(f"Not audio formating needed for '{audio}'")
+        # whi(f"No audio formating needed for '{audio}'")
+        pass
     else:
         raise ValueError(red(f"Unexpected audio format for {audio}: {type(audio)}"))
     return audio
