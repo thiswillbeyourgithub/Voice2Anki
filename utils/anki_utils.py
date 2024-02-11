@@ -1,3 +1,5 @@
+import queue
+from typing import List, Union
 from datetime import datetime
 import rtoml
 import sys
@@ -84,7 +86,7 @@ def call_anki(action, **params):
 
 
 @trace
-def check_anki_models():
+def check_anki_models() -> None:
     """checks for notetype in anki, if no appropriate model is found, create
     one"""
     models = call_anki(action="modelNames")
@@ -113,14 +115,14 @@ def check_anki_models():
 
 @trace
 def add_note_to_anki(
-        bodies,
-        source,
-        source_extra,
-        source_audio,
-        notes_metadata,
-        tags,
-        deck_name="Default",
-        ):
+        bodies: List[str],
+        source: str,
+        source_extra: str,
+        source_audio: str,
+        notes_metadata: List[dict],
+        tags: List,
+        deck_name: str = "Default",
+        ) -> List[Union[int, str]]:
     """create a new cloze directly in anki"""
     assert isinstance(tags, list), "tags have to be a list"
     if not shared.anki_notetype:
@@ -166,7 +168,7 @@ def add_note_to_anki(
 
 
 @trace
-def add_audio_to_anki(audio_mp3, queue):
+def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
     whi("Sending audio to anki")
     try:
         # get the right path
@@ -219,7 +221,7 @@ def add_audio_to_anki(audio_mp3, queue):
 
 @trace
 @Timeout(5)
-async def get_card_status(txt_chatgpt_cloz, return_bool=False):
+async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
@@ -291,7 +293,7 @@ async def get_card_status(txt_chatgpt_cloz, return_bool=False):
 
 
 @trace
-def sync_anki():
+def sync_anki() -> None:
     "trigger anki synchronization"
     sync_output = call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
@@ -300,14 +302,14 @@ def sync_anki():
 
 
 @trace
-def threaded_sync_anki():
+def threaded_sync_anki() -> None:
     # trigger anki sync
     thread = threading.Thread(target=sync_anki)
     thread.start()
 
 
 @trace
-def mark_previous_note():
+def mark_previous_note() -> None:
     "add the tag 'marked' to the latest added card."
     if not shared.added_note_ids:
         raise Exception(red("No card ids found."))
@@ -320,7 +322,7 @@ def mark_previous_note():
 
 
 # @trace
-def get_anki_tags():
+def get_anki_tags() -> List[str]:
     try:
         return call_anki(
                 action="getTags",
@@ -330,7 +332,7 @@ def get_anki_tags():
 
 
 # @trace
-def get_decks():
+def get_decks() -> List[str]:
     try:
         return call_anki(
                 action="deckNames",
