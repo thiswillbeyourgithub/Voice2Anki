@@ -136,7 +136,8 @@ with gr.Blocks(
         with gr.Group():
             with gr.Row():
                 rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
-                rollaudio_12_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
+                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
+                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
         # 1+2 / 1+2+3
@@ -712,7 +713,7 @@ with gr.Blocks(
             show_progress=False,
             )
 
-    rollaudio_12_btn.click(
+    rollaudio_1_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
             outputs=audio_slots,
@@ -730,13 +731,57 @@ with gr.Blocks(
                     ).then(
                         lambda: None,
                         outputs=[txt_chatgpt_cloz],
-#                    ).success(
-#                        fn=alfred,
-#                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
-#                        outputs=[txt_chatgpt_cloz],
-#                        queue=False,
-#                        preprocess=False,
-#                        postprocess=False,
+                    ).success(
+                            fn=dirload_splitted_last,
+                            inputs=[
+                                roll_dirload_check,
+                                txt_whisp_prompt,
+                                txt_whisp_lang,
+                                sld_whisp_temp,
+
+                                txt_chatgpt_context,
+                                txt_profile,
+                                sld_max_tkn,
+                                sld_temp,
+                                sld_buffer,
+                                llm_choice,
+                                txt_keywords,
+                                ],
+                            outputs=[audio_slots[-1]],
+                            # preprocess=False,
+                            # postprocess=False,
+                            queue=False,
+                            show_progress=False,
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[update_status_btn],
+                                    # queue=True,
+                                    # preprocess=False,
+                                    # postprocess=False,
+                                    )
+    rollaudio_12_btn.click(
+            fn=roll_audio,
+            inputs=audio_slots,
+            outputs=audio_slots,
+            preprocess=False,
+            postprocess=True,
+            queue=False,
+            show_progress=False,
+            ).success(
+                    fn=transcribe,
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                    outputs=[txt_audio],
+                    preprocess=False,
+                    postprocess=False,
+                    queue=False,
+                    ).success(
+                        fn=alfred,
+                        inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords],
+                        outputs=[txt_chatgpt_cloz],
+                        queue=False,
+                        preprocess=False,
+                        postprocess=False,
                     ).success(
                             fn=dirload_splitted_last,
                             inputs=[
