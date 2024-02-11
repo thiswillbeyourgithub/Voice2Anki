@@ -168,7 +168,14 @@ def add_note_to_anki(
 def add_audio_to_anki(audio_mp3, queue):
     whi("Sending audio to anki")
     try:
-        audio_mp3 = format_audio_component(audio_mp3)
+        if isinstance(audio_mp3, dict):
+            test = shared.anki_media / audio_mp3["orig_name"]
+            if test.exists():
+                audio_mp3 = test
+            else:
+                audio_mp3 = format_audio_component(audio_mp3)
+        else:
+            audio_mp3 = format_audio_component(audio_mp3)
         if not Path(audio_mp3).exists():
             red(f"File {audio_mp3} not found, looking for the right file")
             if (Path(audio_mp3).parent.parent / Path(audio_mp3).name).exists():
