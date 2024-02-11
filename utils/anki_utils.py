@@ -1,3 +1,4 @@
+import rtoml
 import sys
 import importlib.util
 from functools import partial
@@ -148,7 +149,7 @@ def add_note_to_anki(
                     "source": source,
                     "source_extra": source_extra,
                     "souce_audio": source_audio,
-                    "GPToAnkiMetadata": note_metadata,
+                    "GPToAnkiMetadata": rtoml.dumps(note_metadata, pretty=True),
                     },
                 "tags": tags,
                 "options": {"allowDuplicate": False},

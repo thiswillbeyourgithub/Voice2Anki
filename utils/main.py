@@ -1171,7 +1171,7 @@ def to_anki(
             source=txt_source,
             source_extra=txt_extra_source,
             source_audio=audio_html,
-            notes_metadata=rtoml.dumps(metadatas, pretty=True),
+            notes_metadata=metadatas,
             tags=new_tags,
             deck_name=txt_deck)
 
