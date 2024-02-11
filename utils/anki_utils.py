@@ -19,7 +19,6 @@ from .shared_module import shared
 from .media import format_audio_component
 
 
-
 def _request_wrapper(action, **params):
     return {'action': action, 'params': params, 'version': 6}
 
