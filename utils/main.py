@@ -1065,6 +1065,13 @@ def to_anki(
     if txt_chatgpt_cloz.startswith("Error with ChatGPT"):
         raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
+    # make sure the audio is a valid path
+    if isinstance(audio_mp3_1, dict):
+        audio_mp3_oname = audio_mp3_1["orig_name"]
+        assert Path(audio_mp3_1["path"]).exists(), f"Not found: {audio_mp3_1['path']}"
+    else:
+        audio_mp3_oname = audio_mp3_1
+
     # checks clozes validity
     clozes = [c.strip() for c in txt_chatgpt_cloz.split("#####") if c.strip()]
     if not clozes or "{{c1::" not in txt_chatgpt_cloz:
@@ -1114,7 +1121,10 @@ def to_anki(
 
     # mention in the metadata the original mp3 name
     if not shared.dirload_queue.empty:
-        metadata["original_mp3_path"] = shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "path"]
+        row = shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.endswith(audio_mp3_oname)==True]
+        assert not row.empty, f"Empty for for {audio_mp3_1}"
+        assert len(row) == 1, f"More than one audio found in dirload_queue for {audio_mp3_1}"
+        metadata["original_mp3_path"] = row.reset_index()["path"].tolist()[0]
 
     whi("Sending to anki:")
 
@@ -1142,7 +1152,7 @@ def to_anki(
         txt_extra_source = txt_extra_source.strip()
 
     with shared.dirload_lock:
-        shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = "started"
+        shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.endswith(audio_mp3_oname)==True, "ankified"] = "started"
 
     # if the txt_audio contains multiple cloze, either the number of created
     # cloze correspond to the number of sections in txt_audio, then the
