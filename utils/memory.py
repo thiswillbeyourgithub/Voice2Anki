@@ -146,6 +146,7 @@ def embedder_wrapper(list_text):
             cnt += 1
         else:
             to_return.append(cached_embedder([list_text[i]], None)[0])
+        to_return[-1] = to_return[-1].reshape(1, -1)
     # make sure the list was emptied
     assert cnt == len(results)
     check_embeddings(list_text, to_return)
