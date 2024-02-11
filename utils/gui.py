@@ -626,8 +626,8 @@ with gr.Blocks(
                 fn=lambda x: x,
                 inputs=[gal_],
                 outputs=[gallery],
-                preprocess=False,
-                postprocess=False,
+                # preprocess=False,
+                # postprocess=False,
                 queue=False).then(
                         fn=shared.pv.save_gallery,
                         inputs=[gallery],
@@ -636,6 +636,8 @@ with gr.Blocks(
                                 fn=get_img_source,
                                 inputs=[gallery],
                                 queue=False,
+                                preprocess=False,
+                                postprocess=False,
                                 )
         # reset image
         rst_.click(
