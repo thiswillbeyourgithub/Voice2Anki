@@ -144,7 +144,7 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
 
         return queue.put(source)
     except Exception as err:
-        return queue.put(red(f"Error getting source: '{err}'"))
+        return queue.put(red(f"Error getting source: '{err}' from {gallery}"))
 
 @trace
 def ocr_image(gallery) -> None:
