@@ -1031,7 +1031,7 @@ with gr.Blocks(
     demo.load(
             fn=shared.reset,
             show_progress=False,
-            js=darkmode_js if (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
+            js=darkmode_js if not (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
             ).then(
                     fn=load_user_chain,
                     inputs=btn_chains,
