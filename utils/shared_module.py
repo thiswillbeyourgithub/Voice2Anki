@@ -218,6 +218,12 @@ class SharedModule:
     def __setattr__(self, name, value):
         "forbid creation of new attributes."
         if hasattr(self, name):
+
+            # if the object is a df, make sure it replaces a df and
+            # contains the same columns
+            if isinstance(value, pd.core.frame.DataFrame):
+                assert isinstance(getattr(self, name), pd.core.frame.DataFrame), name
+                assert sorted(value.columns.tolist()) == sorted(getattr(self, name).columns.tolist()), f"The new df has different columns: {name}"
             object.__setattr__(self, name, value)
         else:
             raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
