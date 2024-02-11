@@ -190,6 +190,7 @@ def add_audio_to_anki(audio_mp3, queue):
         # add hash to name only if missing
         if audio_hash in audio_file_name:
             red(f"Audio hash already in filename: {audio_file_name}")
+            audio_file_name = f"Voice2Anki_{audio_file_name}.mp3"
         else:
             audio_file_name = f"Voice2Anki_{audio_file_name}_{audio_hash}.mp3"
 
