@@ -510,8 +510,8 @@ with gr.Blocks(
             # show_progress=True,
             # every=2,
             # trigger_mode="once",
-            # preprocess=False,
-            # postprocess=False,
+            preprocess=False,
+            postprocess=False,
             )
     # txt_chatgpt_cloz.change(
     #         fn=get_card_status,
@@ -521,8 +521,6 @@ with gr.Blocks(
     #         # show_progress=True,
     #         # every=2,
     #         # trigger_mode="once",
-    #         # preprocess=False,
-    #         # postprocess=False,
     #         )
 
 
@@ -748,8 +746,8 @@ with gr.Blocks(
                                 txt_keywords,
                                 ],
                             outputs=[audio_slots[-1]],
-                            # preprocess=False,
-                            # postprocess=False,
+                            preprocess=False,
+                            postprocess=True,
                             queue=False,
                             show_progress=False,
                             ).then(
@@ -757,8 +755,8 @@ with gr.Blocks(
                                     inputs=[txt_chatgpt_cloz],
                                     outputs=[update_status_btn],
                                     # queue=True,
-                                    # preprocess=False,
-                                    # postprocess=False,
+                                    preprocess=False,
+                                    postprocess=False,
                                     )
     rollaudio_12_btn.click(
             fn=roll_audio,
@@ -808,8 +806,8 @@ with gr.Blocks(
                                     inputs=[txt_chatgpt_cloz],
                                     outputs=[update_status_btn],
                                     # queue=True,
-                                    # preprocess=False,
-                                    # postprocess=False,
+                                    preprocess=False,
+                                    postprocess=False,
                                     )
     rollaudio_123_btn.click(
             fn=roll_audio,
@@ -882,8 +880,8 @@ with gr.Blocks(
                                                             inputs=[txt_chatgpt_cloz],
                                                             outputs=[update_status_btn],
                                                             # queue=True,
-                                                            # preprocess=False,
-                                                            # postprocess=False,
+                                                            preprocess=False,
+                                                            postprocess=False,
                                                             )
 
     # clicking this button will load from a user directory the next sounds and
@@ -927,8 +925,8 @@ with gr.Blocks(
                                 inputs=[txt_chatgpt_cloz],
                                 outputs=[update_status_btn],
                                 # queue=True,
-                                # preprocess=False,
-                                # postprocess=False,
+                                preprocess=False,
+                                postprocess=False,
                                 )
 
     # send to whisper
@@ -977,8 +975,8 @@ with gr.Blocks(
                             inputs=[txt_chatgpt_cloz],
                             outputs=[update_status_btn],
                             # queue=True,
-                            # preprocess=False,
-                            # postprocess=False,
+                            preprocess=False,
+                            postprocess=False,
                             )
 
     # 1+2
