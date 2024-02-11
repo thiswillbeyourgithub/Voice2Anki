@@ -814,7 +814,6 @@ def dirload_splitted_last(
         sld_buffer: int,
         llm_choice: str,
         txt_keywords: str,
-
         prompt_management: str,
         ) -> Union[str, gr.Audio, dict]:
     """wrapper for dirload_splitted to only load the last slot. This is faster
@@ -833,6 +832,7 @@ def dirload_splitted_last(
             sld_buffer,
             llm_choice,
             txt_keywords,
+            prompt_management,
 
             *audios,
             )[-1]
