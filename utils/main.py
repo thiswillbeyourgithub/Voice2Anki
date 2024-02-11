@@ -321,6 +321,7 @@ def pre_alfred(
     """used to prepare the prompts for alfred call. This is a distinct
     function to make it callable by the cached function too."""
     # don't print when using cache
+    assert isinstance(cache_mode, bool), f"Invalid cache_mode: {cache_mode}"
     if cache_mode:
         whi = lambda x: None
         yel = lambda x: None
@@ -428,7 +429,7 @@ def pre_alfred(
         formatted_messages[-1]["content"] += new
 
     else:
-        raise ValueError(f"Invalid prompt managmnet: {prompt_management}")
+        raise ValueError(f"Invalid prompt managment: {prompt_management}")
 
     # add the current prompt
     formatted_messages.append(new_prompt)
@@ -496,6 +497,8 @@ def alfred(
         raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
         raise Exception(red("No txt_chatgpt_context found."))
+    assert isinstance(prompt_management, str), f"Invalid type of prompt_management: {prompt_management}"
+    assert isinstance(cache_mode, bool), f"Invalid type of cache_mode: {cache_mode}"
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         mess = f"Image change detected: '{txt_audio}'"
         if cache_mode:
