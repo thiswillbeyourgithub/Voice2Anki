@@ -60,7 +60,7 @@ def pop_buffer() -> None:
 def floatizer(func: Callable) -> Callable:
     "used to cast the ints as float to make sure the cache is used"
     def wrapper(*args, **kwargs):
-        args = [float(ar) if isinstance(ar, int) else ar for ar in args]
+        args = [float(ar) if (isinstance(ar, int) and not isinstance(ar, bool)) else ar for ar in args]
         kwargs = {k: float(v) if isinstance(v, int) else v for k, v in kwargs.items()}
         return func(*args, **kwargs)
     return wrapper
