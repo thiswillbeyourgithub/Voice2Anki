@@ -105,13 +105,13 @@ with gr.Blocks(
     with gr.Row():
         gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=3, interactive=True)
         dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=0, elem_id="darkmodebtn")
-        update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
+        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="syncankibtn")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
         with gr.Row():
-            rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50)
-            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50)
+            rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1)
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5)
 
         # audio
         audio_number = shared.audio_slot_nb
@@ -137,7 +137,7 @@ with gr.Blocks(
             with gr.Row():
                 rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
                 rollaudio_12_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
-                sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="syncankibtn")
+                update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
