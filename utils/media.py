@@ -274,18 +274,30 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
 
 
 @trace
-def roll_audio(*slots):
+def roll_audio(*slots) -> List[dict]:
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
     slots = list(slots)
     if all((slot is None for slot in slots)):
         return slots
     if all((slot is None for slot in slots[1:])):
         return slots
-    slots[0] = None
-    while slots[0] is None:
-        slots.pop(0)
-        audio_mp3 = create_audio_compo()
-        slots.append(audio_mp3)
+
+    slots.pop(0)
+    # update the name of each audio to its neighbour
+    for i, s in enumerate(slots):
+        slots[i] = {
+                "__type__": "update",  # this is how gr.update works
+                "label": slots[i]["orig_name"],
+                "value": slots[i]["path"],
+                }
+
+    slots.append(
+            {
+                "__type__": "update",
+                "label": "New",
+                "value": None,
+                }
+            )
 
     return slots
 

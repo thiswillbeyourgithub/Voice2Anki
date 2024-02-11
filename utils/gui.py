@@ -716,7 +716,7 @@ with gr.Blocks(
             inputs=audio_slots,
             outputs=audio_slots,
             preprocess=False,
-            postprocess=False,
+            postprocess=True,
             queue=False,
             show_progress=False,
             ).success(
@@ -770,7 +770,7 @@ with gr.Blocks(
             inputs=audio_slots,
             outputs=audio_slots,
             preprocess=False,
-            postprocess=False,
+            postprocess=True,
             queue=False,
             show_progress=False,
             ).success(
