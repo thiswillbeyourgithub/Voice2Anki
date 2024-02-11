@@ -18,9 +18,6 @@ from .logger import whi, red, trace, Timeout
 from .ocr import get_text
 from .shared_module import shared
 
-soundpreprocess_cache = Memory("cache/sound_preprocessing_cache", verbose=0)
-soundpreprocess_cache.clear()  # clear the cache on startup
-
 
 @trace
 def get_image(gallery):
