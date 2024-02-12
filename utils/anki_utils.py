@@ -221,7 +221,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 
 @trace
 @Timeout(5)
-async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str, bool]:
+async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=False) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, f"Demo not yet launched!"
@@ -249,8 +249,10 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str
     if "#####" in cloz:  # multiple cards
         assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = await asyncio.gather(*[get_card_status(sp, True) for sp in splits])
-        # vals = [get_card_status(sp, True) for sp in splits]
+        if async_mode:
+            vals = await asyncio.gather(*[get_card_status(sp, True, True) for sp in splits])
+        else:
+            vals = [get_card_status(sp, True, False) for sp in splits]
 
         n = len(vals)
         if all(vals) and all(isinstance(v, bool) for v in vals):
@@ -273,12 +275,14 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
-        loop = asyncio.get_event_loop()
-        state = await loop.run_in_executor(
-                None,
-                partial(call_anki, action="findCards", query=query)
-                )
-        # state = call_anki(action="findCards", query=query)
+        if async_mode:
+            loop = asyncio.get_event_loop()
+            state = await loop.run_in_executor(
+                    None,
+                    partial(call_anki, action="findCards", query=query)
+                    )
+        else:
+            state = call_anki(action="findCards", query=query)
         if state:
             if return_bool:
                 return True
