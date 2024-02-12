@@ -614,8 +614,8 @@ with gr.Blocks(
                 queue=True,
                 )
 
-        # for the first few galleries only: run ocr in advance
-        if qg_cnt <= 2:
+        # for the first gallery only: run ocr in advance
+        if qg_cnt == 0:
             gal_.change(
                     fn=get_img_source,
                     inputs=[gal_],
