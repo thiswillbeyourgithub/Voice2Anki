@@ -320,8 +320,6 @@ with gr.Blocks(
                             postprocess=False,
                             )
 
-            load_qg_btn = gr.Button(value="Load future galleries", visible=shared.enable_queued_gallery)
-
             queued_galleries = []
             for qg in range(1, shared.queued_gallery_slot_nb + 1):
                 with gr.Row(equal_height=False, visible=shared.enable_queued_gallery):
@@ -347,11 +345,6 @@ with gr.Blocks(
                             ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
-
-            load_qg_btn.click(
-                    fn=load_queued_galleries,
-                    outputs=[row[1] for row in queued_galleries],
-                    )
 
         with gr.Tab(label="Queued audio", elem_id="BigTabV2A") as tab_dirload_queue:
             queue_df = gr.Dataframe(
