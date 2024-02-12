@@ -23,7 +23,7 @@ import joblib
 import litellm
 import openai
 
-from .anki_utils import add_note_to_anki, add_audio_to_anki, sync_anki
+from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache
 from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
@@ -45,9 +45,6 @@ llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 def clear_llm_cache() -> None:
     # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
     llm_cache.clear()
-
-# trigger a sync on startup to test if anki is running and with ankiconnect enabled
-sync_anki()
 
 
 @trace

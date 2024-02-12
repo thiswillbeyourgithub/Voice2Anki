@@ -27,7 +27,6 @@ def _request_wrapper(action, **params):
     return {'action': action, 'params': params, 'version': 6}
 
 
-@trace
 async def anki_request_async(url, request):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=request) as response:
@@ -285,28 +284,21 @@ async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
 
 
 @trace
-def sync_anki() -> None:
+async def sync_anki() -> None:
     "trigger anki synchronization"
-    sync_output = call_anki(action="sync")
+    sync_output = await async_call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
         f"Error during sync?: '{sync_output}'")
     # time.sleep(1)  # wait for sync to finish, just in case
 
 
 @trace
-def threaded_sync_anki() -> None:
-    # trigger anki sync
-    thread = threading.Thread(target=sync_anki)
-    thread.start()
-
-
-@trace
-def mark_previous_note() -> None:
+async def mark_previous_note() -> None:
     "add the tag 'marked' to the latest added card."
     if not shared.added_note_ids:
         raise Exception(red("No card ids found."))
     pc = shared.added_note_ids[-1]
-    call_anki(
+    await async_call_anki(
             action="addTags",
             notes=pc,
             tags="marked",

@@ -3,7 +3,7 @@ import gradio as gr
 
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
-from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
+from .anki_utils import sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
@@ -489,7 +489,7 @@ with gr.Blocks(
     dark_mode_btn.click(fn=None, js=darkmode_js, show_progress=False)
 
     # sync anki
-    sync_btn.click(fn=threaded_sync_anki, queue=False, show_progress=False)
+    sync_btn.click(fn=sync_anki, queue=False, show_progress=False)
 
     # kill threads before timeout
     kill_threads_btn.click(fn=kill_threads, show_progress=False)
@@ -1053,7 +1053,7 @@ with gr.Blocks(
             show_progress=False,
             )
 
-    demo.load(
+    init = demo.load(
             fn=shared.reset,
             show_progress=False,
             js=darkmode_js if not (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
@@ -1061,16 +1061,22 @@ with gr.Blocks(
                     fn=load_user_chain,
                     inputs=btn_chains,
                     outputs=btn_chains,
-                    ).then(
-                            fn=update_audio_slots_txts,
-                            inputs=audio_slots_txts,
-                            outputs=audio_slots_txts,
-                            every=0.5,
-                            show_progress=False,
-                            postprocess=False,
-                            preprocess=False,
-                            trigger_mode="once",
-                            )
+                    )
+    init.then(
+            fn=update_audio_slots_txts,
+            inputs=audio_slots_txts,
+            outputs=audio_slots_txts,
+            every=0.5,
+            show_progress=False,
+            postprocess=False,
+            preprocess=False,
+            trigger_mode="once",
+            )
+    init.then(
+            fn=sync_anki,
+            queue=False,
+            show_progress=False,
+            )
 
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
