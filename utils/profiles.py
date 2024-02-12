@@ -278,6 +278,11 @@ def worker_setitem(in_queue):
 
         kf.unlink(missing_ok=True)
 
+        if item is profile_keys[key]["default"]:
+            # if it's the default value, simply delete it and don't create
+            # the new file
+            continue
+
         if key == "message_buffer":
             try:
                 with open(str(kf), "w") as f:
