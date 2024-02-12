@@ -656,8 +656,8 @@ with gr.Blocks(
             fn=roll_future_galleries,
             inputs=[row[1] for row in queued_galleries],
             outputs=[gallery] + [row[1] for row in queued_galleries],
-            preprocess=False,
-            postprocess=False,
+            # preprocess=False,
+            # postprocess=False,
             )
 
     # audio
