@@ -221,7 +221,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 
 @trace
 @Timeout(5)
-async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=False) -> Union[str, bool]:
+async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=True) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, f"Demo not yet launched!"
