@@ -293,6 +293,7 @@ with gr.Blocks(
                     interactive=False,
                     column_widths="5%",
                     wrap=True,
+                    height="2048",
                     )
 
         with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
@@ -302,6 +303,7 @@ with gr.Blocks(
                     interactive=False,
                     column_widths="5%",
                     wrap=True,
+                    height="2048",
                     )
 
     with gr.Tab(label="Queues", elem_id="BigTabV2A"):
@@ -355,6 +357,7 @@ with gr.Blocks(
                     column_widths="5%",
                     visible=shared.enable_dirload,
                     wrap=True,
+                    height="2048",
                     )
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
