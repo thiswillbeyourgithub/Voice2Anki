@@ -30,45 +30,58 @@ def _request_wrapper(action, **params):
 @trace
 async def anki_request_async(url, request):
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, json=request) as response:
-            data = await response.json()
-            return data
+        async with session.post(url, data=request) as response:
+            return await response.json()
 
 
 def call_anki(action, **params):
     """ bridge between local python libraries and AnnA Companion addon
     (a fork from anki-connect) """
 
-    if "async_mode" in params:
-        use_async = True
-        del params["async_mode"]
-    else:
-        use_async = False
+    requestJson = json.dumps(_request_wrapper(action, **params)
+                             ).encode('utf-8')
+
+    try:
+        response = json.load(urllib.request.urlopen(
+            urllib.request.Request(
+                'http://localhost:8765',
+                requestJson)))
+    except (ConnectionRefusedError, urllib.error.URLError) as e:
+        red(f"{str(e)}: is Anki open and 'AnkiConnect' "
+            "enabled? Firewall issue?")
+        raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                        "addon' enabled? Firewall issue?")
+
+    if len(response) != 2:
+        red('response has an unexpected number of fields')
+        raise Exception('response has an unexpected number of fields')
+    if 'error' not in response:
+        red('response is missing required error field')
+        raise Exception('response is missing required error field')
+    if 'result' not in response:
+        red('response is missing required result field')
+        raise Exception('response is missing required result field')
+    if response['error'] is not None:
+        red(response['error'])
+        raise Exception(response['error'])
+    return response['result']
+
+
+async def async_call_anki(action, **params):
+    """ ASYNC duplicate of call_anki"""
 
     requestJson = json.dumps(_request_wrapper(action, **params)
                              ).encode('utf-8')
 
-    if not use_async:
-        try:
-            response = json.load(urllib.request.urlopen(
-                urllib.request.Request(
-                    'http://localhost:8765',
-                    requestJson)))
-        except (ConnectionRefusedError, urllib.error.URLError) as e:
-            red(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                "enabled? Firewall issue?")
-            raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                            "addon' enabled? Firewall issue?")
-    else:
-        try:
-            response = anki_request_async(
-                    url='http://localhost:8765',
-                    request=requestJson)
-        except Exception as e:
-            red(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                "enabled? Firewall issue?")
-            raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                            "addon' enabled? Firewall issue?")
+    try:
+        response = await anki_request_async(
+                url='http://localhost:8765',
+                request=requestJson)
+    except Exception as e:
+        red(f"{str(e)}: is Anki open and 'AnkiConnect' "
+            "enabled? Firewall issue?")
+        raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
+                        "addon' enabled? Firewall issue?")
 
     if len(response) != 2:
         red('response has an unexpected number of fields')
@@ -221,7 +234,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 
 @trace
 @Timeout(5)
-async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=True) -> Union[str, bool]:
+async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, f"Demo not yet launched!"
@@ -241,32 +254,21 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=T
     cloz = cloz.replace("\"", "\\\"")
 
     if not cloz.strip():
-        if return_bool:
-            return False
-        else:
-            return "EMPTY"
+        return "EMPTY"
 
     if "#####" in cloz:  # multiple cards
-        assert return_bool is False, "Unexpected return_bool True"
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        if async_mode:
-            vals = await asyncio.gather(*[get_card_status(sp, True, True) for sp in splits])
-        else:
-            vals = [get_card_status(sp, True, False) for sp in splits]
+        vals = [await get_card_status(sp) for sp in splits]
+        assert "EMPTY" not in vals, f"Found EMPTY in {txt_chatgpt_cloz} that returned {vals}"
 
         n = len(vals)
-        if all(vals) and all(isinstance(v, bool) for v in vals):
-            if return_bool:
-                return True
-            else:
-                return f"Added {n}/{n}"
+        missing = len([v for v in vals if v == "MISSING"])
+        present = len([v for v in vals if v == "Added"])
+        assert missing + present == n, f"Unmatching length for {txt_chatgpt_cloz} that returned {vals}"
+        if missing == 0:
+            return f"Added {n}/{n}"
         else:
-            s = sum([bool(b) for b in vals])
-            if return_bool:
-                return False
-            else:
-                return f"MISSING {n-s}/{n}"
-
+            return f"MISSING {n-missing}/{n}"
     else:
         cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
         cloz = [cl.strip() for cl in cloz if cl.strip()]
@@ -275,24 +277,11 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False, async_mode=T
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
-        if async_mode:
-            loop = asyncio.get_event_loop()
-            state = await loop.run_in_executor(
-                    None,
-                    partial(call_anki, action="findCards", query=query)
-                    )
-        else:
-            state = call_anki(action="findCards", query=query)
+        state = await async_call_anki(action="findCards", query=query)
         if state:
-            if return_bool:
-                return True
-            else:
-                return "Added"
+            return "Added"
         else:
-            if return_bool:
-                return False
-            else:
-                return "MISSING"
+            return "MISSING"
 
 
 @trace
