@@ -62,7 +62,6 @@ class ValueStorage:
     def __init__(self, profile="latest"):
 
         profile = profile.strip()
-        self.profile_keys = profile_keys
 
         if profile == "latest":
             try:
@@ -88,15 +87,15 @@ class ValueStorage:
                 )
         self.thread.start()
 
-        self.running_tasks = {k: None for k in self.profile_keys}
-        self.cache_values = {k: None for k in self.profile_keys}
+        self.running_tasks = {k: None for k in profile_keys}
+        self.cache_values = {k: None for k in profile_keys}
 
         self.profile_name = profile
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
 
         # create methods like "save_gallery" to save the gallery to the profile
-        for key in self.profile_keys:
+        for key in profile_keys:
             def create_save_method(key):
                 #@trace
                 def save_method(value):
@@ -133,7 +132,7 @@ class ValueStorage:
 
     def __getitem__(self, key):
         assert self.thread.is_alive(), "Saving thread appears to be dead!"
-        if key not in self.profile_keys:
+        if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
 
         # make sure to wait for the previous setitem of the same key to finish
@@ -156,9 +155,9 @@ class ValueStorage:
             raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
 
         if self.cache_values[key] is not None:
-            if "type" in self.profile_keys[key]:
+            if "type" in profile_keys[key]:
                 # cast as specific type
-                return self.profile_keys[key]["type"](self.cache_values[key])
+                return profile_keys[key]["type"](self.cache_values[key])
             else:
                 return self.cache_values[key]
 
@@ -193,18 +192,18 @@ class ValueStorage:
                 if (key == "gallery" or key.startswith("queued_gallery_")) and new is not None:
                     if not isinstance(new, list):
                         new = [im.image.path for im in new.root]
-            if "type" in self.profile_keys[key]:
-                new = self.profile_keys[key]["type"](new)
+            if "type" in profile_keys[key]:
+                new = profile_keys[key]["type"](new)
             self.cache_values[key] = new
             return new
         else:
-            self.cache_values[key] = self.profile_keys[key]["default"]
+            self.cache_values[key] = profile_keys[key]["default"]
             return self.cache_values[key]
 
     def __setitem__(self, key, item):
         assert self.thread.is_alive(), "Saver worker appears to be dead!"
 
-        if key not in self.profile_keys:
+        if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
 
         if not self.__check_equality(item, self.cache_values[key]):
@@ -228,8 +227,8 @@ class ValueStorage:
                 raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
             if item != self.cache_values[key]:
                 # cast as required type
-                if "type" in self.profile_keys[key]:
-                    item = self.profile_keys[key]["type"](item)
+                if "type" in profile_keys[key]:
+                    item = profile_keys[key]["type"](item)
 
                 # save to cache
                 self.cache_values[key] = item
