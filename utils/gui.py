@@ -612,7 +612,7 @@ with gr.Blocks(
                 )
 
         # for the first gallery only: run ocr in advance
-        if qg_cnt == 1:
+        if qg_cnt == 0:
             gal_.change(
                     fn=get_img_source,
                     inputs=[gal_],
