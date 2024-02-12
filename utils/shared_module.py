@@ -182,10 +182,6 @@ class SharedModule:
 
     def reset(self, request: gr.Request):
         "used to reset the values when the gradio page is reloaded"
-        self.initialized += 1
-        if self.initialized > 1:
-            p(f"Shared module initialized {self.initialized} times.")
-
         self.dirload_queue = DF(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
         self.latest_stt_used = None
@@ -222,6 +218,10 @@ class SharedModule:
         self.func_dir.mkdir(exist_ok=True)
         self.user_chains = None
         self.anki_notetype = None
+
+        self.initialized += 1
+        if self.initialized > 1:
+            p(f"Shared module initialized {self.initialized} times.")
 
     def __setattr__(self, name, value):
         "forbid creation of new attributes."
