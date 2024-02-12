@@ -254,14 +254,14 @@ def smartcache(func: Callable) -> Callable:
         h = jhash(jhash(args) + jhash(kwargs))
         if h in shared.smartcache:
             t = shared.smartcache[h]
-            red(f"Cache already ongoing for {func}. Hash={h}")
+            red(f"Cache already ongoing for {func} since {time.time()-t:.2f}s: hash={h}")
             i = 0
             while h in shared.smartcache:
                 time.sleep(0.1)
                 i += 1
                 if i % 10 == 0:
                     delay = time.time() - t
-                    red(f"Waiting for {func} caching to finish for {delay:02f}s. Hash={h}")
+                    red(f"Waiting for {func} caching to finish for {delay:.2f}s. Hash={h}")
             return func(*args, **kwargs)
         else:
             with shared.thread_lock:
