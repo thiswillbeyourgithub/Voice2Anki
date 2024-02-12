@@ -6,7 +6,7 @@ from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitte
 from .anki_utils import threaded_sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
-from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, load_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -608,6 +608,7 @@ with gr.Blocks(
                 fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                 inputs=[gal_],
                 show_progress=False,
+                queue=True,
                 )
 
         # for the first gallery only: run ocr in advance
@@ -615,7 +616,7 @@ with gr.Blocks(
             gal_.change(
                     fn=get_img_source,
                     inputs=[gal_],
-                    queue=False,
+                    queue=True,
                     )
 
         # add image
@@ -652,19 +653,12 @@ with gr.Blocks(
                 )
 
     roll_gall_btn.click(
-            fn=lambda: [None, None],
-            outputs=[queued_galleries[0][1], gallery],
-            ).then(
-                    fn=load_queued_galleries,
-                    outputs=[row[1] for row in queued_galleries],
-                    ).then(
-                        fn=lambda x: x,
-                        inputs=[queued_galleries[0][1]],
-                        outputs=[gallery],
-                        preprocess=False,
-                        postprocess=False,
-                        queue=False,
-                        )
+            fn=roll_future_galleries,
+            inputs=[row[1] for row in queued_galleries],
+            outputs=[gallery] + [row[1] for row in queued_galleries],
+            preprocess=False,
+            postprocess=False,
+            )
 
     # audio
     audio_corrector.stop_recording(

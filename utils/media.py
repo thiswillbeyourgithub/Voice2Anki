@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Tuple
 from pydub import AudioSegment
 import soundfile as sf
 from pathlib import Path
@@ -249,19 +249,9 @@ def rgb_to_bgr(image):
 
 
 @trace
-def load_queued_galleries():
-    """load the saved images beforehand to reorder so that the empty
-    galleries are moved at the end"""
-    saved_fg = [shared.pv[f"queued_gallery_{fg:03d}"] for fg in range(1, shared.queued_gallery_slot_nb + 1)]
-    while None in saved_fg:
-        saved_fg.remove(None)
-    if len(saved_fg) < shared.queued_gallery_slot_nb:
-        saved_fg.extend([None] * ( shared.queued_gallery_slot_nb - len(saved_fg)))
-    assert len(saved_fg) == shared.queued_gallery_slot_nb
-    for i, fg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
-        im = saved_fg[i]
-        getattr(shared.pv, f"save_queued_gallery_{fg:03d}")(im)
-    return saved_fg
+def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
+    "pop the first future gallery and send it to the main gallery"
+    return list(fg) + [None]
 
 
 def create_audio_compo(**kwargs) -> gr.Microphone:
