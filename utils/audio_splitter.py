@@ -500,7 +500,7 @@ class AudioSplitter:
             whi("Done!")
 
         red("All done!")
-        return
+        raise SystemExit()
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
