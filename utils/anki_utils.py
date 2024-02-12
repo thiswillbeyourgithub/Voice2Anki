@@ -226,7 +226,6 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, f"Demo not yet launched!"
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
-        red("Found flashcard_editor.py")
         spec = importlib.util.spec_from_file_location(
                 "flashcard_editor.cloze_editor",
                 (shared.func_dir / "flashcard_editor.py").absolute()
@@ -236,7 +235,6 @@ async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str
         spec.loader.exec_module(editor_module)
         cloze_editor = editor_module.cloze_editor
     else:
-        red("Not flashcard_editor.py found")
         cloze_editor = lambda x: x
 
     cloz = cloze_editor(txt_chatgpt_cloz)
