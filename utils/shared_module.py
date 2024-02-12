@@ -194,8 +194,8 @@ class SharedModule:
             self.running_threads[k] = []
         self.smartcache = {}
         self.added_note_ids = []
-        self.pv.running_tasks = {k: None for k in self.pv.profile_keys}
-        self.pv.cache_values = {k: None for k in self.pv.profile_keys}
+        self.pv.running_tasks = {k: None for k in self.pv.running_tasks.keys()}
+        self.pv.cache_values = {k: None for k in self.pv.cache_values.keys()}
 
         os.environ["OPENAI_API_KEY"] = self.pv["txt_openai_api_key"].strip()
         os.environ["REPLICATE_API_KEY"] = self.pv["txt_replicate_api_key"].strip()
