@@ -119,7 +119,7 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
                     assert isinstance(img, tuple), f"Invalid img type: {img}"
                     assert len(img) == 2, f"Invalid img: {img}"
                     assert img[1] is None, f"Invalid img: {img}"
-                    assert Path(img[0]).exists() is None, f"img not founf: {img}"
+                    assert Path(img[0]).exists() is None, f"img not found: {img}"
                     decoded = cv2.imread(img[0], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
             new = shared.anki_media / f"{img_hash}.png"
