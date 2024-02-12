@@ -140,7 +140,7 @@ def add_note_to_anki(
         spec.loader.exec_module(editor_module)
         cloze_editor = editor_module.cloze_editor
     else:
-        red("Not flashcard_editor.py found")
+        red("No flashcard_editor.py found")
         cloze_editor = lambda x: x
 
     notes = [
