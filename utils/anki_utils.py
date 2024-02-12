@@ -224,6 +224,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 async def get_card_status(txt_chatgpt_cloz: str, return_bool=False) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
+    assert shared.initialized, f"Demo not yet launched!"
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         red("Found flashcard_editor.py")
         spec = importlib.util.spec_from_file_location(
