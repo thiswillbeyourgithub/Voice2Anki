@@ -241,7 +241,7 @@ class ValueStorage:
             # item is the same as in the cache value
             # but if it's None etc, then the cache value must be destroyed
             try:
-                if item is None or item is False or (bool(item) is False):
+                if item is profile_keys[key]["default"]:
                     kp = key + ".pickle"
                     if key.startswith("queued_gallery_"):
                         kf = self.p / "queues" / "galleries" / kp
