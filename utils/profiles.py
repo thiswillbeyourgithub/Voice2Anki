@@ -250,6 +250,8 @@ class ValueStorage:
                     if kf.exists():
                         red(f"Deleting file {kf}")
                         kf.unlink()
+                    else:
+                        whi(f"Couldn't delete file as it did not exist: {kf}")
             except Exception as err:
                 red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
 
