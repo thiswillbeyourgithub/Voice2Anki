@@ -123,7 +123,8 @@ def check_anki_models() -> None:
                 )
         gr.Error(red("Done creating notetype 'Voice2Anki'"))
         shared.anki_notetype = "Voice2Anki"
-    red(f"Anki notetype detected: '{shared.anki_notetype}'")
+    whi(f"Anki notetype detected: '{shared.anki_notetype}'")
+
 
 @trace
 def add_note_to_anki(
