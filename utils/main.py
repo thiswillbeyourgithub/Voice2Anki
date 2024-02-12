@@ -540,6 +540,8 @@ def alfred(
             return "\n#####\n".join(answers).strip()
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
+    if not formatted_messages and max_token < 500:
+        raise Exception(red(f"max_token is low at {max_token} which might be why pre_alfred output no memories."))
     for i, fm in enumerate(formatted_messages):
         if i == 0:
             assert fm["role"] == "system"
