@@ -585,69 +585,68 @@ with gr.Blocks(
             outputs=[gallery],
             show_progress=False,
             queue=False,
-            ).then(
-                fn=shared.pv.save_gallery,
-                inputs=[gallery],
-                show_progress=False,
-                ).success(
-                        fn=get_img_source,
-                        inputs=[gallery],
-                        queue=False,
-                        show_progress=False,
-                        )
+            )
+
+    # when gallery changes, save the image then run ocr
+    gallery.change(
+            fn=shared.pv.save_gallery,
+            inputs=[gallery],
+            show_progress=False,
+            ).success(
+                    fn=get_img_source,
+                    inputs=[gallery],
+                    queue=False,
+                    show_progress=False,
+                    )
 
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
             queue=False,
             show_progress=False,
-            ).then(
-                fn=shared.pv.save_gallery,
-                inputs=[gallery],
-                show_progress=False,
-                )
+            )
 
     # queued gallery
     for qg_cnt, qg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
         rst_, gal_, send_, add_, ocr_ = queued_galleries[qg_cnt]
+
+        # save any change to the gallery
+        gal_.change(
+                fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
+                inputs=[gal_],
+                show_progress=False,
+                )
+
+        # for the first gallery only: run ocr in advance
+        if qg_cnt == 1:
+            gal_.change(
+                    fn=get_img_source,
+                    inputs=[gal_],
+                    queue=False,
+                    )
+
         # add image
         add_.click(
                 fn=get_image,
                 inputs=[gal_],
                 outputs=[gal_],
-                queue=False).then(
-                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
-                        inputs=[gal_],
-                        show_progress=False,
-                        )
+                queue=False)
 
         # send image
         send_.click(
                 fn=lambda x: x,
                 inputs=[gal_],
                 outputs=[gallery],
-                # preprocess=False,
-                # postprocess=False,
-                queue=False).then(
-                        fn=shared.pv.save_gallery,
-                        inputs=[gallery],
-                        show_progress=False,
-                        ).then(
-                                fn=get_img_source,
-                                inputs=[gallery],
-                                queue=False,
-                                preprocess=False,
-                                postprocess=False,
-                                )
+                preprocess=False,
+                postprocess=False,
+                queue=False,
+                )
+
         # reset image
         rst_.click(
                 fn=lambda: None,
                 outputs=[gal_],
-                queue=False).then(
-                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
-                        inputs=[gal_],
-                        show_progress=False,
-                        )
+                queue=False)
 
         # ocr image
         ocr_.click(
@@ -663,32 +662,16 @@ with gr.Blocks(
             fn=lambda: [None, None],
             outputs=[queued_galleries[0][1], gallery],
             ).then(
-                    fn=shared.pv.save_queued_gallery_001,
-                    inputs=[queued_galleries[0][1]],
-                    show_progress=False,
+                    fn=load_queued_galleries,
+                    outputs=[row[1] for row in queued_galleries],
                     ).then(
-                            fn=load_queued_galleries,
-                            outputs=[row[1] for row in queued_galleries],
-                            ).then(
-                                fn=lambda x: x,
-                                inputs=[queued_galleries[0][1]],
-                                outputs=[gallery],
-                                preprocess=False,
-                                postprocess=False,
-                                queue=False,
-                                ).then(
-                                    fn=shared.pv.save_gallery,
-                                    inputs=[gallery],
-                                    show_progress=False,
-                                    ).then(
-                                            fn=get_img_source,
-                                            inputs=[gallery],
-                                            queue=False,
-                                            ).success(
-                                                    fn=get_img_source,
-                                                    inputs=[queued_galleries[1][1]],
-                                                    queue=False,
-                                                    )
+                        fn=lambda x: x,
+                        inputs=[queued_galleries[0][1]],
+                        outputs=[gallery],
+                        preprocess=False,
+                        postprocess=False,
+                        queue=False,
+                        )
 
     # audio
     audio_corrector.stop_recording(

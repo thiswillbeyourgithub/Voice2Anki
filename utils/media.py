@@ -20,7 +20,7 @@ from .shared_module import shared
 
 
 @trace
-def get_image(gallery):
+def get_image(gallery) -> List[gr.Gallery]:
     whi("Getting image from clipboard")
     try:
         # load from clipboard
