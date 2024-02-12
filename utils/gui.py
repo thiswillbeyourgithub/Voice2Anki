@@ -640,7 +640,14 @@ with gr.Blocks(
         rst_.click(
                 fn=lambda: None,
                 outputs=[gal_],
-                queue=False)
+                queue=False,
+                ).then(  # force deletion
+                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
+                        inputs=[gal_],
+                        show_progress=False,
+                        queue=True,
+                        )
+
 
         # ocr image
         ocr_.click(
