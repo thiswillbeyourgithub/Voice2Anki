@@ -87,7 +87,7 @@ class SharedModule:
             # ["reverse"],
 
             # add blank sound to help whisper
-            # ["pad", "0.2@0"],
+            ["pad", "0.2@0"],
             ]
 
     # sox effect when forcing the processing of a sound
