@@ -532,6 +532,11 @@ class AudioSplitter:
             # time of the end of the last pronounced word
             whi(f"Full text:\n'''\n{full_text}\n'''")
 
+        time_limit = 1
+        if duration <= time_limit:
+            red(f"Transcript is too short to be relevant {duration:.4f}s so skipping")
+            return [], []
+
         # verbose_json
         times_to_keep = [[0, duration]]
         previous_start = -1
@@ -615,7 +620,6 @@ class AudioSplitter:
 
         # remove too short audio
         latest_kept_i = 0
-        time_limit = 1
         for iter_ttk, (start, end) in enumerate(times_to_keep):
             metadata[iter_ttk]["duration"] = end - start
             if end - start < time_limit:
