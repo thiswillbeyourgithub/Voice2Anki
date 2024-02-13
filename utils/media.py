@@ -1,3 +1,4 @@
+import time
 from typing import List, Union, Tuple
 from pydub import AudioSegment
 import soundfile as sf
@@ -112,14 +113,24 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
                     path = img["image"]["path"]
                     if path.startswith("http"):
                         path = path.split("file=")[1]
-                        assert Path(path).exists(), f"missing path from url: {path}"
+                    cnt = 0
+                    while not Path(path).exists():
+                        time.sleep(1)
+                        cnt += 1
+                        if cnt == 10:
+                            raise Exception(f"img not found in path: {path}")
                     decoded = cv2.imread(path, flags=1)
                 except:
                     # must be a tuple
                     assert isinstance(img, tuple), f"Invalid img type: {img}"
                     assert len(img) == 2, f"Invalid img: {img}"
                     assert img[1] is None, f"Invalid img: {img}"
-                    assert Path(img[0]).exists() is None, f"img not found: {img}"
+                    cnt = 0
+                    while not Path(img[0]).exists():
+                        time.sleep(1)
+                        cnt += 1
+                        if cnt == 10:
+                            raise Exception(f"img not found: {img[0]}")
                     decoded = cv2.imread(img[0], flags=1)
             img_hash = hashlib.md5(decoded).hexdigest()
             new = shared.anki_media / f"{img_hash}.png"
