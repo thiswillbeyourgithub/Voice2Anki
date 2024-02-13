@@ -734,7 +734,7 @@ with gr.Blocks(
             show_progress=False,
             ).success(
                     # rotate texts too
-                    fn=lambda *x: [None] + x[:-1],
+                    fn=lambda *x: [None] + list(x)[:-1],
                     inputs=audio_slots_txts,
                     outputs=audio_slots_txts,
                     ).success(
