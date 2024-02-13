@@ -199,7 +199,7 @@ class AudioSplitter:
             if self.stop_source == "replicate":
 
                 transcript = self.run_whisper(file, second_pass=False)
-                times_to_keep, metadata = self.split_one_transcript(transcript, False)
+                times_to_keep, metadata = self.split_one_transcript(transcript, second_pass=False)
                 whi("Text segments metadata:")
                 for i, t in enumerate(metadata):
                     whi(f"* {i:03d}:")
@@ -315,7 +315,7 @@ class AudioSplitter:
 
                 transcript = split_transcripts[iter_ttk]
                 assert transcript is not None
-                sub_ttk, sub_meta = self.split_one_transcript(transcript, True)
+                sub_ttk, sub_meta = self.split_one_transcript(transcript, second_pass=True)
                 if not sub_ttk and not sub_meta:
                     red(f"{iter_print}Audio between {t0} and {t1} seems empty after second pass. Keeping results from first pass.")
                     continue
