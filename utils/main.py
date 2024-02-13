@@ -19,6 +19,7 @@ from pathlib import Path
 import cv2
 import gradio as gr
 import joblib
+from pydub import AudioSegment
 
 import litellm
 import openai
@@ -86,6 +87,9 @@ def whisper_cached(
         txt_whisp_prompt = None
     if txt_whisp_lang.strip() == "":
         txt_whisp_lang = None
+    len_audio = len(AudioSegment.from_mp3(audio_path)) // 1000
+    if len_audio <= 2:
+        raise Exception(f"Very short audio under 1s sent to whisper! (length={len_audio:.2f}s)")
     try:
         cnt = 0
         while True:
