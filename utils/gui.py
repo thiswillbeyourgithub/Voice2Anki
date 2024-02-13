@@ -1057,10 +1057,17 @@ with gr.Blocks(
             show_progress=False,
             )
 
+    # darkmode js depending on variables
+    if shared.force_theme == "auto":
+        theme = darkmode_js if not (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None
+    elif shared.force_theme == "dark":
+        theme = darkmode_js
+    elif shared.force_theme == "light":
+        theme = None
     init = demo.load(
             fn=shared.reset,
             show_progress=False,
-            js=darkmode_js if not (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
+            js=theme,
             ).then(
                     fn=load_user_chain,
                     inputs=btn_chains,

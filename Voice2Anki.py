@@ -31,6 +31,7 @@ def start_Voice2Anki(
         disable_tracing=False,
         disable_timeout=True,
         widen_screen=True,
+        force_theme="auto",
         port=7860,
         *args,
         **kwargs
@@ -80,6 +81,9 @@ def start_Voice2Anki(
     widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
         for some widen screens, but very handy for mobile and tablet use.
+    force_theme: str, default 'auto'
+        either 'dark', 'light' or 'auto' to determine the theme from the time
+        of day.
     port: int, default 7860
         default port to use
     """
@@ -98,6 +102,8 @@ def start_Voice2Anki(
         assert print_db_then_exit is False, "Invalid value for print_db_then_exit. You must specify the name of a db"
 
     assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
+
+    assert force_theme in ["dark", "light", "auto"], f"Invalid force_theme: {force_theme}"
 
     whi("Starting Voice2Anki\n")
     if args:
@@ -139,6 +145,7 @@ def start_Voice2Anki(
     shared.enable_queued_gallery = enable_queued_gallery
     shared.enable_flagging = enable_flagging
     shared.enable_dirload = enable_dirload
+    shared.force_theme = force_theme
 
     if shared.enable_queued_gallery is False:
         shared.queued_gallery_slot_nb = 2  # load less elements as they
