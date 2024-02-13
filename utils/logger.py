@@ -261,7 +261,7 @@ def smartcache(func: Callable) -> Callable:
                 i += 1
                 if i % 10 == 0:
                     delay = time.time() - t
-                    red(f"Smartcache: waiting for {func} caching to finish for {delay:.2f}s. Hash={h}")
+                    red(f"Smartcache: waiting for {func} caching to finish for {delay:.2f}s: hash={h}")
             return func(*args, **kwargs)
         else:
             with shared.thread_lock:
