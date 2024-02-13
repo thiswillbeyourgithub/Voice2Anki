@@ -1052,7 +1052,9 @@ def kill_threads() -> None:
 def Voice2Anki_db_save(
         txt_chatgpt_cloz: str,
         txt_chatgpt_context: str,
-        txt_audio: str) -> None:
+        txt_audio: str,
+        note_ids: List[int],
+        ) -> None:
     """when an anki card is created, find the information about its creation
     in the shared module then save it to the db. It can be missing from the db
     if the result from alfred was loaded from cache for example."""
@@ -1079,6 +1081,7 @@ def Voice2Anki_db_save(
                 "cloze": txt_chatgpt_cloz,
                 "Voice2Anki_version": shared.VERSION,
                 "request_information": shared.request,
+                "anki_nids": note_ids,
                 }
     else:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
@@ -1284,6 +1287,6 @@ def to_anki(
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
     shared.pv["message_buffer"] = shared.message_buffer
 
-    Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio)
+    Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio, results)
 
     gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
