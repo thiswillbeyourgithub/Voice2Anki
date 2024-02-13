@@ -482,7 +482,6 @@ with gr.Blocks(
     tab_logging.select(fn=get_log, outputs=[output_elem])
     logging_reload.click(fn=get_log, outputs=[output_elem])
 
-
     # mark the previous card
     mark_previous.click(
             fn=mark_previous_note,
@@ -589,7 +588,7 @@ with gr.Blocks(
             fn=shared.pv.save_gallery,
             inputs=[gallery],
             show_progress=False,
-            ).success(
+            ).then(
                     fn=get_img_source,
                     inputs=[gallery],
                     queue=False,
@@ -703,45 +702,50 @@ with gr.Blocks(
             queue=False,
             show_progress=False,
             ).success(
-                    fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                    outputs=[txt_audio],
-                    preprocess=False,
-                    postprocess=False,
-                    queue=False,
-                    ).then(
-                        lambda: None,
-                        outputs=[txt_chatgpt_cloz],
+                    # rotate texts too
+                    fn=lambda *x: [None] + x[:-1],
+                    inputs=audio_slots_txts,
+                    outputs=audio_slots_txts,
                     ).success(
-                            fn=dirload_splitted_last,
-                            inputs=[
-                                roll_dirload_check,
-                                txt_whisp_prompt,
-                                txt_whisp_lang,
-                                sld_whisp_temp,
-
-                                txt_chatgpt_context,
-                                txt_profile,
-                                sld_max_tkn,
-                                sld_temp,
-                                sld_buffer,
-                                llm_choice,
-                                txt_keywords,
-                                prompt_manag,
-                                ],
-                            outputs=[audio_slots[-1]],
+                            fn=transcribe,
+                            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                            outputs=[txt_audio],
                             preprocess=False,
-                            postprocess=True,
+                            postprocess=False,
                             queue=False,
-                            show_progress=False,
                             ).then(
-                                    fn=get_card_status,
-                                    inputs=[txt_chatgpt_cloz],
-                                    outputs=[update_status_btn],
-                                    # queue=True,
+                                lambda: None,
+                                outputs=[txt_chatgpt_cloz],
+                            ).success(
+                                    fn=dirload_splitted_last,
+                                    inputs=[
+                                        roll_dirload_check,
+                                        txt_whisp_prompt,
+                                        txt_whisp_lang,
+                                        sld_whisp_temp,
+
+                                        txt_chatgpt_context,
+                                        txt_profile,
+                                        sld_max_tkn,
+                                        sld_temp,
+                                        sld_buffer,
+                                        llm_choice,
+                                        txt_keywords,
+                                        prompt_manag,
+                                        ],
+                                    outputs=[audio_slots[-1]],
                                     preprocess=False,
-                                    postprocess=False,
-                                    )
+                                    postprocess=True,
+                                    queue=False,
+                                    show_progress=False,
+                                    ).then(
+                                            fn=get_card_status,
+                                            inputs=[txt_chatgpt_cloz],
+                                            outputs=[update_status_btn],
+                                            # queue=True,
+                                            preprocess=False,
+                                            postprocess=False,
+                                            )
     rollaudio_12_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
