@@ -487,8 +487,8 @@ class AudioSplitter:
                 time.sleep(max(0, 1.1 - (time.time() - begin_time)))
 
             whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
-            if len(ignore) // 1000 == 0:
-                whi(f"No need to trim silence as its so short")
+            if len(ignored) // 1000 == 0:
+                whi("No need to trim silence as its so short")
             else:
                 ignored = self.trim_silences(ignored)
                 whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
