@@ -49,6 +49,8 @@ class AudioSplitter:
             global_slowdown_factor=1.0,
             second_pass_slowdown_factor=1.0,
 
+            split_audio_longer_than=10,
+
             remove_silence=True,
             silence_method="torchaudio",
             h=False,
@@ -96,6 +98,14 @@ class AudioSplitter:
 
         second_pass_slowdown_factor float, default 1.0
             like global_slowdown_factor but for the second pass
+
+        split_audio_longer_than int, default 10
+            if an input audio is longer than that minute long, split it into
+            subaudios then merge the transcripts. This is because 1 the
+            replicate backend seems to have issues with long and heavy audio
+            files and 2 it allows multithreading.
+            File within 10% of this value will not be split. For example
+            a 10.3 minute audio file will not be split but a 12 minute will.
 
         silence_method, str, default 'torchaudio'
             can be any of 'torchaudio', 'pydub' or 'sox_cli'
@@ -148,6 +158,7 @@ class AudioSplitter:
                 "invalid value for second_pass_slowdown_factor")
         self.g_spf = global_slowdown_factor
         self.l_spf = second_pass_slowdown_factor
+        self.split_audio_longer_than = split_audio_longer_than
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
                 for s in stop_list]
@@ -658,11 +669,11 @@ class AudioSplitter:
             whi(f"Running whisper on {audio_path}")
 
             audio = AudioSegment.from_mp3(audio_path)
-            min_limit = 10
-            minutes = len(audio) / 1000 / 60
-            if minutes > min_limit:
-                red(f"Audio is longer than {min_limit} minutes ({minutes:.1f}min) so will split then merge.")
-                return self.run_whisper_long(audio_path, audio, min_limit)
+            limit_min = self.split_audio_longer_than + 0.1 * self.split_audio_longer_than
+            len_min = len(audio) / 1000 / 60
+            if len_min > limit_min:
+                red(f"Audio is longer than {limit_min} minutes ({len_min:.1f}min) so will be split then the transcripts merged.")
+                return self.run_whisper_long(audio_path, audio)
 
 
         # hash used for the caching so that it does not depend on the path
@@ -719,13 +730,14 @@ class AudioSplitter:
 
         return transcript
 
-    def run_whisper_long(self, audio_path, audio, min_limit):
+    def run_whisper_long(self, audio_path, audio):
         """for audio longer than some threshold (say 10 minutes) then in the
         first pass it makes sense to split the audio, use multithreading to
         transcribe it, then merge the transcripts (taking care of the
         transition and offsets)
         """
-        ms_limit = min_limit * 60 * 1000
+        ms_limit = self.split_audio_longer_than * 60 * 1000
+        ms_tolerance = ms_limit + 0.1 * ms_limit
 
         # split the audio
         splits = [
@@ -733,10 +745,10 @@ class AudioSplitter:
                 for i in tqdm(range(len(audio) // ms_limit + 2), desc="splitting")
                 if len(audio) >= i * ms_limit
                 ]
-        min_last = len(splits[-1]) / 1000 / 60
-        if min_last < 1:
+        ms_last = len(splits[-1])
+        if ms_last < ms_tolerance:
             # less than one minute, merge it with latest
-            red(f"Last audio split lasts {min_last:.2f}min so merging with previous")
+            red(f"Last audio split lasts {ms_last/1000/60:.2f}min so merging with previous")
             splits[-2] += splits[-1]
             splits = splits[:-1]
 
@@ -759,7 +771,7 @@ class AudioSplitter:
                             splits,
                             tqdm(
                                 tempfiles,
-                                unit=f"{min_limit}min file",
+                                unit=f"{self.split_audio_longer_than}min file",
                                 desc="Exporting splits"
                                 )
                             )
@@ -776,7 +788,7 @@ class AudioSplitter:
                         joblib.delayed(threaded_whisper)(t)
                         for t in tqdm(
                             tempfiles,
-                            unit=f"{min_limit}min file",
+                            unit=f"{self.split_audio_longer_than}min file",
                             desc="Treating long audio as splits"
                             )
                         )
@@ -786,7 +798,7 @@ class AudioSplitter:
         offset = 0
         for it, t in enumerate(tscripts[1:]):
             transcript["transcription"] += " " + t["transcription"]
-            offset = (it + 1) * min_limit * 60
+            offset = (it + 1) * self.split_audio_longer_than * 60
 
             # offset the timestamps
             segs = t["segments"]
@@ -812,6 +824,8 @@ class AudioSplitter:
             segs.pop(0)
             transcript["segments"].extend(segs)
 
+        assert transcript["segments"][-1]["end"] * 1000 < len(audio), "Unexpected length"
+        assert transcript["segments"][0]["start"] >= 0, "Unexpected length"
         return transcript
 
     def trim_silences(self, audio, dbfs_threshold=-50, depth=0):
