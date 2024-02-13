@@ -89,7 +89,7 @@ def whisper_cached(
         txt_whisp_lang = None
     len_audio = len(AudioSegment.from_mp3(audio_path)) // 1000
     if len_audio <= 2:
-        raise Exception(f"Very short audio under 1s sent to whisper! (length={len_audio:.2f}s)")
+        red(f"Very short audio under 1s sent to whisper! (length={len_audio:.2f}s)")
     try:
         cnt = 0
         while True:
@@ -228,6 +228,8 @@ def transcribe(
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
         txt_audio = transcript.text
+        if transcript["duration"] <= 2:
+            txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
         yel(f"\nWhisper transcript: {txt_audio}")
 
         with shared.thread_lock:
