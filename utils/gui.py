@@ -1,6 +1,8 @@
 from datetime import datetime
 import gradio as gr
 
+from gradio.themes.utils import sizes as theme_size
+
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
 from .anki_utils import sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
@@ -9,11 +11,13 @@ from .memory import recur_improv, display_price, get_memories_df, get_message_bu
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
 from .shared_module import shared
 
+large_text_theme = theme_size.Size('10px', '12px', '14px', '25px', '20px', '24px', '28px')
+# default is '10px', '12px', '14px', '16px', '20px', '24px', '28px')
 theme = gr.themes.Soft(
         primary_hue="violet",
         secondary_hue="purple",
         neutral_hue="gray",
-        text_size="lg",
+        text_size=large_text_theme,
         spacing_size="sm",
         radius_size="sm",
         font="ui-sans-serif",
