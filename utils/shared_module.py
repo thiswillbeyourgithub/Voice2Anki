@@ -29,7 +29,6 @@ class SharedModule:
     disable_tracing = None
     disable_timeout = None
     widen_screen = None
-    force_theme = None
     timeout_lock = Lock()
     dirload_lock = Lock()
     thread_lock = Lock()
