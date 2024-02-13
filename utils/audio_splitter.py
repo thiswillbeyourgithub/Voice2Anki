@@ -744,7 +744,7 @@ class AudioSplitter:
         transition and offsets)
         """
         ms_limit = self.split_audio_longer_than * 60 * 1000
-        ms_tolerance = ms_limit + 0.1 * ms_limit
+        ms_tolerance = 0.1 * ms_limit
 
         # split the audio
         splits = [
