@@ -168,7 +168,7 @@ with gr.Blocks(
             with gr.Row():
                 rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
                 rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
-                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5)
+                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False)
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
         # 1/2/3
