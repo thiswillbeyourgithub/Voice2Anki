@@ -266,24 +266,25 @@ with gr.Blocks(
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
         with gr.Row():
             kill_threads_btn = gr.Button(value="Kill threads", variant="secondary")
-        with gr.Row():
-            code_user_flashcard_editor = gr.Code(
-                    value=None,
-                    language="python",
-                    lines=5,
-                    label="User flashcard editor function",
-                    interactive=False,
-                    show_label=True,
-                    )
-        with gr.Row():
-            code_user_chains = gr.Code(
-                    value=None,
-                    language="python",
-                    lines=5,
-                    label="User chains",
-                    interactive=False,
-                    show_label=True,
-                    )
+        with gr.Accordion(label="User functions", open=False):
+            with gr.Row():
+                code_user_flashcard_editor = gr.Code(
+                        value=None,
+                        language="python",
+                        lines=5,
+                        label="flashcard_editor.py",
+                        interactive=False,
+                        show_label=True,
+                        )
+            with gr.Row():
+                code_user_chains = gr.Code(
+                        value=None,
+                        language="python",
+                        lines=5,
+                        label="chains.py",
+                        interactive=False,
+                        show_label=True,
+                        )
 
     with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A") as tab_memories_and_buffer:
         with gr.Tab(label="Memories", elem_id="BigTabV2A") as tab_memories:
