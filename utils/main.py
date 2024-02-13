@@ -228,7 +228,7 @@ def transcribe(
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
         txt_audio = transcript.text
-        if transcript["duration"] <= 2:
+        if transcript.duration <= 2:
             txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
         yel(f"\nWhisper transcript: {txt_audio}")
 
