@@ -159,8 +159,9 @@ with gr.Blocks(
                 t.render()
 
         # whisper and chatgpt text output
-        txt_audio = gr.Textbox(label="Transcript", lines=8, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True)
-        txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True)
+        with gr.Row():
+            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True, scale=1)
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True, scale=1)
 
         # rolls
         with gr.Group():
