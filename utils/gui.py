@@ -39,7 +39,29 @@ function shortcuts(e) {
     var event = document.all ? window.event : e;
     switch (e.target.tagName.toLowerCase()) {
         case "input":
+            // unselect anything by pressing shift+space or escape
+            if (e.code == 'Space' && e.shiftKey) {
+                document.activeElement.blur();
+                document.documentElement.focus();
+                document.body.focus();
+            }
+            else if (e.key == 'Escape' || e.keyCode == 27) {
+                document.activeElement.blur();
+                document.body.focus();
+                document.documentElement.focus();
+            }
         case "textarea":
+            // unselect anything by pressing shift+space or escape
+            if (e.code == 'Space' && e.shiftKey) {
+                document.activeElement.blur();
+                document.documentElement.focus();
+                document.body.focus();
+            }
+            else if (e.key == 'Escape' || e.keyCode == 27) {
+                document.activeElement.blur();
+                document.body.focus();
+                document.documentElement.focus();
+            }
         //case "select":
         //case "button":
         break;
@@ -68,6 +90,10 @@ function shortcuts(e) {
         }
         else if (e.key == "3" && e.shiftKey) {
             document.getElementById("toankibtn").click();
+        }
+        else if (e.key == 'Escape' || e.keyCode == 27) {
+            document.body.focus();
+            document.documentElement.focus();
         }
         else {
             alert(`Unrecognized shortcut: ${e.key}`);
