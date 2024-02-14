@@ -64,7 +64,7 @@ function shortcuts(e) {
             //document.getElementById("syncankibtn").click();
             document.getElementById("suspendpreviousbtn").click();
         }
-        else if (e.code == "KeyM" && e.shiftKey) {
+        else if (e.code == ";" && e.shiftKey) {
             document.getElementById("markpreviousbtn").click();
         }
         else if (e.key == "s") {
@@ -137,7 +137,7 @@ function shortcuts(e) {
 
         // no shortcut found
         else {
-            alert(`Unrecognized shortcut: ${e.key}`);
+            alert(`Unrecognized shortcut: ${e.key} (or ${e.code})`);
             }
 
         }
