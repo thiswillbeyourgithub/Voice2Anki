@@ -116,7 +116,7 @@ def start_Voice2Anki(
     if debug:
         yel("Debug mode enabled")
     if authentication or share:
-        auth_args = {"auth": ("v2ft", "v2ft"), "auth_message": "Please login"}
+        auth_args = {"auth": ("v2a", "v2a"), "auth_message": "Please login"}
         yel("Authentication enabled")
     else:
         auth_args = {}
