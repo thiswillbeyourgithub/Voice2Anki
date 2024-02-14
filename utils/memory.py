@@ -497,7 +497,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
     except Exception as err:
         red(f"Error during recursive improvement: '{err}'")
         return
-    whi(f"Recursively improved: {len(prev_prompts)} total examples")
+    gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
 
 @trace
