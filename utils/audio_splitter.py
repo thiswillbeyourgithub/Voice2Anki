@@ -442,6 +442,7 @@ class AudioSplitter:
 
             ignored = AudioSegment.empty()
             prev_end = 0
+            ofname = fileo.stem.replace(" ", "_").replace("'", "").replace("/", "")
             for iter_ttk, val in enumerate(tqdm(times_to_keep, unit="segment", desc="cutting")):
                 if val is not None:
                     time_markers = f"_{int(val[0])}s_to_{int(val[1])}s"
@@ -449,7 +450,7 @@ class AudioSplitter:
                     time_markers = ""
 
                 begin_time = time.time()
-                out_file = self.sp_dir / f"{int(time.time())}_HASH_{fileo.stem.replace(' ', '_')}_{iter_ttk+1:03d}{time_markers}.mp3"
+                out_file = self.sp_dir / f"{int(time.time())}_HASH_{ofname}_{iter_ttk+1:03d}{time_markers}.mp3"
                 assert not out_file.exists(), f"File {out_file} already exists!"
 
                 with self.metadata_file.open("a") as mf:
@@ -492,7 +493,7 @@ class AudioSplitter:
             else:
                 ignored = self.trim_silences(ignored)
                 whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
-            out_file = self.sp_dir / f"{int(time.time())}_HASH_{fileo.stem.replace(' ', '_')}_{iter_ttk+2:03d}_IGNORED.mp3"
+            out_file = self.sp_dir / f"{int(time.time())}_HASH_{ofname}_{iter_ttk+2:03d}_IGNORED.mp3"
             assert not out_file.exists(), f"File {out_file} already exists!"
             ignored.export(out_file, format="mp3")
 
