@@ -488,14 +488,18 @@ class AudioSplitter:
                 time.sleep(max(0, 1.1 - (time.time() - begin_time)))
 
             whi(f"Length of ignored sections before trimming silences: '{len(ignored)//1000}s'")
-            if len(ignored) // 1000 == 0:
+            if len(ignored) // 1000 < 2:
                 whi("No need to trim silence as its so short")
             else:
                 ignored = self.trim_silences(ignored)
                 whi(f"Length of ignored sections after trimming silences: '{len(ignored)//1000}s'")
-            out_file = self.sp_dir / f"{int(time.time())}_HASH_{ofname}_{iter_ttk+2:03d}_IGNORED.mp3"
-            assert not out_file.exists(), f"File {out_file} already exists!"
-            ignored.export(out_file, format="mp3")
+                if len(ignored) // 1000 <= 1:
+                    red(f"No need to export the ignored sections because it's {len(ignored)//1000}s long (<= 1s)")
+                else:
+                    red(f"Length of all combined ignored sections: {len(ignored)/1000}s")
+                    out_file = self.sp_dir / f"{int(time.time())}_HASH_{ofname}_{iter_ttk+2:03d}_IGNORED.mp3"
+                    assert not out_file.exists(), f"File {out_file} already exists!"
+                    ignored.export(out_file, format="mp3")
 
             # rename to replace HASH by its hash
             with open(out_file, "rb") as f:
