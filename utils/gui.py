@@ -82,11 +82,13 @@ function shortcuts(e) {
         // select text
         else if (e.key == "e") {
             e.preventDefault();  // dont type the e
-            document.getElementById("txtchatgpt").children[0].focus();
+            ch = document.getElementById("txtchatgpt").children;
+            ch[ch.length - 1].focus();
         }
         else if (e.code == "KeyE" && e.shiftKey) {
             e.preventDefault();  // dont type the e
-            document.getElementById("txtwhisper").children[0].focus();
+            ch = document.getElementById("txtwhisper").children;
+            ch[ch.length - 1].focus();
         }
 
         // roll 1 2 3
