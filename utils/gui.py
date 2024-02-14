@@ -80,10 +80,10 @@ function shortcuts(e) {
 
         // select text
         else if (e.key == "e") {
-            document.getElementById("txtchatgpt").children()[0].focus();
+            document.getElementById("txtchatgpt").children[0].focus();
         }
         else if (e.code == "KeyE" && e.shiftKey) {
-            document.getElementById("txtwhisper").children()[0].focus();
+            document.getElementById("txtwhisper").children[0].focus();
         }
 
         // roll 1 2 3
@@ -114,6 +114,7 @@ function shortcuts(e) {
 
         // roll gallery
         else if (e.code == 'KeyG' && e.shiftKey) {
+            alert("Rolling gallery");
             document.getElementById("rollgallbtn").click();
         }
 
