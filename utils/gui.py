@@ -39,20 +39,10 @@ function shortcuts(e) {
     // in focus
     var event = document.all ? window.event : e;
     switch (e.target.tagName.toLowerCase()) {
+
+        // unselect anything by pressing shift+space or escape
         case "input":
-            // unselect anything by pressing shift+space or escape
-            if (e.code == 'Space' && e.shiftKey) {
-                document.activeElement.blur();
-                document.documentElement.focus();
-                document.body.focus();
-            }
-            else if (e.key == 'Escape' || e.keyCode == 27) {
-                document.activeElement.blur();
-                document.body.focus();
-                document.documentElement.focus();
-            }
         case "textarea":
-            // unselect anything by pressing shift+space or escape
             if (e.code == 'Space' && e.shiftKey) {
                 document.activeElement.blur();
                 document.documentElement.focus();
@@ -63,16 +53,18 @@ function shortcuts(e) {
                 document.body.focus();
                 document.documentElement.focus();
             }
+
         //case "select":
         //case "button":
         break;
 
         default:
         if (e.code == "KeyS" && e.shiftKey) {
-            document.getElementById("syncankibtn").click();
+            //document.getElementById("syncankibtn").click();
+            document.getElementById("suspendpreviousbtn").click();
         }
-        else if (e.code == "KeyN" && e.shiftKey) {
-            document.getElementById("darkmodebtn").click();
+        else if (e.code == "KeyM" && e.shiftKey) {
+            document.getElementById("markpreviousbtn").click();
         }
         else if (e.key == "s") {
             document.getElementById("cardstatusbtn").click();
@@ -80,22 +72,51 @@ function shortcuts(e) {
         else if (e.key == "f") {
             document.getElementById("llmfeedbackbtn").click();
         }
-        else if (e.key == "m") {
-            document.getElementById("markpreviousbtn").click();
+
+        // nightmode
+        else if (e.code == "KeyN" && e.shiftKey) {
+            document.getElementById("darkmodebtn").click();
         }
-        else if (e.key == "1" && e.shiftKey) {
+
+        // select text
+        else if (e.key == "e") {
+            document.getElementById("txtchatgpt").children()[0].focus();
+        }
+        else if (e.code == "KeyE" && e.shiftKey) {
+            document.getElementById("txtwhisper").children()[0].focus();
+        }
+
+        // roll 1 2 3
+        else if (e.key == "&") {
+            document.getElementById("roll123").click();
+        }
+        else if (e.key == "é") {
+            document.getElementById("roll12").click();
+        }
+        else if (e.key == '"') {
+            document.getElementById("roll1").click();
+        }
+
+        // 123
+        else if (e.key == "3" && e.shiftKey) {
             document.getElementById("transcribebtn").click();
         }
         else if (e.key == "2" && e.shiftKey) {
             document.getElementById("transcriptbtn").click();
         }
-        else if (e.key == "3" && e.shiftKey) {
+        else if (e.key == "1" && e.shiftKey) {
             document.getElementById("toankibtn").click();
         }
         else if (e.key == 'Escape' || e.keyCode == 27) {
             document.body.focus();
             document.documentElement.focus();
         }
+
+        // roll gallery
+        else if (e.code == 'KeyG' && e.shiftKey) {
+            document.getElementById("rollgallbtn").click();
+        }
+
         else {
             alert(`Unrecognized shortcut: ${e.key}`);
             }
@@ -161,15 +182,15 @@ with gr.Blocks(
 
         # whisper and chatgpt text output
         with gr.Row():
-            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True, scale=1)
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True, scale=1)
+            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True, scale=1, elem_id="txtwhisper")
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True, scale=1, elem_id="txtchatgpt")
 
         # rolls
         with gr.Group():
             with gr.Row():
-                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5)
-                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5)
-                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False)
+                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="roll123")
+                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="roll12")
+                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="roll1")
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
 
         # 1/2/3
@@ -182,7 +203,7 @@ with gr.Blocks(
         with gr.Row():
             mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
-            suspend_previous = gr.Button(value="Toggle suspend previous")
+            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="suspendpreviousbtn")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
@@ -240,7 +261,7 @@ with gr.Blocks(
         with gr.Accordion(label="Main gallery", open=True, visible=shared.pv["enable_gallery"]) as accordion_gallery:
             with gr.Row():
                 with gr.Column():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"])
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="rollgallbtn")
                     gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                     with gr.Group():
                         with gr.Row():
