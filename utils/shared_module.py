@@ -34,10 +34,6 @@ class SharedModule:
     thread_lock = Lock()
     db_lock = Lock()
     openai_client = None
-    enable_gallery = None
-    enable_queued_gallery = None
-    enable_flagging = None
-    enable_dirload = None
     user_chains = None
     anki_notetype = None
 

@@ -1,5 +1,6 @@
-from datetime import datetime
 import gradio as gr
+from datetime import datetime
+from functools import partial
 
 from gradio.themes.utils import sizes as theme_size
 
@@ -229,17 +230,17 @@ with gr.Blocks(
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
             with gr.Row():
-                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.enable_flagging)
+                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"])
                 force_sound_processing_btn = gr.Button(value="Sound processing")
                 clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
 
         # image
-        with gr.Accordion(label="Main gallery", open=True, visible=shared.enable_gallery):
+        with gr.Accordion(label="Main gallery", open=True, visible=shared.pv["enable_gallery"]) as accordion_gallery:
             with gr.Row():
                 with gr.Column():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=all([shared.enable_gallery, shared.enable_queued_gallery]))
-                    gallery = gr.Gallery(value=shared.pv["gallery"] if shared.enable_gallery else None, label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"])
+                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                     with gr.Group():
                         with gr.Row():
                             rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50)
@@ -267,8 +268,15 @@ with gr.Blocks(
                         )
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
-        with gr.Row():
-            roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"] if shared.enable_dirload else False, interactive=True, label="Roll from queues", show_label=True, visible=shared.enable_dirload)
+        with gr.Tab(label="GUI"):
+            with gr.Row():
+                gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True)
+                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True)
+                gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
+            with gr.Row():
+                roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
+                gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True)
+
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
         with gr.Row():
@@ -317,10 +325,10 @@ with gr.Blocks(
                         show_label=True,
                         )
 
-    with gr.Tab(label="Queues", elem_id="BigTabV2A"):
-        with gr.Tab(label="Queued galleries", elem_id="BigTabV2A") as tab_galleries:
+    with gr.Tab(label="Queues", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]) as tab_queues:
+        with gr.Tab(label="Queued galleries", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"]) as tab_queued_galleries:
 
-            with gr.Row(visible=shared.enable_queued_gallery):
+            with gr.Row():
                 with gr.Column():
                     source_txt_btn = gr.Button("OCR the main gallery")
                     source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
@@ -335,11 +343,11 @@ with gr.Blocks(
 
             queued_galleries = []
             for qg in range(1, shared.queued_gallery_slot_nb + 1):
-                with gr.Row(equal_height=False, visible=shared.enable_queued_gallery):
+                with gr.Row(equal_height=False):
                     with gr.Column(scale=10):
                         gal_ = gr.Gallery(
                             # value=None,
-                            value=shared.pv[f"queued_gallery_{qg:03d}"] if shared.enable_queued_gallery else None,
+                            value=shared.pv[f"queued_gallery_{qg:03d}"],
                             label=f"Gallery {qg}",
                             columns=[2],
                             rows=[1],
@@ -359,14 +367,13 @@ with gr.Blocks(
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
 
-        with gr.Tab(label="Queued audio", elem_id="BigTabV2A") as tab_dirload_queue:
+        with gr.Tab(label="Queued audio", elem_id="BigTabV2A", visible=shared.pv["enable_dirload"]) as tab_dirload_queue:
             queue_df = gr.Dataframe(
                     value=None,
                     type="pandas",
                     label="Queued audio",
                     interactive=False,
                     column_widths="5%",
-                    visible=shared.enable_dirload,
                     wrap=True,
                     height="2048",
                     )
@@ -433,6 +440,62 @@ with gr.Blocks(
     #                 )
 
     # events ############################################################
+
+    def save_and_load_gui(value: bool, name: str):
+        if name == "enable_dirload":
+            shared.pv[name] = value
+            return {
+                    accordion_gallery: gr.update(visible=value),
+                    tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
+                    }
+        elif name == "enable_gallery":
+            if value is False and shared.pv["enable_queued_gallery"]:
+                gr.Warning(red("You can't disable Gallery while Gallery Queue is enabled"))
+                return {gui_enable_gallery: False}
+            else:
+                shared.pv[name] = value
+                return {accordion_gallery: gr.update(visible=value)}
+        elif name == "enable_queued_gallery":
+            if value and not shared.pv["enable_gallery"]:
+                gr.Warning(red("You can't enable Gallery Queue if Gallery is not enabled"))
+                return {gui_enable_gallery: False}
+            else:
+                shared.pv[name] = value
+                return {
+                    roll_gall_btn: gr.update(visible=value),
+                    tab_queued_galleries: gr.update(visible=value),
+                    tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
+                    }
+        elif name == "enable_flagging":
+            shared.pv[name] = value
+            return {
+                flag_audio_btn: gr.update(visible=value),
+                }
+        else:
+            raise ValueError(name)
+
+    # update gui
+    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn]
+    gui_enable_dirload.input(
+            fn=partial(save_and_load_gui, name="enable_dirload"),
+            inputs=[gui_enable_dirload],
+            outputs=gui_outputs,
+            )
+    gui_enable_flagging.input(
+            fn=partial(save_and_load_gui, name="enable_flagging"),
+            inputs=[gui_enable_flagging],
+            outputs=gui_outputs,
+            )
+    gui_enable_queued_gallery.input(
+            fn=partial(save_and_load_gui, name="enable_queued_gallery"),
+            inputs=[gui_enable_queued_gallery],
+            outputs=gui_outputs,
+            )
+    gui_enable_gallery.input(
+            fn=partial(save_and_load_gui, name="enable_gallery"),
+            inputs=[gui_enable_gallery],
+            outputs=gui_outputs,
+            )
 
     # remove the last item from message buffer
     pop_buffer_btn.click(fn=pop_buffer)

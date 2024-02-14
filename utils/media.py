@@ -23,6 +23,7 @@ from .shared_module import shared
 @trace
 def get_image(gallery) -> List[gr.Gallery]:
     whi("Getting image from clipboard")
+    assert shared.pv["enable_gallery"], "Incoherent UI"
     try:
         # load from clipboard
         pasted = pyclip.paste()
@@ -77,6 +78,7 @@ def get_image(gallery) -> List[gr.Gallery]:
 def check_source(source: str) -> str:
     "makes sure the source is only an img"
     whi("Checking source")
+    assert shared.pv["enable_gallery"], "Incoherent UI"
     if source:
         soup = BeautifulSoup(source, 'html.parser')
         imgs = soup.find_all("img")
@@ -94,6 +96,7 @@ def check_source(source: str) -> str:
 @trace
 def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
     whi("Getting source from image")
+    assert shared.pv["enable_gallery"], "Incoherent UI"
 
     try:
         if hasattr(gallery, "root"):
@@ -173,6 +176,7 @@ def ocr_image(gallery) -> None:
 def reset_gallery() -> None:
     whi("Reset images.")
     shared.pv["gallery"] = None
+    assert shared.pv["enable_gallery"], "Incoherent UI"
 
 
 # @trace
@@ -256,12 +260,14 @@ def format_audio_component(audio: Union[str, gr.Audio]) -> str:
 def rgb_to_bgr(image):
     """gradio is turning cv2's BGR colorspace into RGB, so
     I need to convert it again"""
+    assert shared.pv["enable_gallery"], "Incoherent UI"
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
 @trace
 def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
     "pop the first future gallery and send it to the main gallery"
+    assert shared.pv["enable_queued_gallery"], "Incoherent UI"
     return list(fg) + [None]
 
 

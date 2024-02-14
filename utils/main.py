@@ -279,6 +279,7 @@ def flag_audio(
         gallery: Union[None, List, gr.Gallery],
         ) -> None:
     """copy audio in slot #1 to the user_directory/flagged folder"""
+    assert shared.pv["enable_flagging"], "Incoherent UI"
     # move audio file
     if not (shared.dirload_queue["loaded"] == True).any():
         raise Exception(red("No loaded files in shared.dirload_queue"))
@@ -670,6 +671,7 @@ def dirload_splitted(
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
+    assert shared.pv["enable_dirload"], "Incoherent UI"
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
         return audios
@@ -1146,10 +1148,11 @@ def to_anki(
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
     txt_source = None
-    if gallery is None or len(gallery) == 0:
+    if gallery is None or len(gallery) == 0 or shared.pv["enable_gallery"] is False:
         red("you should probably specify an image in source")
         txt_source = ""
     else:
+        assert shared.pv["enable_gallery"] is True, "Incoherent UI"
         thread = threading.Thread(
                 target=get_img_source,
                 args=(gallery, txt_source_queue)
