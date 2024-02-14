@@ -88,25 +88,27 @@ function shortcuts(e) {
 
         // roll 1 2 3
         else if (e.key == "&") {
-            document.getElementById("roll123").click();
+            document.getElementById("roll1").click();
         }
         else if (e.key == "é") {
             document.getElementById("roll12").click();
         }
         else if (e.key == '"') {
-            document.getElementById("roll1").click();
+            document.getElementById("roll123").click();
         }
 
         // 123
         else if (e.key == "3" && e.shiftKey) {
-            document.getElementById("transcribebtn").click();
+            document.getElementById("toankibtn").click();
         }
         else if (e.key == "2" && e.shiftKey) {
             document.getElementById("transcriptbtn").click();
         }
         else if (e.key == "1" && e.shiftKey) {
-            document.getElementById("toankibtn").click();
+            document.getElementById("transcribebtn").click();
         }
+
+        // unfocus
         else if (e.key == 'Escape' || e.keyCode == 27) {
             document.body.focus();
             document.documentElement.focus();
@@ -118,6 +120,7 @@ function shortcuts(e) {
             document.getElementById("rollgallbtn").click();
         }
 
+        // no shortcut found
         else {
             alert(`Unrecognized shortcut: ${e.key}`);
             }
