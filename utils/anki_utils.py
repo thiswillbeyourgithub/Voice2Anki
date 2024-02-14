@@ -277,7 +277,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
-        state = await async_call_anki(action="findCards", query=query)
+        state = await async_call_anki(action="findNotes", query=query)
         if state:
             return "Added"
         else:
@@ -294,16 +294,57 @@ async def sync_anki() -> None:
 
 
 @trace
-async def mark_previous_note() -> None:
-    "add the tag 'marked' to the latest added card."
+async def mark_previous_notes() -> None:
+    "add the tag 'marked' to the latest added notes."
     if not shared.added_note_ids:
-        raise Exception(red("No card ids found."))
-    pc = shared.added_note_ids[-1]
+        raise Exception(red("No note ids found."))
+    nids = shared.added_note_ids[-1]
     await async_call_anki(
             action="addTags",
-            notes=pc,
+            notes=nids,
             tags="marked",
             )
+
+
+@trace
+async def suspend_previous_notes() -> None:
+    "suspend the latest added notes."
+    if not shared.added_note_ids:
+        raise Exception(red("No note ids found."))
+    nids = shared.added_note_ids[-1]
+    nids = [str(n) for n in nids]
+    cids = await async_call_anki(
+            action="findCards",
+            query="nid:" + ",".join(nids),
+            )
+    assert cids, "No card ids found for the given note ids: {','.join(nids)}"
+    status = await async_call_anki(
+            action="areSuspended",
+            cards=cids,
+            )
+    if all(status):
+        gr.Warning(red(f"Previous notes already suspended so UNsuspending them"))
+        out = await async_call_anki(
+                action="unsuspend",
+                cards=cids)
+        assert not any(
+                await async_call_anki(
+                    action="areSuspended",
+                    cards=cids,
+                    )
+                ), f"Cards failed to unsuspend?"
+    else:
+        gr.Warning(red(f"Suspending notes nid:{','.join(nids)}"))
+        out = await async_call_anki(
+                action="suspend",
+                cards=cids)
+        assert out, f"Unexpected result from anki: {out} for nids {','.join(nids)}"
+        assert all(
+                await async_call_anki(
+                    action="areSuspended",
+                    cards=cids,
+                    )
+                ), "cards failed to suspend?"
 
 
 # @trace

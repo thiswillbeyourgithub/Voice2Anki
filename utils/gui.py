@@ -6,7 +6,7 @@ from gradio.themes.utils import sizes as theme_size
 
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
-from .anki_utils import sync_anki, get_card_status, mark_previous_note, get_anki_tags, get_decks
+from .anki_utils import sync_anki, get_card_status, mark_previous_notes, suspend_previous_notes, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
@@ -181,7 +181,8 @@ with gr.Blocks(
 
         with gr.Row():
             mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
-            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next card", show_label=True)
+            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
+            suspend_previous = gr.Button(value="Toggle suspend previous")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
@@ -576,9 +577,15 @@ with gr.Blocks(
     tab_logging.select(fn=get_log, outputs=[output_elem])
     logging_reload.click(fn=get_log, outputs=[output_elem])
 
-    # mark the previous card
+    # mark the previous car
     mark_previous.click(
-            fn=mark_previous_note,
+            fn=mark_previous_notes,
+            show_progress=False,
+            )
+
+    # suspend the previous cards
+    suspend_previous.click(
+            fn=suspend_previous_notes,
             show_progress=False,
             )
 
