@@ -34,6 +34,14 @@ document.querySelector('body').classList.add('dark');
 
 shortcut_js = """
 <script>
+
+function unfocus(e) {
+    document.activeElement.blur();
+    document.body.focus();
+    document.documentElement.focus();
+    e.preventDefault();  // make sure to avoid scrolling up
+}
+
 function shortcuts(e) {
     // the switch is so that keypress are ignored if an input element is
     // in focus
@@ -43,15 +51,8 @@ function shortcuts(e) {
         // unselect anything by pressing shift+space or escape
         case "input":
         case "textarea":
-            if (e.code == 'Space' && e.shiftKey) {
-                document.activeElement.blur();
-                document.documentElement.focus();
-                document.body.focus();
-            }
-            else if (e.key == 'Escape' || e.keyCode == 27) {
-                document.activeElement.blur();
-                document.body.focus();
-                document.documentElement.focus();
+            if ((e.code == 'Space' && e.shiftKey) || (e.key == 'Escape') || (e.keyCode == 27)) {
+                unfocus(e);
             }
 
         //case "select":
@@ -80,9 +81,11 @@ function shortcuts(e) {
 
         // select text
         else if (e.key == "e") {
+            e.preventDefault();  // dont type the e
             document.getElementById("txtchatgpt").children[0].focus();
         }
         else if (e.code == "KeyE" && e.shiftKey) {
+            e.preventDefault();  // dont type the e
             document.getElementById("txtwhisper").children[0].focus();
         }
 
@@ -108,16 +111,26 @@ function shortcuts(e) {
             document.getElementById("transcribebtn").click();
         }
 
-        // unfocus
-        else if (e.key == 'Escape' || e.keyCode == 27) {
-            document.body.focus();
-            document.documentElement.focus();
-        }
-
         // roll gallery
         else if (e.code == 'KeyG' && e.shiftKey) {
             alert("Rolling gallery");
             document.getElementById("rollgallbtn").click();
+        }
+
+        // dirload
+        else if (e.code == 'KeyD' && e.shiftKey) {
+            alert("Loading from dir");
+            document.getElementById("dirloadbtn").click();
+        }
+
+        // unfocus
+        else if ((e.code == 'Space' && e.shiftKey) || (e.key == 'Escape') || (e.keyCode == 27)) {
+            unfocus(e);
+        }
+
+        // ignore space
+        else if ((e.code == 'Space' && e.shiftKey) || (e.code == 'Space')) {
+            // do nothing
         }
 
         // no shortcut found
@@ -167,7 +180,7 @@ with gr.Blocks(
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1)
-            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5)
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="dirloadbtn")
 
         # audio
         audio_number = shared.audio_slot_nb
