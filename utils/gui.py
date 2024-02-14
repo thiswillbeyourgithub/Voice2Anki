@@ -317,27 +317,6 @@ with gr.Blocks(
                         show_label=True,
                         )
 
-    with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A") as tab_memories_and_buffer:
-        with gr.Tab(label="Memories", elem_id="BigTabV2A") as tab_memories:
-            df_memories = gr.Dataframe(
-                    label="Saved memories",
-                    value=None,
-                    interactive=False,
-                    column_widths="5%",
-                    wrap=True,
-                    height="2048",
-                    )
-
-        with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
-            df_buffer = gr.Dataframe(
-                    label="Message buffer",
-                    value=None,
-                    interactive=False,
-                    column_widths="5%",
-                    wrap=True,
-                    height="2048",
-                    )
-
     with gr.Tab(label="Queues", elem_id="BigTabV2A"):
         with gr.Tab(label="Queued galleries", elem_id="BigTabV2A") as tab_galleries:
 
@@ -397,6 +376,27 @@ with gr.Blocks(
             logging_reload = gr.Button(value="Refresh")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
+
+    with gr.Tab(label="Memories & Buffer", elem_id="BigTabV2A") as tab_memories_and_buffer:
+        with gr.Tab(label="Memories", elem_id="BigTabV2A") as tab_memories:
+            df_memories = gr.Dataframe(
+                    label="Saved memories",
+                    value=None,
+                    interactive=False,
+                    column_widths="5%",
+                    wrap=True,
+                    height="2048",
+                    )
+
+        with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
+            df_buffer = gr.Dataframe(
+                    label="Message buffer",
+                    value=None,
+                    interactive=False,
+                    column_widths="5%",
+                    wrap=True,
+                    height="2048",
+                    )
 
     # with gr.Tab(label="Files", elem_id="BigTabV2A") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
