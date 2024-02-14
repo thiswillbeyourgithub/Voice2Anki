@@ -1184,10 +1184,13 @@ def to_anki(
 
     # mention in the metadata the original mp3 name
     if not shared.dirload_queue.empty:
-        row = shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.endswith(audio_mp3_oname)==True]
-        assert not row.empty, f"Empty for for {audio_mp3_1}"
-        assert len(row) == 1, f"More than one audio found in dirload_queue for {audio_mp3_1}"
-        metadata["original_mp3_path"] = row.reset_index()["path"].tolist()[0]
+        audio_row = shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.endswith(audio_mp3_oname)==True]
+        if audio_row.empty:
+            # the ' can be stripped from the original path
+            audio_row = shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.replace("'", "").str.endswith(audio_mp3_oname)==True]
+        assert not audio_row.empty, f"Empty for for {audio_mp3_1}\nThe temp_path present were {shared.dirload_queue['temp_path'].tolist()}"
+        assert len(audio_row) == 1, f"More than one audio found in dirload_queue for {audio_mp3_1}"
+        metadata["original_mp3_path"] = audio_row.reset_index()["path"].tolist()[0]
 
     whi("Sending to anki:")
 
@@ -1217,8 +1220,9 @@ def to_anki(
     else:
         txt_extra_source = txt_extra_source.strip()
 
-    with shared.dirload_lock:
-        shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.endswith(audio_mp3_oname)==True, "ankified"] = "started"
+    if not shared.dirload_queue.empty:
+        with shared.dirload_lock:
+            audio_row["ankified"] = "started"
 
     # if the txt_audio contains multiple cloze, either the number of created
     # cloze correspond to the number of sections in txt_audio, then the
@@ -1248,8 +1252,9 @@ def to_anki(
     if not len(results) == len(clozes):
         gather_threads(["audio_to_anki", "ocr"])
         raise Exception(red(f"Some flashcards were not added:{','.join(errors)}"))
-    with shared.dirload_lock:
-        shared.dirload_queue.loc[shared.dirload_queue["temp_path"] == str(audio_mp3_1), "ankified"] = True
+    if not shared.dirload_queue.empty:
+        with shared.dirload_lock:
+            audio_row["ankified"] = True
 
     whi("Finished adding card.\n\n")
 
