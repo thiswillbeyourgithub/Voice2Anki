@@ -90,6 +90,7 @@ def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool
         red(f"Error when checking validity of embeddings: {err}")
         raise
 
+@trace
 def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
