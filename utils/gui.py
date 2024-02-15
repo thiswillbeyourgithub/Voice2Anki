@@ -272,7 +272,7 @@ with gr.Blocks(
 
             with gr.Row():
                 flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"])
-                force_sound_processing_btn = gr.Button(value="Sound processing")
+                force_sound_processing_btn = gr.Button(value="Extra sound processing")
                 clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
 
