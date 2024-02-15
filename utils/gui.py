@@ -1216,15 +1216,15 @@ with gr.Blocks(
                     inputs=btn_chains,
                     outputs=btn_chains,
                     )
-    gr.on(
-            triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
-            fn=update_audio_slots_txts,
-            inputs=audio_slots_txts,
-            outputs=audio_slots_txts,
-            show_progress=False,
-            postprocess=False,
-            preprocess=False,
-            )
+    # gr.on(
+    #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
+    #         fn=update_audio_slots_txts,
+    #         inputs=audio_slots_txts,
+    #         outputs=audio_slots_txts,
+    #         show_progress=False,
+    #         postprocess=False,
+    #         preprocess=False,
+    #         )
     init.then(
             fn=update_audio_slots_txts,
             inputs=audio_slots_txts,
@@ -1232,8 +1232,8 @@ with gr.Blocks(
             show_progress=False,
             postprocess=False,
             preprocess=False,
-            every=1,
-            trigger_mode="always_last",
+            every=0.25,
+            trigger_mode="once",
             )
     init.then(
             fn=sync_anki,
