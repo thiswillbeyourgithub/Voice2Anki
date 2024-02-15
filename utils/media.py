@@ -339,9 +339,10 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
         return ["Dirload not yet loaded" for i in audio_slots_txts]
 
     # exit quickly if not modified since last time
-    elif df._modtime < df._checktime:
+    elif df.attrs["modtime"] < df.attrs["checktime"]:
+        whi("3")
         return audio_slots_txts
-    df._checktime = time.time()
+    df.attrs["checktime"] = time.time()
 
     try:
         df = df[df["loaded"] == True]
