@@ -304,7 +304,11 @@ async def mark_previous_notes() -> None:
             notes=nids,
             tags="marked",
             )
-    gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}"))
+
+    bodies = get_anki_content(nid=nids)
+    bodies = "* " + "\n* ".join(bodies)
+
+    gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
 
 
 @trace
@@ -323,8 +327,11 @@ async def suspend_previous_notes() -> None:
             action="areSuspended",
             cards=cids,
             )
+
+    bodies = get_anki_content(nid=nids)
+    bodies = "* " + "\n* ".join(bodies)
     if all(status):
-        gr.Warning(red(f"Previous notes already suspended so UNsuspending them"))
+        gr.Warning(red(f"Previous notes already suspended so UNsuspending them:\n{bodies}"))
         out = await async_call_anki(
                 action="unsuspend",
                 cards=cids)
@@ -335,7 +342,7 @@ async def suspend_previous_notes() -> None:
                     )
                 ), f"Cards failed to unsuspend?"
     else:
-        gr.Warning(red(f"Suspending notes nid:{','.join(nids)}"))
+        gr.Warning(red(f"Suspending notes nid:{','.join(nids)} with bodies:\n{bodies}"))
         out = await async_call_anki(
                 action="suspend",
                 cards=cids)
@@ -346,6 +353,21 @@ async def suspend_previous_notes() -> None:
                     cards=cids,
                     )
                 ), "cards failed to suspend?"
+
+
+def get_anki_content(nid: List[Union[str, int]]) -> str:
+    "retrieve the content of the body of an anki note"
+    nid = [int(n) for n in nid]
+    infos = call_anki(
+            action="notesInfo",
+            notes=nid,
+            )
+    if all("body" in inf["fields"] for inf in infos):
+        return [inf["fields"]["body"]["value"] for inf in infos]
+    else:
+        fields = infos[0]["fields"]
+        first_field = [f for f in fields if f["order"]==0]
+        return [inf["fields"][first_field]["value"] for inf in infos]
 
 
 # @trace
