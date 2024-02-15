@@ -511,6 +511,8 @@ def alfred(
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
         raise Exception(red("No transcribed audio found."))
+    if txt_audio.count(" ") < 5:
+        raise Exception(red(f"Too few words in txt_audio to be plausible"))
     if txt_audio.strip().startswith("Error"):
         raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
