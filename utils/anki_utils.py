@@ -295,20 +295,32 @@ async def sync_anki() -> None:
 
 @trace
 async def mark_previous_notes() -> None:
-    "add the tag 'marked' to the latest added notes."
+    "add or remove the tag 'marked' to the latest added notes."
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
-    await async_call_anki(
-            action="addTags",
-            notes=nids,
-            tags="marked",
-            )
 
     bodies = get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
 
-    gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
+    current = [await async_call_anki(
+        action="getNoteTags",
+        note=int(n)) for n in nids]
+
+    if all("marked" in t for t in current):
+        await async_call_anki(
+                action="removeTags",
+                notes=nids,
+                tags="marked",
+                )
+        gr.Warning(red(f"Note ids were already marked. Unmarking them.\nBodies:\n{bodies}"))
+    else:
+        await async_call_anki(
+                action="addTags",
+                notes=nids,
+                tags="marked",
+                )
+        gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
 
 
 @trace
