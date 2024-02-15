@@ -540,7 +540,7 @@ def alfred(
         splits = txt_audio.split("#####")
         splits = [sp.strip() for sp in splits if sp.strip()]
         if len(splits) == 1:
-            gr.Error(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
+            gr.Warning(red(f"Found only 1 split in '{txt_audio}' which is '{splits[0]}'"))
             txt_audio = splits[0]
         else:
             answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, prompt_management, cache_mode))

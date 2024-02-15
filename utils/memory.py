@@ -449,16 +449,16 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
 def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, llm_choice):
     whi("Recursively improving")
     if not txt_audio:
-        gr.Error(red("No audio transcripts found."))
+        raise Exception(red("No audio transcripts found."))
         return
     if not txt_chatgpt_outputstr:
-        gr.Error(red("No chatgpt output string found."))
+        raise Exception(red("No chatgpt output string found."))
         return
     if "\n" in txt_chatgpt_outputstr:
         whi("Replaced newlines in txt_chatgpt_outputstr")
         txt_chatgpt_outputstr = txt_chatgpt_outputstr.replace("\n", "<br/>")
     if "#####" in txt_audio or "\n\n" in txt_audio:
-        gr.Error(red("You can't memorize a prompt that was automatically split."))
+        raise Exception(red("You can't memorize a prompt that was automatically split."))
         return
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
@@ -486,8 +486,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
                 "hash": hasher(content),
                 }
         if to_add["hash"] in [pp["hash"] for pp in prev_prompts]:
-            gr.Warning(red("This prompt is already present in the memory!"))
-            return
+            raise Exception(red("Prompt already in the memory.json!"))
         prev_prompts.append(to_add)
 
         prev_prompts = check_prompts(prev_prompts)
@@ -495,7 +494,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         with open(f"profiles/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
     except Exception as err:
-        gr.Warning(red(f"Error during recursive improvement: '{err}'"))
+        raise Exception(red(f"Error during recursive improvement: '{err}'"))
         return
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
@@ -531,7 +530,7 @@ def display_price(sld_max_tkn, llm_choice):
 def get_memories_df(profile):
     memories = load_prev_prompts(profile)
     if not memories:
-        gr.Warning(f"No memories found for profile {profile}")
+        gr.Warning(red(f"No memories found for profile {profile}"))
         return pd.DataFrame()
     for i in range(len(memories)):
         memories[i]["n"] = i + 1
@@ -542,7 +541,7 @@ def get_memories_df(profile):
 def get_message_buffer_df():
     buffer = shared.message_buffer
     if not buffer:
-        gr.Warning("No message buffer found")
+        gr.Warning(red("No message buffer found"))
         return pd.DataFrame()
     for i in range(len(buffer)):
         buffer[i]["n"] = i + 1
