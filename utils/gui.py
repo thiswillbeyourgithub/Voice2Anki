@@ -64,7 +64,7 @@ function shortcuts(e) {
             //document.getElementById("syncankibtn").click();
             document.getElementById("suspendpreviousbtn").click();
         }
-        else if (e.key == ';' && e.shiftKey) {
+        else if (e.code == 'Semicolon' && e.shiftKey) {
             document.getElementById("markpreviousbtn").click();
         }
         else if (e.key == "s") {

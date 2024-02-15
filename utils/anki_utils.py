@@ -304,6 +304,7 @@ async def mark_previous_notes() -> None:
             notes=nids,
             tags="marked",
             )
+    gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}"))
 
 
 @trace
