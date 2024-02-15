@@ -227,9 +227,9 @@ def force_sound_processing(audio_mp3: dict) -> str:
             )
 
     # write to file as wav
-    sf.write(str(audio_mp3), waveform.numpy().T, sample_rate, format='wav')
-    temp = AudioSegment.from_wav(audio_mp3)
     new_path = Path(audio_mp3).parent / (Path(audio_mp3).stem + "_fproc" + Path(audio_mp3).suffix)
+    sf.write(str(new_path), waveform.numpy().T, sample_rate, format='wav')
+    temp = AudioSegment.from_wav(audio_mp3)
     temp.export(new_path, format="mp3")
 
     whi(f"Done forced preprocessing {audio_mp3} to {new_path}")
