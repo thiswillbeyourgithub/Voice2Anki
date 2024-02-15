@@ -753,7 +753,7 @@ with gr.Blocks(
                 fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                 inputs=[gal_],
                 show_progress=False,
-                queue=True,
+                # queue=True,
                 )
 
         # for the first gallery only: run ocr in advance
