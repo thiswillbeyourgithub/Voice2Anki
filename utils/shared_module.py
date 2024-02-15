@@ -13,15 +13,11 @@ col_rst = "\033[0m"
 class DF(pd.DataFrame):
     """Pandas DataFrame but forbid new column creation
     This is to make sure no bugs happened silently
-    Also: stores the last modif time and the last check time, useful for
-    frequent checking like updating the audio_slot_txts"""
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        super().attrs["modtime"] = -1
-        super().attrs["checktime"] = -1
     def __setitem__(self, key, value):
         if key in self.columns:
-            super().attrs["modtime"] = time.time()
             super().__setitem__(key, value)
         else:
             raise ValueError(f"Adding new columns is not allowed: key={key} value={value}")
