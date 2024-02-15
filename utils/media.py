@@ -330,10 +330,20 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription and cloze
     """
+    if shared.pv["enable_dirload"] is False:
+        # the components are invisible so return None
+        return [None for i in audio_slots_txts]
+
+    df = shared.dirload_queue
+    if df.empty:
+        return ["Dirload not yet loaded" for i in audio_slots_txts]
+
+    # exit quickly if not modified since last time
+    elif df._modtime < df._checktime:
+        return audio_slots_txts
+    df._checktime = time.time()
+
     try:
-        df = shared.dirload_queue
-        if df.empty:
-            return ["Empty df" for i in audio_slots_txts]
         df = df[df["loaded"] == True]
         if df.empty:
             return ["Empty" for i in audio_slots_txts]

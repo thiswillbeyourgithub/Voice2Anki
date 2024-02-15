@@ -1,3 +1,4 @@
+import time
 import os
 import tempfile
 from pathlib import Path
@@ -10,12 +11,22 @@ col_red = "\033[91m"
 col_rst = "\033[0m"
 
 class DF(pd.DataFrame):
-    "Pandas DataFrame but forbid new column creation"
+    """Pandas DataFrame but forbid new column creation
+    This is to make sure no bugs happened silently
+    Also: stores the last modif time and the last check time, useful for
+    frequent checking like updating the audio_slot_txts"""
+    _modtime = -1
+    _checktime = -1
+
     def __setitem__(self, key, value):
+        if key == "_checktime":
+            self._modtime = time.time()
+            return
+
         if key in self.columns:
             super().__setitem__(key, value)
         else:
-            raise ValueError("Adding new columns is not allowed")
+            raise ValueError(f"Adding new columns is not allowed: key={key} value={value}")
 
 
 class SharedModule:
