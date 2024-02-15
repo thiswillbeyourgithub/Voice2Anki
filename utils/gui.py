@@ -847,50 +847,50 @@ with gr.Blocks(
             queue=False,
             show_progress=False,
             ).success(
-                    # rotate texts too
-                    fn=lambda *x: [None] + list(x)[:-1],
-                    inputs=audio_slots_txts,
-                    outputs=audio_slots_txts,
+                    # # roll texts too
+                    # fn=lambda *x: [None] + list(x)[:-1],
+                    # inputs=audio_slots_txts,
+                    # outputs=audio_slots_txts,
+                    # ).success(
+                    fn=transcribe,
+                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                    outputs=[txt_audio],
+                    preprocess=False,
+                    postprocess=False,
+                    queue=False,
+                    ).then(
+                        lambda: None,
+                        outputs=[txt_chatgpt_cloz],
                     ).success(
-                            fn=transcribe,
-                            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                            outputs=[txt_audio],
-                            preprocess=False,
-                            postprocess=False,
-                            queue=False,
-                            ).then(
-                                lambda: None,
-                                outputs=[txt_chatgpt_cloz],
-                            ).success(
-                                    fn=dirload_splitted_last,
-                                    inputs=[
-                                        roll_dirload_check,
-                                        txt_whisp_prompt,
-                                        txt_whisp_lang,
-                                        sld_whisp_temp,
+                            fn=dirload_splitted_last,
+                            inputs=[
+                                roll_dirload_check,
+                                txt_whisp_prompt,
+                                txt_whisp_lang,
+                                sld_whisp_temp,
 
-                                        txt_chatgpt_context,
-                                        txt_profile,
-                                        sld_max_tkn,
-                                        sld_temp,
-                                        sld_buffer,
-                                        llm_choice,
-                                        txt_keywords,
-                                        prompt_manag,
-                                        ],
-                                    outputs=[audio_slots[-1]],
+                                txt_chatgpt_context,
+                                txt_profile,
+                                sld_max_tkn,
+                                sld_temp,
+                                sld_buffer,
+                                llm_choice,
+                                txt_keywords,
+                                prompt_manag,
+                                ],
+                            outputs=[audio_slots[-1]],
+                            preprocess=False,
+                            postprocess=True,
+                            queue=False,
+                            show_progress=False,
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[update_status_btn],
+                                    # queue=True,
                                     preprocess=False,
-                                    postprocess=True,
-                                    queue=False,
-                                    show_progress=False,
-                                    ).then(
-                                            fn=get_card_status,
-                                            inputs=[txt_chatgpt_cloz],
-                                            outputs=[update_status_btn],
-                                            # queue=True,
-                                            preprocess=False,
-                                            postprocess=False,
-                                            )
+                                    postprocess=False,
+                                    )
     rollaudio_12_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -1216,15 +1216,24 @@ with gr.Blocks(
                     inputs=btn_chains,
                     outputs=btn_chains,
                     )
+    gr.on(
+            triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
+            fn=update_audio_slots_txts,
+            inputs=audio_slots_txts,
+            outputs=audio_slots_txts,
+            show_progress=False,
+            postprocess=False,
+            preprocess=False,
+            )
     init.then(
             fn=update_audio_slots_txts,
             inputs=audio_slots_txts,
             outputs=audio_slots_txts,
-            every=0.25,
             show_progress=False,
             postprocess=False,
             preprocess=False,
-            trigger_mode="once",
+            every=1,
+            trigger_mode="always_last",
             )
     init.then(
             fn=sync_anki,
