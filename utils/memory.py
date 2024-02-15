@@ -458,7 +458,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         whi("Replaced newlines in txt_chatgpt_outputstr")
         txt_chatgpt_outputstr = txt_chatgpt_outputstr.replace("\n", "<br/>")
     if "#####" in txt_audio or "\n\n" in txt_audio:
-        gr.Error(red(f"You can't memorize a prompt that was automatically split."))
+        gr.Error(red("You can't memorize a prompt that was automatically split."))
         return
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
