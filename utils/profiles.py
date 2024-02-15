@@ -144,6 +144,7 @@ class ValueStorage:
         if prev_q is None:
             prev_q_val = True
         while prev_q is not None:
+            assert self.thread.is_alive(), "Saving thread appears to be dead!"
             prev_q = self.running_tasks[key]
             try:
                 # Waits for X seconds, otherwise throws `Queue.Empty`
@@ -216,6 +217,7 @@ class ValueStorage:
             if prev_q is None:
                 prev_q_val = True
             while prev_q is not None:
+                assert self.thread.is_alive(), "Saving thread appears to be dead!"
                 prev_q = self.running_tasks[key]
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
@@ -307,7 +309,6 @@ def worker_setitem(in_queue):
                     out_queue.put(True)
                 except Exception as err:
                     out_queue.put(f"Error when setting {kf}: '{err}'")
-                    raise Exception(f"Error when setting {kf}: '{err}'")
 
 
 # @trace
