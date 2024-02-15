@@ -1200,9 +1200,9 @@ with gr.Blocks(
                 sld_improve,
                 llm_choice,
                 ],
-            preprocess=False,
-            postprocess=False,
-            queue=False,
+            # preprocess=False,
+            # postprocess=False,
+            # queue=False,
             show_progress=False,
             )
 
