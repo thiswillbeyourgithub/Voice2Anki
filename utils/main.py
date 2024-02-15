@@ -511,8 +511,6 @@ def alfred(
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
     if not txt_audio:
         raise Exception(red("No transcribed audio found."))
-    if txt_audio.count(" ") < 5:
-        raise Exception(red(f"Too few words in txt_audio to be plausible"))
     if txt_audio.strip().startswith("Error"):
         raise Exception(red("Error when transcribing sound."))
     if not txt_chatgpt_context:
@@ -526,6 +524,8 @@ def alfred(
         else:
             # gr.Error(mess)
             return red(mess)
+    if txt_audio.count(" ") < 5:
+        return red(f"Too few words in txt_audio to be plausible")
 
     if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
