@@ -488,6 +488,7 @@ with gr.Blocks(
             outdict = {
                     accordion_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
+                    dir_load_btn: gr.update(visible=value),
                     }
             for ast in audio_slots_txts:
                 outdict[ast] = gr.update(visible=value)
