@@ -485,10 +485,13 @@ with gr.Blocks(
     def save_and_load_gui(value: bool, name: str):
         if name == "enable_dirload":
             shared.pv[name] = value
-            return {
+            outdict = {
                     accordion_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     }
+            for ast in audio_slots_txts:
+                outdict[ast] = gr.update(visible=value)
+            return outdict
         elif name == "enable_gallery":
             if value is False and shared.pv["enable_queued_gallery"]:
                 gr.Warning(red("You can't disable Gallery while Gallery Queue is enabled"))
@@ -516,7 +519,7 @@ with gr.Blocks(
             raise ValueError(name)
 
     # update gui
-    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn]
+    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn] + audio_slots_txt
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],
