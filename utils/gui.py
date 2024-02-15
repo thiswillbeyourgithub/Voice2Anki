@@ -1219,7 +1219,7 @@ with gr.Blocks(
             fn=update_audio_slots_txts,
             inputs=audio_slots_txts,
             outputs=audio_slots_txts,
-            every=0.1,
+            every=0.25,
             show_progress=False,
             postprocess=False,
             preprocess=False,
