@@ -182,7 +182,7 @@ with gr.Blocks(
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1)
-            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="dirloadbtn")
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="dirloadbtn", visible=shared.pv["enable_dirload"])
 
         # audio
         audio_number = shared.audio_slot_nb
@@ -191,7 +191,7 @@ with gr.Blocks(
         for i in range(audio_number):
                 audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", show_label=True, render=False)
                 audio_slots.append(audio_mp3)
-                audio_slots_txt = gr.Textbox(lines=10, max_lines=10, container=False, interactive=False, scale=2, render=False)
+                audio_slots_txt = gr.Textbox(lines=10, max_lines=10, container=False, interactive=False, scale=2, render=False, visible=shared.pv["enable_dirload"])
                 audio_slots_txts.append(audio_slots_txt)
         # rendering afterwards to reverse the order
         for aud, t in zip(audio_slots[::-1], audio_slots_txts[::-1]):
