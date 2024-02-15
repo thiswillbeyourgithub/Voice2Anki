@@ -18,10 +18,10 @@ except:
     from shared_module import shared
 
 profile_keys = {
-        "enable_gallery": {"default": False},
-        "enable_queued_gallery": {"default": False},
-        "enable_flagging": {"default": False},
-        "enable_dirload": {"default": False},
+        "enable_gallery": {"default": False, "type": bool}},
+        "enable_queued_gallery": {"default": False, "type": bool}},
+        "enable_flagging": {"default": False, "type": bool}},
+        "enable_dirload": {"default": False, "type": bool},
         "sld_max_tkn": {"default": 3500},
         "sld_buffer": {"default": 0},
         "sld_temp": {"default": 0.0, "type": float},
