@@ -170,9 +170,9 @@ class AudioSplitter:
             assert self.stop_source != "local_json", (
                 "can't use local_json stop source and remove_silence")
             for i, file in enumerate(tqdm(self.to_split, unit="file")):
-                if "_unsilenced" not in str(file):
+                if "_uns" not in str(file):
                     new_filename = self.unsilence_audio(file)
-                    assert "_unsilenced" in str(new_filename), "error"
+                    assert "_uns" in str(new_filename), "error"
                     self.to_split[i] = new_filename
 
         # contains the original file path, while self.to_split will contain
@@ -868,7 +868,7 @@ class AudioSplitter:
         whi(f"Removing silence from {file}")
 
         audio = AudioSegment.from_mp3(file)
-        new_filename = file.parent / (file.stem + "_unsilenced" + file.suffix)
+        new_filename = file.parent / (file.stem + "_uns" + file.suffix)
         previous_len = len(audio) // 1000
 
         # pydub's way (very slow)
