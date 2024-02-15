@@ -87,9 +87,12 @@ def whisper_cached(
         txt_whisp_prompt = None
     if txt_whisp_lang.strip() == "":
         txt_whisp_lang = None
-    len_audio = len(AudioSegment.from_mp3(audio_path)) // 1000
-    if len_audio <= 1:
-        red(f"Very short audio under 1s sent to whisper! (length={len_audio:.2f}s)")
+    try:
+        len_audio = len(AudioSegment.from_mp3(audio_path)) // 1000
+        if len_audio <= 1:
+            red(f"Very short audio under 1s sent to whisper! (length={len_audio:.2f}s)")
+    except Exception as err:
+        red(f"Error when trying to see if audio is too short but will continue nonetheless with whisper.\nError: {err}")
     try:
         cnt = 0
         while True:
