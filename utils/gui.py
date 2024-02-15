@@ -654,15 +654,12 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             )
-    # txt_chatgpt_cloz.change(
-    #         fn=get_card_status,
-    #         inputs=[txt_chatgpt_cloz],
-    #         outputs=[update_status_btn],
-    #         # queue=False,
-    #         # show_progress=True,
-    #         # every=2,
-    #         # trigger_mode="once",
-    #         )
+    txt_chatgpt_cloz.input(
+            fn=lambda: "?",
+            outputs=[update_status_btn],
+            preprocess=False,
+            postprocess=False,
+            )
 
 
     # display pricing then save values
