@@ -220,7 +220,7 @@ with gr.Blocks(
                 anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="toankibtn")
 
         with gr.Row():
-            mark_previous = gr.Button(value="Mark previous", elem_id="markpreviousbtn")
+            mark_previous = gr.Button(value="Toggle mark previous", elem_id="markpreviousbtn")
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
             suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="suspendpreviousbtn")
 
