@@ -1,3 +1,4 @@
+import time
 import os
 import json
 import threading
@@ -94,6 +95,8 @@ class ValueStorage:
         self.running_tasks = {k: None for k in profile_keys}
         self.cache_values = {k: None for k in profile_keys}
 
+        self.time_limit = 10  # number of seconds to wait for a queue
+
         self.profile_name = profile
         whi(f"Profile loaded: {self.p.name}")
         assert self.p.exists(), f"{self.p} not found!"
@@ -143,8 +146,14 @@ class ValueStorage:
         prev_q = self.running_tasks[key]
         if prev_q is None:
             prev_q_val = True
+        start = time.time()
         while prev_q is not None:
             assert self.thread.is_alive(), "Saving thread appears to be dead!"
+            elapsed = time.time() - start
+            if elapsed > self.time_limit:
+                red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
+                prev_q_val = True
+                break
             prev_q = self.running_tasks[key]
             try:
                 # Waits for X seconds, otherwise throws `Queue.Empty`
@@ -155,6 +164,7 @@ class ValueStorage:
                 break
             except queue.Empty:
                 red(f"Waiting for {key} queue to output in getitem")
+                assert prev_q_val is True
         if prev_q_val is not True:
             assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
             raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
@@ -216,8 +226,14 @@ class ValueStorage:
             prev_q = self.running_tasks[key]
             if prev_q is None:
                 prev_q_val = True
+            start = time.time()
             while prev_q is not None:
                 assert self.thread.is_alive(), "Saving thread appears to be dead!"
+                elapsed = time.time() - start
+                if elapsed > self.time_limit:
+                    red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
+                    prev_q_val = True
+                    break
                 prev_q = self.running_tasks[key]
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
@@ -228,6 +244,7 @@ class ValueStorage:
                     break
                 except queue.Empty:
                     red(f"Waiting for {key} queue to output in setitem")
+                    assert prev_q_val is True
             if prev_q_val is not True:
                 assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
                 raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
