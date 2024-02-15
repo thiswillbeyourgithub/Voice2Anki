@@ -97,6 +97,7 @@ def get_coloured_logger(color_asked: str) -> Callable:
     # all logs are considered "errors" otherwise the datascience libs just
     # overwhelm the logs
     def printer(string: str, **args) -> str:
+        inp = string
         if isinstance(string, dict):
             try:
                 string = rtoml.dumps(string, pretty=True)
@@ -116,7 +117,7 @@ def get_coloured_logger(color_asked: str) -> Callable:
                 string = string.__repr__()
         log.info(string)
         tqdm.write(col + string + colors["reset"], **args)
-        return string
+        return inp
     return printer
 
 def get_log() -> str:
