@@ -501,11 +501,11 @@ class AudioSplitter:
                     assert not out_file.exists(), f"File {out_file} already exists!"
                     ignored.export(out_file, format="mp3")
 
-            # rename to replace HASH by its hash
-            with open(out_file, "rb") as f:
-                h = hashlib.md5(f.read()).hexdigest()[:10]
-            assert str(out_file.absolute()).count("HASH") == 1, f"Unexpected name: {out_file}"
-            shutil.move(out_file, str(out_file.absolute()).replace("HASH", h))
+                    # rename to replace HASH by its hash
+                    with open(out_file, "rb") as f:
+                        h = hashlib.md5(f.read()).hexdigest()[:10]
+                    assert str(out_file.absolute()).count("HASH") == 1, f"Unexpected name: {out_file}"
+                    shutil.move(out_file, str(out_file.absolute()).replace("HASH", h))
 
             whi(f"Moving {fileo} to {self.done_dir} dir")
             whi("Copying")
