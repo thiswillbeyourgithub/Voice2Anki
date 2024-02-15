@@ -486,7 +486,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
                 "hash": hasher(content),
                 }
         if to_add["hash"] in [pp["hash"] for pp in prev_prompts]:
-            red("This prompt is already present in the memory!")
+            gr.Warning(red("This prompt is already present in the memory!"))
             return
         prev_prompts.append(to_add)
 
@@ -495,7 +495,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         with open(f"profiles/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
     except Exception as err:
-        red(f"Error during recursive improvement: '{err}'")
+        gr.Warning(red(f"Error during recursive improvement: '{err}'"))
         return
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
