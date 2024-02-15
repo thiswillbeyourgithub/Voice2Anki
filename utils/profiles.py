@@ -164,7 +164,6 @@ class ValueStorage:
                 break
             except queue.Empty:
                 red(f"Waiting for {key} queue to output in getitem")
-                assert prev_q_val is True
         if prev_q_val is not True:
             assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
             raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
@@ -244,7 +243,6 @@ class ValueStorage:
                     break
                 except queue.Empty:
                     red(f"Waiting for {key} queue to output in setitem")
-                    assert prev_q_val is True
             if prev_q_val is not True:
                 assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
                 raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")

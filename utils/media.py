@@ -340,7 +340,6 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
     # exit quickly if not modified since last time
     elif df.attrs["modtime"] < df.attrs["checktime"]:
-        whi("3")
         return audio_slots_txts
     df.attrs["checktime"] = time.time()
 
