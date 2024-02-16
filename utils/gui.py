@@ -662,6 +662,12 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             )
+    txt_audio.input(
+            fn=lambda: "?",
+            outputs=[update_status_btn],
+            preprocess=False,
+            postprocess=False,
+            )
 
 
     # display pricing then save values
