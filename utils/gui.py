@@ -193,13 +193,15 @@ with gr.Blocks(
         for i in range(audio_number):
                 audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", show_label=True, render=False)
                 audio_slots.append(audio_mp3)
-                audio_slots_txt = gr.Textbox(lines=10, max_lines=10, container=False, interactive=False, scale=2, render=False, visible=shared.pv["enable_dirload"])
+                audio_slots_txt = gr.HTML(render=False, visible=shared.pv["enable_dirload"])
                 audio_slots_txts.append(audio_slots_txt)
         # rendering afterwards to reverse the order
         for aud, t in zip(audio_slots[::-1], audio_slots_txts[::-1]):
             with gr.Row():
-                aud.render()
-                t.render()
+                with gr.Column():
+                    aud.render()
+                with gr.Column():
+                    t.render()
 
         # whisper and chatgpt text output
         with gr.Row():

@@ -1,3 +1,4 @@
+import re
 import shutil
 import time
 from typing import List, Union, Tuple
@@ -363,23 +364,38 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
     df = shared.dirload_queue
     if df.empty:
-        return ["Dirload not yet loaded" for i in audio_slots_txts]
+        return ["<mark>Dirload not yet loaded</mark>" for i in audio_slots_txts]
 
     try:
         df = df[df["loaded"] == True]
         if df.empty:
-            return ["Empty" for i in audio_slots_txts]
+            return ["<mark>Empty</mark>" for i in audio_slots_txts]
 
         trans = df["transcribed"].tolist()
         while len(trans) < len(audio_slots_txts):
-            trans.append("Pending?")
+            trans.append("<mark>Pending?</mark>")
 
         alf = df["alfreded"].tolist()
         while len(alf) < len(trans):
-            alf.append("Pending?")
+            alf.append("<mark>Pending?</mark>")
 
-        output = [f"{t}\n-----\n{f}" for t, f in zip(trans, alf)]
+        sep = '<div style="height: 1px; background-color: lightblue; margin-top: 0; margin-bottom: 0;">-</div>'
+        output = [f"{t.strip()}{sep}{f.strip()}" for t, f in zip(trans, alf)]
+
+        header = """
+        <br>
+        <br>
+        """
+
+        for i, o in enumerate(output):
+            o = re.sub("alfred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("fred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("carte", "<mark>carte</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("\Wstop \W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("\Wstop\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+            output[i] = header + o
 
         return output
     except Exception as err:
-        return [err for i in audio_slots_txts]
+        return [f"<mark>{err}</mark>" for i in audio_slots_txts]
