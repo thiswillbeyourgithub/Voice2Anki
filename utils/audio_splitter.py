@@ -31,7 +31,7 @@ today = f"{d.day:02d}_{d.month:02d}"
 class AudioSplitter:
     def __init__(
             self,
-            prompt=None,
+            prompt=" STOP ",
             profile=None,
 
             stop_list=[" stop", " top"],
