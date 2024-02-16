@@ -411,7 +411,7 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
         for i, o in enumerate(output):
             o = re.sub("alfred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
-            o = re.sub("fred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
+            o = re.sub(" fred", " <mark>alfred</mark>", o, flags=re.IGNORECASE)
             o = re.sub("carte", "<mark>carte</mark>", o, flags=re.IGNORECASE)
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
 
