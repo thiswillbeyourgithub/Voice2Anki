@@ -72,7 +72,7 @@ def split_txt_audio(txt_audio: str) -> str:
     # remove leading space etc
     sp = txt_audio.split("\n\n")
     txt_audio = "\n\n".join([s.strip() for s in sp])
-    return txt_audio
+    return txt_audio.strip()
 
 
 
