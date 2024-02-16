@@ -691,22 +691,20 @@ class AudioSplitter:
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        if second_pass:
-            n_retry = 1
-        else:
-            n_retry = 3
         failed = True
         trial_dict = [
                 {
                     "model": "large-v2",
                     "repo": "hnesk",
                     "batch_size": None,
+                    "n_retry": 3,
                     },
-                # {
-                #     "model": "large-v1",
-                #     "repo": "hnesk",
-                #     "batch_size": None,
-                #     },
+                {
+                    "model": "large-v1",
+                    "repo": "hnesk",
+                    "batch_size": None,
+                    "n_retry": 1,
+                    },
                 # {
                 #     "model": "medium",
                 #     "repo": "hnesk",
@@ -719,6 +717,8 @@ class AudioSplitter:
                 #     },
                 ]
         for iparam, params in enumerate(trial_dict):
+            n_retry = params["n_retry"]
+            del params["n_retry"]
             for iter_retry in range(n_retry):
                 try:
                     transcript = whisper_splitter(
