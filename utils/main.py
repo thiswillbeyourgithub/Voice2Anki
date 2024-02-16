@@ -166,17 +166,24 @@ def thread_whisp_then_llm(
     assert tmp_df.index.tolist().count(str(audio_mp3)) == 1, f"Duplicate temp_path in shared.dirload_queue: {audio_mp3}"
     orig_path = tmp_df.loc[str(audio_mp3), "path"]
 
-    txt_audio = whisper_cached(
+    transcript = whisper_cached(
             audio_mp3,
             audio_hash,
             modelname,
             txt_whisp_prompt,
             txt_whisp_lang,
             sld_whisp_temp,
-            ).text
+            )
+    txt_audio = transcript.text
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
+
+    if transcript.duration <= 1:
+        txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
+
+    # if contains stop, split it
+    txt_audio = re.sub(" [sS]top[,.:$]", "\n\n", txt_audio).strip()
 
     try:
         cloze = alfred(
