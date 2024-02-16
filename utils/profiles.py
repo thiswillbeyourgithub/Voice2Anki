@@ -23,7 +23,7 @@ profile_keys = {
         "enable_queued_gallery": {"default": False, "type": bool},
         "enable_flagging": {"default": False, "type": bool},
         "enable_dirload": {"default": False, "type": bool},
-        "sld_max_tkn": {"default": 3500},
+        "sld_max_tkn": {"default": 1300},
         "sld_buffer": {"default": 0},
         "sld_temp": {"default": 0.0, "type": float},
         "txt_chatgpt_context": {},
