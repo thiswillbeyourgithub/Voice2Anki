@@ -178,19 +178,23 @@ def thread_whisp_then_llm(
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
-    cloze = alfred(
-            txt_audio,
-            txt_chatgpt_context,
-            txt_profile,
-            max_token,
-            temperature,
-            sld_buffer,
-            llm_choice,
-            txt_keywords,
-            prompt_management,
-            cache_mode=True)
-    with shared.dirload_lock:
-        shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
+    try:
+        cloze = alfred(
+                txt_audio,
+                txt_chatgpt_context,
+                txt_profile,
+                max_token,
+                temperature,
+                sld_buffer,
+                llm_choice,
+                txt_keywords,
+                prompt_management,
+                cache_mode=True)
+        with shared.dirload_lock:
+            shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
+    except Exception as err:
+        with shared.dirload_lock:
+            shared.dirload_queue.loc[orig_path, "alfreded"] = f"Failed: {err}"
 
 
 @trace
