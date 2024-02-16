@@ -697,23 +697,42 @@ class AudioSplitter:
                     "model": "large-v2",
                     "repo": "hnesk",
                     "batch_size": None,
+                    "condition_on_previous_text": False if not second_pass else True,
+                    "initial_prompt": self.prompt,
+                    "temperature": 0,
+                    "language": self.language,
+                    "no_speech_threshold": 1,
                     "n_retry": 3,
                     },
                 {
                     "model": "large-v1",
                     "repo": "hnesk",
                     "batch_size": None,
+                    "condition_on_previous_text": False if not second_pass else True,
+                    "initial_prompt": self.prompt,
+                    "temperature": 0,
+                    "language": self.language,
+                    "no_speech_threshold": 1,
                     "n_retry": 1,
                     },
                 # {
                 #     "model": "medium",
                 #     "repo": "hnesk",
                 #     "batch_size": None,
+                #     "initiaon_on_previous_text": False if not second_pass else True,
+                #     "initiall_prompt": self.prompt,
+                #     "temperature": 0,
+                #     "language": self.language,
+                #     "no_speech_threshold": 1,
+                #     "n_retry": 1,
                 #     },
                 # {
                 #     "model": "large-v3",
                 #     "repo": "fast",
                 #     "batch_size": 1,
+                #     "temperature": 0,
+                #     "language": self.language,
+                #     "n_retry": 1,
                 #     },
                 ]
         for iparam, params in enumerate(trial_dict):
@@ -724,8 +743,6 @@ class AudioSplitter:
                     transcript = whisper_splitter(
                             audio_path=audio_path,
                             audio_hash=audio_hash,
-                            prompt=self.prompt,
-                            language=self.language,
                             **params,
                             )
                     failed = False
@@ -942,27 +959,26 @@ class AudioSplitter:
         os.system(cmd)
 
 
-@stt_cache.cache(ignore=["audio_path", "batch_size"])
-def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batch_size):
-    whi(f"Starting replicate (meaning cache is not used). Model={model} Repo={repo} Batch_size={batch_size}")
+@stt_cache.cache(ignore=["audio_path"])
+def whisper_splitter(audio_path, audio_hash, **kwargs):
+    whi(f"Starting replicate (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
     start = time.time()
-    if repo == "fast":
+    if kwargs["repo"] == "fast":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
         # https://github.com/chenxwh/insanely-fast-whisper
+        args = {
+                "audio": audio_path,
+                "task": "transcribe",
+                "timestamp": "word",
+                "diarise_audio": False,
+                }
+        args.update(kwargs)
         transcript = replicate.run(
                 "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
-                input={
-                    "audio": audio_path,
-                    "task": "transcribe",
-                    "model": model,
-                    "language": language,
-                    "timestamp": "word",
-                    "diarise_audio": False,
-                    "batch_size": batch_size,
-                    },
+                input=args,
                 )
 
         # fix the format to have the same type as hnesk and collectiveai
@@ -982,44 +998,39 @@ def whisper_splitter(audio_path, audio_hash, prompt, language, repo, model, batc
                         }
                     ]
 
-    elif repo == "collectiveai":
+    elif kwargs["repo"] == "collectiveai":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
         # https://github.com/collectiveai-team/whisper-wordtimestamps/
         # fork from hnesk's repo. Allows larger file to be sent apparently.
+        args = {
+                "audio": audio_path,
+                "word_timestamps": True,
+                "no_speech_threshold": 1,
+                }
+        args.update(kwargs)
         transcript = replicate.run(
                 "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
-                input={
-                    "audio": audio_path,
-                    "model": model,
-                    "language": language,
-                    "temperature": 0,
-                    "initial_prompt": prompt,
-                    "condition_on_previous_text": False,
-                    "word_timestamps": True,
-                    "no_speech_threshold": 1,
-                    },
+                input=args,
                 )
-    elif repo == "hnesk":
+    elif kwargs["repo"] == "hnesk":
         # https://replicate.com/hnesk/whisper-wordtimestamps/
         # https://github.com/hnesk/whisper-wordtimestamps
+        args = {
+                "audio": audio_path,
+                "word_timestamps": True,
+                "no_speech_threshold": 1,
+                }
+        args.update(kwargs)
         transcript = replicate.run(
                 "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
-                input={
-                    "audio": audio_path,
-                    "model": model,
-                    "language": language,
-                    "temperature": 0,
-                    "initial_prompt": prompt,
-                    "condition_on_previous_text": False,
-                    "word_timestamps": True,
-                    "no_speech_threshold": 1,
-                    },
+                input=args,
                 )
     else:
-        raise ValueError(repo)
+        raise ValueError(kwargs["repo"])
 
-    transcript["modelname"] = model
-    transcript["repo"] = repo
+    transcript["modelname"] = kwargs["model"]
+    transcript["repo"] = kwargs["repo"]
+    transcript["replicate_arguments"] = kwargs
 
     whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
