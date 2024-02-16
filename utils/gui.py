@@ -115,14 +115,16 @@ function shortcuts(e) {
 
         // roll gallery
         else if (e.code == 'KeyG' && e.shiftKey) {
-            alert("Rolling gallery");
-            document.getElementById("rollgallbtn").click();
+            if (confirm("Roll gallery?")) {
+                document.getElementById("rollgallbtn").click();
+            }
         }
 
         // dirload
         else if (e.code == 'KeyD' && e.shiftKey) {
-            alert("Loading from dir");
-            document.getElementById("dirloadbtn").click();
+            if (confirm("Load from dir?")) {
+                document.getElementById("dirloadbtn").click();
+            }
         }
 
         // unfocus
