@@ -199,10 +199,6 @@ class ValueStorage:
                             new = pickle.load(f)
                     except Exception as err:
                         raise Exception(f"Error when getting {kf}: '{err}'")
-                if key.startswith("audio_mp3"):
-                    if not isinstance(new, (tuple, type(None))) and len(new) == 2 and isinstance(new[0], int) and isinstance(new[1], type(np.array(()))):
-                        red(f"Error when loading {kf}: unexpected value for loaded value")
-                        return None
                 if (key == "gallery" or key.startswith("queued_gallery_")) and new is not None:
                     if not isinstance(new, list):
                         new = [im.image.path for im in new.root]
