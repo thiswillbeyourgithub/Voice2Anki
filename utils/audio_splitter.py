@@ -428,7 +428,7 @@ class AudioSplitter:
                 assert t0 > prev_t0 and t1 >= prev_t1, "overlapping splits!"
                 if dur > 45:
                     red(f"Split #{iter_ttk}/{n} has too long duration even after second pass: {dur:.2f}s.")
-                    red(f"metadata: {metadata[iter_ttk]}")
+                    red(f"metadata:\n{textwrap.indent(json.dumps(metadata[iter_ttk], indent=2), '    ')}")
                 prev_t0 = t0
                 prev_t1 = t1
 
