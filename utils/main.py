@@ -63,6 +63,13 @@ def floatizer(func: Callable) -> Callable:
         return func(*args, **kwargs)
     return wrapper
 
+def split_txt_audio(txt_audio: str) -> str:
+    """if the txt audio contains "STOP" then it must be replaced by \n\n so
+    that alfred treats them as separate notes"""
+    txt_audio = re.sub("\Wstop\W", "\n\n", txt_audio, flags=re.IGNORECASE).strip()
+    return txt_audio
+
+
 
 @floatizer
 @trace
@@ -180,7 +187,7 @@ def thread_whisp_then_llm(
         txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
 
     # if contains stop, split it
-    txt_audio = re.sub(" [sS]top[,.:$ ]", "\n\n", txt_audio).strip()
+    txt_audio = split_txt_audio(txt_audio)
 
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
@@ -277,7 +284,7 @@ def transcribe(
             shared.running_threads["saving_whisper"].append(thread)
 
         # if contains stop, split it
-        txt_audio = re.sub(" [sS]top[,.:$] ", "\n\n", txt_audio).strip()
+        txt_audio = split_txt_audio(txt_audio)
 
         return txt_audio
     except Exception as err:
