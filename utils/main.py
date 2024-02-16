@@ -180,7 +180,7 @@ def thread_whisp_then_llm(
         txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
 
     # if contains stop, split it
-    txt_audio = re.sub(" [sS]top[,.:$]", "\n\n", txt_audio).strip()
+    txt_audio = re.sub(" [sS]top[,.:$ ]", "\n\n", txt_audio).strip()
 
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
@@ -277,7 +277,7 @@ def transcribe(
             shared.running_threads["saving_whisper"].append(thread)
 
         # if contains stop, split it
-        txt_audio = re.sub(" [sS]top[,.:$]", "\n\n", txt_audio).strip()
+        txt_audio = re.sub(" [sS]top[,.:$] ", "\n\n", txt_audio).strip()
 
         return txt_audio
     except Exception as err:
