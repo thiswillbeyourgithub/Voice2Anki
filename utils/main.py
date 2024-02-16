@@ -268,7 +268,8 @@ def transcribe(
         with shared.thread_lock:
             shared.running_threads["saving_whisper"].append(thread)
 
-        txt_audio = txt_audio.replace(" Stop. ", "\n\n").strip()
+        # if contains stop, split it
+        txt_audio = re.sub(" [sS]top[,.:$]", "\n\n", txt_audio).strip()
 
         return txt_audio
     except Exception as err:
