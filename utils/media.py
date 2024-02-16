@@ -401,11 +401,11 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
         trans = [t.strip() if isinstance(t, str) else t for t in df["transcribed"].tolist()]
         while len(trans) < len(audio_slots_txts):
-            trans.append("<mark>Pending?</mark>")
+            trans.append("Pending?")
 
         alf = [a.strip() if isinstance(a, str) else a for a in df["alfreded"].tolist()]
         while len(alf) < len(trans):
-            alf.append("<mark>Pending?</mark>")
+            alf.append("Pending?")
 
         output = [f"{t}{div_separator}{f}" for t, f in zip(trans, alf)]
 
@@ -414,8 +414,11 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
             o = re.sub("fred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
             o = re.sub("carte", "<mark>carte</mark>", o, flags=re.IGNORECASE)
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
-            o = re.sub("\Wstop \W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+
             o = re.sub("\Wstop\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+
+            o = re.sub("\Wstarted\W", "<mark>started</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("\WPending?\W", "<mark>Pending?</mark>", o)
             output[i] = audio_txts_header + o
 
         return output
