@@ -454,6 +454,7 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
     if not txt_chatgpt_outputstr:
         raise Exception(red("No chatgpt output string found."))
         return
+    txt_audio = txt_audio.strip()
     if "\n" in txt_chatgpt_outputstr:
         whi("Replaced newlines in txt_chatgpt_outputstr")
         txt_chatgpt_outputstr = txt_chatgpt_outputstr.replace("\n", "<br/>")
