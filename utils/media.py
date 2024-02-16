@@ -1,3 +1,4 @@
+import shutil
 import time
 from typing import List, Union, Tuple
 from pydub import AudioSegment
@@ -214,27 +215,52 @@ def sound_preprocessing(audio_mp3_path):
     return new_path
 
 @trace
-def force_sound_processing(audio_mp3: dict) -> str:
-    assert shared.pv["enable_dirload"], f"Incoherent UI"
-    assert audio_mp3 is not None, "Received None in force_sound_processing"
+def force_sound_processing():
+    """harsher sound processing for the currently loaded next audio. This is
+    done if there are some residual long silence that are making whisper
+    hallucinate. The previous audio will be moved to the dirload done_dir and
+    the new processed sound will take its place"""
+    assert shared.pv["enable_dirload"], "Incoherent UI"
+    assert not shared.dirload_queue.empty, "Dirload queue is empty"
 
-    audio_mp3 = format_audio_component(audio_mp3)
-    waveform, sample_rate = torchaudio.load(audio_mp3)
+    path = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
+    path = Path(path)
+    assert path.exists(), f"Missing {path}"
+    red(f"Forcing harsher sound processing of {path}")
 
+    out_path = shared.done_dir / (path.stem + "_unprocessed" + path.suffix)
+    if out_path.exists():
+        red(f"Output file already exists: {out_path}\nI will not replace it")
+
+    waveform, sample_rate = torchaudio.load(path)
     waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
             waveform,
             sample_rate,
             shared.force_preprocess_sox_effects,
             )
 
-    # write to file as wav
-    new_path = Path(audio_mp3).parent / (Path(audio_mp3).stem + "_fproc" + Path(audio_mp3).suffix)
-    sf.write(str(new_path), waveform.numpy().T, sample_rate, format='wav')
-    temp = AudioSegment.from_wav(audio_mp3)
-    temp.export(new_path, format="mp3")
 
-    whi(f"Done forced preprocessing {audio_mp3} to {new_path}")
-    return new_path
+    # saving file as wav then as mp3
+    try:
+        assert not (path.parent / (path.stem + ".wav")).exists()
+        sf.write(str(path.parent / (path.stem + ".wav")), waveform.numpy().T, sample_rate, format='wav')
+        temp = AudioSegment.from_wav(path.parent / (path.stem + ".wav"))
+        red(f"Moving {path} to {out_path}")
+        shutil.move(path, out_path)
+        assert not path.exists()
+        temp.export(path, format="mp3")
+        Path(path.parent / (path.stem + ".wav")).unlink(missing_ok=False)
+        gr.Warning(red(f"Done forced preprocessing {path}. The original is in {out_path}"))
+        return out_path
+    except Exception as err:
+        gr.Warning(red(f"Error when processing sound: {err}"))
+        # undo everything
+        Path(path.parent / (path.stem + ".wav")).unlink(missing_ok=True)
+        if out_path.exists():
+            shutil.move(out_path, path)
+        assert path.exists(), f"File was lost! {path}"
+        return path
+
 
 
 # @trace

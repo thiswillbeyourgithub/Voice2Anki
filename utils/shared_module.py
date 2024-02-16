@@ -101,20 +101,20 @@ class SharedModule:
             # ["highpass", "-2", "50"],
             # ["lowpass", "-2", "5000"],
             # # normalize audio
-            # ["norm"],
+            ["norm"],
             # # max silence should be 1s
             ["silence", "-l", "1", "0", "1%", "-1", "1.0", "1%"],
 
-            # # remove leading silence
-            ["vad", "-p", "0.2", "-t", "5"],
+            # # # remove leading silence
+            # ["vad", "-p", "0.2", "-t", "5"],
 
-            # # and ending silence, this might be unecessary for splitted audio
-            ["reverse"],
-            ["vad", "-p", "0.2", "-t", "5"],
-            ["reverse"],
+            # # # and ending silence, this might be unecessary for splitted audio
+            # ["reverse"],
+            # ["vad", "-p", "0.2", "-t", "5"],
+            # ["reverse"],
 
             # add blank sound to help whisper
-            # ["pad", "0.2@0"],
+            ["pad", "0.2@0"],
             ]
 
     # sox effects when splitting long audio
