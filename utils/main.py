@@ -175,15 +175,16 @@ def thread_whisp_then_llm(
             sld_whisp_temp,
             )
     txt_audio = transcript.text
-    with shared.dirload_lock:
-        shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
-        shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
     if transcript.duration <= 1:
         txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
 
     # if contains stop, split it
     txt_audio = re.sub(" [sS]top[,.:$]", "\n\n", txt_audio).strip()
+
+    with shared.dirload_lock:
+        shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
+        shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
 
     try:
         cloze = alfred(
