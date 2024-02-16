@@ -775,8 +775,8 @@ with gr.Blocks(
                 fn=lambda x: x,
                 inputs=[gal_],
                 outputs=[gallery],
-                preprocess=False,
-                postprocess=False,
+                # preprocess=False,
+                # postprocess=False,
                 # queue=False,
                 )
 
