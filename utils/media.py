@@ -354,6 +354,34 @@ def roll_audio(*slots) -> List[dict]:
     return slots
 
 
+audio_txts_header = """
+<style>
+mark {
+    background-color: lightblue;
+    color: black;
+    }
+.dark mark {
+    background-color: red;
+    color: white;
+    }
+
+.separator {
+    height: 1px;
+    background-color: purple;
+    margin-top: 0;
+    margin-bottom: 0;
+.separator.dark {
+.dark .separator {
+    height: 1px;
+    background-color: lightblue;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+</style>
+<br>
+"""
+div_separator = '<div class=separator></div>'
+
 def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription and cloze
@@ -364,28 +392,22 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
     df = shared.dirload_queue
     if df.empty:
-        return ["<mark>Dirload not yet loaded</mark>" for i in audio_slots_txts]
+        return [f"{audio_txts_header}<mark>Dirload not yet loaded</mark>" for i in audio_slots_txts]
 
     try:
         df = df[df["loaded"] == True]
         if df.empty:
-            return ["<mark>Empty</mark>" for i in audio_slots_txts]
+            return [f"{audio_txts_header}<mark>Empty</mark>" for i in audio_slots_txts]
 
-        trans = df["transcribed"].tolist()
+        trans = [t.strip() if isinstance(t, str) else t for t in df["transcribed"].tolist()]
         while len(trans) < len(audio_slots_txts):
             trans.append("<mark>Pending?</mark>")
 
-        alf = df["alfreded"].tolist()
+        alf = [a.strip() if isinstance(a, str) else a for a in df["alfreded"].tolist()]
         while len(alf) < len(trans):
             alf.append("<mark>Pending?</mark>")
 
-        sep = '<div style="height: 1px; background-color: lightblue; margin-top: 0; margin-bottom: 0;">-</div>'
-        output = [f"{t.strip()}{sep}{f.strip()}" for t, f in zip(trans, alf)]
-
-        header = """
-        <br>
-        <br>
-        """
+        output = [f"{t}{div_separator}{f}" for t, f in zip(trans, alf)]
 
         for i, o in enumerate(output):
             o = re.sub("alfred", "<mark>alfred</mark>", o, flags=re.IGNORECASE)
@@ -394,7 +416,7 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
             o = re.sub("\Wstop \W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
             o = re.sub("\Wstop\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
-            output[i] = header + o
+            output[i] = audio_txts_header + o
 
         return output
     except Exception as err:
