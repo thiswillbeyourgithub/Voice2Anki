@@ -668,7 +668,7 @@ class AudioSplitter:
                     latest_kept_i = iter_meta
             nbefore = len(times_to_keep)
             nafter = len([t for t in times_to_keep if t is not None])
-            whi(f"    Removed {nafter-nbefore}/{nbefore} splits with less than {word_limit} words")
+            whi(f"    Removed {nbefore-nafter}/{nbefore} splits with less than {word_limit} words")
 
         assert len(times_to_keep) == len(metadata), "invalid lengths"
 
