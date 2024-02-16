@@ -272,7 +272,7 @@ with gr.Blocks(
 
             with gr.Row():
                 flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"])
-                force_sound_processing_btn = gr.Button(value="Extra sound processing")
+                force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"])
                 clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
 
@@ -489,6 +489,7 @@ with gr.Blocks(
                     accordion_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
+                    force_sound_processing_btn: gr.update(visible=value),
                     }
             for ast in audio_slots_txts:
                 outdict[ast] = gr.update(visible=value)
@@ -520,7 +521,7 @@ with gr.Blocks(
             raise ValueError(name)
 
     # update gui
-    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn] + audio_slots_txts
+    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn] + audio_slots_txts
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],

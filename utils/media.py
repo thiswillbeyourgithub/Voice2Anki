@@ -215,6 +215,7 @@ def sound_preprocessing(audio_mp3_path):
 
 @trace
 def force_sound_processing(audio_mp3: dict) -> str:
+    assert shared.pv["enable_dirload"], f"Incoherent UI"
     assert audio_mp3 is not None, "Received None in force_sound_processing"
 
     audio_mp3 = format_audio_component(audio_mp3)
