@@ -648,27 +648,27 @@ class AudioSplitter:
         if not second_pass:
             whi(f"Kept {nafter}/{nbefore} splits when removing those <{time_limit}s")
 
-        # remove almost no words if large model was used
-        if second_pass:
-            latest_kept_i = 0
-            word_limit = 3
-            for iter_meta, met in enumerate(metadata):
-                if times_to_keep[iter_meta] is None:
-                    continue
-                start, end = times_to_keep[iter_meta]
-                metadata[iter_meta]["n_words"] = len(met["text"].split(" "))
-                if metadata[iter_meta]["n_words"] <= word_limit:
+        # # remove almost no words if large model was used
+        # if second_pass:
+        #     latest_kept_i = 0
+        #     word_limit = 3
+        #     for iter_meta, met in enumerate(metadata):
+        #         if times_to_keep[iter_meta] is None:
+        #             continue
+        #         start, end = times_to_keep[iter_meta]
+        #         metadata[iter_meta]["n_words"] = len(met["text"].split(" "))
+        #         if metadata[iter_meta]["n_words"] <= word_limit:
 
-                    times_to_keep[latest_kept_i][1] = end
-                    metadata[latest_kept_i]["end"] = end
+        #             times_to_keep[latest_kept_i][1] = end
+        #             metadata[latest_kept_i]["end"] = end
 
-                    times_to_keep[iter_meta] = None
-                    metadata[iter_meta]["status"] += "Low nwords"
-                else:
-                    latest_kept_i = iter_meta
-            nbefore = len(times_to_keep)
-            nafter = len([t for t in times_to_keep if t is not None])
-            whi(f"    Removed {nbefore-nafter}/{nbefore} splits with less than {word_limit} words")
+        #             times_to_keep[iter_meta] = None
+        #             metadata[iter_meta]["status"] += "Low nwords"
+        #         else:
+        #             latest_kept_i = iter_meta
+        #     nbefore = len(times_to_keep)
+        #     nafter = len([t for t in times_to_keep if t is not None])
+        #     whi(f"    Removed {nbefore-nafter}/{nbefore} splits with less than {word_limit} words")
 
         assert len(times_to_keep) == len(metadata), "invalid lengths"
 
