@@ -380,7 +380,7 @@ mark {
 </style>
 <br>
 """
-div_separator = '<div class=separator></div>'
+div_separator = ' <div class=separator>-</div> '
 
 def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
