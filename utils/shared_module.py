@@ -94,9 +94,6 @@ class SharedModule:
 
     # sox effect when forcing the processing of a sound
     force_preprocess_sox_effects = [
-            # denoize (remove humming etc)
-            ["noisered"],
-
             # normalize audio
             ["norm"],
 
