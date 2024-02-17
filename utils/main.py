@@ -561,6 +561,13 @@ def alfred(
         else:
             # gr.Warning(mess)
             return red(mess)
+    if ("cour" in txt_audio.lower() and len(txt_audio) < 40 and re.search(r"d[eé]but", txt_audio.lower()):
+        mess = f"Lesson switch detected: '{txt_audio}'"
+        if cache_mode:
+            return red(mess)
+        else:
+            # gr.Warning(mess)
+            return red(mess)
     if txt_audio.count(" ") < 3:
         return red(f"Too few words in txt_audio to be plausible")
 
