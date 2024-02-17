@@ -98,7 +98,7 @@ class SharedModule:
             ["norm"],
 
             # max silence should be 1s
-            ["silence", "-l", "1", "0", "1%", "-1", "1.0", "1%"],
+            ["silence", "-l", "1", "0", "5%", "-1", "1.0", "5%"],
 
             # remove leading silence
             ["vad", "-p", "0.2", "-t", "5"],
