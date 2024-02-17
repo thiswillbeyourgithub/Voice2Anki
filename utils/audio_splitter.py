@@ -160,6 +160,7 @@ class AudioSplitter:
         self.split_audio_longer_than = split_audio_longer_than
         self.stop_list = [
                 re.compile(s, flags=re.DOTALL | re.MULTILINE | re.IGNORECASE)
+                if isinstance(s, str) else s  # don't recompile compiled
                 for s in stop_list]
 
         self.to_split = self.gather_todos()
