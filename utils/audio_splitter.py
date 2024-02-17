@@ -368,9 +368,9 @@ class AudioSplitter:
                     whi(f"{iter_print}No change after second pass")
 
             if len(times_to_keep) == 1:
-                red(f"KNOWN ISSUE: only 1 split was found in the original
+                red("""KNOWN ISSUE: only 1 split was found in the original
                 audio after 1 pass. This means that the 2nd pass will have as last
-                element a duplicate of the whole audio.")
+                element a duplicate of the whole audio.""")
             red(f"Resplitting after second pass")
             for iter_alt, vals in tqdm(alterations.items(), desc="Resplitting"):
                 new_times = vals[0]
