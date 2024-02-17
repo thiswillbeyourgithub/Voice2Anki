@@ -1,3 +1,4 @@
+import sys
 import textwrap
 import json
 import torchaudio
@@ -519,7 +520,7 @@ class AudioSplitter:
             whi("Done!")
 
         red("All done!")
-        raise SystemExit()
+        sys.exit(0)
 
     def gather_todos(self):
         to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
