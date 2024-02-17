@@ -859,50 +859,45 @@ with gr.Blocks(
             # queue=False,
             show_progress=False,
             ).success(
-                    # roll texts too
-                    fn=lambda *x: [None] + list(x)[:-1],
-                    inputs=audio_slots_txts,
-                    outputs=audio_slots_txts,
-                    ).success(
-                        fn=transcribe,
-                        inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                        outputs=[txt_audio],
-                        preprocess=False,
-                        postprocess=False,
-                        # queue=False,
-                        ).then(
-                            lambda: None,
-                            outputs=[txt_chatgpt_cloz],
-                        ).success(
-                                fn=dirload_splitted_last,
-                                inputs=[
-                                    roll_dirload_check,
-                                    txt_whisp_prompt,
-                                    txt_whisp_lang,
-                                    sld_whisp_temp,
+                fn=transcribe,
+                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                outputs=[txt_audio],
+                preprocess=False,
+                postprocess=False,
+                # queue=False,
+                ).then(
+                    lambda: None,
+                    outputs=[txt_chatgpt_cloz],
+                ).success(
+                        fn=dirload_splitted_last,
+                        inputs=[
+                            roll_dirload_check,
+                            txt_whisp_prompt,
+                            txt_whisp_lang,
+                            sld_whisp_temp,
 
-                                    txt_chatgpt_context,
-                                    txt_profile,
-                                    sld_max_tkn,
-                                    sld_temp,
-                                    sld_buffer,
-                                    llm_choice,
-                                    txt_keywords,
-                                    prompt_manag,
-                                    ],
-                                outputs=[audio_slots[-1]],
+                            txt_chatgpt_context,
+                            txt_profile,
+                            sld_max_tkn,
+                            sld_temp,
+                            sld_buffer,
+                            llm_choice,
+                            txt_keywords,
+                            prompt_manag,
+                            ],
+                        outputs=[audio_slots[-1]],
+                        preprocess=False,
+                        postprocess=True,
+                        # queue=False,
+                        show_progress=False,
+                        ).then(
+                                fn=get_card_status,
+                                inputs=[txt_chatgpt_cloz],
+                                outputs=[update_status_btn],
+                                # queue=True,
                                 preprocess=False,
-                                postprocess=True,
-                                # queue=False,
-                                show_progress=False,
-                                ).then(
-                                        fn=get_card_status,
-                                        inputs=[txt_chatgpt_cloz],
-                                        outputs=[update_status_btn],
-                                        # queue=True,
-                                        preprocess=False,
-                                        postprocess=False,
-                                        )
+                                postprocess=False,
+                                )
     rollaudio_12_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -912,25 +907,88 @@ with gr.Blocks(
             # queue=False,
             show_progress=False,
             ).success(
-                    # roll texts too
-                    fn=lambda *x: [None] + list(x)[:-1],
-                    inputs=audio_slots_txts,
-                    outputs=audio_slots_txts,
-                    ).success(
-                        fn=transcribe,
-                        inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                        outputs=[txt_audio],
-                        preprocess=False,
-                        postprocess=False,
+                fn=transcribe,
+                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                outputs=[txt_audio],
+                preprocess=False,
+                postprocess=False,
+                # queue=False,
+                ).success(
+                    fn=alfred,
+                    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
+                    outputs=[txt_chatgpt_cloz],
+                    # queue=False,
+                    preprocess=False,
+                    postprocess=False,
+                ).success(
+                        fn=dirload_splitted_last,
+                        inputs=[
+                            roll_dirload_check,
+                            txt_whisp_prompt,
+                            txt_whisp_lang,
+                            sld_whisp_temp,
+
+                            txt_chatgpt_context,
+                            txt_profile,
+                            sld_max_tkn,
+                            sld_temp,
+                            sld_buffer,
+                            llm_choice,
+                            txt_keywords,
+                            prompt_manag,
+                            ],
+                        outputs=[audio_slots[-1]],
+                        # preprocess=False,
+                        # postprocess=False,
                         # queue=False,
-                        ).success(
-                            fn=alfred,
-                            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
-                            outputs=[txt_chatgpt_cloz],
-                            # queue=False,
+                        show_progress=False,
+                        ).then(
+                                fn=get_card_status,
+                                inputs=[txt_chatgpt_cloz],
+                                outputs=[update_status_btn],
+                                # queue=True,
+                                preprocess=False,
+                                postprocess=False,
+                                )
+    rollaudio_123_btn.click(
+            fn=roll_audio,
+            inputs=audio_slots,
+            outputs=audio_slots,
+            preprocess=False,
+            postprocess=True,
+            # queue=False,
+            show_progress=False,
+            ).success(
+                fn=transcribe,
+                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                outputs=[txt_audio],
+                preprocess=False,
+                postprocess=False,
+                # queue=False,
+                ).success(
+                    fn=alfred,
+                    inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
+                    outputs=[txt_chatgpt_cloz],
+                    preprocess=False,
+                    postprocess=False,
+                    # queue=False,
+                    ).success(
+                            fn=to_anki,
+                            inputs=[
+                                audio_slots[0],
+                                txt_audio,
+                                txt_chatgpt_cloz,
+                                txt_chatgpt_context,
+                                txt_deck,
+                                txt_tags,
+                                gallery,
+                                check_marked,
+                                txt_extra_source,
+                                ],
                             preprocess=False,
                             postprocess=False,
-                        ).success(
+                            # queue=False,
+                            ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
                                     roll_dirload_check,
@@ -960,86 +1018,24 @@ with gr.Blocks(
                                         preprocess=False,
                                         postprocess=False,
                                         )
-    rollaudio_123_btn.click(
-            fn=roll_audio,
-            inputs=audio_slots,
-            outputs=audio_slots,
-            preprocess=False,
-            postprocess=True,
-            # queue=False,
-            show_progress=False,
-            ).success(
-                    # roll texts too
-                    fn=lambda *x: [None] + list(x)[:-1],
-                    inputs=audio_slots_txts,
-                    outputs=audio_slots_txts,
-                    ).success(
-                        fn=transcribe,
-                        inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
-                        outputs=[txt_audio],
-                        preprocess=False,
-                        postprocess=False,
-                        # queue=False,
-                        ).success(
-                            fn=alfred,
-                            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
-                            outputs=[txt_chatgpt_cloz],
-                            preprocess=False,
-                            postprocess=False,
-                            # queue=False,
-                            ).success(
-                                    fn=lambda: "Rolling",
-                                    outputs=[update_status_btn],
-                                    ).success(
-                                            fn=to_anki,
-                                            inputs=[
-                                                audio_slots[0],
-                                                txt_audio,
-                                                txt_chatgpt_cloz,
-                                                txt_chatgpt_context,
-                                                txt_deck,
-                                                txt_tags,
-                                                gallery,
-                                                check_marked,
-                                                txt_extra_source,
-                                                ],
-                                            preprocess=False,
-                                            postprocess=False,
-                                            # queue=False,
-                                            ).then(
-                                                fn=dirload_splitted_last,
-                                                inputs=[
-                                                    roll_dirload_check,
-                                                    txt_whisp_prompt,
-                                                    txt_whisp_lang,
-                                                    sld_whisp_temp,
+    # roll texts then set status to Rolling
+    gr.on(
+            triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
+            fn=lambda *x: [None] + list(x)[:-1],
+            inputs=audio_slots_txts,
+            outputs=audio_slots_txts,
+            ).then(
+                    fn=lambda: "Rolling",
+                    outputs=[update_status_btn],
+                    )
 
-                                                    txt_chatgpt_context,
-                                                    txt_profile,
-                                                    sld_max_tkn,
-                                                    sld_temp,
-                                                    sld_buffer,
-                                                    llm_choice,
-                                                    txt_keywords,
-                                                    prompt_manag,
-                                                    ],
-                                                outputs=[audio_slots[-1]],
-                                                # preprocess=False,
-                                                # postprocess=False,
-                                                # queue=False,
-                                                show_progress=False,
-                                                ).then(
-                                                        fn=lambda: False,
-                                                        outputs=[check_marked],
-                                                        show_progress=False,
-                                                        ).then(
-                                                                fn=get_card_status,
-                                                                inputs=[txt_chatgpt_cloz],
-                                                                outputs=[update_status_btn],
-                                                                # queue=True,
-                                                                preprocess=False,
-                                                                postprocess=False,
-                                                                )
+    # reset check for mark next
+    gr.on(
+            triggers=[anki_btn.click, txt_chatgpt_cloz.change],
+            fn=lambda: False,
+            outputs=[check_marked],
+            show_progress=False,
+            )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use Voice2Anki on the computer but record the audio
