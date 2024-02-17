@@ -748,7 +748,7 @@ class AudioSplitter:
                             )
                     failed = False
                     if iter_retry > 0 or iparam > 0:
-                        red(f"Successfuly translated using parameters: {json.dumps(params)}")
+                        red(f"Successfuly transcribed using parameters: {json.dumps(params)}")
                     break
                 except Exception as err:
                     red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
