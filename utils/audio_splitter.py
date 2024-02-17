@@ -60,7 +60,6 @@ class AudioSplitter:
         """
         prompt: str, default ' STOP '
             prompt used to guide whisper. None to disable
-            It is doubled for the second pass (e.g. ' STOP  STOP '
 
         profile: str, default None
             name of the profile to use when looking for the audio to split
@@ -715,8 +714,9 @@ class AudioSplitter:
                     "repo": "hnesk",
                     "batch_size": None,
                     "condition_on_previous_text": False,
-                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    "temperature": 0,
+                    # "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                    "initial_prompt": self.prompt,
+                    "temperature": 0 if second_pass else 0.1,
                     "language": self.language,
                     "no_speech_threshold": 1,
                     "n_retry": 3,
@@ -726,8 +726,9 @@ class AudioSplitter:
                     "repo": "hnesk",
                     "batch_size": None,
                     "condition_on_previous_text": False,
-                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    "temperature": 0,
+                    # "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                    "initial_prompt": self.prompt,
+                    "temperature": 0 if second_pass else 0.1,
                     "language": self.language,
                     "no_speech_threshold": 1,
                     "n_retry": 1,
