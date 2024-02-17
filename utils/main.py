@@ -136,6 +136,16 @@ def whisper_cached(
                         if sum(temps) / len(temps) == 1:
                             raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
+                # update the df
+                if shared.pv["enable_dirload"]:
+                    try:
+                        if not shared.dirload_queue.empty:
+                            orig_path = shared.dirload_queue.loc[str(audio_path), "path"]
+                            with shared.dirload_lock:
+                                shared.dirload_queue.loc[orig_path, "transcribed"] = transcript.text
+                    except Exception as err:
+                        red(f"Couldn't update df to set transcript of {audio_mp3}")
+
                 return transcript
             except openai.RateLimitError as err:
                 if cnt >= 5:
