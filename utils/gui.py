@@ -12,13 +12,11 @@ from .memory import recur_improv, display_price, get_memories_df, get_message_bu
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts
 from .shared_module import shared
 
-large_text_theme = theme_size.Size('10px', '12px', '14px', '25px', '20px', '24px', '28px')
-# default is '10px', '12px', '14px', '16px', '20px', '24px', '28px')
 theme = gr.themes.Soft(
         primary_hue="violet",
         secondary_hue="purple",
         neutral_hue="gray",
-        text_size=large_text_theme if shared.big_font else "lg",
+        text_size="sm",
         spacing_size="sm",
         radius_size="sm",
         font="ui-sans-serif",
@@ -162,6 +160,9 @@ css = """
 /* remove clipping controls
 #js_audiocomponent > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
 */
+
+#js_txtchatgpt > label > textarea {font-size: 20px;}
+#js_txtwhisper > label > textarea {font-size: 20px;}
 """.strip()
 
 if shared.widen_screen:
