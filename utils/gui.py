@@ -65,6 +65,9 @@ function shortcuts(e) {
         else if (e.code == 'Semicolon' && e.shiftKey) {
             document.getElementById("js_markpreviousbtn").click();
         }
+        else if (e.code == 'Semicolon') {
+            document.getElementById("js_marknext").click();
+        }
         else if (e.key == "s") {
             document.getElementById("js_cardstatusbtn").click();
         }
@@ -228,7 +231,7 @@ with gr.Blocks(
 
         with gr.Row():
             mark_previous = gr.Button(value="Toggle mark previous", elem_id="js_markpreviousbtn", size="sm")
-            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
+            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True, elem_id="js_marknext")
             suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
 
         # 1+2 / 1+2+3
