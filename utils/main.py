@@ -1227,7 +1227,7 @@ def to_anki(
         if audio_row.empty:
             # the ' can be stripped from the original path
             audio_row = shared.dirload_queue.loc[shared.dirload_queue["temp_path"].str.replace("'", "").str.endswith(audio_mp3_oname)==True]
-        assert not audio_row.empty, f"Empty for for {audio_mp3_1}\nThe temp_path present were {shared.dirload_queue['temp_path'].tolist()}"
+        assert not audio_row.empty, f"Empty for {audio_mp3_1}\nThe temp_path present were {shared.dirload_queue['temp_path'].tolist()}"
         assert len(audio_row) == 1, f"More than one audio found in dirload_queue for {audio_mp3_1}"
         metadata["original_mp3_path"] = audio_row.reset_index()["path"].tolist()[0]
 
