@@ -486,4 +486,4 @@ def call_user_chain(txt_audio, evt: gr.EventData):
     assert chain is not None
     func = trace(chain["func"])
     txt_audio = func(txt_audio)
-    return [txt_audio]
+    return txt_audio
