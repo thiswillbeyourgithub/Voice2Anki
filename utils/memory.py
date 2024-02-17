@@ -163,8 +163,6 @@ def check_prompts(prev_prompts):
         assert mess["role"] != "system", "system message should not be here"
         if mess["role"] == "user":
             assert "answer" in mess, "no answer key in message"
-            assert "{{c1::" in mess["answer"], f"No cloze found in {mess}"
-            assert "}}" in mess["answer"], f"No cloze found in {mess}"
         else:
             raise ValueError("role of previous prompt is not user or system")
 
@@ -461,6 +459,9 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
     if "#####" in txt_audio or "\n\n" in txt_audio:
         raise Exception(red("You can't memorize a prompt that was automatically split."))
         return
+
+    if "{{c1::" not in txt_chatgpt_outputstr and "}}" not in txt_chatgpt_outputstr:
+        gr.Warning(red(f"No cloze found in new memory. Make sure it's on purpose.\nCard: {txt_chatgpt_outputstr}"))
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
