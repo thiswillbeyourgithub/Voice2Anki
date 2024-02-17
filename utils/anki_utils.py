@@ -52,17 +52,13 @@ def call_anki(action, **params):
                         "addon' enabled? Firewall issue?")
 
     if len(response) != 2:
-        red('response has an unexpected number of fields')
-        raise Exception('response has an unexpected number of fields')
+        raise Exception(red('response has an unexpected number of fields'))
     if 'error' not in response:
-        red('response is missing required error field')
-        raise Exception('response is missing required error field')
+        raise Exception(red('response is missing required error field'))
     if 'result' not in response:
-        red('response is missing required result field')
-        raise Exception('response is missing required result field')
+        raise Exception(red('response is missing required result field'))
     if response['error'] is not None:
-        red(response['error'])
-        raise Exception(response['error'])
+        raise Exception(red(response['error']))
     return response['result']
 
 
@@ -83,17 +79,13 @@ async def async_call_anki(action, **params):
                         "addon' enabled? Firewall issue?")
 
     if len(response) != 2:
-        red('response has an unexpected number of fields')
-        raise Exception('response has an unexpected number of fields')
+        raise Exception(red('response has an unexpected number of fields'))
     if 'error' not in response:
-        red('response is missing required error field')
-        raise Exception('response is missing required error field')
+        raise Exception(red('response is missing required error field'))
     if 'result' not in response:
-        red('response is missing required result field')
-        raise Exception('response is missing required result field')
+        raise Exception(red('response is missing required result field'))
     if response['error'] is not None:
-        red(response['error'])
-        raise Exception(response['error'])
+        raise Exception(red(response['error']))
     return response['result']
 
 
