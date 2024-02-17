@@ -57,8 +57,9 @@ class AudioSplitter:
             help=False,
             ):
         """
-        prompt: str, default None
+        prompt: str, default ' STOP '
             prompt used to guide whisper. None to disable
+            It is doubled for the second pass (e.g. ' STOP  STOP '
 
         profile: str, default None
             name of the profile to use when looking for the audio to split
