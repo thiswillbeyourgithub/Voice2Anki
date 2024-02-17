@@ -826,9 +826,11 @@ def dirload_splitted(
             if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
                 gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
             red(f"Moving {p} to done_dir")
-            shutil.move(p, shared.done_dir / Path(p).name)
+            shutil.copy2(p, shared.done_dir / Path(p).name)
             shared.dirload_queue.loc[p, "loaded"] = False
             shared.dirload_queue.loc[p, "moved"] = True
+            assert (shared.done_dir / (Path(p).name)).exists(), f"Error when moving {p}"
+            p.unlink(missing_ok=False)
 
     while len(output) < shared.audio_slot_nb:
         output.append(None)
