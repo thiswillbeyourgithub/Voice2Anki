@@ -66,7 +66,7 @@ function shortcuts(e) {
             document.getElementById("js_markpreviousbtn").click();
         }
         else if (e.key == 'm') {
-            document.getElementById("js_marknext").click();
+            document.getElementById("js_marknext").children[1].children[0].checked = false;
         }
         else if (e.key == "s") {
             document.getElementById("js_cardstatusbtn").click();
