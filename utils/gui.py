@@ -230,9 +230,9 @@ with gr.Blocks(
                 anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn", size="sm")
 
         with gr.Row():
-            mark_previous = gr.Button(value="Toggle mark previous", elem_id="js_markpreviousbtn", size="sm")
+            mark_previous = gr.Button(value="Mark previous", elem_id="js_markpreviousbtn", size="sm")
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True, elem_id="js_marknext")
-            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
+            suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
