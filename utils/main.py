@@ -144,7 +144,7 @@ def whisper_cached(
                             with shared.dirload_lock:
                                 shared.dirload_queue.loc[orig_path, "transcribed"] = transcript.text
                     except Exception as err:
-                        red(f"Couldn't update df to set transcript of {audio_mp3}")
+                        red(f"Couldn't update df to set transcript of {audio_path}")
 
                 return transcript
             except openai.RateLimitError as err:
