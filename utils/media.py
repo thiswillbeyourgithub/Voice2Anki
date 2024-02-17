@@ -357,23 +357,23 @@ def roll_audio(*slots) -> List[dict]:
 audio_txts_header = """
 <style>
 mark {
-    background-color: lightblue;
-    color: black;
+    background-color: #5767AE;
+    color: white;
     }
 .dark mark {
-    background-color: red;
+    background-color: #5767AE;
     color: white;
     }
 
 .separator {
     height: 1px;
-    background-color: purple;
+    background-color: #5767AE;
     margin-top: 0;
     margin-bottom: 0;
 .separator.dark {
 .dark .separator {
     height: 1px;
-    background-color: lightblue;
+    background-color: #5767AE;
     margin-top: 0;
     margin-bottom: 0;
 }
