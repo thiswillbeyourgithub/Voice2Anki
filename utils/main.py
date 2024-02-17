@@ -63,6 +63,16 @@ def floatizer(func: Callable) -> Callable:
         return func(*args, **kwargs)
     return wrapper
 
+def stripizer(func: Callable) -> Callable:
+    """wrapper for alfred to make sure to strip the txt_audio"""
+    def wrapper(*args, **kwargs):
+        if "txt_audio" in kwargs:
+            kwargs["txt_audio"] = kwargs["txt_audio"].strip()
+        else:
+            assert isinstance(args[0], str)
+            args[0] = args[0].strip()
+        return func(*args, **kwargs)
+
 def split_txt_audio(txt_audio: str) -> str:
     """if the txt audio contains "STOP" then it must be replaced by \n\n so
     that alfred treats them as separate notes"""
@@ -346,6 +356,7 @@ def flag_audio(
         pickle.dump(to_save, f)
 
 
+@stripizer
 @trace
 def pre_alfred(
         txt_audio: str,
@@ -513,6 +524,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
     return await asyncio.gather(*tasks)
 
 
+@stripizer
 @floatizer
 @trace
 @Timeout(180)
