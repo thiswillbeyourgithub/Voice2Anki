@@ -186,7 +186,10 @@ def thread_whisp_then_llm(
     tmp_df = shared.dirload_queue.reset_index().set_index("temp_path")
     assert str(audio_mp3) in tmp_df.index, f"Missing {audio_mp3} from shared.dirload_queue"
     assert tmp_df.index.tolist().count(str(audio_mp3)) == 1, f"Duplicate temp_path in shared.dirload_queue: {audio_mp3}"
+
     orig_path = tmp_df.loc[str(audio_mp3), "path"]
+    with shared.dirload_lock:
+        shared.dirload_queue.loc[orig_path, "transcribed"] = "started"
 
     transcript = whisper_cached(
             audio_mp3,
