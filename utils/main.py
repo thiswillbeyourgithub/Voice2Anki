@@ -829,7 +829,7 @@ def dirload_splitted(
                 red(f"Moving {p} to done_dir")
                 shutil.copy2(p, shared.done_dir / Path(p).name)
                 assert (shared.done_dir / (Path(p).name)).exists(), f"Error when moving {p}"
-                p.unlink(missing_ok=False)
+                Path(p).unlink(missing_ok=False)
                 shared.dirload_queue.loc[p, "loaded"] = False
                 shared.dirload_queue.loc[p, "moved"] = True
         except Exception as err:
