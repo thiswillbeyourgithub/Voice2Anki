@@ -245,7 +245,7 @@ with gr.Blocks(
                         scale=0,
                         elem_id="js_audiocomponent",
                         min_width=300,
-                        editable=False,
+                        editable=True,
                         )
                 audio_corrector_txt = gr.Textbox(value=None, label="Edit via GPT-4", scale=2)
                 auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False, size="sm")
