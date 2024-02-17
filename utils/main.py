@@ -70,8 +70,10 @@ def stripizer(func: Callable) -> Callable:
             kwargs["txt_audio"] = kwargs["txt_audio"].strip()
         else:
             assert isinstance(args[0], str)
+            args = list(args)
             args[0] = args[0].strip()
         return func(*args, **kwargs)
+    return wrapper
 
 def split_txt_audio(txt_audio: str) -> str:
     """if the txt audio contains "STOP" then it must be replaced by \n\n so
@@ -845,7 +847,7 @@ def dirload_splitted(
                 shared.dirload_queue.loc[p, "loaded"] = False
                 shared.dirload_queue.loc[p, "moved"] = True
         except Exception as err:
-            gr.Warning(red(f"Error when moving audio, restart V2A to avoid unexpected behaviors!\nError: {err}"))
+            gr.Warning(red(f"Error when moving audio, restart app to avoid unexpected behaviors!\nError: {err}"))
             raise
 
     while len(output) < shared.audio_slot_nb:

@@ -1,3 +1,4 @@
+import gradio as gr
 from typing import Callable
 from joblib import hash as jhash
 import asyncio
@@ -58,9 +59,10 @@ def Critical(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exeption as err:
+        except Exception as err:
             gr.Warning(red(f"CRITICAL ERROR - PLEASE RESTART THE APP\nFunction: {func}\nError: {err}"))
             raise
+    return wrapper
 
 
 @Critical
