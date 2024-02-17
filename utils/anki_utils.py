@@ -329,12 +329,12 @@ async def suspend_previous_notes() -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
-    nids = [str(n) for n in nids]
+    s_nids = [int(n) for n in nids]
     cids = await async_call_anki(
             action="findCards",
             query="nid:" + ",".join(nids),
             )
-    assert cids, "No card ids found for the given note ids: {','.join(nids)}"
+    assert cids, "No card ids found for the given note ids: {','.join(s_nids)}"
     status = await async_call_anki(
             action="areSuspended",
             cards=cids,
@@ -358,7 +358,7 @@ async def suspend_previous_notes() -> None:
         out = await async_call_anki(
                 action="suspend",
                 cards=cids)
-        assert out, f"Unexpected result from anki: {out} for nids {','.join(nids)}"
+        assert out, f"Unexpected result from anki: {out} for nids {','.join(s_nids)}"
         assert all(
                 await async_call_anki(
                     action="areSuspended",
