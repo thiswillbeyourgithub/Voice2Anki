@@ -58,7 +58,7 @@ def call_anki(action, **params):
     if 'result' not in response:
         raise Exception(red('response is missing required result field'))
     if response['error'] is not None:
-        raise Exception(red(response['error']))
+        raise Exception(red(f"Error in call_anki: {response['error']}\nArgs: {action}, {params}"))
     return response['result']
 
 
@@ -85,7 +85,7 @@ async def async_call_anki(action, **params):
     if 'result' not in response:
         raise Exception(red('response is missing required result field'))
     if response['error'] is not None:
-        raise Exception(red(response['error']))
+        raise Exception(red(f"Error in call_anki: {response['error']}\nArgs: {action}, {params}"))
     return response['result']
 
 
