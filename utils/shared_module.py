@@ -73,12 +73,12 @@ class SharedModule:
             # ["highpass", "-1", "100"],
             # ["lowpass", "-1", "3000"],
             # # removes high frequency and very low ones
-            # ["highpass", "-2", "50"],
-            # ["lowpass", "-2", "5000"],
+            ["highpass", "-2", "50"],
+            ["lowpass", "-2", "5000"],
             # # # normalize audio
             # ["norm"],
             # max silence should be 1s
-            ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.1%"],
+            ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.5%"],
 
             # # remove leading silence
             # ["vad", "-p", "0.2", "-t", "5"],
