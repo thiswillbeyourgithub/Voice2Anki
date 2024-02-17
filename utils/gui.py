@@ -180,8 +180,9 @@ with gr.Blocks(
     with gr.Row():
         gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=1, interactive=True, size="sm")
         with gr.Group():
-            dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm")
-            sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm")
+            with gr.Row():
+                dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm")
+                sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
