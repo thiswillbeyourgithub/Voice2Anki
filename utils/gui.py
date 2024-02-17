@@ -16,7 +16,7 @@ theme = gr.themes.Soft(
         primary_hue="violet",
         secondary_hue="purple",
         neutral_hue="gray",
-        text_size="sm",
+        text_size="lg",
         spacing_size="sm",
         radius_size="sm",
         font="ui-sans-serif",
@@ -177,15 +177,15 @@ with gr.Blocks(
         ) as demo:
 
     with gr.Row():
-        gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=3, interactive=True)
-        dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=0, elem_id="js_darkmodebtn")
-        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="js_syncankibtn")
+        gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=0, interactive=True, size="sm")
+        dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=0, elem_id="js_darkmodebtn", size="sm")
+        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="js_syncankibtn", size="sm")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
         with gr.Row():
-            rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1)
-            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="js_dirloadbtn", visible=shared.pv["enable_dirload"])
+            rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1, size="sm")
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="js_dirloadbtn", visible=shared.pv["enable_dirload"], size="sm")
 
         # audio
         audio_number = shared.audio_slot_nb
@@ -199,9 +199,9 @@ with gr.Blocks(
         # rendering afterwards to reverse the order
         for aud, t in zip(audio_slots[::-1], audio_slots_txts[::-1]):
             with gr.Row():
-                with gr.Column():
+                with gr.Column(min_width=50):
                     aud.render()
-                with gr.Column():
+                with gr.Column(min_width=50):
                     t.render()
 
         # whisper and chatgpt text output
@@ -210,24 +210,23 @@ with gr.Blocks(
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=True, interactive=True, scale=1, elem_id="js_txtchatgpt", show_label=True)
 
         # rolls
-        with gr.Group():
-            with gr.Row():
-                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123")
-                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12")
-                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1")
-                update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn")
+        with gr.Row():
+            rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123", size="sm")
+            rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12", size="sm")
+            rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1", size="sm")
+            update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn", size="sm")
 
         # 1/2/3
         with gr.Group():
             with gr.Row():
-                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="js_transcribebtn")
-                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="js_transcriptbtn")
-                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn")
+                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="js_transcribebtn", size="sm")
+                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="js_transcriptbtn", size="sm")
+                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn", size="sm")
 
         with gr.Row():
-            mark_previous = gr.Button(value="Toggle mark previous", elem_id="js_markpreviousbtn")
+            mark_previous = gr.Button(value="Toggle mark previous", elem_id="js_markpreviousbtn", size="sm")
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
-            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="js_suspendpreviousbtn")
+            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
@@ -244,11 +243,11 @@ with gr.Blocks(
                         show_label=True,
                         scale=0,
                         elem_id="js_audiocomponent",
-                        #min_width=300,
+                        min_width=300,
                         editable=False,
                         )
                 audio_corrector_txt = gr.Textbox(value=None, label="Edit via GPT-4", scale=2)
-                auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False)
+                auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False, size="sm")
                 semiauto_btn = gr.Button(
                         value="1+2",
                         variant="secondary",
@@ -261,7 +260,7 @@ with gr.Blocks(
         with gr.Accordion(label="Quick settings", open=True):
             with gr.Row():
                 sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
-                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn")
+                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
                 prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
             with gr.Row():
                 with gr.Column(scale=10):
@@ -276,21 +275,21 @@ with gr.Blocks(
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
 
             with gr.Row():
-                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"])
-                force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"])
-                clear_llm_cache_btn = gr.Button(value="Clear LLM cache")
-                pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary")
+                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
+                force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
+                clear_llm_cache_btn = gr.Button(value="Clear LLM cache", size="sm")
+                pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
         # image
         with gr.Accordion(label="Main gallery", open=True, visible=shared.pv["enable_gallery"]) as accordion_gallery:
             with gr.Row():
                 with gr.Column():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn")
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
                     gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                     with gr.Group():
                         with gr.Row():
-                            rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50)
-                            img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50)
+                            rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
+                            img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
 
         txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
@@ -350,7 +349,7 @@ with gr.Blocks(
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
         with gr.Row():
-            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary")
+            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", size="sm")
         with gr.Accordion(label="User functions", open=False):
             with gr.Row():
                 code_user_flashcard_editor = gr.Code(
@@ -376,7 +375,7 @@ with gr.Blocks(
 
             with gr.Row():
                 with gr.Column():
-                    source_txt_btn = gr.Button("OCR the main gallery")
+                    source_txt_btn = gr.Button("OCR the main gallery", size="sm")
                     source_txt = gr.Textbox(value=None, interactive=False, lines=1, max_lines=20)
                     source_txt_btn.click(
                             fn=ocr_image,
@@ -405,11 +404,11 @@ with gr.Blocks(
                             preview=False,
                             )
                     with gr.Column(scale=0):
-                        send_ = gr.Button(value="Send to gallery", size="sm", variant="primary", min_width=50, scale=10)
-                        add_ = gr.Button(value="Add image from clipboard", size="sm", min_width=50, scale=10)
+                        send_ = gr.Button(value="Send to gallery", variant="primary", min_width=50, scale=10, size="sm")
+                        add_ = gr.Button(value="Add image from clipboard", min_width=50, scale=10, size="sm")
                         with gr.Row():
-                            rst_ = gr.Button(value="Clear", variant="primary", size="sm", min_width=50, scale=0)
-                            ocr_ = gr.Button("OCR", variant="secondary", size="sm", scale=1)
+                            rst_ = gr.Button(value="Clear", variant="primary", min_width=50, scale=0, size="sm")
+                            ocr_ = gr.Button("OCR", variant="secondary", scale=1, size="sm")
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
 
@@ -426,7 +425,7 @@ with gr.Blocks(
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
         with gr.Column():
-            logging_reload = gr.Button(value="Refresh")
+            logging_reload = gr.Button(value="Refresh", size="sm")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
 
