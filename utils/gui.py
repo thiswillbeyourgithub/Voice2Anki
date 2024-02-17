@@ -163,7 +163,8 @@ css = """
 
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
-""".strip()
+
+"""
 
 if shared.widen_screen:
     css += "\n.app { max-width: 100% !important; }"
