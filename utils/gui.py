@@ -179,8 +179,9 @@ with gr.Blocks(
 
     with gr.Row():
         gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=1, interactive=True, size="sm")
-        dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm")
-        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm")
+        with gr.Group():
+            dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm")
+            sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
@@ -211,11 +212,12 @@ with gr.Blocks(
             txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=25, placeholder="The anki flashcard will appear here", container=True, interactive=True, scale=1, elem_id="js_txtchatgpt", show_label=True)
 
         # rolls
-        with gr.Row():
-            rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123", size="sm")
-            rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12", size="sm")
-            rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1", size="sm")
-            update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn", size="sm")
+        with gr.Group():
+            with gr.Row():
+                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123", size="sm")
+                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12", size="sm")
+                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1", size="sm")
+                update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn", size="sm")
 
         # 1/2/3
         with gr.Group():
