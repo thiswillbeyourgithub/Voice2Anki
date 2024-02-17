@@ -34,6 +34,7 @@ class SharedModule:
     disable_tracing = None
     disable_timeout = None
     widen_screen = None
+    big_font = None
     timeout_lock = Lock()
     dirload_lock = Lock()
     thread_lock = Lock()
