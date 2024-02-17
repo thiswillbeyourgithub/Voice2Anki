@@ -34,7 +34,7 @@ class AudioSplitter:
             prompt=" STOP ",
             profile=None,
 
-            stop_list=[" stop", " top"],
+            stop_list=[re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
             language="fr",
             n_todo=1,
 
@@ -64,7 +64,7 @@ class AudioSplitter:
             as well as the replicate API key.
             if None, will use the latest_profile used by Voice2Anki
 
-        stop_list: list, default [' stop', ' top']
+        stop_list: list, re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
             list of strings that when found will trigger the audio splitting.
 
         language: str, default fr

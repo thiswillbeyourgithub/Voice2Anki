@@ -423,7 +423,7 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
             o = re.sub("carte", "<mark>carte</mark>", o, flags=re.IGNORECASE)
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
 
-            o = re.sub(r"\Wstop\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+            o = re.sub(r"\Wstop ?\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
             o = re.sub(r"\W#####\W", "<mark>#####</mark>", o, flags=re.IGNORECASE)
 
             o = re.sub(r"\Wstarted\W", "<mark>started</mark>", o, flags=re.IGNORECASE)

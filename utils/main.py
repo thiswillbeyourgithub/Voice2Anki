@@ -66,8 +66,7 @@ def floatizer(func: Callable) -> Callable:
 def split_txt_audio(txt_audio: str) -> str:
     """if the txt audio contains "STOP" then it must be replaced by \n\n so
     that alfred treats them as separate notes"""
-    txt_audio = re.sub(r"\Wstop \W", "\n\n", txt_audio, flags=re.IGNORECASE)
-    txt_audio = re.sub(r"\Wstop\W", "\n\n", txt_audio, flags=re.IGNORECASE)
+    txt_audio = re.sub(r"\Wstop ?\W", "\n\n", txt_audio, flags=re.IGNORECASE)
 
     # remove leading space etc
     sp = txt_audio.split("\n\n")
