@@ -34,6 +34,7 @@ class AudioSplitter:
             self,
             prompt=" STOP ",
             profile=None,
+            debug=False,
 
             stop_list=[re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
             language="fr",
@@ -65,6 +66,10 @@ class AudioSplitter:
             name of the profile to use when looking for the audio to split
             as well as the replicate API key.
             if None, will use the latest_profile used by Voice2Anki
+
+        debug: bool, default False
+            if True, a breakpoint() will be called before exporting the splits
+            and the original audio will not be moved.
 
         stop_list: list, re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
             list of strings that when found will trigger the audio splitting.
@@ -138,6 +143,7 @@ class AudioSplitter:
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
         self.metadata_file = self.sp_dir / "metadata.txt"
+        self.debug = debug
         assert silence_method in ["sox_cli", "pydub", "torchaudio"], "invalid silence_method"
         assert self.unsp_dir.exists(), "missing untouched dir"
         assert self.sp_dir.exists(), "missing splitted dir"
@@ -436,6 +442,10 @@ class AudioSplitter:
             # # contained no words
             # times_to_keep[-1][1] = len(audio_o) / 1000 / self.g_spf
             # times_to_keep[0][0] = 0
+
+            if self.debug:
+                red("Opening debugger because debug argument")
+                breakpoint()
 
             if len(times_to_keep) == 1:
                 whi(f"Stopping there for {fileo} as there is no cutting to do")
@@ -944,16 +954,19 @@ class AudioSplitter:
 
         assert new_len >= 10, red("Suspiciously show new audio file, exiting.")
 
-        whi(f"Moving {file} to {self.done_dir} dir")
-        whi("Copying")
-        shutil.copy2(file, self.done_dir / (file.name + "temp"))
-        whi("Renaming")
-        shutil.move(
-                self.done_dir / (file.name + "temp"),
-                self.done_dir / file.name)
-        whi("Removing")
-        file.unlink(missing_ok=False)
-        whi("Done!")
+        if not self.debug:
+            whi(f"Moving {file} to {self.done_dir} dir")
+            whi("Copying")
+            shutil.copy2(file, self.done_dir / (file.name + "temp"))
+            whi("Renaming")
+            shutil.move(
+                    self.done_dir / (file.name + "temp"),
+                    self.done_dir / file.name)
+            whi("Removing")
+            file.unlink(missing_ok=False)
+            whi("Done!")
+        else:
+            red(f"Not moving {file} to {self.done_dir} because debug is on")
 
         return new_filename
 
