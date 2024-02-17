@@ -354,33 +354,41 @@ def roll_audio(*slots) -> List[dict]:
     return slots
 
 
-audio_txts_header = """
+head = """
 <style>
 mark {
     background-color: #5767AE;
-    color: white;
-    }
+    color: white !important;
+}
 .dark mark {
     background-color: #5767AE;
     color: white;
-    }
+}
 
 .separator {
     height: 1px;
     background-color: #5767AE;
     margin-top: 0;
     margin-bottom: 0;
-.separator.dark {
+}
 .dark .separator {
     height: 1px;
     background-color: #5767AE;
     margin-top: 0;
     margin-bottom: 0;
 }
+
+.scrollablecontent {
+    max-height: 250px !important;
+    overflow-y: auto;
+}
 </style>
-<br>
+<div class="scrollablecontent">
 """
-div_separator = ' <div class=separator>-</div> '
+div_separator = ' <div class="separator">-</div> '
+tail = """
+</div>
+"""
 
 def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
@@ -392,12 +400,12 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
 
     df = shared.dirload_queue
     if df.empty:
-        return [f"{audio_txts_header}<mark>Dirload not yet loaded</mark>" for i in audio_slots_txts]
+        return [f"{head}<mark>Dirload not yet loaded</mark>{tail}" for i in audio_slots_txts]
 
     try:
         df = df[df["loaded"] == True]
         if df.empty:
-            return [f"{audio_txts_header}<mark>Empty</mark>" for i in audio_slots_txts]
+            return [f"{head}<mark>Empty</mark>{tail}" for i in audio_slots_txts]
 
         trans = [t.strip() if isinstance(t, str) else t for t in df["transcribed"].tolist()]
         while len(trans) < len(audio_slots_txts):
@@ -416,11 +424,12 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
 
             o = re.sub("\Wstop\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("\W#####\W", "<mark>#####</mark>", o, flags=re.IGNORECASE)
 
             o = re.sub("\Wstarted\W", "<mark>started</mark>", o, flags=re.IGNORECASE)
             o = re.sub("\WPending?\W", "<mark>Pending?</mark>", o)
-            output[i] = audio_txts_header + o
+            output[i] = head + o + tail
 
         return output
     except Exception as err:
-        return [f"<mark>{err}</mark>" for i in audio_slots_txts]
+        return [f"{head}<mark>{err}</mark>{tail}" for i in audio_slots_txts]
