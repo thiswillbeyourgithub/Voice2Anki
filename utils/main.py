@@ -31,7 +31,7 @@ from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_templ
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
-litellm.set_verbose = shared.debug
+litellm.set_verbose = False  #shared.debug
 shared.pv = ValueStorage()
 shared.message_buffer = shared.pv["message_buffer"]
 
