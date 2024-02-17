@@ -486,4 +486,5 @@ def call_user_chain(txt_audio, evt: gr.EventData):
     assert chain is not None
     func = trace(chain["func"])
     txt_audio = func(txt_audio)
+    assert isinstance(txt_audio, str), f"Output of user chain must be a string, not {type(txt_audio)}. Value: {txt_audio}"
     return txt_audio
