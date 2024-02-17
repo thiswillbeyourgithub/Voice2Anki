@@ -1038,4 +1038,4 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
     return transcript
 
 if __name__ == "__main__":
-    fire.Fire(AudioSplitter)
+    out = fire.Fire(AudioSplitter)
