@@ -107,7 +107,7 @@ def check_anki_models() -> None:
     elif "Voice2Anki" in models:
         shared.anki_notetype = "Voice2Anki"
     else:
-        gr.Error(red("Anki does not contain a notetype 'Voice2Anki' nor 'Clozolkor', creating it."))
+        gr.Warning(red("Anki does not contain a notetype 'Voice2Anki' nor 'Clozolkor', creating it."))
         # create note type model that has the right fields
         call_anki(
                 action="createModel",
@@ -121,7 +121,7 @@ def check_anki_models() -> None:
                         },
                     ],
                 )
-        gr.Error(red("Done creating notetype 'Voice2Anki'"))
+        gr.Warning(red("Done creating notetype 'Voice2Anki'"))
         shared.anki_notetype = "Voice2Anki"
     whi(f"Anki notetype detected: '{shared.anki_notetype}'")
 

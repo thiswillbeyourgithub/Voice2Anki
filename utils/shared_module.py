@@ -241,7 +241,7 @@ class SharedModule:
 
 def p(message):
     print(col_red + message + col_rst)
-    gr.Error(message)
+    gr.Warning(message)
 
 
 shared = SharedModule()

@@ -130,7 +130,7 @@ def whisper_cached(
                 if cnt >= 5:
                     raise Exception(red(f"Cached whisper: RateLimitError >5: '{err}'"))
                 else:
-                    gr.Error(red(f"Cached whisper: RateLimitError #{cnt}/5 from cached whisper: '{err}'"))
+                    gr.Warning(red(f"Cached whisper: RateLimitError #{cnt}/5 from cached whisper: '{err}'"))
                     time.sleep(2 * cnt)
     except Exception as err:
         raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
@@ -546,7 +546,7 @@ def alfred(
         if cache_mode:
             return red(mess)
         else:
-            # gr.Error(mess)
+            # gr.Warning(mess)
             return red(mess)
     if txt_audio.count(" ") < 5:
         return red(f"Too few words in txt_audio to be plausible")
@@ -719,13 +719,13 @@ def dirload_splitted(
     # check how many audio are needed
     whi(f"Number of empty sound slots: {empty_slots}")
     if empty_slots < 0:
-        gr.Error(red("Invalid number of empty audio slots: {empty_slots}!"))
+        gr.Warning(red("Invalid number of empty audio slots: {empty_slots}!"))
         return audios
     if len(audios) > shared.audio_slot_nb:
-        gr.Error(red("Invalid number of audio slots: {empty_slots}!"))
+        gr.Warning(red("Invalid number of audio slots: {empty_slots}!"))
         return audios
     if not empty_slots:
-        gr.Error(red("No empty audio slots!"))
+        gr.Warning(red("No empty audio slots!"))
         return audios
 
     # sort by oldest
@@ -748,7 +748,7 @@ def dirload_splitted(
     shared.dirload_queue = shared.dirload_queue.sort_index()
 
     if not (shared.dirload_queue["moved"] == False).any():
-        gr.Error(red("No mp3 files in shared.dirload_queue"))
+        gr.Warning(red("No mp3 files in shared.dirload_queue"))
         return audios
 
     # iterate over each files from the dir. If images are found, load them
@@ -825,7 +825,7 @@ def dirload_splitted(
                 assert shared.dirload_queue.loc[p, "moved"] is False, f"File {p} was already moved"
                 assert not shared.dirload_queue.loc[p, "transcribed"] in [False, "started"], f"File {p} shouldn't have to be moved as it has not been transcribed"
                 if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
-                    gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
+                    gr.Warning(red(f"File {p} was moved but had not been sent to alfred"))
                 red(f"Moving {p} to done_dir")
                 shutil.copy2(p, shared.done_dir / Path(p).name)
                 assert (shared.done_dir / (Path(p).name)).exists(), f"Error when moving {p}"
