@@ -32,7 +32,7 @@ document.querySelector('body').classList.add('dark');
 }
 }"""
 
-shortcut_js = """
+html_head = """
 <script>
 
 function unfocus(e) {
@@ -172,7 +172,7 @@ with gr.Blocks(
         title=f"Voice2Anki V{shared.VERSION}",
         theme=theme,
         css=css,
-        head=shortcut_js,
+        head=html_head,
         ) as demo:
 
     with gr.Row():
