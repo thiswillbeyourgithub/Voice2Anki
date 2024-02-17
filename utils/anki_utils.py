@@ -346,7 +346,7 @@ async def suspend_previous_notes() -> None:
                     )
                 ), f"Cards failed to unsuspend?"
     else:
-        gr.Warning(red(f"Suspending notes nid:{','.join(nids)} with bodies:\n{bodies}"))
+        gr.Warning(red(f"Suspending notes nid:{','.join(s_nids)} with bodies:\n{bodies}"))
         out = await async_call_anki(
                 action="suspend",
                 cards=cids)
