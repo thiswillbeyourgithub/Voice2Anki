@@ -772,6 +772,11 @@ def dirload_splitted(
         gr.Warning(red("No mp3 files in shared.dirload_queue"))
         return audios
 
+    # check that loaded audio are all next to each other
+    loadeds = shared.dirload_queue[shared.dirload_queue["loaded"] == True].index.tolist()
+    index = shared.dirload_queue.index.tolist()
+    assert ",".join(loadeds) in ",".join(index), f"Loaded audio are not neighbors!"
+
     # iterate over each files from the dir. If images are found, load them
     # into gallery but if the images are found after sounds, stops iterating
     sounds_to_load = []
