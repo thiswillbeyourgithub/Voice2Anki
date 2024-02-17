@@ -385,7 +385,7 @@ mark {
 </style>
 <div class="scrollablecontent">
 """
-div_separator = ' <div class="separator">-</div> '
+div_separator = '  <div class="separator">-</div>  '
 tail = """
 </div>
 """
