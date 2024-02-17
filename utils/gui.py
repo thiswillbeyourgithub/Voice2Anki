@@ -39,7 +39,7 @@ function unfocus(e) {
     document.activeElement.blur();
     document.body.focus();
     document.documentElement.focus();
-    e.preventDefault();  // make sure to avoid scrolling up
+    e.preventDefault();  // make sure to avoid scrolling after pressing spacebar
 }
 
 function shortcuts(e) {
@@ -61,69 +61,69 @@ function shortcuts(e) {
 
         default:
         if (e.code == "KeyS" && e.shiftKey) {
-            //document.getElementById("syncankibtn").click();
-            document.getElementById("suspendpreviousbtn").click();
+            //document.getElementById(js_"syncankibtn").click();
+            document.getElementById("js_suspendpreviousbtn").click();
         }
         else if (e.code == 'Semicolon' && e.shiftKey) {
-            document.getElementById("markpreviousbtn").click();
+            document.getElementById("js_markpreviousbtn").click();
         }
         else if (e.key == "s") {
-            document.getElementById("cardstatusbtn").click();
+            document.getElementById("js_cardstatusbtn").click();
         }
         else if (e.key == "f") {
-            document.getElementById("llmfeedbackbtn").click();
+            document.getElementById("js_llmfeedbackbtn").click();
         }
 
         // nightmode
         else if (e.code == "KeyN" && e.shiftKey) {
-            document.getElementById("darkmodebtn").click();
+            document.getElementById("js_darkmodebtn").click();
         }
 
         // select text
         else if (e.key == "e") {
             e.preventDefault();  // dont type the e
-            ch = document.getElementById("txtchatgpt").children;
+            ch = document.getElementById("js_txtchatgpt").children;
             ch[ch.length - 1].focus();
         }
         else if (e.code == "KeyE" && e.shiftKey) {
             e.preventDefault();  // dont type the e
-            ch = document.getElementById("txtwhisper").children;
+            ch = document.getElementById("js_txtwhisper").children;
             ch[ch.length - 1].focus();
         }
 
         // roll 1 2 3
         else if (e.key == "&") {
-            document.getElementById("roll1").click();
+            document.getElementById("js_roll1").click();
         }
         else if (e.key == "é") {
-            document.getElementById("roll12").click();
+            document.getElementById("js_roll12").click();
         }
         else if (e.key == '"') {
-            document.getElementById("roll123").click();
+            document.getElementById("js_roll123").click();
         }
 
         // 123
         else if (e.key == "3" && e.shiftKey) {
-            document.getElementById("toankibtn").click();
+            document.getElementById("js_toankibtn").click();
         }
         else if (e.key == "2" && e.shiftKey) {
-            document.getElementById("transcriptbtn").click();
+            document.getElementById("js_transcriptbtn").click();
         }
         else if (e.key == "1" && e.shiftKey) {
-            document.getElementById("transcribebtn").click();
+            document.getElementById("js_transcribebtn").click();
         }
 
         // roll gallery
         else if (e.code == 'KeyG' && e.shiftKey) {
             if (confirm("Roll gallery?")) {
-                document.getElementById("rollgallbtn").click();
+                document.getElementById("js_rollgallbtn").click();
             }
         }
 
         // dirload
         else if (e.code == 'KeyD' && e.shiftKey) {
             if (confirm("Load from dir?")) {
-                document.getElementById("dirloadbtn").click();
+                document.getElementById("js_dirloadbtn").click();
             }
         }
 
@@ -153,14 +153,14 @@ css = """
 #BigTabV2A-button { flex-grow:1 !important; }
 
 /* remove source selector */
-#Audio_component_Voice2Anki > div.component-wrapper > div.controls > select {display: none !important; flex-grow:0 !important;}
+#js_audiocomponent > div.component-wrapper > div.controls > select {display: none !important; flex-grow:0 !important;}
 
 /* remove volume and speed controls */
-#Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.control-wrapper {display: none !important; flex-grow:0 !important;}
+#js_audiocomponent > div.component-wrapper > div.controls > div.control-wrapper {display: none !important; flex-grow:0 !important;}
 
 
 /* remove clipping controls
-#Audio_component_Voice2Anki > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
+#js_audiocomponent > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
 */
 """.strip()
 
@@ -177,14 +177,14 @@ with gr.Blocks(
 
     with gr.Row():
         gr.Button(value=f"Voice2Anki V{shared.VERSION}", variant="primary", scale=3, interactive=True)
-        dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=0, elem_id="darkmodebtn")
-        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="syncankibtn")
+        dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=0, elem_id="js_darkmodebtn")
+        sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=0, elem_id="js_syncankibtn")
 
     with gr.Tab(label="Main", elem_id="BigTabV2A"):
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1)
-            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="dirloadbtn", visible=shared.pv["enable_dirload"])
+            dir_load_btn = gr.Button(value="Dirload", variant="secondary", min_width=50, scale=5, elem_id="js_dirloadbtn", visible=shared.pv["enable_dirload"])
 
         # audio
         audio_number = shared.audio_slot_nb
@@ -205,28 +205,28 @@ with gr.Blocks(
 
         # whisper and chatgpt text output
         with gr.Row():
-            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True, scale=1, elem_id="txtwhisper")
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True, scale=1, elem_id="txtchatgpt")
+            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=100, placeholder="The transcript of the audio recording will appear here", container=False, interactive=True, scale=1, elem_id="js_txtwhisper")
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=100, placeholder="The anki flashcard will appear here", container=False, interactive=True, scale=1, elem_id="js_txtchatgpt")
 
         # rolls
         with gr.Group():
             with gr.Row():
-                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="roll123")
-                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="roll12")
-                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="roll1")
-                update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="cardstatusbtn")
+                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123")
+                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12")
+                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1")
+                update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn")
 
         # 1/2/3
         with gr.Group():
             with gr.Row():
-                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="transcribebtn")
-                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="transcriptbtn")
-                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="toankibtn")
+                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="js_transcribebtn")
+                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="js_transcriptbtn")
+                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn")
 
         with gr.Row():
-            mark_previous = gr.Button(value="Toggle mark previous", elem_id="markpreviousbtn")
+            mark_previous = gr.Button(value="Toggle mark previous", elem_id="js_markpreviousbtn")
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True)
-            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="suspendpreviousbtn")
+            suspend_previous = gr.Button(value="Toggle suspend previous", elem_id="js_suspendpreviousbtn")
 
         # 1+2 / 1+2+3
         with gr.Accordion(open=False, label="Edit"):
@@ -242,7 +242,7 @@ with gr.Blocks(
                         container=True,
                         show_label=True,
                         scale=0,
-                        elem_id="Audio_component_Voice2Anki",
+                        elem_id="js_audiocomponent",
                         #min_width=300,
                         editable=False,
                         )
@@ -260,7 +260,7 @@ with gr.Blocks(
         with gr.Accordion(label="Quick settings", open=True):
             with gr.Row():
                 sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
-                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="llmfeedbackbtn")
+                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn")
                 prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
             with gr.Row():
                 with gr.Column(scale=10):
@@ -284,7 +284,7 @@ with gr.Blocks(
         with gr.Accordion(label="Main gallery", open=True, visible=shared.pv["enable_gallery"]) as accordion_gallery:
             with gr.Row():
                 with gr.Column():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="rollgallbtn")
+                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn")
                     gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                     with gr.Group():
                         with gr.Row():
@@ -299,7 +299,7 @@ with gr.Blocks(
                 but = gr.Button(
                         value=str(i),
                         visible=False,
-                        elem_id=f"user_chain_btn #{i}",
+                        elem_id=f"js_userchainbtn_#{i}",
                         )
                 btn_chains.append(but)
             for ch in btn_chains:
