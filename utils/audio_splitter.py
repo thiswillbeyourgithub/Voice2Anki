@@ -287,7 +287,7 @@ class AudioSplitter:
                     # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                     # whi("Saved")
                 audio.export(path, format="mp3")
-            joblib.Parallel(
+            _ = joblib.Parallel(
                     n_jobs=10,
                     backend="threading",
                     )(joblib.delayed(threaded_export)(sub, f)
