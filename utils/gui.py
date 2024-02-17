@@ -65,13 +65,13 @@ function shortcuts(e) {
         else if (e.code == 'Semicolon' && e.shiftKey) {
             document.getElementById("js_markpreviousbtn").click();
         }
-        else if (e.code == 'Semicolon') {
+        else if (e.key == 'm') {
             document.getElementById("js_marknext").click();
         }
         else if (e.key == "s") {
             document.getElementById("js_cardstatusbtn").click();
         }
-        else if (e.key == "f") {
+        else if (e.code == "KeyF" && e.shiftKey) {
             document.getElementById("js_llmfeedbackbtn").click();
         }
 
