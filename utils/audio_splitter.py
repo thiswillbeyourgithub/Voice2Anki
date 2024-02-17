@@ -227,11 +227,6 @@ class AudioSplitter:
             fileo = self.to_split_original[iter_file]  # original file
             audio_o = AudioSegment.from_mp3(fileo)  # original audio, without slowing down
 
-            if len(times_to_keep) == 1:
-                whi(f"Stopping there for {fileo} as there is no cutting to do")
-                shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
-                continue
-
             # check overlap
             prev_t0 = -1
             prev_t1 = -1
@@ -440,6 +435,11 @@ class AudioSplitter:
             # # contained no words
             # times_to_keep[-1][1] = len(audio_o) / 1000 / self.g_spf
             # times_to_keep[0][0] = 0
+
+            if len(times_to_keep) == 1:
+                whi(f"Stopping there for {fileo} as there is no cutting to do")
+                shutil.move(fileo, self.sp_dir / f"{fileo.stem}_too_small.{fileo.suffix}")
+                continue
 
             ignored = AudioSegment.empty()
             prev_end = 0
