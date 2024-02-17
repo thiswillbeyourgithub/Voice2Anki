@@ -51,6 +51,19 @@ colors = {
         }
 
 
+def Critical(func: Callable) -> Callable:
+    """if this decorator is used, any exception in the wrapped function
+    will add to the error message to restart the app.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exeption as err:
+            gr.Warning(red(f"CRITICAL ERROR - PLEASE RESTART THE APP\nFunction: {func}\nError: {err}"))
+            raise
+
+
+@Critical
 def store_to_db(dictionnary: dict, db_name: str) -> bool:
     """
     take a dictionnary and add it to the sqlite db. This is used to store
