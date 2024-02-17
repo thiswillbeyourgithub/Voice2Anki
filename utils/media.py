@@ -426,8 +426,8 @@ def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
             o = re.sub(r"\Wstop ?\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
             o = re.sub(r"\W#####\W", "<mark>#####</mark>", o, flags=re.IGNORECASE)
 
-            o = re.sub(r"\Wstarted\W", "<mark>started</mark>", o, flags=re.IGNORECASE)
-            o = re.sub(r"\WPending?\W", "<mark>Pending?</mark>", o)
+            o = re.sub("started", "<mark>started</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("Pending?", "<mark>Pending?</mark>", o)
             output[i] = head + o + tail
 
         return output
