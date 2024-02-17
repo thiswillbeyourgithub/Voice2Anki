@@ -527,7 +527,7 @@ class AudioSplitter:
         assert to_split, f"no mp3/wav found in {self.unsp_dir}"
         # to_split = sorted(to_split, key=lambda x: x.stat().st_mtime)
         to_split = sorted(to_split, key=lambda x: x.name)
-        to_split = to_split[:self.n_todo + 1]
+        to_split = to_split[:self.n_todo]
         whi(f"Total number of files to split: {len(to_split)}")
 
         return to_split
