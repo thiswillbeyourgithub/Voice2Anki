@@ -819,18 +819,22 @@ def dirload_splitted(
                 shared.running_threads["transcribing_audio"].extend(new_threads)
 
     with shared.dirload_lock:
-        while len(shared.dirload_queue[shared.dirload_queue["loaded"] == True]) > shared.audio_slot_nb:
-            p = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
-            assert shared.dirload_queue.loc[p, "moved"] is False, f"File {p} was already moved"
-            assert not shared.dirload_queue.loc[p, "transcribed"] in [False, "started"], f"File {p} shouldn't have to be moved as it has not been transcribed"
-            if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
-                gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
-            red(f"Moving {p} to done_dir")
-            shutil.copy2(p, shared.done_dir / Path(p).name)
-            shared.dirload_queue.loc[p, "loaded"] = False
-            shared.dirload_queue.loc[p, "moved"] = True
-            assert (shared.done_dir / (Path(p).name)).exists(), f"Error when moving {p}"
-            p.unlink(missing_ok=False)
+        try:
+            while len(shared.dirload_queue[shared.dirload_queue["loaded"] == True]) > shared.audio_slot_nb:
+                p = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
+                assert shared.dirload_queue.loc[p, "moved"] is False, f"File {p} was already moved"
+                assert not shared.dirload_queue.loc[p, "transcribed"] in [False, "started"], f"File {p} shouldn't have to be moved as it has not been transcribed"
+                if shared.dirload_queue.loc[p, "alfreded"] in [False, "started"]:
+                    gr.Error(red(f"File {p} was moved but had not been sent to alfred"))
+                red(f"Moving {p} to done_dir")
+                shutil.copy2(p, shared.done_dir / Path(p).name)
+                assert (shared.done_dir / (Path(p).name)).exists(), f"Error when moving {p}"
+                p.unlink(missing_ok=False)
+                shared.dirload_queue.loc[p, "loaded"] = False
+                shared.dirload_queue.loc[p, "moved"] = True
+        except Exception as err:
+            gr.Warning(red(f"Error when moving audio, restart V2A to avoid unexpected behaviors!\nError: {err}"))
+            raise
 
     while len(output) < shared.audio_slot_nb:
         output.append(None)
