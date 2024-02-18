@@ -1059,13 +1059,13 @@ with gr.Blocks(
                                         preprocess=False,
                                         postprocess=False,
                                         )
-    # roll texts then set status to Rolling
-    gr.on(
-            triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
-            fn=lambda *x: list(x)[:-1] + [None],
-            inputs=audio_slots_txts,
-            outputs=audio_slots_txts,
-            )
+    # # roll texts then set status to Rolling
+    # gr.on(
+    #         triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
+    #         fn=lambda *x: list(x)[:-1] + [None],
+    #         inputs=audio_slots_txts,
+    #         outputs=audio_slots_txts,
+    #         )
 
     # write Rolling in the status button
     gr.on(
