@@ -344,7 +344,7 @@ with gr.Blocks(
                         )
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
-        with gr.Tab(label="GUI"):
+        with gr.Tab(label="GUI", elem_id="BigTabV2A"):
             with gr.Row():
                 gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
                 gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
@@ -353,53 +353,56 @@ with gr.Blocks(
                 roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
                 gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
 
-        with gr.Row():
-            txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
-        with gr.Row():
-            txt_deck = gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True)
-            txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
-        txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
-        with gr.Row():
-            txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
-            txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
-        with gr.Row():
-            txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
-        with gr.Row():
-            if shared.memory_metric == "embeddings":
-                sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.1, label="Embeddings weight")
-            elif shared.memory_metric == "length":
-                sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.1, label="Length weight")
-            sld_prio_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_prio_weight"], step=0.1, label="Priority weight")
-            sld_timestamp_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_timestamp_weight"], step=0.1, label="Timestamp weight")
-            sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.1, label="Keywords weight")
-        with gr.Row():
+        with gr.Tab(label="Anki", elem_id="BigTabV2A"):
+            with gr.Row():
+                txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
+            with gr.Row():
+                txt_deck = gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True)
+                txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
+            txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
+        with gr.Tab(label="LLM", elem_id="BigTabV2A"):
+            with gr.Row():
+                txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
+                txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
             with gr.Column():
                 embed_choice = gr.Dropdown(value=shared.pv["embed_choice"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
                 txt_replicate_api_key = gr.Textbox(value=shared.pv["txt_replicate_api_key"], label="Replicate API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
-        with gr.Row():
-            kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", size="sm")
-        with gr.Accordion(label="User functions", open=False):
+        with gr.Tab(label="Memory retrieval", elem_id="BigTabV2A"):
             with gr.Row():
-                code_user_flashcard_editor = gr.Code(
-                        value=None,
-                        language="python",
-                        lines=5,
-                        label="flashcard_editor.py",
-                        interactive=False,
-                        show_label=True,
-                        )
+                txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
             with gr.Row():
-                code_user_chains = gr.Code(
-                        value=None,
-                        language="python",
-                        lines=5,
-                        label="chains.py",
-                        interactive=False,
-                        show_label=True,
-                        )
+                if shared.memory_metric == "embeddings":
+                    sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.1, label="Embeddings weight")
+                elif shared.memory_metric == "length":
+                    sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.1, label="Length weight")
+                sld_prio_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_prio_weight"], step=0.1, label="Priority weight")
+                sld_timestamp_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_timestamp_weight"], step=0.1, label="Timestamp weight")
+                sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.1, label="Keywords weight")
+        with gr.Tab(label="Misc", elem_id="BigTabV2A"):
+            with gr.Row():
+                kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", size="sm")
+            with gr.Accordion(label="User functions", open=False):
+                with gr.Row():
+                    code_user_flashcard_editor = gr.Code(
+                            value=None,
+                            language="python",
+                            lines=5,
+                            label="flashcard_editor.py",
+                            interactive=False,
+                            show_label=True,
+                            )
+                with gr.Row():
+                    code_user_chains = gr.Code(
+                            value=None,
+                            language="python",
+                            lines=5,
+                            label="chains.py",
+                            interactive=False,
+                            show_label=True,
+                            )
 
     with gr.Tab(label="Queues", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"], elem_classes=["js_queuetabclass"]) as tab_queues:
         with gr.Tab(label="Queued galleries", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"], elem_classes=["js_queuefgclass"]) as tab_queued_galleries:
