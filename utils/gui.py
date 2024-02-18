@@ -347,11 +347,12 @@ with gr.Blocks(
         with gr.Tab(label="GUI", elem_id="BigTabV2A"):
             with gr.Row():
                 gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
-                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
-                gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
-            with gr.Row():
                 gui_rolldirloadcheck = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
+            with gr.Row():
+                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
                 gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
+            with gr.Row():
+                gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
 
         with gr.Tab(label="Anki", elem_id="BigTabV2A"):
             with gr.Row():
@@ -567,7 +568,18 @@ with gr.Blocks(
             raise ValueError(name)
 
     # update gui
-    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn, gui_rolldirloadcheck, gui_enable_queued_gallery] + audio_slots_txts
+    gui_outputs = [
+            tab_queues,
+            tab_queued_galleries,
+            accordion_gallery,
+            gui_enable_gallery,
+            roll_gall_btn,
+            flag_audio_btn,
+            dir_load_btn,
+            force_sound_processing_btn,
+            gui_rolldirloadcheck,
+            gui_enable_queued_gallery,
+            ] + audio_slots_txts
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],
