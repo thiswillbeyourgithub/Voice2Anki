@@ -143,7 +143,7 @@ function shortcuts(e) {
         }
 
         // dirload
-        else if (e.code == 'KeyD' && e.shiftKey) {
+        else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyD' && e.shiftKey) {
             if (confirm("Load from dir?")) {
                 document.getElementById("js_dirloadbtn").click();
             }
