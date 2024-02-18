@@ -130,7 +130,7 @@ class SharedModule:
             # ["norm"],  # normalize audio
 
             # max silence should be 2s
-            ["silence", "-l", "1", "0", "0.1%", "-1", "2.0", "0.1%"],
+            ["silence", "-l", "1", "0", "1%", "-1", "2.0", "1%"],
 
             # ["norm"],
             ]
