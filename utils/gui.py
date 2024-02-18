@@ -350,7 +350,7 @@ with gr.Blocks(
                 gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
                 gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
             with gr.Row():
-                roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
+                gui_rolldirloadcheck = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
                 gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
 
         with gr.Tab(label="Anki", elem_id="BigTabV2A"):
@@ -531,7 +531,7 @@ with gr.Blocks(
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
                     force_sound_processing_btn: gr.update(visible=value),
-                    roll_dirload_check: gr.update(visible=value, value=False),
+                    gui_rolldirloadcheck: gr.update(visible=value, value=False),
                     }
             for ast in audio_slots_txts:
                 outdict[ast] = gr.update(visible=value)
@@ -567,7 +567,7 @@ with gr.Blocks(
             raise ValueError(name)
 
     # update gui
-    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn, roll_dirload_check, gui_enable_queued_gallery] + audio_slots_txts
+    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn, gui_rolldirloadcheck, gui_enable_queued_gallery] + audio_slots_txts
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],
@@ -753,7 +753,7 @@ with gr.Blocks(
     sld_whisp_temp.change(fn=shared.pv.save_sld_whisp_temp, inputs=[sld_whisp_temp], show_progress=False)
     sld_buffer.change(fn=shared.pv.save_sld_buffer, inputs=[sld_buffer], show_progress=False)
     sld_temp.change(fn=shared.pv.save_sld_temp, inputs=[sld_temp], show_progress=False)
-    roll_dirload_check.change(fn=shared.pv.save_dirload_check, inputs=[roll_dirload_check], show_progress=False)
+    gui_rolldirloadcheck.change(fn=shared.pv.save_dirload_check, inputs=[gui_rolldirloadcheck], show_progress=False)
     prompt_manag.change(fn=shared.pv.save_prompt_management, inputs=[prompt_manag], show_progress=False)
     txt_tags.select(fn=shared.pv.save_txt_tags, inputs=[txt_tags], show_progress=False)
     txt_deck.select(fn=shared.pv.save_txt_deck, inputs=[txt_deck], show_progress=False)
@@ -922,7 +922,7 @@ with gr.Blocks(
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
-                            roll_dirload_check,
+                            gui_rolldirloadcheck,
                             txt_whisp_prompt,
                             txt_whisp_lang,
                             sld_whisp_temp,
@@ -974,7 +974,7 @@ with gr.Blocks(
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
-                            roll_dirload_check,
+                            gui_rolldirloadcheck,
                             txt_whisp_prompt,
                             txt_whisp_lang,
                             sld_whisp_temp,
@@ -1042,7 +1042,7 @@ with gr.Blocks(
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
-                                    roll_dirload_check,
+                                    gui_rolldirloadcheck,
                                     txt_whisp_prompt,
                                     txt_whisp_lang,
                                     sld_whisp_temp,
@@ -1098,7 +1098,7 @@ with gr.Blocks(
     dir_load_btn.click(
             fn=dirload_splitted,
             inputs=[
-                roll_dirload_check,
+                gui_rolldirloadcheck,
                 txt_whisp_prompt,
                 txt_whisp_lang,
                 sld_whisp_temp,
