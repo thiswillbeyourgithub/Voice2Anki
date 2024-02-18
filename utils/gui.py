@@ -455,7 +455,7 @@ with gr.Blocks(
                     interactive=False,
                     wrap=True,
                     height=2000,
-                    column_widths="15%"
+                    column_widths=["1%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
                     )
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
