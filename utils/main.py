@@ -141,7 +141,10 @@ def whisper_cached(
                     try:
                         if not shared.dirload_queue.empty:
                             tmp_df = shared.dirload_queue.reset_index().set_index("temp_path")
-                            orig_path = tmp_df.loc[str(audio_path), "path"]
+                            try:
+                                orig_path = tmp_df.loc[str(audio_path), "path"]
+                            except:
+                                orig_path = tmp_df.loc[str(audio_path).replace("_proc", ""), "path"]
                             with shared.dirload_lock:
                                 tmp_df.loc[orig_path, "transcribed"] = transcript.text
                     except Exception as err:
