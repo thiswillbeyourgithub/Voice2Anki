@@ -414,7 +414,6 @@ with gr.Blocks(
                             fn=ocr_image,
                             inputs=[gallery],
                             outputs=[source_txt],
-                            # queue=False,
                             preprocess=False,
                             postprocess=False,
                             )
@@ -676,12 +675,10 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            # queue=False,
             ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
-                    # queue=False,
                     preprocess=False,
                     postprocess=False,
                     )
@@ -716,10 +713,6 @@ with gr.Blocks(
             fn=get_card_status,
             inputs=[txt_chatgpt_cloz],
             outputs=[update_status_btn],
-            # queue=False,
-            # show_progress=True,
-            # every=2,
-            # trigger_mode="once",
             preprocess=False,
             postprocess=False,
             )
@@ -797,7 +790,6 @@ with gr.Blocks(
             inputs=[gallery],
             outputs=[gallery],
             show_progress=False,
-            # queue=False,
             ).then(
                 fn=shared.pv.save_gallery,
                 inputs=[gallery],
@@ -805,7 +797,6 @@ with gr.Blocks(
                 ).then(
                         fn=get_img_source,
                         inputs=[gallery],
-                        # queue=False,
                         show_progress=False,
                         )
 
@@ -818,14 +809,12 @@ with gr.Blocks(
             ).then(
                     fn=get_img_source,
                     inputs=[gallery],
-                    # queue=False,
                     show_progress=False,
                     )
 
     rst_img_btn.click(
             fn=reset_gallery,
             outputs=[gallery],
-            # queue=False,
             show_progress=False,
             ).then(
                 fn=shared.pv.save_gallery,
@@ -842,7 +831,6 @@ with gr.Blocks(
                 fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                 inputs=[gal_],
                 show_progress=False,
-                # queue=True,
                 )
 
         # for the first gallery only: run ocr in advance
@@ -850,7 +838,6 @@ with gr.Blocks(
             gal_.change(
                     fn=get_img_source,
                     inputs=[gal_],
-                    # queue=True,
                     )
 
         # add image
@@ -858,12 +845,10 @@ with gr.Blocks(
                 fn=get_image,
                 inputs=[gal_],
                 outputs=[gal_],
-                # queue=False,
                 ).then(  # force deletion
                         fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
                         show_progress=False,
-                       # queue=True,
                         )
 
         # send image
@@ -871,21 +856,16 @@ with gr.Blocks(
                 fn=lambda x: x,
                 inputs=[gal_],
                 outputs=[gallery],
-                # preprocess=False,
-                # postprocess=False,
-                # queue=False,
                 )
 
         # reset image
         rst_.click(
                 fn=lambda: None,
                 outputs=[gal_],
-                # queue=False,
                 ).then(  # force deletion
                         fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
                         show_progress=False,
-                       # queue=True,
                         )
 
 
@@ -894,7 +874,6 @@ with gr.Blocks(
                 fn=ocr_image,
                 inputs=[gal_],
                 outputs=[source_txt],
-                # queue=False,
                 preprocess=False,
                 postprocess=False,
                 )
@@ -903,8 +882,6 @@ with gr.Blocks(
             fn=roll_queued_galleries,
             inputs=[row[1] for row in queued_galleries],
             outputs=[gallery] + [row[1] for row in queued_galleries],
-            # preprocess=False,
-            # postprocess=False,
             )
 
     # audio
@@ -926,7 +903,6 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=False,
-            # queue=False,
             show_progress=False,
             )
 
@@ -936,7 +912,6 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            # queue=False,
             show_progress=False,
             ).success(
                 fn=transcribe,
@@ -944,7 +919,6 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                # queue=False,
                 ).then(
                     lambda: None,
                     outputs=[txt_chatgpt_cloz],
@@ -968,13 +942,11 @@ with gr.Blocks(
                         outputs=[audio_slots[-1]],
                         preprocess=False,
                         postprocess=True,
-                        # queue=False,
                         show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
                                 outputs=[update_status_btn],
-                                # queue=True,
                                 preprocess=False,
                                 postprocess=False,
                                 )
@@ -984,7 +956,6 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            # queue=False,
             show_progress=False,
             ).success(
                 fn=transcribe,
@@ -992,12 +963,10 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                # queue=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
-                    # queue=False,
                     preprocess=False,
                     postprocess=False,
                 ).success(
@@ -1020,13 +989,11 @@ with gr.Blocks(
                         outputs=[audio_slots[-1]],
                         # preprocess=False,
                         # postprocess=False,
-                        # queue=False,
                         show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
                                 outputs=[update_status_btn],
-                                # queue=True,
                                 preprocess=False,
                                 postprocess=False,
                                 )
@@ -1036,7 +1003,6 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            # queue=False,
             show_progress=False,
             ).success(
                 fn=transcribe,
@@ -1044,14 +1010,12 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                # queue=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                    # queue=False,
                     ).success(
                             fn=to_anki,
                             inputs=[
@@ -1067,7 +1031,6 @@ with gr.Blocks(
                                 ],
                             preprocess=False,
                             postprocess=False,
-                            # queue=False,
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -1086,15 +1049,11 @@ with gr.Blocks(
                                     prompt_manag,
                                     ],
                                 outputs=[audio_slots[-1]],
-                                # preprocess=False,
-                                # postprocess=False,
-                                # queue=False,
                                 show_progress=False,
                                 ).then(
                                         fn=get_card_status,
                                         inputs=[txt_chatgpt_cloz],
                                         outputs=[update_status_btn],
-                                        # queue=True,
                                         preprocess=False,
                                         postprocess=False,
                                         )
@@ -1142,7 +1101,6 @@ with gr.Blocks(
                 prompt_manag,
                 ] + audio_slots,
             outputs=audio_slots,
-            # queue=False,
             show_progress=False,
             ).success(
                     fn=transcribe,
@@ -1150,19 +1108,16 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    # queue=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                         outputs=[txt_chatgpt_cloz],
-                        # queue=False,
                         preprocess=False,
                         postprocess=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
                                 outputs=[update_status_btn],
-                                # queue=True,
                                 preprocess=False,
                                 postprocess=False,
                                 )
@@ -1174,7 +1129,6 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            # queue=False,
             )
 
     # send to chatgpt
@@ -1182,7 +1136,6 @@ with gr.Blocks(
             fn=alfred,
             inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
             outputs=[txt_chatgpt_cloz],
-            # queue=False,
             preprocess=False,
             postprocess=False,
             )
@@ -1203,7 +1156,6 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
-            # queue=False,
             ).then(
                     fn=lambda: False,
                     outputs=[check_marked],
@@ -1212,7 +1164,6 @@ with gr.Blocks(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
                             outputs=[update_status_btn],
-                            # queue=True,
                             preprocess=False,
                             postprocess=False,
                             )
@@ -1224,14 +1175,12 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            # queue=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                # queue=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1247,7 +1196,6 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    # queue=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
@@ -1261,14 +1209,12 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            # queue=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                # queue=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1284,7 +1230,6 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    # queue=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
@@ -1304,7 +1249,6 @@ with gr.Blocks(
                 ],
             # preprocess=False,
             # postprocess=False,
-            # queue=False,
             show_progress=False,
             )
 
@@ -1339,7 +1283,6 @@ with gr.Blocks(
             )
     init.then(
             fn=sync_anki,
-            # queue=False,
             show_progress=False,
             )
 
