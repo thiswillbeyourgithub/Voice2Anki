@@ -122,7 +122,7 @@ function shortcuts(e) {
         }
 
         // add to next future gallery
-        else if (document.getElementById('js_guienabledirloadbtn').children[1].children[0].checked == true && e.code == 'KeyR' && e.shiftKey) {
+        else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyR' && e.shiftKey) {
             // only active if the right tabs are enabled
             if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queuefgclass').checkVisibility()) {
                     document.getElementById("js_btnfgnew").click();
@@ -132,7 +132,7 @@ function shortcuts(e) {
             }
         }
         // append to latest future gallery
-        else if (document.getElementById('js_guienabledirloadbtn').children[1].children[0].checked == true && e.code == 'KeyQ' && e.shiftKey) {
+        else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyQ' && e.shiftKey) {
             // only active if the right tabs are enabled
             if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queuefgclass').checkVisibility()) {
                 document.getElementById("js_btnfgadd").click();
@@ -342,12 +342,12 @@ with gr.Blocks(
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
         with gr.Tab(label="GUI"):
             with gr.Row():
-                gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirloadbtn")
-                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True)
+                gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
+                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
                 gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
             with gr.Row():
                 roll_dirload_check = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
-                gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True)
+                gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
 
         with gr.Row():
             txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
