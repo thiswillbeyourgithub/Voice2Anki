@@ -17,7 +17,7 @@ def start_Voice2Anki(
 
         share=False,
         open_browser=False,
-        debug=True,
+        debug=False,
         authentication=True,
         localnetwork=True,
         use_ssl=True,
@@ -44,7 +44,7 @@ def start_Voice2Anki(
         will create a url reachable from the global internet
     open_browser: bool, default False
         automatically open the browser
-    debug: bool, default True
+    debug: bool, default False
         increase verbosity
     authentication: bool, default True
         if True, will use the login/password pairs specified in Voice2Anki.py
