@@ -306,6 +306,38 @@ def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
 
     return output
 
+@trace
+def fg_add_to_new(*fg):
+    """triggered by a shortcut, will add from clipboard the image to
+    a new future gallery"""
+    fg = list(fg)
+    # find the index of the latest non empty gallery
+    for i, img in enumerate(fg):
+        if img is None:
+            break
+    i = max(0, min(i, shared.queued_gallery_slot_nb))
+    new_img = get_image(fg[i])
+    gr.Warning(red(f"Adding to new gallery #{i + 1}"))
+    fg[i] = new_img
+    return fg
+
+
+
+@trace
+def fg_add_to_latest(*fg):
+    """triggered by a shortcut, will add from clipboard the image to
+    the latest non empty future gallery"""
+    fg = list(fg)
+    for i, img in enumerate(fg):
+        if img is None:
+            break
+    i -= 1
+    i = max(0, min(i, shared.queued_gallery_slot_nb))
+    new_img = get_image(fg[i])
+    fg[i] = new_img
+    gr.Warning(red(f"Adding to latest gallery #{i + 1}"))
+    return fg
+
 
 def create_audio_compo(**kwargs) -> gr.Microphone:
     defaults = {
