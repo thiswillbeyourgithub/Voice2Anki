@@ -255,9 +255,11 @@ with gr.Blocks(
                 anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn", size="sm")
 
         with gr.Row():
-            mark_previous = gr.Button(value="Mark previous", elem_id="js_markpreviousbtn", size="sm")
-            check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True, elem_id="js_marknext")
-            suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
+            with gr.Group():
+                with gr.Row():
+                    mark_previous = gr.Button(value="Mark previous", elem_id="js_markpreviousbtn", size="sm", scale=3)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True, elem_id="js_marknext", scale=1, min_width=75)
+            suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm", scale=2)
 
         # quick settings
         with gr.Tab(label="Controls"):
