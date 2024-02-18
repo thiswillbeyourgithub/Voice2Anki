@@ -260,7 +260,7 @@ with gr.Blocks(
             suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
 
         # quick settings
-        with gr.Tab(label="Quick settings"):
+        with gr.Tab(label="Controls"):
             with gr.Row():
                 sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                 improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
