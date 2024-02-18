@@ -669,7 +669,13 @@ with gr.Blocks(
     force_sound_processing_btn.click(
             fn=force_sound_processing,
             outputs=[audio_slots[0]],
-            )
+            ).then(
+                fn=transcribe,
+                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                outputs=[txt_audio],
+                preprocess=False,
+                postprocess=False,
+                )
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(
             fn=transcribe,
