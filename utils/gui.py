@@ -453,9 +453,9 @@ with gr.Blocks(
                     type="pandas",
                     label="Queued audio",
                     interactive=False,
-                    column_widths="5%",
                     wrap=True,
-                    height="2048",
+                    height=2000,
+                    column_widths="15%"
                     )
 
     with gr.Tab(label="Logging", elem_id="BigTabV2A") as tab_logging:
@@ -470,9 +470,9 @@ with gr.Blocks(
                     label="Saved memories",
                     value=None,
                     interactive=False,
-                    column_widths="5%",
                     wrap=True,
-                    height="2048",
+                    height=2000,
+                    column_widths=["1%", "25%", "5%", "5%", "25%", "10%", "10%", "5%", "5%", "10%"],
                     )
 
         with gr.Tab(label="Message buffer", elem_id="BigTabV2A") as tab_buffer:
@@ -480,9 +480,9 @@ with gr.Blocks(
                     label="Message buffer",
                     value=None,
                     interactive=False,
-                    column_widths="5%",
                     wrap=True,
-                    height="2048",
+                    height=2000,
+                    column_widths=["1%", "10%", "10%", "10%", "10%", "5%"],
                     )
 
     # with gr.Tab(label="Files", elem_id="BigTabV2A") as tab_files:
