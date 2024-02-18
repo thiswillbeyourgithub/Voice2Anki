@@ -15,8 +15,6 @@ import pyclip
 import hashlib
 import torchaudio
 
-from joblib import Memory
-
 from .logger import whi, red, trace, Timeout
 from .ocr import get_text
 from .shared_module import shared
