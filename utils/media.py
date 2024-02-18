@@ -430,11 +430,11 @@ tail = """
 </div>
 """
 
-def update_audio_slots_txts(*audio_slots_txts) -> List[str]:
+def update_audio_slots_txts(gui_enable_dirload, *audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription and cloze
     """
-    if shared.pv["enable_dirload"] is False:
+    if gui_enable_dirload is False:
         # the components are invisible so return None
         return [None for i in audio_slots_txts]
 

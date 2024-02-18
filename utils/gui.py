@@ -1299,7 +1299,7 @@ with gr.Blocks(
     #         )
     init.then(
             fn=update_audio_slots_txts,
-            inputs=audio_slots_txts,
+            inputs=[gui_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
             show_progress=False,
             postprocess=False,
