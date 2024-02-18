@@ -718,12 +718,17 @@ with gr.Blocks(
 
     # display card status
     update_status_btn.click(
-            fn=get_card_status,
-            inputs=[txt_chatgpt_cloz],
+            fn=lambda: "Checking",
             outputs=[update_status_btn],
-            preprocess=False,
-            postprocess=False,
-            )
+            show_progress=False,
+            ).then(
+                    fn=get_card_status,
+                    inputs=[txt_chatgpt_cloz],
+                    outputs=[update_status_btn],
+                    preprocess=False,
+                    postprocess=False,
+                    show_progress=False,
+                    )
     txt_chatgpt_cloz.input(
             fn=lambda: "?",
             outputs=[update_status_btn],
