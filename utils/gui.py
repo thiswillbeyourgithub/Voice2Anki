@@ -259,8 +259,41 @@ with gr.Blocks(
             check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=True, elem_id="js_marknext")
             suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm")
 
-        # 1+2 / 1+2+3
-        with gr.Accordion(open=False, label="Edit"):
+        # quick settings
+        with gr.Tab(label="Quick settings"):
+            with gr.Row():
+                sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
+                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
+                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
+            with gr.Row():
+                with gr.Column(scale=10):
+                    with gr.Row():
+                        sld_max_tkn = gr.Number(minimum=0, maximum=15000, value=shared.pv["sld_max_tkn"], step=100.0, label="LLM avail. tkn.", scale=1)
+                        sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
+                        sld_temp = gr.Number(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
+                        sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
+
+            with gr.Row():
+                llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False)
+                txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
+
+            with gr.Row():
+                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
+                force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
+                clear_llm_cache_btn = gr.Button(value="Clear LLM cache", size="sm")
+                pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
+
+        # image
+        with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"]) as tab_gallery:
+            with gr.Column():
+                roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
+                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
+                with gr.Group():
+                    with gr.Row():
+                        rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
+                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
+
+        with gr.Tab(label="Edit"):
             with gr.Row():
                 audio_corrector = gr.Microphone(
                         format="mp3",
@@ -287,44 +320,7 @@ with gr.Blocks(
                         visible=False,
                         )
 
-        # quick settings
-        with gr.Accordion(label="Quick settings", open=True):
-            with gr.Row():
-                sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
-                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
-                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
-            with gr.Row():
-                with gr.Column(scale=10):
-                    with gr.Row():
-                        sld_max_tkn = gr.Number(minimum=0, maximum=15000, value=shared.pv["sld_max_tkn"], step=100.0, label="LLM avail. tkn.", scale=1)
-                        sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
-                        sld_temp = gr.Number(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
-                        sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
-
-            with gr.Row():
-                llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False)
-                txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
-
-            with gr.Row():
-                flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
-                force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
-                clear_llm_cache_btn = gr.Button(value="Clear LLM cache", size="sm")
-                pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
-
-        # image
-        with gr.Accordion(label="Main gallery", open=True, visible=shared.pv["enable_gallery"]) as accordion_gallery:
-            with gr.Row():
-                with gr.Column():
-                    roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
-                    gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
-                    with gr.Group():
-                        with gr.Row():
-                            rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
-                            img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
-
-        txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
-
-        with gr.Row():
+        with gr.Tab(label="User chains"):
             btn_chains = []
             for i in range(5):
                 but = gr.Button(
@@ -342,6 +338,8 @@ with gr.Blocks(
                         postprocess=False,
                         show_progress=False,
                         )
+
+        txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
     with gr.Tab(label="Settings", elem_id="BigTabV2A") as tab_settings:
         with gr.Tab(label="GUI", elem_id="BigTabV2A"):
@@ -530,7 +528,7 @@ with gr.Blocks(
             if value is False:
                 shared.pv["gui_rolldirloadcheck"] = False
             outdict = {
-                    accordion_gallery: gr.update(visible=value),
+                    tab_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
                     force_sound_processing_btn: gr.update(visible=value),
@@ -545,7 +543,7 @@ with gr.Blocks(
             if value is False:
                 shared.pv["enable_queued_gallery"] = False
             return {
-                    accordion_gallery: gr.update(visible=value),
+                    tab_gallery: gr.update(visible=value),
                     roll_gall_btn: gr.update(visible=value),
                     tab_queued_galleries: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
@@ -572,7 +570,7 @@ with gr.Blocks(
     gui_outputs = [
             tab_queues,
             tab_queued_galleries,
-            accordion_gallery,
+            tab_gallery,
             gui_enable_gallery,
             roll_gall_btn,
             flag_audio_btn,
