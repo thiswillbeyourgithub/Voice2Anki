@@ -745,13 +745,14 @@ def dirload_splitted(
         return audios
 
     # warn the user if there is one None surrounded by non None
-    check = False
-    for i, a in enumerate(audios):
-        if a is None:
-            if check:
-                gr.Warning(red(f"There seems to be a missing audios in the slots. This can indicate a bug so you are advised to restart the app;"))
-                break
-            check = True
+    if not all(a is None for a in audios):
+        check = False
+        for i, a in enumerate(audios):
+            if a is None:
+                if check:
+                    gr.Warning(red(f"There seems to be a missing audios in the slots. This can indicate a bug so you are advised to restart the app;"))
+                    break
+                check = True
 
     # make sure to move any empty slot at the end
     audios = [a for a in audios if a is not None]
