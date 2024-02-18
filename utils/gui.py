@@ -9,7 +9,7 @@ from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitte
 from .anki_utils import sync_anki, get_card_status, mark_previous_notes, suspend_previous_notes, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
-from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_future_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, fg_add_to_new, fg_add_to_latest
+from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, qg_add_to_new, qg_add_to_latest
 from .shared_module import shared
 
 theme = gr.themes.Soft(
@@ -125,21 +125,21 @@ function shortcuts(e) {
                 document.getElementById("js_rollgallbtn").click();
             }
         }
-        // add to next future gallery
+        // add to next queued gallery
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyR' && e.shiftKey) {
             // only active if the right tabs are enabled
-            if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queuefgclass').checkVisibility()) {
-                    document.getElementById("js_btnfgnew").click();
+            if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queueqgclass').checkVisibility()) {
+                    document.getElementById("js_btnqgnew").click();
             }
             else {
                 alert("To add to queued gallery, go to 'Queues' then 'Queud audio'");
             }
         }
-        // append to latest future gallery
+        // append to latest queueud gallery
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyQ' && e.shiftKey) {
             // only active if the right tabs are enabled
-            if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queuefgclass').checkVisibility()) {
-                document.getElementById("js_btnfgadd").click();
+            if (document.querySelector('.js_queuetabclass').checkVisibility() && document.querySelector('.js_queueqgclass').checkVisibility()) {
+                document.getElementById("js_btnqgadd").click();
             }
             else {
                 alert("To add to queued gallery, go to 'Queues' then 'Queud audio'");
@@ -405,7 +405,7 @@ with gr.Blocks(
                             )
 
     with gr.Tab(label="Queues", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"], elem_classes=["js_queuetabclass"]) as tab_queues:
-        with gr.Tab(label="Queued galleries", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"], elem_classes=["js_queuefgclass"]) as tab_queued_galleries:
+        with gr.Tab(label="Queued galleries", elem_id="BigTabV2A", visible=shared.pv["enable_queued_gallery"], elem_classes=["js_queueqgclass"]) as tab_queued_galleries:
 
             with gr.Row():
                 with gr.Column():
@@ -445,8 +445,8 @@ with gr.Blocks(
                             ocr_ = gr.Button("OCR", variant="secondary", scale=1, size="sm")
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
-            btn_fg_new = gr.Button(visible=False, elem_id="js_btnfgnew")
-            btn_fg_add = gr.Button(visible=False, elem_id="js_btnfgadd")
+            btn_qg_new = gr.Button(visible=False, elem_id="js_btnqgnew")
+            btn_qg_add = gr.Button(visible=False, elem_id="js_btnqgadd")
 
 
         with gr.Tab(label="Queued audio", elem_id="BigTabV2A", visible=shared.pv["enable_dirload"]) as tab_dirload_queue:
@@ -589,20 +589,19 @@ with gr.Blocks(
             outputs=gui_outputs,
             )
 
-    # shortcut to load to future gallery
-    btn_fg_new.click(
-            fn=fg_add_to_new,
+    # shortcut to load to queued gallery
+    btn_qg_new.click(
+            fn=qg_add_to_new,
             inputs=[row[1] for row in queued_galleries],
             outputs=[row[1] for row in queued_galleries],
             show_progress=False,
             )
-    btn_fg_add.click(
-            fn=fg_add_to_latest,
+    btn_qg_add.click(
+            fn=qg_add_to_latest,
             inputs=[row[1] for row in queued_galleries],
             outputs=[row[1] for row in queued_galleries],
             show_progress=False,
             )
-
 
     # remove the last item from message buffer
     pop_buffer_btn.click(fn=pop_buffer)
@@ -871,7 +870,7 @@ with gr.Blocks(
                 )
 
     roll_gall_btn.click(
-            fn=roll_future_galleries,
+            fn=roll_queued_galleries,
             inputs=[row[1] for row in queued_galleries],
             outputs=[gallery] + [row[1] for row in queued_galleries],
             # preprocess=False,

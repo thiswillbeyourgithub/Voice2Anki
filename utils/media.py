@@ -293,12 +293,12 @@ def rgb_to_bgr(image):
 
 
 @trace
-def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
-    "pop the first future gallery and send it to the main gallery"
+def roll_queued_galleries(*qg: Tuple[dict]) -> List[dict]:
+    "pop the first queued gallery and send it to the main gallery"
     assert shared.pv["enable_queued_gallery"], "Incoherent UI"
-    output = list(fg) + [None]
+    output = list(qg) + [None]
 
-    # make sure to delete the future gallery that are now None from profile
+    # make sure to delete the queued gallery that are now None from profile
     for qg_cnt, qg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
         img = output[qg_cnt]
         if img is None:
@@ -306,37 +306,37 @@ def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
 
     return output
 
+
 @trace
-def fg_add_to_new(*fg):
+def qg_add_to_new(*qg):
     """triggered by a shortcut, will add from clipboard the image to
-    a new future gallery"""
-    fg = list(fg)
+    a new queued gallery"""
+    qg = list(qg)
     # find the index of the latest non empty gallery
-    for i, img in enumerate(fg):
+    for i, img in enumerate(qg):
         if img is None:
             break
     i = max(0, min(i, shared.queued_gallery_slot_nb))
-    new_img = get_image(fg[i])
+    new_img = get_image(qg[i])
     gr.Warning(red(f"Adding to new gallery #{i + 1}"))
-    fg[i] = new_img
-    return fg
-
+    qg[i] = new_img
+    return qg
 
 
 @trace
-def fg_add_to_latest(*fg):
+def qg_add_to_latest(*qg):
     """triggered by a shortcut, will add from clipboard the image to
-    the latest non empty future gallery"""
-    fg = list(fg)
-    for i, img in enumerate(fg):
+    the latest non empty queued gallery"""
+    qg = list(qg)
+    for i, img in enumerate(qg):
         if img is None:
             break
     i -= 1
     i = max(0, min(i, shared.queued_gallery_slot_nb))
-    new_img = get_image(fg[i])
-    fg[i] = new_img
+    new_img = get_image(qg[i])
+    qg[i] = new_img
     gr.Warning(red(f"Adding to latest gallery #{i + 1}"))
-    return fg
+    return qg
 
 
 def create_audio_compo(**kwargs) -> gr.Microphone:
