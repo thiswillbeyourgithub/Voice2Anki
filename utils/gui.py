@@ -115,7 +115,7 @@ function shortcuts(e) {
         }
 
         // roll gallery
-        else if (e.code == 'KeyG' && e.shiftKey) {
+        else if (document.getElementById('js_guienablequeuedgallery').children[1].children[0].checked == true && e.code == 'KeyG' && e.shiftKey) {
             if (confirm("Roll gallery?")) {
                 document.getElementById("js_rollgallbtn").click();
             }
