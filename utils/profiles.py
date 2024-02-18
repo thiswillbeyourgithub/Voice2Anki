@@ -298,6 +298,7 @@ def worker_setitem(in_queue):
         if item is profile_keys[key]["default"]:
             # if it's the default value, simply delete it and don't create
             # the new file
+            out_queue.put(True)
             continue
 
         if key == "message_buffer":
