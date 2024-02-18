@@ -58,29 +58,34 @@ function shortcuts(e) {
         break;
 
         default:
+        // suspend previous card
         if (e.code == "KeyS" && e.shiftKey) {
             //document.getElementById(js_"syncankibtn").click();
             document.getElementById("js_suspendpreviousbtn").click();
         }
+        // mark previous card
         else if (e.code == 'Semicolon' && e.shiftKey) {
             document.getElementById("js_markpreviousbtn").click();
         }
+        // untoggle check next card
         else if (e.key == 'm') {
             document.getElementById("js_marknext").children[1].children[0].checked = false;
         }
+        // get card status
         else if (e.key == "s") {
             document.getElementById("js_cardstatusbtn").click();
         }
+        // recur improvement
         else if (e.code == "KeyF" && e.shiftKey) {
             document.getElementById("js_llmfeedbackbtn").click();
         }
 
-        // nightmode
+        // toggle nightmode
         else if (e.code == "KeyN" && e.shiftKey) {
             document.getElementById("js_darkmodebtn").click();
         }
 
-        // select text
+        // select textbox
         else if (e.key == "e") {
             e.preventDefault();  // dont type the e
             ch = document.getElementById("js_txtchatgpt").children;
@@ -120,7 +125,6 @@ function shortcuts(e) {
                 document.getElementById("js_rollgallbtn").click();
             }
         }
-
         // add to next future gallery
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyR' && e.shiftKey) {
             // only active if the right tabs are enabled
