@@ -296,7 +296,15 @@ def rgb_to_bgr(image):
 def roll_future_galleries(*fg: Tuple[dict]) -> List[dict]:
     "pop the first future gallery and send it to the main gallery"
     assert shared.pv["enable_queued_gallery"], "Incoherent UI"
-    return list(fg) + [None]
+    output = list(fg) + [None]
+
+    # make sure to delete the future gallery that are now None from profile
+    for qg_cnt, qg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
+        img = output[qg_cnt]
+        if img is None:
+            getattr(shared.pv, f"save_queued_gallery_{qg:03d}")(None)
+
+    return output
 
 
 def create_audio_compo(**kwargs) -> gr.Microphone:
