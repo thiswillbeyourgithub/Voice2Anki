@@ -527,6 +527,8 @@ with gr.Blocks(
     def save_and_load_gui(value: bool, name: str):
         if name == "enable_dirload":
             shared.pv[name] = value
+            if value is False:
+                shared.pv["gui_rolldirloadcheck"] = False
             outdict = {
                     accordion_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
@@ -539,25 +541,24 @@ with gr.Blocks(
             return outdict
 
         elif name == "enable_gallery":
-            if value is False and shared.pv["enable_queued_gallery"]:
-                gr.Warning(red("You can't disable Gallery while Gallery Queue is enabled"))
-                return {gui_enable_gallery: False}
-            else:
-                shared.pv[name] = value
-                return {accordion_gallery: gr.update(visible=value)}
-
-        elif name == "enable_queued_gallery":
-            if value and not shared.pv["enable_gallery"]:
-                gr.Warning(red("You can't enable Gallery Queue if Gallery is not enabled"))
-                return {gui_enable_gallery: False, gui_enable_queued_gallery: gr.update(visible=False, value=False)}
-            else:
-                shared.pv[name] = value
-                return {
+            shared.pv[name] = value
+            if value is False:
+                shared.pv["enable_queued_gallery"] = False
+            return {
+                    accordion_gallery: gr.update(visible=value),
                     roll_gall_btn: gr.update(visible=value),
                     tab_queued_galleries: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     gui_enable_queued_gallery: gr.update(visible=value, value=False),
                     }
+
+        elif name == "enable_queued_gallery":
+            shared.pv[name] = value
+            return {
+                roll_gall_btn: gr.update(visible=value),
+                tab_queued_galleries: gr.update(visible=value),
+                tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
+                }
 
         elif name == "enable_flagging":
             shared.pv[name] = value
