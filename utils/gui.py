@@ -531,10 +531,12 @@ with gr.Blocks(
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
                     force_sound_processing_btn: gr.update(visible=value),
+                    roll_dirload_check: gr.update(visible=value, value=False),
                     }
             for ast in audio_slots_txts:
                 outdict[ast] = gr.update(visible=value)
             return outdict
+
         elif name == "enable_gallery":
             if value is False and shared.pv["enable_queued_gallery"]:
                 gr.Warning(red("You can't disable Gallery while Gallery Queue is enabled"))
@@ -542,17 +544,20 @@ with gr.Blocks(
             else:
                 shared.pv[name] = value
                 return {accordion_gallery: gr.update(visible=value)}
+
         elif name == "enable_queued_gallery":
             if value and not shared.pv["enable_gallery"]:
                 gr.Warning(red("You can't enable Gallery Queue if Gallery is not enabled"))
-                return {gui_enable_gallery: False}
+                return {gui_enable_gallery: False, gui_enable_queued_gallery: gr.update(visible=False, value=False)}
             else:
                 shared.pv[name] = value
                 return {
                     roll_gall_btn: gr.update(visible=value),
                     tab_queued_galleries: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
+                    gui_enable_queued_gallery: gr.update(visible=value, value=False),
                     }
+
         elif name == "enable_flagging":
             shared.pv[name] = value
             return {
@@ -562,7 +567,7 @@ with gr.Blocks(
             raise ValueError(name)
 
     # update gui
-    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn] + audio_slots_txts
+    gui_outputs = [tab_queues, tab_queued_galleries, accordion_gallery, gui_enable_gallery, roll_gall_btn, flag_audio_btn, dir_load_btn, force_sound_processing_btn, roll_dirload_check, gui_enable_queued_gallery] + audio_slots_txts
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],
