@@ -798,7 +798,17 @@ with gr.Blocks(
             outputs=[gallery],
             show_progress=False,
             # queue=False,
-            )
+            ).then(
+                fn=shared.pv.save_gallery,
+                inputs=[gallery],
+                show_progress=False,
+                ).then(
+                        fn=get_img_source,
+                        inputs=[gallery],
+                        # queue=False,
+                        show_progress=False,
+                        )
+
 
     # when gallery changes, save the image then run ocr
     gallery.change(
@@ -817,7 +827,11 @@ with gr.Blocks(
             outputs=[gallery],
             # queue=False,
             show_progress=False,
-            )
+            ).then(
+                fn=shared.pv.save_gallery,
+                inputs=[gallery],
+                show_progress=False,
+                )
 
     # queued gallery
     for qg_cnt, qg in enumerate(range(1, shared.queued_gallery_slot_nb + 1)):
@@ -845,7 +859,12 @@ with gr.Blocks(
                 inputs=[gal_],
                 outputs=[gal_],
                 # queue=False,
-                )
+                ).then(  # force deletion
+                        fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
+                        inputs=[gal_],
+                        show_progress=False,
+                       # queue=True,
+                        )
 
         # send image
         send_.click(
