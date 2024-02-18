@@ -36,7 +36,9 @@ class AudioSplitter:
             profile=None,
             debug=False,
 
-            stop_list=[re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
+            stop_list=[
+                re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE),
+                ],
             language="fr",
             n_todo=1,
 
@@ -70,7 +72,7 @@ class AudioSplitter:
             if True, a breakpoint() will be called before exporting the splits
             and the original audio will not be moved.
 
-        stop_list: list, re.compile(r"\Ws?top\W", flags=re.IGNORECASE)],
+        stop_list: list, default re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE)
             list of strings that when found will trigger the audio splitting.
 
         language: str, default fr
