@@ -252,7 +252,7 @@ def force_sound_processing():
         temp.export(path, format="mp3")
         Path(path.parent / (path.stem + ".wav")).unlink(missing_ok=False)
         gr.Warning(red(f"Done forced preprocessing {path}. The original is in {out_path}"))
-        return out_path
+        return path
     except Exception as err:
         gr.Warning(red(f"Error when processing sound: {err}"))
         # undo everything
