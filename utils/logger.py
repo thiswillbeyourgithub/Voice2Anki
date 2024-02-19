@@ -267,17 +267,21 @@ def smartcache(func: Callable) -> Callable:
     If it already exists that means the cache is already computing the same
     value so just wait for that to finish to avoid concurrent calls."""
     def wrapper(*args, **kwargs):
+        if hasattr(func, "check_call_in_cache"):
+            fstr = str(func.func)
+        else:
+            fstr = str(func)
         h = jhash(jhash(args) + jhash(kwargs))
         if h in shared.smartcache:
             t = shared.smartcache[h]
-            red(f"Smartcache: already ongoing for {func} since {time.time()-t:.2f}s: hash={h}")
+            red(f"Smartcache: already ongoing for {fstr} since {time.time()-t:.2f}s: hash={h}")
             i = 0
             while h in shared.smartcache:
                 time.sleep(0.1)
                 i += 1
                 if i % 10 == 0:
                     delay = time.time() - t
-                    red(f"Smartcache: waiting for {func} caching to finish for {delay:.2f}s: hash={h}")
+                    red(f"Smartcache: waiting for {fstr} caching to finish for {delay:.2f}s: hash={h}")
             return func(*args, **kwargs)
         else:
             with shared.thread_lock:
