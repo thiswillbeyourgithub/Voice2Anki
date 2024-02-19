@@ -54,6 +54,19 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
+
+def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool:
+    try:
+        assert all(isinstance(t, str) for t in list_text)
+        assert not any(not(t) for t in list_text), f"Invalid texts: {[t for t in list_text if not t]}"
+        assert len(list_text) == len(list_embed), f"Incompatible length: {len(list_text)} vs {len(list_embed)}"
+        assert all(isinstance(e, np.ndarray) for e in list_embed), f"Several types: {[type(e) for e in list_embed]}"
+        assert all(e.shape == list_embed[0].shape for e in list_embed), f"Several shapes: {[e.shape for e in list_embed]}"
+    except Exception as err:
+        red(f"Error when checking validity of embeddings: {err}")
+        raise
+
+
 def embedder(text_list, result):
     """compute the emebdding of 1 text
     if result is not None, it is the embedding and returned right away. This
@@ -79,17 +92,6 @@ def embedder(text_list, result):
             )
     return [np.array(d["embedding"]).reshape(1, -1) for d in vec.data]
 
-
-def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool:
-    try:
-        assert all(isinstance(t, str) for t in list_text)
-        assert not any(not(t) for t in list_text), f"Invalid texts: {[t for t in list_text if not t]}"
-        assert len(list_text) == len(list_embed), f"Incompatible length: {len(list_text)} vs {len(list_embed)}"
-        assert all(isinstance(e, np.ndarray) for e in list_embed), f"Several types: {[type(e) for e in list_embed]}"
-        assert all(e.shape == list_embed[0].shape for e in list_embed), f"Several shapes: {[e.shape for e in list_embed]}"
-    except Exception as err:
-        red(f"Error when checking validity of embeddings: {err}")
-        raise
 
 @trace
 def embedder_wrapper(list_text):
