@@ -23,7 +23,8 @@ prompt_finish = "\n\n###\n\n"
 
 # used to count the number of tokens for chatgpt
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
-tkn_len = lambda x: len(tokenizer.encode(dedent(x)))
+def tkn_len(message):
+    return len(tokenizer.encode(dedent(message)))
 
 transcript_template = """
 CONTEXT
@@ -286,9 +287,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     distances = []
     if shared.memory_metric == "length":
         for i, pr in enumerate(candidate_prompts):
-            tkn_len = pr["tkn_len_in"]
+            tkn_len_in = pr["tkn_len_in"]
             # mean of A/B and B/A is (A**2*B**2)(2AB)
-            dist = ((tkn_len ** 2) + (new_prompt_len ** 2)) / (2 * tkn_len * new_prompt_len)
+            dist = ((tkn_len_in ** 2) + (new_prompt_len ** 2)) / (2 * tkn_len_in * new_prompt_len)
             # at this point: 1 means same length and anything other means
             # should not be picked.
             dist = abs(dist - 1)
