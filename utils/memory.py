@@ -67,7 +67,7 @@ def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool
         raise
 
 
-def embedder(text_list, result):
+def embedder(text_list, result=None):
     """compute the emebdding of 1 text
     if result is not None, it is the embedding and returned right away. This
     was done to allow caching individual embeddings while still making one batch
@@ -98,11 +98,12 @@ def embedder(text_list, result):
 def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
-    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t], result=None)]
+    assert all(isinstance(t, str) for t in list_text)
+    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t])]
 
     if not uncached_texts:
         red("Everything already in cache")
-        out = [cached_embedder([t], result=None)[0] for t in list_text]
+        out = [cached_embedder([t])[0] for t in list_text]
         check_embeddings(list_text, out)
         return out
 
@@ -134,14 +135,13 @@ def embedder_wrapper(list_text):
     results = []
     for batch in tqdm(batches, desc="Embedding text", unit="batch"):
         assert batch, f"Found empty batch. Batches: {batches}"
-        out = cached_embedder(batch, result=None)
+        out = cached_embedder(batch)
 
-        if len(batch) > 1:
-            dedup_batch = list(set(batch))
-            assert not any(cached_embedder.check_call_in_cache([t], result=None) for t in dedup_batch), "Error with cache 1"
         # manually recache the values for each individual memory
         [cached_embedder([t], result=[r]) for t, r in zip(batch, out)]
-        assert all(cached_embedder.check_call_in_cache([t], result=None) for t in batch), "Error with cache 2"
+        for t in batch:
+            if not cached_embedder.check_call_in_cache([t]):
+                red(f"CacheError: Caching failed for {t}")
 
         # mistral is very rate limiting
         time.sleep(wait)
@@ -154,10 +154,11 @@ def embedder_wrapper(list_text):
     cnt = 0
     for i in range(len(list_text)):
         if list_text[i] in uncached_texts:
-            to_return.append(next(it_results)[0])
+            to_return.append(next(it_results))
             cnt += 1
         else:
-            to_return.append(cached_embedder([list_text[i]], result=None)[0])
+            assert cached_embedder.check_call_in_cache([list_text[i]]), f"Supposed to be in cache: #{i} {list_text[i]}"
+            to_return.append(cached_embedder([list_text[i]])[0])
         to_return[-1] = to_return[-1].reshape(1, -1)
     # make sure the list was emptied
     assert cnt == len(results)
