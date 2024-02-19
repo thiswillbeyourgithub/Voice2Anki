@@ -195,9 +195,6 @@ document.addEventListener('keydown', tabswitcher, false);
 """
 
 css = """
-/* Make tabs take all the width */
-#js_widetabs-button { flex-grow:1 !important; }
-
 /* remove source selector */
 #js_audiocomponent > div.component-wrapper > div.controls > select {display: none !important; flex-grow:0 !important;}
 
@@ -209,9 +206,9 @@ css = """
 #js_audiocomponent > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
 */
 
+/* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
-
 """
 
 if shared.widen_screen:
@@ -231,7 +228,7 @@ with gr.Blocks(
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm")
             dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm")
 
-    with gr.Tab(label="Main", elem_id="js_widetabs"):
+    with gr.Tab(label="Main", elem_classes=["js_widetabs"]):
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1, size="sm")
@@ -284,7 +281,7 @@ with gr.Blocks(
                 suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm", scale=2)
 
         # quick settings
-        with gr.Tab(label="Controls", elem_classes=["js_subtab"]):
+        with gr.Tab(label="Controls", elem_classes=["js_subtab_main"]):
             with gr.Row():
                 sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                 improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
@@ -308,7 +305,7 @@ with gr.Blocks(
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
         # image
-        with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab"]) as tab_gallery:
+        with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab_main"]) as tab_gallery:
             with gr.Column():
                 roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
                 gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
@@ -317,7 +314,7 @@ with gr.Blocks(
                         rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
 
-        with gr.Tab(label="Edit", elem_classes=["js_subtab"]):
+        with gr.Tab(label="Edit", elem_classes=["js_subtab_main"]):
             with gr.Row():
                 audio_corrector = gr.Microphone(
                         format="mp3",
@@ -344,7 +341,7 @@ with gr.Blocks(
                         visible=False,
                         )
 
-        with gr.Tab(label="User chains", elem_classes=["js_subtab"]):
+        with gr.Tab(label="User chains", elem_classes=["js_subtab_main"]):
             btn_chains = []
             for i in range(5):
                 but = gr.Button(
@@ -365,8 +362,8 @@ with gr.Blocks(
 
         txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
-    with gr.Tab(label="Settings", elem_id="js_widetabs") as tab_settings:
-        with gr.Tab(label="GUI", elem_id="js_widetabs"):
+    with gr.Tab(label="Settings", elem_classes=["js_widetabs"]) as tab_settings:
+        with gr.Tab(label="GUI", elem_classes=["js_widetabs"]):
             with gr.Row():
                 gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
                 gui_rolldirloadcheck = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
@@ -376,14 +373,14 @@ with gr.Blocks(
             with gr.Row():
                 gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
 
-        with gr.Tab(label="Anki", elem_id="js_widetabs"):
+        with gr.Tab(label="Anki", elem_classes=["js_widetabs"]):
             with gr.Row():
                 txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
             with gr.Row():
                 txt_deck = gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True)
                 txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
             txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
-        with gr.Tab(label="LLM", elem_id="js_widetabs"):
+        with gr.Tab(label="LLM", elem_classes=["js_widetabs"]):
             with gr.Row():
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
@@ -393,7 +390,7 @@ with gr.Blocks(
                 txt_replicate_api_key = gr.Textbox(value=shared.pv["txt_replicate_api_key"], label="Replicate API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
-        with gr.Tab(label="Memory retrieval", elem_id="js_widetabs"):
+        with gr.Tab(label="Memory retrieval", elem_classes=["js_widetabs"]):
             with gr.Row():
                 txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
             with gr.Row():
@@ -404,7 +401,7 @@ with gr.Blocks(
                 sld_prio_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_prio_weight"], step=0.1, label="Priority weight")
                 sld_timestamp_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_timestamp_weight"], step=0.1, label="Timestamp weight")
                 sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.1, label="Keywords weight")
-        with gr.Tab(label="Misc", elem_id="js_widetabs"):
+        with gr.Tab(label="Misc", elem_classes=["js_widetabs"]):
             with gr.Row():
                 kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", size="sm")
             with gr.Accordion(label="User functions", open=False):
@@ -427,8 +424,8 @@ with gr.Blocks(
                             show_label=True,
                             )
 
-    with gr.Tab(label="Queues", elem_id="js_widetabs", visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"], elem_classes=["js_queuetabclass"]) as tab_queues:
-        with gr.Tab(label="Queued galleries", elem_id="js_widetabs", visible=shared.pv["enable_queued_gallery"], elem_classes=["js_queueqgclass"]) as tab_queued_galleries:
+    with gr.Tab(label="Queues", elem_classes=["js_widetabs", "js_queuetabclass"], visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]) as tab_queues:
+        with gr.Tab(label="Queued galleries", elem_classes=["js_widetabs", "js_queueqgclass"], visible=shared.pv["enable_queued_gallery"]) as tab_queued_galleries:
 
             with gr.Row():
                 with gr.Column():
@@ -471,7 +468,7 @@ with gr.Blocks(
             btn_qg_add = gr.Button(visible=False, elem_id="js_btnqgadd")
 
 
-        with gr.Tab(label="Queued audio", elem_id="js_widetabs", visible=shared.pv["enable_dirload"]) as tab_dirload_queue:
+        with gr.Tab(label="Queued audio", elem_classes=["js_widetabs"], visible=shared.pv["enable_dirload"]) as tab_dirload_queue:
             queue_df = gr.Dataframe(
                     value=None,
                     type="pandas",
@@ -482,14 +479,14 @@ with gr.Blocks(
                     column_widths=["1%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
                     )
 
-    with gr.Tab(label="Logging", elem_id="js_widetabs") as tab_logging:
+    with gr.Tab(label="Logging", elem_classes=["js_widetabs"]) as tab_logging:
         with gr.Column():
             logging_reload = gr.Button(value="Refresh", size="sm")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
 
-    with gr.Tab(label="Memories & Buffer", elem_id="js_widetabs") as tab_memories_and_buffer:
-        with gr.Tab(label="Memories", elem_id="js_widetabs") as tab_memories:
+    with gr.Tab(label="Memories & Buffer", elem_classes=["js_widetabs"]) as tab_memories_and_buffer:
+        with gr.Tab(label="Memories", elem_classes=["js_widetabs"]) as tab_memories:
             df_memories = gr.Dataframe(
                     label="Saved memories",
                     value=None,
@@ -499,7 +496,7 @@ with gr.Blocks(
                     column_widths=["1%", "25%", "5%", "5%", "25%", "10%", "10%", "5%", "5%", "10%"],
                     )
 
-        with gr.Tab(label="Message buffer", elem_id="js_widetabs") as tab_buffer:
+        with gr.Tab(label="Message buffer", elem_classes=["js_widetabs"]) as tab_buffer:
             df_buffer = gr.Dataframe(
                     label="Message buffer",
                     value=None,
@@ -509,7 +506,7 @@ with gr.Blocks(
                     column_widths=["1%", "10%", "10%", "10%", "10%", "5%"],
                     )
 
-    # with gr.Tab(label="Files", elem_id="js_widetabs") as tab_files:
+    # with gr.Tab(label="Files", elem_classes=["js_widetabs"]) as tab_files:
     #     with gr.Accordion(label="Done", open=False):
     #         fex_done = gr.FileExplorer(
     #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_done",
@@ -1297,6 +1294,13 @@ with gr.Blocks(
                     inputs=btn_chains,
                     outputs=btn_chains,
                     )
+
+    # make the widetabs wide (had to do it in js)
+    start_js = """() => {
+        // Make tabs take all the width
+        Array.from(document.querySelectorAll(".js_widetabs")[1].parentNode.firstChild.children).forEach(child => child.style.flexGrow='1');
+    }"""
+
     # gr.on(
     #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
     #         fn=update_audio_slots_txts,
