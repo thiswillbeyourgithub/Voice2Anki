@@ -529,40 +529,40 @@ with gr.Blocks(
                     column_widths=["1%", "10%", "10%", "10%", "10%", "5%"],
                     )
 
-    with gr.Tab(label="Console", elem_id="js_widetabs"):
-        from pprint import pformat
-        with gr.Column():
-            console = gr.Chatbot(
-                    value=None,
-                    label="Console",
-                    show_label=True,
-                    sanitize_html=False,
-                    render_markdown=False,
-                    bubble_full_width=True,
-                    layout="panel",
-                    height="100%",
-                    )
+    # with gr.Tab(label="Console", elem_id="js_widetabs"):
+    #     from pprint import pformat
+    #     with gr.Column():
+    #         console = gr.Chatbot(
+    #                 value=None,
+    #                 label="Console",
+    #                 show_label=True,
+    #                 sanitize_html=False,
+    #                 render_markdown=False,
+    #                 bubble_full_width=True,
+    #                 layout="panel",
+    #                 height="100%",
+    #                 )
 
-            with gr.Row():
-                console_in = gr.Textbox(scale=5)
-                console_reset = gr.Button("Reset", scale=1)
-        def exec_console(history, msg):
-            red(f"Console in:'{msg}'")
-            try:
-                answer = pformat(eval(msg, globals()))
-            except Exception as err:
-                answer = f"Error: {err}"
-            red(f"Console out:'{answer}'")
-            history.append([msg, answer])
+    #         with gr.Row():
+    #             console_in = gr.Textbox(scale=5)
+    #             console_reset = gr.Button("Reset", scale=1)
+    #     def exec_console(history, msg):
+    #         red(f"Console in:'{msg}'")
+    #         try:
+    #             answer = pformat(eval(msg, globals()))
+    #         except Exception as err:
+    #             answer = f"Error: {err}"
+    #         red(f"Console out:'{answer}'")
+    #         history.append([msg, answer])
 
-            return [history, None]
-        console_in.submit(
-                fn=exec_console,
-                inputs=[console, console_in],
-                outputs=[console, console_in],
-                postprocess=False,
-                )
-        console_reset.click(fn=lambda: None, outputs=[console])
+    #         return [history, None]
+    #     console_in.submit(
+    #             fn=exec_console,
+    #             inputs=[console, console_in],
+    #             outputs=[console, console_in],
+    #             postprocess=False,
+    #             )
+    #     console_reset.click(fn=lambda: None, outputs=[console])
 
     # with gr.Tab(label="Files", elem_id="js_widetabs") as tab_files:
     #     with gr.Accordion(label="Done", open=False):
