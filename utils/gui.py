@@ -1420,7 +1420,6 @@ with gr.Blocks(
             inputs=[gui_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
             postprocess=False,
-            show_progress=False,
             preprocess=False,
             every=0.25,
             trigger_mode="once",
