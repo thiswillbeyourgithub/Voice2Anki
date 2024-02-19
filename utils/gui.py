@@ -60,23 +60,27 @@ function shortcuts(e) {
         default:
         // suspend previous card
         if (e.code == "KeyS" && e.shiftKey) {
-            //document.getElementById(js_"syncankibtn").click();
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_suspendpreviousbtn").click();
         }
         // mark previous card
         else if (e.code == 'Semicolon' && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_markpreviousbtn").click();
         }
         // untoggle check next card
         else if (e.key == 'm') {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_marknext").children[1].children[0].checked = false;
         }
         // get card status
         else if (e.key == "s") {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_cardstatusbtn").click();
         }
         // recur improvement
         else if (e.code == "KeyF" && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_llmfeedbackbtn").click();
         }
 
@@ -88,45 +92,55 @@ function shortcuts(e) {
         // select textbox
         else if (e.key == "e") {
             e.preventDefault();  // dont type the e
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             ch = document.getElementById("js_txtchatgpt").children;
             ch[ch.length - 1].focus();
         }
         else if (e.code == "KeyE" && e.shiftKey) {
             e.preventDefault();  // dont type the e
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             ch = document.getElementById("js_txtwhisper").children;
             ch[ch.length - 1].focus();
         }
 
         // roll 1 2 3
         else if (e.key == "&") {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_roll1").click();
         }
         else if (e.key == "é") {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_roll12").click();
         }
         else if (e.key == '"') {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_roll123").click();
         }
 
         // 123
         else if (e.key == "3" && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_toankibtn").click();
         }
         else if (e.key == "2" && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_transcriptbtn").click();
         }
         else if (e.key == "1" && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             document.getElementById("js_transcribebtn").click();
         }
 
         // roll gallery
         else if (document.getElementById('js_guienablequeuedgallery').children[1].children[0].checked == true && e.code == 'KeyG' && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             if (confirm("Roll gallery?")) {
                 document.getElementById("js_rollgallbtn").click();
             }
         }
         // add to next queued gallery
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyR' && e.shiftKey) {
+            if (!document.querySelector('.js_tabqueues').checkVisibility()) { alert("Shortcut only available in tab 'Queues'") ; return ;}
             // only active if the right tabs are enabled
             if (document.querySelector('.js_tabqueues').checkVisibility() && document.querySelector('.js_queueqgclass').checkVisibility()) {
                     document.getElementById("js_btnqgnew").click();
@@ -137,6 +151,7 @@ function shortcuts(e) {
         }
         // append to latest queueud gallery
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyQ' && e.shiftKey) {
+            if (!document.querySelector('.js_tabqueues').checkVisibility()) { alert("Shortcut only available in tab 'Queues'") ; return ;}
             // only active if the right tabs are enabled
             if (document.querySelector('.js_tabqueues').checkVisibility() && document.querySelector('.js_queueqgclass').checkVisibility()) {
                 document.getElementById("js_btnqgadd").click();
@@ -148,6 +163,7 @@ function shortcuts(e) {
 
         // dirload
         else if (document.getElementById('js_guienabledirload').children[1].children[0].checked == true && e.code == 'KeyD' && e.shiftKey) {
+            if (!document.querySelector('.js_tabmain').checkVisibility()) { alert("Shortcut only available in tab 'Main'") ; return ;}
             if (confirm("Load from dir?")) {
                 document.getElementById("js_dirloadbtn").click();
             }
