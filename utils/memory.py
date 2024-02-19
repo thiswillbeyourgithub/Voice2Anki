@@ -23,7 +23,7 @@ prompt_finish = "\n\n###\n\n"
 
 # used to count the number of tokens for chatgpt
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
-tokenize = tokenizer.encode
+tkn_len = lambda x: len(tokenizer.encode(dedent(x)))
 
 transcript_template = """
 CONTEXT
@@ -69,7 +69,7 @@ def embedder(text_list, result):
     red("Computing embedding of:")
     for i, t in enumerate(text_list):
         red(f"* {i+1}: {t}")
-        tkn_sum += len(tokenize(t))
+        tkn_sum += tkn_len(t)
     red(f"Total token to embed: {tkn_sum}")
 
     vec = litellm.embedding(
@@ -115,7 +115,7 @@ def embedder_wrapper(list_text):
     batches = [[]]
     tkn_cnt = 0
     for t in uncached_texts:
-        new_tkn = len(tokenize(t))
+        new_tkn = tkn_len(t)
         if tkn_cnt + new_tkn < tkn_max:
             batches[-1].append(t)
             tkn_cnt += new_tkn
@@ -187,8 +187,8 @@ def check_prompts(prev_prompts):
             mess["hash"] = hasher(mess["content"])
 
         if "tkn_len_in" not in mess or "tkn_len_out" not in mess:
-            mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
-            mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
+            mess["tkn_len_in"] = tkn_len(mess["content"].strip())
+            mess["tkn_len_out"] = tkn_len(mess["answer"].strip())
         assert isinstance(mess["tkn_len_in"], int), "tkn_len_in is not int!"
         assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
         assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
@@ -244,9 +244,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         assert "Context: '" not in m["content"] and "Transcript: '" not in m["content"], f"Invalid prompt: {m}"
 
     # count the number of tokens added so far
-    new_prompt_len = sum([len(tokenize(p["content"])) for p in prompt_messages])
+    new_prompt_len = sum([tkn_len(p["content"]) for p in prompt_messages])
     tkns = 0
-    tkns += len(tokenize(default_system_prompt["content"]))  # system prompt
+    tkns += tkn_len(default_system_prompt["content"])  # system prompt
     tkns += new_prompt_len  # current question + message buffer
     all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in candidate_prompts])
 
@@ -466,8 +466,8 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
-    tkn_len_in = len(tokenize(content))
-    tkn_len_out = len(tokenize(answer))
+    tkn_len_in = tkn_len(content)
+    tkn_len_out = tkn_len(answer)
     if tkn_len_in + tkn_len_out > 500:
         red("You supplied an example "
             f"with a surprising amount of token: '{tkn_len_in + tkn_len_out}' This can have "

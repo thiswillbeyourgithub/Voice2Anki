@@ -27,7 +27,7 @@ import openai
 from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache, Critical
-from .memory import prompt_filter, load_prev_prompts, tokenize, transcript_template, default_system_prompt
+from .memory import prompt_filter, load_prev_prompts, tkn_len, transcript_template, default_system_prompt
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
 
@@ -509,7 +509,7 @@ def pre_alfred(
     # prompts in chatgpt format
     tkns = 0
     for mess in formatted_messages:
-        tkns += len(tokenize(mess["content"]))
+        tkns += tkn_len(mess["content"])
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
