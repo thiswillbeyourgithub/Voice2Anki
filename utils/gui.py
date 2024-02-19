@@ -227,6 +227,14 @@ function tabswitcher(e) {
 }
 document.addEventListener('keypress', shortcuts, false);
 document.addEventListener('keydown', tabswitcher, false);
+
+
+// resize the waveform
+document.querySelectorAll("#waveform").forEach(el => el.style.transform = "scaleY(0.5)");
+document.querySelectorAll("#waveform").forEach(el => el.style.maxHeight = "25px");
+// and the controls for the audios
+document.querySelectorAll(".controls").forEach(el => el.style.transform = "scaleY(0.5)");
+document.querySelectorAll(".controls").forEach(el => el.style.maxHeight = "25px");
 </script>
 """
 
@@ -239,7 +247,6 @@ css = """
 
 /* remove volume and speed controls */
 .control-wrapper {display: none !important; flex-grow:0 !important;}
-
 
 
 /* remove clipping controls */
