@@ -1299,8 +1299,9 @@ def to_anki(
     if txt_source is None:
         txt_source = wait_for_queue(txt_source_queue, "txt_source")
         if "Error" in txt_source:  # then out is an error message and not the source
-            gather_threads(["add_audio_to_anki", "ocr"])
-            raise Exception(f"Error in gallery source: '{txt_source}'")
+            gr.Warning(red(f"Error in gallery source but continuing nonetheless: '{txt_source}'"))
+            # gather_threads(["add_audio_to_anki", "ocr"])
+            # raise Exception(f"Error in gallery source: '{txt_source}'")
 
     # anki tags
     new_tags = txt_tags + [f"Voice2Anki::{today}"]
