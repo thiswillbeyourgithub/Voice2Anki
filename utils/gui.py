@@ -343,6 +343,8 @@ with gr.Blocks(
                 clear_llm_cache_btn = gr.Button(value="Clear LLM cache", size="sm")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
+            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
+
         # image
         with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab_main"], elem_id="js_widetabs") as tab_gallery:
             with gr.Column():
@@ -398,8 +400,6 @@ with gr.Blocks(
                         postprocess=False,
                         show_progress=False,
                         )
-
-        txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
     with gr.Tab(label="Settings", elem_id="js_widetabs", elem_classes=["js_tabsettings"]) as tab_settings:
         with gr.Tab(label="GUI", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
