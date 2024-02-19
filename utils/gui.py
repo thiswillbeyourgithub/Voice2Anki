@@ -996,6 +996,7 @@ with gr.Blocks(
             fn=roll_queued_galleries,
             inputs=[row[1] for row in queued_galleries],
             outputs=[gallery] + [row[1] for row in queued_galleries],
+            show_progress=False,
             )
 
     # audio
@@ -1026,16 +1027,18 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            show_progress=False,
+            #show_progress=False,
             ).success(
                 fn=transcribe,
                 inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).then(
                     lambda: None,
                     outputs=[txt_chatgpt_cloz],
+                    show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
@@ -1056,7 +1059,7 @@ with gr.Blocks(
                         outputs=[audio_slots[-1]],
                         preprocess=False,
                         postprocess=True,
-                        show_progress=False,
+                        # show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
@@ -1078,12 +1081,14 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
@@ -1119,19 +1124,21 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            show_progress=False,
+            #show_progress=False,
             ).success(
                 fn=transcribe,
                 inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).success(
                             fn=to_anki,
                             inputs=[
@@ -1147,6 +1154,7 @@ with gr.Blocks(
                                 ],
                             preprocess=False,
                             postprocess=False,
+                            show_progress=False,
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -1219,26 +1227,28 @@ with gr.Blocks(
                 prompt_manag,
                 ] + audio_slots,
             outputs=audio_slots,
-            show_progress=False,
+            #show_progress=False,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
+                        show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
                                 outputs=[update_status_btn],
                                 preprocess=False,
                                 postprocess=False,
-                                show_progress=False,
+                                #show_progress=False,
                                 )
 
     # send to whisper
@@ -1248,6 +1258,7 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             )
 
     # send to chatgpt
@@ -1257,6 +1268,7 @@ with gr.Blocks(
             outputs=[txt_chatgpt_cloz],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             )
 
     # send to anki
@@ -1275,17 +1287,18 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             ).then(
                     fn=lambda: False,
                     outputs=[check_marked],
-                    show_progress=False,
+                    #show_progress=False,
                     ).then(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
                             outputs=[update_status_btn],
                             preprocess=False,
                             postprocess=False,
-                            show_progress=False,
+                            #show_progress=False,
                             )
 
     # 1+2
@@ -1295,12 +1308,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1316,6 +1331,7 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
@@ -1329,12 +1345,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1350,10 +1368,11 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
-                            show_progress=False,
+                            #show_progress=False,
                             )
 
     improve_btn.click(
@@ -1401,8 +1420,8 @@ with gr.Blocks(
             inputs=[gui_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
             postprocess=False,
-            preprocess=False,
             show_progress=False,
+            preprocess=False,
             every=0.25,
             trigger_mode="once",
             )
