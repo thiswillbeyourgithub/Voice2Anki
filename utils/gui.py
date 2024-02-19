@@ -170,7 +170,27 @@ function shortcuts(e) {
 
         }
 }
+function tabswitcher(e) {
+    // tab to switch tab
+    if (event.key === 'Tab') {
+        event.preventDefault();
+        var tabs = document.querySelectorAll('.js_subtab');
+        tabs.forEach((tab, index) => {
+            if (tab.checkVisibility()) {
+                if (event.shiftKey) {
+                    var newIndex = (index > 0) ? index - 1 : tabs.length - 1;
+                } else {
+                    var newIndex = (index + 1) % tabs.length;
+                }
+                tabs[0].parentElement.childNodes[0].children[newIndex].click();
+                return;
+            }
+        });
+
+    }
+}
 document.addEventListener('keypress', shortcuts, false);
+document.addEventListener('keydown', tabswitcher, false);
 </script>
 """
 
@@ -264,7 +284,7 @@ with gr.Blocks(
                 suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm", scale=2)
 
         # quick settings
-        with gr.Tab(label="Controls"):
+        with gr.Tab(label="Controls", elem_classes=["js_subtab"]):
             with gr.Row():
                 sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority")
                 improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm")
@@ -288,7 +308,7 @@ with gr.Blocks(
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
         # image
-        with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"]) as tab_gallery:
+        with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab"]) as tab_gallery:
             with gr.Column():
                 roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
                 gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
@@ -297,7 +317,7 @@ with gr.Blocks(
                         rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
 
-        with gr.Tab(label="Edit"):
+        with gr.Tab(label="Edit", elem_classes=["js_subtab"]):
             with gr.Row():
                 audio_corrector = gr.Microphone(
                         format="mp3",
@@ -324,7 +344,7 @@ with gr.Blocks(
                         visible=False,
                         )
 
-        with gr.Tab(label="User chains"):
+        with gr.Tab(label="User chains", elem_classes=["js_subtab"]):
             btn_chains = []
             for i in range(5):
                 but = gr.Button(
