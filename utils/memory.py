@@ -77,6 +77,8 @@ def embedder(text_list, result):
     if result is not None:
         assert isinstance(result, list)
         assert len(text_list) == len(result)
+        assert len(text_list) == 1, "Supplied result even though text_list is multiple!"
+        assert isinstance(text_list[0], str), "text_list must contain a string"
         assert all(isinstance(a, np.ndarray) for a in result)
         return result
     tkn_sum = 0
@@ -97,11 +99,11 @@ def embedder(text_list, result):
 def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
-    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t], None)]
+    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t], result=None)]
 
     if not uncached_texts:
         red("Everything already in cache")
-        out = [cached_embedder([t], None)[0] for t in list_text]
+        out = [cached_embedder([t], result=None)[0] for t in list_text]
         check_embeddings(list_text, out)
         return out
 
@@ -126,17 +128,24 @@ def embedder_wrapper(list_text):
             batches.append([t])
             tkn_cnt = 0
 
+    if "mistral" in shared.pv["embed_choice"]:
+        wait = 2
+    else:
+        wait = 0
     results = []
     for batch in tqdm(batches, desc="Embedding text", unit="batch"):
         assert batch, f"Found empty batch. Batches: {batches}"
-        out = cached_embedder(batch, None)
+        out = cached_embedder(batch, result=None)
 
+        if len(batch) > 1:
+            dedup_batch = list(set(batch))
+            assert not any(cached_embedder.check_call_in_cache([t], result=None) for t in dedup_batch), "Error with cache 1"
         # manually recache the values for each individual memory
-        [cached_embedder([t], [r]) for t, r in zip(batch, out)]
+        [cached_embedder([t], result=[r]) for t, r in zip(batch, out)]
+        assert all(cached_embedder.check_call_in_cache([t], result=None) for t in batch), "Error with cache 2"
 
         # mistral is very rate limiting
-        if "mistral" in shared.pv["embed_choice"]:
-            time.sleep(2)
+        time.sleep(wait)
 
         results.extend(out)
 
@@ -149,7 +158,7 @@ def embedder_wrapper(list_text):
             to_return.append(next(it_results)[0])
             cnt += 1
         else:
-            to_return.append(cached_embedder([list_text[i]], None)[0])
+            to_return.append(cached_embedder([list_text[i]], result=None)[0])
         to_return[-1] = to_return[-1].reshape(1, -1)
     # make sure the list was emptied
     assert cnt == len(results)
