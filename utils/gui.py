@@ -811,12 +811,14 @@ with gr.Blocks(
             outputs=[update_status_btn],
             preprocess=False,
             postprocess=False,
+            trigger_mode="always_last",
             )
     txt_audio.input(
             fn=lambda: "?",
             outputs=[update_status_btn],
             preprocess=False,
             postprocess=False,
+            trigger_mode="always_last",
             )
 
 
