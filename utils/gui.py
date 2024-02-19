@@ -996,7 +996,6 @@ with gr.Blocks(
             fn=roll_queued_galleries,
             inputs=[row[1] for row in queued_galleries],
             outputs=[gallery] + [row[1] for row in queued_galleries],
-            show_progress=False,
             )
 
     # audio
@@ -1034,11 +1033,9 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).then(
                     lambda: None,
                     outputs=[txt_chatgpt_cloz],
-                    show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
@@ -1081,14 +1078,12 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
@@ -1131,14 +1126,12 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).success(
                             fn=to_anki,
                             inputs=[
@@ -1154,7 +1147,6 @@ with gr.Blocks(
                                 ],
                             preprocess=False,
                             postprocess=False,
-                            show_progress=False,
                             ).then(
                                 fn=dirload_splitted_last,
                                 inputs=[
@@ -1234,14 +1226,12 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
-                        show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
@@ -1258,7 +1248,6 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             )
 
     # send to chatgpt
@@ -1268,7 +1257,6 @@ with gr.Blocks(
             outputs=[txt_chatgpt_cloz],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             )
 
     # send to anki
@@ -1287,7 +1275,6 @@ with gr.Blocks(
                 ],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             ).then(
                     fn=lambda: False,
                     outputs=[check_marked],
@@ -1308,14 +1295,12 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1331,7 +1316,6 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
@@ -1345,14 +1329,12 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1368,7 +1350,6 @@ with gr.Blocks(
                         ],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).then(
                             fn=lambda: False,
                             outputs=[check_marked],
