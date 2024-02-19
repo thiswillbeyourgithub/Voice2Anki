@@ -186,8 +186,9 @@ def check_prompts(prev_prompts):
         if "hash" not in mess:
             mess["hash"] = hasher(mess["content"])
 
-        mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
-        mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
+        if "tkn_len_in" not in mess or "tkn_len_out" not in mess:
+            mess["tkn_len_in"] = len(tokenize(dedent(mess["content"]).strip()))
+            mess["tkn_len_out"] = len(tokenize(dedent(mess["answer"]).strip()))
         assert isinstance(mess["tkn_len_in"], int), "tkn_len_in is not int!"
         assert isinstance(mess["tkn_len_out"], int), "tkn_len_out is not int!"
         assert mess["tkn_len_in"] > 0, "tkn_len_in under 0 !"
