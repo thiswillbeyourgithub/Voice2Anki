@@ -1288,7 +1288,6 @@ with gr.Blocks(
     init = demo.load(
             fn=shared.reset,
             show_progress=False,
-            js=darkmode_js if not (datetime.now().hour <= 8 or datetime.now().hour >= 19) else None,
             ).then(
                     fn=load_user_chain,
                     inputs=btn_chains,
@@ -1300,6 +1299,11 @@ with gr.Blocks(
         // Make tabs take all the width
         Array.from(document.querySelectorAll(".js_widetabs")[1].parentNode.firstChild.children).forEach(child => child.style.flexGrow='1');
     }"""
+    init.then(fn=None, js=start_js)
+
+    # trigger darkmode depending on time of day
+    if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
+        init = demo.load(fn=None, js=darkmode_js)
 
     # gr.on(
     #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
@@ -1310,6 +1314,7 @@ with gr.Blocks(
     #         postprocess=False,
     #         preprocess=False,
     #         )
+
     init.then(
             fn=update_audio_slots_txts,
             inputs=[gui_enable_dirload] + audio_slots_txts,
