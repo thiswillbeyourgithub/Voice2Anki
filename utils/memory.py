@@ -81,12 +81,9 @@ def embedder(text_list, result=None):
         assert isinstance(text_list[0], str), "text_list must contain a string"
         assert all(isinstance(a, np.ndarray) for a in result)
         return result
-    tkn_sum = 0
-    red("Computing embedding of:")
-    for i, t in enumerate(text_list):
-        red(f"* {i+1}: {t}")
-        tkn_sum += tkn_len(t)
-    red(f"Total token to embed: {tkn_sum}")
+
+    tkn_sum = sum([tkn_len(t) for t in text_list])
+    red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
 
     vec = litellm.embedding(
             model=shared.pv["embed_choice"],
