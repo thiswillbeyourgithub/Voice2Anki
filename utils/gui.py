@@ -1419,12 +1419,11 @@ with gr.Blocks(
             fn=update_audio_slots_txts,
             inputs=[gui_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
-            show_progress=False,
             postprocess=False,
             preprocess=False,
+            show_progress=False,
             every=0.25,
             trigger_mode="once",
-            show_progress=False,
             )
     init.then(
             fn=sync_anki,
