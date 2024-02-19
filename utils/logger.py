@@ -282,10 +282,9 @@ def smartcache(func: Callable) -> Callable:
                 if i % 10 == 0:
                     delay = time.time() - t
                     red(f"Smartcache: waiting for {fstr} caching to finish for {delay:.2f}s: hash={h}")
-            out = func(*args, **kwargs)
             if hasattr(func, "check_call_in_cache") and not func.check_call_in_cache(*args, **kwargs):
                 red(f"Smartcache: after waiting for {fstr} the result was still missing from the cache.")
-            return out
+            return func(*args, **kwargs)
 
         else:
             with shared.thread_lock:
