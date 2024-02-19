@@ -825,6 +825,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             trigger_mode="always_last",
+            show_progress=False,
             )
     txt_audio.input(
             fn=lambda: "?",
@@ -832,6 +833,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             trigger_mode="always_last",
+            show_progress=False,
             )
 
 
@@ -1054,6 +1056,7 @@ with gr.Blocks(
                                 outputs=[update_status_btn],
                                 preprocess=False,
                                 postprocess=False,
+                                show_progress=False,
                                 )
     rollaudio_12_btn.click(
             fn=roll_audio,
@@ -1101,6 +1104,7 @@ with gr.Blocks(
                                 outputs=[update_status_btn],
                                 preprocess=False,
                                 postprocess=False,
+                                show_progress=False,
                                 )
     rollaudio_123_btn.click(
             fn=roll_audio,
@@ -1161,6 +1165,7 @@ with gr.Blocks(
                                         outputs=[update_status_btn],
                                         preprocess=False,
                                         postprocess=False,
+                                        show_progress=False,
                                         )
     # # roll texts then set status to Rolling
     # gr.on(
@@ -1175,6 +1180,7 @@ with gr.Blocks(
             triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
             fn=lambda: "Rolling",
             outputs=[update_status_btn],
+            show_progress=False,
             )
 
     # reset check for mark next
@@ -1225,6 +1231,7 @@ with gr.Blocks(
                                 outputs=[update_status_btn],
                                 preprocess=False,
                                 postprocess=False,
+                                show_progress=False,
                                 )
 
     # send to whisper
@@ -1271,6 +1278,7 @@ with gr.Blocks(
                             outputs=[update_status_btn],
                             preprocess=False,
                             postprocess=False,
+                            show_progress=False,
                             )
 
     # 1+2
