@@ -488,7 +488,6 @@ def pre_alfred(
         inputs = []
         for m in prev_prompts:
             inputs.append(f"INPUT: '{m['content']}'\nOUTPUT: '{m['answer']}'")
-        assert sld_buffer
         for m in buffer_to_add:
             if m["role"] == "user":
                 inputs.append(f"INPUT: '{m['content']}'")
