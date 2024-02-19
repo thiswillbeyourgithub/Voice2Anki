@@ -15,7 +15,7 @@ import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
 
-from .logger import whi, red, yel, trace, Timeout
+from .logger import whi, red, yel, trace, Timeout, smartcache
 from .shared_module import shared
 
 # string at the end of the prompt
@@ -95,7 +95,6 @@ def embedder(text_list, result):
     return [np.array(d["embedding"]).reshape(1, -1) for d in vec.data]
 
 
-@trace
 def embedder_wrapper(list_text):
     mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
@@ -306,7 +305,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     to_embed = [prompt_messages[-1]["content"]]
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
-    all_embeddings = embedder_wrapper(to_embed)
+    ew_mem = Memory(f"cache/embeddings_wrapper_{shared.pv['embed_choice']}", verbose=0)
+    ew = trace(smartcache(ew_mem.cache(embedder_wrapper)))
+    all_embeddings = ew(to_embed)
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
