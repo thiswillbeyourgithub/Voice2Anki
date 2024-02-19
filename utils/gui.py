@@ -1403,7 +1403,7 @@ with gr.Blocks(
 
     # trigger darkmode depending on time of day
     if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
-        init = demo.load(fn=None, js=darkmode_js)
+        init.then(fn=None, js=darkmode_js)
 
     # gr.on(
     #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
