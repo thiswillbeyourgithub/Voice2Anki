@@ -235,15 +235,15 @@ css = """
 #js_widetabs-button { flex-grow: 1 !important;}
 
 /* remove source selector */
-#js_audiocomponent > div.component-wrapper > div.controls > select {display: none !important; flex-grow:0 !important;}
+.mic-select {display: none !important; flex-grow:0 !important;}
 
 /* remove volume and speed controls */
-#js_audiocomponent > div.component-wrapper > div.controls > div.control-wrapper {display: none !important; flex-grow:0 !important;}
+.control-wrapper {display: none !important; flex-grow:0 !important;}
 
 
-/* remove clipping controls
-#js_audiocomponent > div.component-wrapper > div.controls > div.settings-wrapper {display: none !important; flex-grow:0 !important;}
-*/
+
+/* remove clipping controls */
+.settings-wrapper {display: none !important; flex-grow:0 !important;}
 
 /* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
