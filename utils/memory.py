@@ -283,85 +283,44 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         for i, pr in enumerate(candidate_prompts):
             candidate_prompts[i]["kw_score"] = 1
 
-    # score based on length or embedding similarity
+    # score based on embedding similarity
     distances = []
-    if shared.memory_metric == "length":
-        for i, pr in enumerate(candidate_prompts):
-            tkn_len_in = pr["tkn_len_in"]
-            # mean of A/B and B/A is (A**2*B**2)(2AB)
-            dist = ((tkn_len_in ** 2) + (new_prompt_len ** 2)) / (2 * tkn_len_in * new_prompt_len)
-            # at this point: 1 means same length and anything other means
-            # should not be picked.
-            dist = abs(dist - 1)
-            # now: 0 means same length and anything above means should not
-            # be picked.
-            candidate_prompts[i]["length_dist"] = dist
-            distances.append(dist)
+    whi("Computing cosine similarity")
+    max_sim = [0, None]
+    min_sim = [1, None]
 
-        max_dist = max(distances)
-        min_dist = min(distances)
+    # get the embedding for all memories in another way (because this way
+    # we get all embeddings from the memories in a single call, provided the
+    # memories.json file hasn't changed since)
+    to_embed = [prompt_messages[-1]["content"]]
+    to_embed += [pr["content"] for pr in candidate_prompts]
+    to_embed += [pr["answer"] for pr in candidate_prompts]
+    all_embeddings = embedder_wrapper(to_embed)
+    assert all(isinstance(item, np.ndarray) for item in all_embeddings)
+    assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
+    new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
+    embeddings_contents = all_embeddings[:len(candidate_prompts)]
+    embeddings_answers = all_embeddings[len(candidate_prompts):]
+    assert len(embeddings_contents) == len(embeddings_answers)
+    sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
+    sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
+    w1, w2 = 5, 1
+    sim_combined = ((sim_content * w1 + sim_answer * w2) / (w1 + w2)).squeeze()
+    max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
+    min_sim = [sim_combined.min(), candidate_prompts[sim_combined.argmin()]["content"]]
+    distances = list(sim_combined).copy()
 
-        max_sim = [0, None]
-        min_sim = [1, None]
-        for i, pr in enumerate(candidate_prompts):
-            # make it so that the highest value is 1, lowest is 0 and
-            # high means high chances of being selected
-            candidate_prompts[i]["length_dist"] = 1 - ((candidate_prompts[i]["length_dist"] - min_dist) / (max_dist - min_dist))
+    whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
+    whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
 
-            if candidate_prompts[i]["length_dist"] > max_sim[0]:
-                max_sim[0] = candidate_prompts[i]["length_dist"]
-                max_sim[1] = pr["content"]
-            if candidate_prompts[i]["length_dist"] < min_sim[0]:
-                min_sim[0] = candidate_prompts[i]["length_dist"]
-                min_sim[1] = pr["content"]
-        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
-        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
-        assert len(candidate_prompts) == len(distances), "Unexpected list length"
-
-    elif shared.memory_metric == "embeddings":
-        whi("Computing cosine similarity")
-        max_sim = [0, None]
-        min_sim = [1, None]
-
-        # get the embedding for all memories in another way (because this way
-        # we get all embeddings from the memories in a single call, provided the
-        # memories.json file hasn't changed since)
-        to_embed = [prompt_messages[-1]["content"]]
-        to_embed += [pr["content"] for pr in candidate_prompts]
-        to_embed += [pr["answer"] for pr in candidate_prompts]
-        all_embeddings = embedder_wrapper(to_embed)
-        assert all(isinstance(item, np.ndarray) for item in all_embeddings)
-        assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
-        new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
-        embeddings_contents = all_embeddings[:len(candidate_prompts)]
-        embeddings_answers = all_embeddings[len(candidate_prompts):]
-        assert len(embeddings_contents) == len(embeddings_answers)
-        sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
-        sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
-        w1, w2 = 5, 1
-        sim_combined = ((sim_content * w1 + sim_answer * w2) / (w1 + w2)).squeeze()
-        max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
-        min_sim = [sim_combined.min(), candidate_prompts[sim_combined.argmin()]["content"]]
-        distances = list(sim_combined).copy()
-
-        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
-        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
-
-        # scaling
-        sim_combined -= sim_combined.min()
-        sim_combined /= sim_combined.max()
-        for i in range(len(candidate_prompts)):
-            candidate_prompts[i]["content_sim"] = float(sim_combined[i].squeeze())
-        assert len(candidate_prompts) == len(distances), "Unexpected list length"
-
-    else:
-        raise ValueError(shared.memory_metric)
+    # scaling
+    sim_combined -= sim_combined.min()
+    sim_combined /= sim_combined.max()
+    for i in range(len(candidate_prompts)):
+        candidate_prompts[i]["content_sim"] = float(sim_combined[i].squeeze())
+    assert len(candidate_prompts) == len(distances), "Unexpected list length"
 
     # combine score
-    if shared.memory_metric == "embeddings":
-        similarity_key = "content_sim"
-    elif shared.memory_metric == "length":
-        similarity_key = "length_dist"
 
     w = [
             shared.pv["sld_pick_weight"],
@@ -371,7 +330,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             ]
     pm_contents = [pr["content"].replace("<br/>", "\n") for pr in prompt_messages]
     for i, pr in enumerate(candidate_prompts):
-        score = pr[similarity_key] * w[0]
+        score = pr["content_sim"] * w[0]
         score += pr["priority_score"] * w[1]
         score += pr["kw_score"] * w[2]
         score += pr["time_score"] * w[3]

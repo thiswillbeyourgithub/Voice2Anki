@@ -22,7 +22,6 @@ def start_Voice2Anki(
         localnetwork=True,
         use_ssl=True,
         anki_media_folder=None,
-        memory_metric="embeddings",
         disable_tracing=False,
         disable_timeout=True,
         widen_screen=True,
@@ -56,9 +55,6 @@ def start_Voice2Anki(
         Disable if share is used as self signed certificate mess with it.
     anki_media_folder: str, default None
         optional anki media database location
-    memory_metric: str, default "embeddings"
-        if "length", will not use embeddings to improve the memory filtering
-        but instead rely on finding memories with adequate length.
     disable_tracing: bool, default False
         if True, disables the decorator that indicates which function were
         called
@@ -86,8 +82,6 @@ def start_Voice2Anki(
                 f"a value from {', '.join(db_list)}")
     else:
         assert print_db_then_exit is False, "Invalid value for print_db_then_exit. You must specify the name of a db"
-
-    assert memory_metric in ["embeddings", "length"], "Invalid memory_metric"
 
     whi("Starting Voice2Anki\n")
     if args:
@@ -117,7 +111,6 @@ def start_Voice2Anki(
         server = None
 
     shared.audio_slot_nb = nb_audio_slots
-    shared.memory_metric = memory_metric
     shared.anki_media = anki_media_folder
     shared.debug = debug
     shared.disable_tracing = disable_tracing

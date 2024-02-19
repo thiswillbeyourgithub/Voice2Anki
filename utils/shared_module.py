@@ -28,7 +28,6 @@ class SharedModule:
     the main .py files"""
     # things that are not changed when self.reset is called
     VERSION = 1.0
-    memory_metric = None
     anki_media = None
     debug = None
     disable_tracing = None
