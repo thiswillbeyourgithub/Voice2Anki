@@ -246,9 +246,9 @@ def thread_whisp_then_llm(audio_mp3) -> None:
 
     try:
         cloze = alfred(
-                txt_audio,
+                txt_audio=txt_audio,
                 txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
-                txt_profile=shared.pv.profile_name,
+                profile=shared.pv.profile_name,
                 max_token=shared.pv["sld_max_tkn"],
                 temperature=shared.pv["sld_temp"],
                 sld_buffer=shared.pv["sld_buffer"],
