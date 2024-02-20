@@ -1342,10 +1342,10 @@ with gr.Blocks(
                     outputs=btn_chains,
                     )
 
-    # trigger darkmode depending on time of day
-    if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
-        yel("Triggering darkmode because of time of day")
-        init.then(fn=None, js=darkmode_js)
+    # # trigger darkmode depending on time of day
+    # if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
+    #     yel("Triggering darkmode because of time of day")
+    #     init.then(fn=None, js=darkmode_js)
 
     # larger height to avoid scrolling up when changing tabs
     # this height is reset when another tab is selected to avoid cropping galleries for example
