@@ -7,7 +7,7 @@ from gradio.themes.utils import sizes as theme_size
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_cache
 from .anki_utils import sync_anki, get_card_status, mark_previous_notes, suspend_previous_notes, get_anki_tags, get_decks
-from .logger import get_log, red
+from .logger import get_log, red, yel
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, qg_add_to_new, qg_add_to_latest
 from .shared_module import shared
