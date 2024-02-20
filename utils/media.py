@@ -346,7 +346,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "show_share_button": False,
             "show_download_button": True,
             "waveform_options": {"show_controls": False, "show_recording_waveform": False},
-            "elem_id": "Audio_component_Voice2Anki",
+            "elem_id": "js_audiocomponent",
             "min_width": "1%",
             "editable": True,
             "scale": 1,
