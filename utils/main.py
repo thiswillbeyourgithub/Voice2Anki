@@ -174,7 +174,7 @@ def whisper_cached(
                         raise ValueError(stt_model)
 
                 if not transcript["segments"]:
-                    raise Exception(f"No audio segment found in {audio_path}")
+                    gr.Warning(red(f"No audio segment found in {audio_path}"))
 
                 # update the df
                 if shared.pv["enable_dirload"]:
