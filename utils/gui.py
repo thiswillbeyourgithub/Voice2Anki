@@ -258,9 +258,7 @@ css = """
 """
 
 if shared.widen_screen:
-    css += """
-.app { max-width: 100% !important; max-height: '50O0px !important'; height: '5000px !important'}
-"""
+    css += "\n.app { max-width: 100% !important; }"
 
 with gr.Blocks(
         analytics_enabled=False,
