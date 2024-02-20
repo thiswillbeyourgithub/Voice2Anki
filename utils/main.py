@@ -23,6 +23,7 @@ from pydub import AudioSegment
 
 import litellm
 import openai
+import replicate
 
 from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
@@ -96,18 +97,27 @@ def whisper_cached(
         txt_whisp_prompt: str,
         txt_whisp_lang: str,
         sld_whisp_temp: Union[float, int],
-        ):
-    """this is a call to OpenAI's whisper. It's called as soon as the
+        stt_model: str,
+        ) -> dict:
+    """this is a call to whisper. It's called as soon as the
     recording is done to begin caching. The audio_path can change so a hash
     of the content is used instead."""
     red(f"Calling whisper because not in cache: {audio_path}")
-    assert shared.pv["txt_openai_api_key"], "Missing OpenAI key, needed for Whisper"
-    if shared.openai_client is None:
-        shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
+
+    assert shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"], "Missing OpenAI or replicate API key, needed for Whisper"
+    if "openai" in stt_model:
+        assert shared.pv["txt_openai_api_key"], "Missing OpenAI API key, needed for Whisper"
+        if shared.openai_client is None:
+            shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
+    elif "replicate" in stt_model:
+        assert shared.pv["txt_replicate_api_key"], "Missing Replicate API key, needed for Whisper"
+        os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
+
     if txt_whisp_prompt.strip() == "":
         txt_whisp_prompt = None
     if txt_whisp_lang.strip() == "":
         txt_whisp_lang = None
+
     try:
         len_audio = len(AudioSegment.from_mp3(audio_path)) // 1000
         if len_audio <= 1:
@@ -119,21 +129,51 @@ def whisper_cached(
         while True:
             try:
                 cnt += 1
+
                 with open(audio_path, "rb") as audio_file:
-                    transcript = shared.openai_client.audio.transcriptions.create(
-                        model=modelname,
-                        file=audio_file,
-                        prompt=txt_whisp_prompt,
-                        language=txt_whisp_lang,
-                        temperature=sld_whisp_temp,
-                        response_format="verbose_json",
-                        )
-                    if sld_whisp_temp == 0:
-                        temps = [seg["temperature"] for seg in transcript.segments]
-                        if not transcript.segments:
-                            raise Exception(f"No audio segment found in {audio_path}")
-                        if sum(temps) / len(temps) == 1:
-                            raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
+                    if stt_model == "openai:whisper-1":
+                        transcript = shared.openai_client.audio.transcriptions.create(
+                            model="whisper-1",
+                            file=audio_file,
+                            prompt=txt_whisp_prompt,
+                            language=txt_whisp_lang,
+                            temperature=sld_whisp_temp,
+                            response_format="verbose_json",
+                            )
+                        transcript = json.loads(transcript.json())
+                        if sld_whisp_temp == 0:
+                            temps = [seg["temperature"] for seg in transcript["segments"]]
+                            if sum(temps) / len(temps) == 1:
+                                raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
+
+                    elif stt_model == "replicate:vaibhavs10/incredibly-fast-whisper":
+                        if txt_whisp_lang == "fr":
+                            txt_whisp_lang = "french"
+                        elif txt_whisp_lang == "en":
+                            txt_whisp_lang = "english"
+                        transcript = replicate.run(
+                                "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
+                                input={
+                                    "audio": audio_file,
+                                    "task": "transcribe",
+                                    "model": "large-v3",
+                                    "batch_size": 1,
+                                    "temperature": sld_whisp_temp,
+                                    "language": txt_whisp_lang,
+                                    "timestamp": "chunk",
+                                    "diarise_audio": False,
+                                    }
+                                )
+                        # adjust format
+                        transcript["segments"] = transcript["chunks"]
+                        del transcript["chunks"]
+                        if "duration" not in transcript:
+                            transcript["duration"] = transcript["segments"][-1]["timestamp"][-1]
+                    else:
+                        raise ValueError(stt_model)
+
+                if not transcript["segments"]:
+                    raise Exception(f"No audio segment found in {audio_path}")
 
                 # update the df
                 if shared.pv["enable_dirload"]:
@@ -145,7 +185,7 @@ def whisper_cached(
                             except:
                                 orig_path = tmp_df.loc[str(audio_path).replace("_proc", ""), "path"]
                             with shared.dirload_lock:
-                                tmp_df.loc[orig_path, "transcribed"] = transcript.text
+                                tmp_df.loc[orig_path, "transcribed"] = transcript["text"]
                     except Exception as err:
                         red(f"Couldn't update df to set transcript of {audio_path}: {err}")
 
@@ -190,6 +230,7 @@ def thread_whisp_then_llm(audio_mp3) -> None:
             txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
             txt_whisp_lang=shared.pv["txt_whisp_lang"],
             sld_whisp_temp=shared.pv["sld_whisp_temp"],
+            stt_model=shared.pv["stt_choice"],
             )
     txt_audio = transcript["text"]
 
@@ -246,6 +287,7 @@ def transcribe(audio_mp3_1: Union[str, dict]) -> str:
                 txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
                 txt_whisp_lang=shared.pv["txt_whisp_lang"],
                 sld_whisp_temp=shared.pv["sld_whisp_temp"],
+                stt_model=shared.pv["stt_choice"],
                 )
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
@@ -272,6 +314,7 @@ def transcribe(audio_mp3_1: Union[str, dict]) -> str:
                         "Voice2Anki_profile": shared.pv.profile_name,
                         "transcribed_input": txt_audio,
                         "full_whisper_output": transcript,
+                        "model_name": shared.pv["stt_choice"],
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "Voice2Anki_version": shared.VERSION,
                         "request_information": shared.request,
@@ -869,6 +912,7 @@ def audio_edit(
                 txt_whisp_prompt=None,
                 txt_whisp_lang=txt_whisp_lang,
                 sld_whisp_temp=0,
+                stt_model=shared.pv["stt_choice"],
                 )
         instructions = transcript["text"]
     else:

@@ -346,6 +346,7 @@ with gr.Blocks(
                     with gr.Row():
                         sld_max_tkn = gr.Number(minimum=0, maximum=15000, value=shared.pv["sld_max_tkn"], step=100.0, label="LLM avail. tkn.", scale=1)
                         sld_whisp_temp = gr.Number(minimum=0, maximum=1, value=shared.pv["sld_whisp_temp"], step=0.1, label="Whisper temp", scale=1)
+                        stt_choice = gr.Dropdown(value=shared.pv["stt_choice"], choices=shared.stt_models, label="STT model", show_label=True, scale=0, multiselect=False)
                         sld_temp = gr.Number(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
                         sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=shared.pv["sld_buffer"], label="Buffer size", scale=1)
 
@@ -865,6 +866,11 @@ with gr.Blocks(
                     inputs=[llm_choice],
                     show_progress=False,
                     )
+    stt_choice.change(
+            fn=shared.pv.save_stt_choice,
+            inputs=[stt_choice],
+            show_progress=False,
+            )
 
     # change some values to profile
     sld_whisp_temp.change(fn=shared.pv.save_sld_whisp_temp, inputs=[sld_whisp_temp], show_progress=False)
