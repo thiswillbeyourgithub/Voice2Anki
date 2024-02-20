@@ -248,6 +248,15 @@ js_reset_height = """() => {
 }
 """
 
+# executed on load
+js_load = """() => {
+    // slimmer mark and suspend row
+    //document.getElementById("js_markpreviousbtn").style.height="40px";
+    //document.getElementById("js_marknext").style.height="40px";
+    //document.getElementById("js_suspendpreviousbtn").style.height="40px";
+}
+"""
+
 css = """
 /* widen tabs */
 #js_widetabs-button { flex-grow: 1 !important;}
@@ -328,7 +337,7 @@ with gr.Blocks(
                 anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
 
         with gr.Row():
-            with gr.Column(scale=2, min_width=100, variant="compact"):
+            with gr.Column(scale=2, variant="compact"):
                 with gr.Row():
                     mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=3, min_width=100)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
@@ -340,9 +349,10 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(scale=2, variant="compact"):
                     with gr.Row():
-                        improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=1)
-                        sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1)
-                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=True, scale=1)
+                        sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=False)
+                        improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=3)
+                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
+
             with gr.Row():
                 with gr.Column(scale=10):
                     with gr.Row():
@@ -1405,6 +1415,7 @@ with gr.Blocks(
 
     # trigger darkmode depending on time of day
     if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
+        yel("Triggering darkmode because of time of day")
         init.then(fn=None, js=darkmode_js)
 
     # larger height to avoid scrolling up when changing tabs
@@ -1441,6 +1452,7 @@ with gr.Blocks(
             fn=sync_anki,
             show_progress=False,
             )
+    init.then(fn=None, js=js_load)
 
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
