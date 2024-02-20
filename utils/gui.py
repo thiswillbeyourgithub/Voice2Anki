@@ -1092,7 +1092,6 @@ with gr.Blocks(
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
                         inputs=[
@@ -1142,7 +1141,6 @@ with gr.Blocks(
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).success(
                             fn=to_anki,
                             inputs=[
@@ -1245,7 +1243,6 @@ with gr.Blocks(
                         outputs=[txt_chatgpt_cloz],
                         preprocess=False,
                         postprocess=False,
-                        show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
@@ -1272,7 +1269,6 @@ with gr.Blocks(
             outputs=[txt_chatgpt_cloz],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             )
 
     # send to anki
@@ -1319,7 +1315,6 @@ with gr.Blocks(
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
@@ -1356,7 +1351,6 @@ with gr.Blocks(
                 outputs=[txt_chatgpt_cloz],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=to_anki,
                     inputs=[
