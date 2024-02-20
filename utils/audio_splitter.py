@@ -32,7 +32,7 @@ today = f"{d.day:02d}_{d.month:02d}"
 class AudioSplitter:
     def __init__(
             self,
-            prompt=" STOP ",
+            prompt="Stop! ",
             profile=None,
             debug=False,
 
@@ -60,7 +60,7 @@ class AudioSplitter:
             help=False,
             ):
         """
-        prompt: str, default ' STOP '
+        prompt: str, default 'Stop! '
             prompt used to guide whisper. None to disable
 
         profile: str, default None
@@ -716,9 +716,11 @@ class AudioSplitter:
                     "repo": "hnesk",
                     "batch_size": None,
                     "condition_on_previous_text": False,
-                    # "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    "initial_prompt": self.prompt,
-                    "temperature": 0 if second_pass else 0.1,
+                    # "initial_prompt": self.prompt if not second_pass else "",
+                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                    # "initial_prompt": self.prompt,
+                    "temperature": 0,
+                    # "temperature": 0 if second_pass else 0.1,
                     "language": self.language,
                     "no_speech_threshold": 1,
                     "n_retry": 3,
@@ -728,9 +730,11 @@ class AudioSplitter:
                     "repo": "hnesk",
                     "batch_size": None,
                     "condition_on_previous_text": False,
-                    # "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    "initial_prompt": self.prompt,
-                    "temperature": 0 if second_pass else 0.1,
+                    # "initial_prompt": self.prompt if not second_pass else "",
+                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                    # "initial_prompt": self.prompt,
+                    "temperature": 0,
+                    # "temperature": 0 if second_pass else 0.1,
                     "language": self.language,
                     "no_speech_threshold": 1,
                     "n_retry": 1,
