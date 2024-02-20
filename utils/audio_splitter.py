@@ -37,7 +37,7 @@ class AudioSplitter:
             debug=False,
 
             stop_list=[
-                re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE),
+                re.compile(r"(\W|^)s?top(\W|$)", flags=re.IGNORECASE),
                 ],
             language="fr",
             n_todo=1,
