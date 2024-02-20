@@ -24,7 +24,7 @@ import replicate
 from logger import whi, yel, red, shared
 from profiles import ValueStorage
 
-stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=1)
+stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=0)
 
 d = datetime.today()
 today = f"{d.day:02d}_{d.month:02d}"
