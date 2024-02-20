@@ -292,7 +292,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
             candidate_prompts[i]["kw_score"] = 1
 
     # score based on embedding similarity
-    distances = []
     whi("Computing cosine similarity")
     max_sim = [0, None]
     min_sim = [1, None]
@@ -316,10 +315,9 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
     w1, w2 = 5, 1
     sim_combined = ((sim_content * w1 + sim_answer * w2) / (w1 + w2)).squeeze()
+
     max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
     min_sim = [sim_combined.min(), candidate_prompts[sim_combined.argmin()]["content"]]
-    distances = list(sim_combined).copy()
-
     whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
     whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
 
@@ -328,7 +326,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     sim_combined /= sim_combined.max()
     for i in range(len(candidate_prompts)):
         candidate_prompts[i]["content_sim"] = float(sim_combined[i].squeeze())
-    assert len(candidate_prompts) == len(distances), "Unexpected list length"
+    assert len(candidate_prompts) == len(list(sim_combined)), "Unexpected list length"
 
     # combine score
 
