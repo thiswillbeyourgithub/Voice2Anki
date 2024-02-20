@@ -307,9 +307,9 @@ with gr.Blocks(
         # rolls
         with gr.Group():
             with gr.Row():
-                rollaudio_123_btn = gr.Button(value="Roll + 1+2+3", variant="primary", scale=5, elem_id="js_roll123", size="sm", min_width=100)
-                rollaudio_12_btn = gr.Button(value="Roll + 1+2", variant="primary", scale=5, elem_id="js_roll12", size="sm", min_width=100)
-                rollaudio_1_btn = gr.Button(value="Roll + 1", variant="primary", scale=5, visible=False, elem_id="js_roll1", size="sm", min_width=100)
+                rollaudio_123_btn = gr.Button(value="Roll+123", variant="primary", scale=5, elem_id="js_roll123", size="sm", min_width=100)
+                rollaudio_12_btn = gr.Button(value="Roll+12", variant="primary", scale=5, elem_id="js_roll12", size="sm", min_width=100)
+                rollaudio_1_btn = gr.Button(value="Roll+1", variant="primary", scale=5, visible=False, elem_id="js_roll1", size="sm", min_width=100)
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn", size="sm", min_width=100)
 
         # 1/2/3
@@ -320,20 +320,21 @@ with gr.Blocks(
                 anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
 
         with gr.Row():
+            with gr.Column(scale=2, min_width=100, variant="compact"):
+                with gr.Row():
+                    mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=3, min_width=100)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
             with gr.Column(scale=1, min_width=100):
-                with gr.Group():
-                    with gr.Row():
-                        mark_previous = gr.Button(value="Mark previous", elem_id="js_markpreviousbtn", size="sm", scale=3, min_width=100)
-                        check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
-            with gr.Column(scale=1, min_width=100):
-                suspend_previous = gr.Button(value="Suspend previous", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=100)
+                suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=100)
 
         # quick settings
         with gr.Tab(label="Controls", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
             with gr.Row():
-                sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Feedback priority", min_width=100)
-                improve_btn = gr.Button(value="LLM Feedback", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100)
-                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt management", show_label=True)
+                with gr.Column(scale=2, variant="compact"):
+                    with gr.Row():
+                        improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=1)
+                        sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1)
+                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=True, scale=1)
             with gr.Row():
                 with gr.Column(scale=10):
                     with gr.Row():
