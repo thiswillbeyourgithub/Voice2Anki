@@ -238,6 +238,7 @@ document.querySelectorAll(".controls").forEach(el => el.style.maxHeight = "25px"
 </script>
 """
 
+# dynamically adjust the height of the app to avoid scrolling up abruptly
 js_longer = """() => {
     document.querySelectorAll(".app")[0].style.height='2500px';
 }
