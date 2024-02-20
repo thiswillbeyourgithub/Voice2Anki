@@ -44,9 +44,10 @@ llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 
 
 @trace
-def clear_llm_cache() -> None:
-    # reset the llm cache to make sure shared.llm_to_db_buffer is up to date
+def clear_cache() -> None:
+    # reset the llm and stt cache to make sure shared.llm_to_db_buffer is up to date
     llm_cache.clear()
+    stt_cache.clear()
 
 
 @trace

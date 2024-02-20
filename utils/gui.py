@@ -5,7 +5,7 @@ from functools import partial
 from gradio.themes.utils import sizes as theme_size
 
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
-from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_llm_cache
+from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_cache
 from .anki_utils import sync_anki, get_card_status, mark_previous_notes, suspend_previous_notes, get_anki_tags, get_decks
 from .logger import get_log, red
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
@@ -357,7 +357,7 @@ with gr.Blocks(
             with gr.Row():
                 flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
                 force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
-                clear_llm_cache_btn = gr.Button(value="Clear LLM cache", size="sm")
+                clear_cache_btn = gr.Button(value="Clear cache", size="sm")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
             txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
@@ -760,8 +760,8 @@ with gr.Blocks(
             show_progress=False,
             )
     # clear cache of llm. Forcing recomputation.
-    clear_llm_cache_btn.click(
-            fn=clear_llm_cache,
+    clear_cache_btn.click(
+            fn=clear_cache,
             )
     # force sound preprocessing for the first audio
     force_sound_processing_btn.click(
