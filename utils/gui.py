@@ -258,7 +258,9 @@ css = """
 """
 
 if shared.widen_screen:
-    css += "\n.app { max-width: 100% !important; }"
+    css += """
+.app { max-width: 100% !important; max-height: '50O0px !important'; height: '5000px !important'}
+"""
 
 with gr.Blocks(
         analytics_enabled=False,
@@ -313,9 +315,9 @@ with gr.Blocks(
         # 1/2/3
         with gr.Group():
             with gr.Row():
-                transcript_btn = gr.Button(value="1. Transcribe audio", variant="secondary", elem_id="js_transcribebtn", size="sm", min_width=100)
-                chatgpt_btn = gr.Button(value="2. Transcript to cloze", variant="secondary", elem_id="js_transcriptbtn", size="sm", min_width=100)
-                anki_btn = gr.Button(value="3. Cloze to Anki", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
+                transcript_btn = gr.Button(value="Transcribe", variant="secondary", elem_id="js_transcribebtn", size="sm", min_width=100)
+                chatgpt_btn = gr.Button(value="Clozify", variant="secondary", elem_id="js_transcriptbtn", size="sm", min_width=100)
+                anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
 
         with gr.Row():
             with gr.Column(scale=1, min_width=100):
