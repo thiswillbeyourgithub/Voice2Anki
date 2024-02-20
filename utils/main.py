@@ -93,7 +93,6 @@ def split_txt_audio(txt_audio: str) -> str:
 def whisper_cached(
         audio_path: str,
         audio_hash: str,
-        modelname: str,
         txt_whisp_prompt: str,
         txt_whisp_lang: str,
         sld_whisp_temp: Union[float, int],
@@ -162,34 +161,14 @@ def whisper_cached(
 
 
 @trace
-def thread_whisp_then_llm(
-        audio_mp3,
-        txt_whisp_prompt: str,
-        txt_whisp_lang: str,
-        sld_whisp_temp: Union[float, int],
-
-        txt_chatgpt_context: str,
-        txt_profile: str,
-        max_token: int,
-        temperature: Union[float, int],
-        sld_buffer: int,
-        llm_choice: str,
-        txt_keywords: str,
-        prompt_management: str,
-        ) -> None:
+def thread_whisp_then_llm(audio_mp3) -> None:
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
         return
 
-    if txt_whisp_lang is None:
-        return
-
     whi("Transcribing audio for the cache")
-    modelname = "whisper-1"
     audio_mp3 = format_audio_component(audio_mp3)
-    if shared.latest_stt_used != modelname:
-        shared.latest_stt_used = modelname
 
     if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
@@ -208,14 +187,13 @@ def thread_whisp_then_llm(
     transcript = whisper_cached(
             audio_mp3,
             audio_hash,
-            modelname,
-            txt_whisp_prompt,
-            txt_whisp_lang,
-            sld_whisp_temp,
+            txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
+            txt_whisp_lang=shared.pv["txt_whisp_lang"],
+            sld_whisp_temp=shared.pv["sld_whisp_temp"],
             )
-    txt_audio = transcript.text
+    txt_audio = transcript["text"]
 
-    if transcript.duration <= 1:
+    if transcript["duration"] <= 1:
         txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
 
     # if contains stop, split it
@@ -228,14 +206,14 @@ def thread_whisp_then_llm(
     try:
         cloze = alfred(
                 txt_audio,
-                txt_chatgpt_context,
-                txt_profile,
-                max_token,
-                temperature,
-                sld_buffer,
-                llm_choice,
-                txt_keywords,
-                prompt_management,
+                txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                txt_profile=shared.pv.profile_name,
+                max_token=shared.pv["sld_max_tkn"],
+                temperature=shared.pv["sld_max_temp"],
+                sld_buffer=shared.pv["sld_buffer"],
+                llm_choice=shared.pv["llm_choice"],
+                txt_keywords=shared.pv["txt_keywords"],
+                prompt_management=shared.pv["prompt_management"],
                 cache_mode=True)
         with shared.dirload_lock:
             shared.dirload_queue.loc[orig_path, "alfreded"] = cloze
@@ -245,24 +223,15 @@ def thread_whisp_then_llm(
 
 
 @trace
-def transcribe(
-        audio_mp3_1: Union[str, dict],
-        txt_whisp_prompt: str,
-        txt_whisp_lang: str,
-        sld_whisp_temp: Union[float, int],
-        ) -> str:
+def transcribe(audio_mp3_1: Union[str, dict]) -> str:
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
     if audio_mp3_1 is None:
         raise Exception(red("Error: None audio_mp3_1"))
 
-    if txt_whisp_lang is None:
+    if shared.pv["txt_whisp_lang"] is None:
         red("Warning: None whisper language")
-
-    modelname = "whisper-1"
-    if shared.latest_stt_used != modelname:
-        shared.latest_stt_used = modelname
 
     audio_mp3_1 = format_audio_component(audio_mp3_1)
 
@@ -274,15 +243,14 @@ def transcribe(
         transcript = whisper_cached(
                 audio_mp3_1,
                 audio_hash,
-                modelname,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-                sld_whisp_temp
+                txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
+                txt_whisp_lang=shared.pv["txt_whisp_lang"],
+                sld_whisp_temp=shared.pv["sld_whisp_temp"],
                 )
         with open(audio_mp3_1, "rb") as audio_file:
             mp3_content = audio_file.read()
-        txt_audio = transcript.text
-        if transcript.duration <= 1:
+        txt_audio = transcript["text"]
+        if transcript["duration"] <= 1:
             txt_audio = f"Very short audio, so unreliable transcript: {txt_audio}"
         yel(f"\nWhisper transcript: {txt_audio}")
 
@@ -298,13 +266,12 @@ def transcribe(
                     "dictionnary": {
                         "type": "whisper_transcription",
                         "timestamp": time.time(),
-                        "whisper_language": txt_whisp_lang,
-                        "whisper_context": txt_whisp_prompt,
-                        "whisper_temperature": sld_whisp_temp,
+                        "whisper_language": shared.pv["txt_whisp_lang"],
+                        "whisper_context": shared.pv["txt_whisp_prompt"],
+                        "whisper_temperature": shared.pv["sld_whisp_temp"],
                         "Voice2Anki_profile": shared.pv.profile_name,
                         "transcribed_input": txt_audio,
-                        "full_whisper_output": transcript.json(),
-                        "model_name": modelname,
+                        "full_whisper_output": transcript,
                         "audio_mp3": base64.b64encode(mp3_content).decode(),
                         "Voice2Anki_version": shared.VERSION,
                         "request_information": shared.request,
@@ -717,23 +684,7 @@ def alfred(
 
 @trace
 @Critical
-def dirload_splitted(
-        checkbox: bool,
-        txt_whisp_prompt: str,
-        txt_whisp_lang: str,
-        sld_whisp_temp: Union[int, float],
-
-        txt_chatgpt_context: str,
-        txt_profile: str,
-        max_token: int,
-        temperature: Union[int, float],
-        sld_buffer: int,
-        llm_choice: str,
-        txt_keywords: str,
-        prompt_management: str,
-
-        *audios: List,
-        ) -> List[Union[dict, gr.Audio, str]]:
+def dirload_splitted(checkbox: bool, *audios: List) -> List[Union[dict, gr.Audio, str]]:
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
@@ -829,21 +780,7 @@ def dirload_splitted(
                 )
         thread = threading.Thread(
             target=thread_whisp_then_llm,
-            args=(
-                    to_temp,
-                    txt_whisp_prompt,
-                    txt_whisp_lang,
-                    sld_whisp_temp,
-
-                    txt_chatgpt_context,
-                    txt_profile,
-                    max_token,
-                    temperature,
-                    sld_buffer,
-                    llm_choice,
-                    txt_keywords,
-                    prompt_management,
-                    ),
+            args=(to_temp,),
             )
         with shared.dirload_lock:
             shared.dirload_queue.loc[str(path), "transcribed"] = "started"
@@ -897,41 +834,11 @@ def dirload_splitted(
 
 @trace
 @Critical
-def dirload_splitted_last(
-        checkbox: bool,
-        txt_whisp_prompt: str,
-        txt_whisp_lang: str,
-        sld_whisp_temp: Union[int, float],
-
-        txt_chatgpt_context: str,
-        txt_profile: str,
-        max_token: int,
-        temperature: Union[int, float],
-        sld_buffer: int,
-        llm_choice: str,
-        txt_keywords: str,
-        prompt_management: str,
-        ) -> Union[str, gr.Audio, dict]:
+def dirload_splitted_last(checkbox: bool) -> Union[str, gr.Audio, dict]:
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
-    return dirload_splitted(
-            checkbox,
-            txt_whisp_prompt,
-            txt_whisp_lang,
-            sld_whisp_temp,
-
-            txt_chatgpt_context,
-            txt_profile,
-            max_token,
-            temperature,
-            sld_buffer,
-            llm_choice,
-            txt_keywords,
-            prompt_management,
-
-            *audios,
-            )[-1]
+    return dirload_splitted(checkbox, *audios)[-1]
 
 @trace
 def audio_edit(
@@ -954,12 +861,16 @@ def audio_edit(
     assert (audio is None and audio_txt) or (audio is not None and audio_txt is None), f"Can't give both audio and text to AudioEdit"
     if not audio_txt:
         red("Transcribing audio for audio_edit.")
-        instructions = transcribe(
-                audio,
+        with open(audio, "rb") as f:
+            audio_hash = hashlib.sha256(f.read()).hexdigest()
+        transcript = whisper_cached(
+                audio_path=audio,
+                audio_hash=audio_hash,
                 txt_whisp_prompt=None,
                 txt_whisp_lang=txt_whisp_lang,
                 sld_whisp_temp=0,
                 )
+        instructions = transcript["text"]
     else:
         instructions = audio_txt
 

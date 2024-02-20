@@ -768,7 +768,7 @@ with gr.Blocks(
             outputs=[audio_slots[0]],
             ).then(
                 fn=transcribe,
-                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                inputs=[audio_slots[0]],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
@@ -776,7 +776,7 @@ with gr.Blocks(
     # trigger transcription when first audio stops recording
     audio_slots[0].stop_recording(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+            inputs=[audio_slots[0]],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -1034,7 +1034,7 @@ with gr.Blocks(
             #show_progress=False,
             ).success(
                 fn=transcribe,
-                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                inputs=[audio_slots[0]],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
@@ -1044,21 +1044,7 @@ with gr.Blocks(
                     show_progress=False,
                 ).success(
                         fn=dirload_splitted_last,
-                        inputs=[
-                            gui_rolldirloadcheck,
-                            txt_whisp_prompt,
-                            txt_whisp_lang,
-                            sld_whisp_temp,
-
-                            txt_chatgpt_context,
-                            txt_profile,
-                            sld_max_tkn,
-                            sld_temp,
-                            sld_buffer,
-                            llm_choice,
-                            txt_keywords,
-                            prompt_manag,
-                            ],
+                        inputs=[gui_rolldirloadcheck],
                         outputs=[audio_slots[-1]],
                         preprocess=False,
                         postprocess=True,
@@ -1080,7 +1066,7 @@ with gr.Blocks(
             show_progress=False,
             ).success(
                 fn=transcribe,
-                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                inputs=[audio_slots[0]],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
@@ -1092,21 +1078,7 @@ with gr.Blocks(
                     postprocess=False,
                 ).success(
                         fn=dirload_splitted_last,
-                        inputs=[
-                            gui_rolldirloadcheck,
-                            txt_whisp_prompt,
-                            txt_whisp_lang,
-                            sld_whisp_temp,
-
-                            txt_chatgpt_context,
-                            txt_profile,
-                            sld_max_tkn,
-                            sld_temp,
-                            sld_buffer,
-                            llm_choice,
-                            txt_keywords,
-                            prompt_manag,
-                            ],
+                        inputs=[gui_rolldirloadcheck],
                         outputs=[audio_slots[-1]],
                         # preprocess=False,
                         # postprocess=False,
@@ -1128,7 +1100,7 @@ with gr.Blocks(
             #show_progress=False,
             ).success(
                 fn=transcribe,
-                inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                inputs=[audio_slots[0]],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
@@ -1156,21 +1128,7 @@ with gr.Blocks(
                             show_progress=False,
                             ).then(
                                 fn=dirload_splitted_last,
-                                inputs=[
-                                    gui_rolldirloadcheck,
-                                    txt_whisp_prompt,
-                                    txt_whisp_lang,
-                                    sld_whisp_temp,
-
-                                    txt_chatgpt_context,
-                                    txt_profile,
-                                    sld_max_tkn,
-                                    sld_temp,
-                                    sld_buffer,
-                                    llm_choice,
-                                    txt_keywords,
-                                    prompt_manag,
-                                    ],
+                                inputs=[gui_rolldirloadcheck],
                                 outputs=[audio_slots[-1]],
                                 show_progress=False,
                                 ).then(
@@ -1210,26 +1168,12 @@ with gr.Blocks(
     # on another distance device
     dir_load_btn.click(
             fn=dirload_splitted,
-            inputs=[
-                gui_rolldirloadcheck,
-                txt_whisp_prompt,
-                txt_whisp_lang,
-                sld_whisp_temp,
-
-                txt_chatgpt_context,
-                txt_profile,
-                sld_max_tkn,
-                sld_temp,
-                sld_buffer,
-                llm_choice,
-                txt_keywords,
-                prompt_manag,
-                ] + audio_slots,
+            inputs=[gui_rolldirloadcheck] + audio_slots,
             outputs=audio_slots,
             #show_progress=False,
             ).success(
                     fn=transcribe,
-                    inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+                    inputs=[audio_slots[0]],
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
@@ -1251,7 +1195,7 @@ with gr.Blocks(
     # send to whisper
     transcript_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+            inputs=[audio_slots[0]],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -1299,7 +1243,7 @@ with gr.Blocks(
     # 1+2
     semiauto_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+            inputs=[audio_slots[0]],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
@@ -1334,7 +1278,7 @@ with gr.Blocks(
     # 1+2+3
     auto_btn.click(
             fn=transcribe,
-            inputs=[audio_slots[0], txt_whisp_prompt, txt_whisp_lang, sld_whisp_temp],
+            inputs=[audio_slots[0]],
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
