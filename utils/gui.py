@@ -234,7 +234,7 @@ document.addEventListener('keydown', tabswitcher, false);
 
 # dynamically adjust the height of the app to avoid scrolling up abruptly
 js_longer = """() => {
-    document.querySelectorAll(".app")[0].style.height='2500px';
+    document.querySelectorAll(".app")[0].style.height='5000px';
 }
 """
 js_reset_height = """() => {
@@ -244,6 +244,11 @@ js_reset_height = """() => {
 
 # executed on load
 js_load = """() => {
+    // make sure the audios keep the same size even when they are unset
+    var h = Math.floor(2.3 * document.getElementsByClassName("js_audiocomponent")[0].clientHeight);
+
+    Array.from(document.getElementsByClassName("js_audiocomponent")).forEach(el => el.style.height = `${h}px`)
+
 }
 """
 
@@ -257,9 +262,6 @@ css = """
 /* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
-
-/* make sure the audios keep the same size even when they are unset */
-.js_audiocomponent {height: 190px;}
 """
 
 if shared.widen_screen:
