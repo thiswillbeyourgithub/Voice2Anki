@@ -952,6 +952,7 @@ with gr.Blocks(
             gal_.change(
                     fn=get_img_source,
                     inputs=[gal_],
+                    show_progress=False,
                     )
 
         # add image
@@ -959,6 +960,7 @@ with gr.Blocks(
                 fn=get_image,
                 inputs=[gal_],
                 outputs=[gal_],
+                show_progress=False,
                 ).then(  # force deletion
                         fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
@@ -976,6 +978,7 @@ with gr.Blocks(
         rst_.click(
                 fn=lambda: None,
                 outputs=[gal_],
+                show_progress=False,
                 ).then(  # force deletion
                         fn=getattr(shared.pv, f"save_queued_gallery_{qg:03d}"),
                         inputs=[gal_],
@@ -990,6 +993,7 @@ with gr.Blocks(
                 outputs=[source_txt],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 )
 
     roll_gall_btn.click(
