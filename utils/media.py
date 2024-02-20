@@ -354,11 +354,6 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "show_label": True,
             "min_length": 1,
             }
-    if "elem_classes" in kwargs:
-        for el in kwargs["elem_classes"]:
-            if el not in defaults["elem_classes"]:
-                defaults["elem_classes"].append(el)
-        del kwargs["elem_classes"]
     defaults.update(kwargs)
     return gr.Microphone(**defaults)
 
