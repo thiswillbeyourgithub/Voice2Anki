@@ -244,10 +244,6 @@ js_reset_height = """() => {
 
 # executed on load
 js_load = """() => {
-    // slimmer mark and suspend row
-    //document.getElementById("js_markpreviousbtn").style.height="40px";
-    //document.getElementById("js_marknext").style.height="40px";
-    //document.getElementById("js_suspendpreviousbtn").style.height="40px";
 }
 """
 
