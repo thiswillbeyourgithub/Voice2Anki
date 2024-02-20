@@ -378,6 +378,14 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 exit_while = True
                 break
 
+            # don't add super similar memories otherwise we lack diversity
+            dists = [abs(pr["content_sim"] - p["content_sim"]) for p in output_pr]
+            if dists and min(dists) <= 0.0001:
+                cont1 = output_pr[dists.index(min(dists))]["content"]
+                cont2 = pr["content"]
+                red(f"Very similar prompts {min(dists)}:\n* {cont2}\n* {cont1}")
+                continue
+
             # as the temperature incrase, increase the randomness of the picking
             if temperature <= 0.3:
                 threshold = 0.05
