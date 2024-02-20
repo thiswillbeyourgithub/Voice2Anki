@@ -342,7 +342,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "type": "filepath",
             "format": "mp3",
             "value": None,
-            "container": False,
+            "container": True,
             "show_share_button": False,
             "show_download_button": True,
             "waveform_options": {"show_controls": False, "show_recording_waveform": False},
