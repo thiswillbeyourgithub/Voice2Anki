@@ -48,7 +48,7 @@ default_system_prompt = {
             }
 
 
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "tts_model", "hash", "llm_choice"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice"]
 
 
 def hasher(text):
@@ -452,8 +452,8 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
                 "priority": priority,
                 "answer": answer,
                 "llm_choice": llm_choice,  # can be different than llm_model because of cache
-                "llm_model": shared.latest_llm_used,
-                "tts_model": shared.latest_stt_used,
+                "llm_model": shared.pv["llm_choice"],
+                "stt_model": shared.pv["stt_choice"],
                 "tkn_len_in": tkn_len_in,
                 "tkn_len_out": tkn_len_out,
                 "hash": hasher(content),

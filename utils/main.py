@@ -1218,7 +1218,7 @@ def to_anki(
             "transcripted_text": txt_audio,
             "chatgpt_context": txt_chatgpt_context,
             "llm_used": shared.pv["llm_choice"],
-            "tts_used": shared.pv["stt_choice"],
+            "stt_used": shared.pv["stt_choice"],
             "version": shared.VERSION,
             "timestamp": time.time(),
             "user-agent": shared.request["user-agent"],
