@@ -248,25 +248,18 @@ js_load = """() => {
 """
 
 css = """
-/* widen tabs */
+/* make sure those tabs take all the width */
 #js_widetabs-button { flex-grow: 1 !important;}
 
 /* remove source selector */
 .mic-select {display: none !important; flex-grow:0 !important;}
-
-/* remove volume and speed controls */
-.control-wrapper {display: none !important; flex-grow:0 !important;}
-
-
-/* remove clipping controls */
-.settings-wrapper {display: none !important; flex-grow:0 !important;}
 
 /* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
 
 /* make sure the audios keep the same size even when they are unset */
-.js_audiocomponent {height: 189px;}
+.js_audiocomponent {height: 190px;}
 """
 
 if shared.widen_screen:

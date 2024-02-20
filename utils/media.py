@@ -342,17 +342,17 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "type": "filepath",
             "format": "mp3",
             "value": None,
+            "min_length": 1,
+            "label": "Untitled",
+            "show_label": True,
             "container": True,
             "show_share_button": False,
             "show_download_button": True,
-            "waveform_options": {"show_controls": False, "show_recording_waveform": False},
             "elem_classes": ["js_audiocomponent"],
-            "min_width": "1%",
+            "min_width": "100px",
+            "waveform_options": {"show_controls": False, "show_recording_waveform": False},
             "editable": True,
             "scale": 1,
-            "label": "Untitled",
-            "show_label": True,
-            "min_length": 1,
             }
     defaults.update(kwargs)
     return gr.Microphone(**defaults)
