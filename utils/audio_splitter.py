@@ -289,7 +289,7 @@ class AudioSplitter:
                     # whi("Saved")
                 audio.export(path, format="mp3")
             _ = joblib.Parallel(
-                    n_jobs=10,
+                    n_jobs=-1,
                     backend="threading",
                     )(joblib.delayed(threaded_export)(sub, f)
                         for sub, f in zip(
