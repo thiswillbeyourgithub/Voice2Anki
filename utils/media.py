@@ -355,7 +355,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "min_lenth": 1,
             }
     defaults.update(kwargs)
-    return gr.Microphone(**kwargs)
+    return gr.Microphone(**defaults)
 
 
 @trace
