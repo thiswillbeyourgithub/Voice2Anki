@@ -1038,7 +1038,6 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).then(
                     lambda: None,
                     outputs=[txt_chatgpt_cloz],
@@ -1085,7 +1084,6 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -1134,7 +1132,6 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
-                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -1236,7 +1233,6 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
-                    show_progress=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -1259,7 +1255,6 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             )
 
     # send to chatgpt
@@ -1308,7 +1303,6 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -1344,7 +1338,6 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
-            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
