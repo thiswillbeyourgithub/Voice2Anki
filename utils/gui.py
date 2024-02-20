@@ -264,6 +264,9 @@ css = """
 /* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
+
+/* make sure the audios keep the same size even when they are unset */
+.js_audiocomponent {height: 189px;}
 """
 
 if shared.widen_screen:
