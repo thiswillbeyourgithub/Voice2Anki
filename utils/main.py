@@ -663,10 +663,6 @@ def alfred(
     output_tkn_cost = response["usage"]["completion_tokens"]
     tkn_cost = [input_tkn_cost, output_tkn_cost]
 
-    # in case recur improv is called
-    if llm_choice != shared.latest_llm_used:
-        shared.latest_llm_used = llm_choice
-
     if isinstance(model_price, tuple):
         tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
     else:
@@ -1120,7 +1116,7 @@ def Voice2Anki_db_save(
                 "LLM_context": txt_chatgpt_context,
                 "Voice2Anki_profile": shared.pv.profile_name,
                 "transcribed_input": txt_audio,
-                "model_name": f"Probably:{shared.latest_llm_used}",
+                "model_name": f"Probably:{shared.pv['llm_choice']}",
                 "last_message_from_conversation": None,
                 "nb_of_message_in_conversation": None,
                 "system_prompt": default_system_prompt["content"],
@@ -1220,8 +1216,8 @@ def to_anki(
             "author": "Voice2Anki",
             "transcripted_text": txt_audio,
             "chatgpt_context": txt_chatgpt_context,
-            "llm_used": shared.latest_llm_used,
-            "tts_used": shared.latest_stt_used,
+            "llm_used": shared.pv["llm_choice"],
+            "tts_used": shared.pv["stt_choice"],
             "version": shared.VERSION,
             "timestamp": time.time(),
             "user-agent": shared.request["user-agent"],

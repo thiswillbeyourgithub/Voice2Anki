@@ -168,8 +168,6 @@ class SharedModule:
     dirload_queue = DF(columns=dirload_queue_columns).set_index("path")
 
     llm_to_db_buffer = {}
-    latest_stt_used = None
-    latest_llm_used = None
 
     running_threads = {
             "saving_chatgpt": [],
@@ -187,8 +185,6 @@ class SharedModule:
         "used to reset the values when the gradio page is reloaded"
         self.dirload_queue = DF(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
-        self.latest_stt_used = None
-        self.latest_llm_used = None
         for k in self.running_threads:
             self.running_threads[k] = []
         self.smartcache = {}
