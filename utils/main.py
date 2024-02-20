@@ -261,6 +261,7 @@ def thread_whisp_then_llm(audio_mp3) -> None:
     except Exception as err:
         with shared.dirload_lock:
             shared.dirload_queue.loc[orig_path, "alfreded"] = f"Failed: {err}"
+        gr.Warning(red(f"Failed anticipating Alfred call: {err}"))
 
 
 @trace
