@@ -241,6 +241,9 @@ def thread_whisp_then_llm(audio_mp3) -> None:
     # if contains stop, split it
     txt_audio = split_txt_audio(txt_audio)
 
+    if not txt_audio:
+        txt_audio = "Empty"
+
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
         shared.dirload_queue.loc[orig_path, "alfreded"] = "started"
