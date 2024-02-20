@@ -238,6 +238,15 @@ document.querySelectorAll(".controls").forEach(el => el.style.maxHeight = "25px"
 </script>
 """
 
+js_longer = """() => {
+    document.querySelectorAll(".app")[0].style.height='2500px';
+}
+"""
+js_reset_height = """() => {
+    document.querySelectorAll(".app")[0].style.height='';
+}
+"""
+
 css = """
 /* widen tabs */
 #js_widetabs-button { flex-grow: 1 !important;}
@@ -274,7 +283,7 @@ with gr.Blocks(
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm", min_width=100)
             dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm", min_width=100)
 
-    with gr.Tab(label="Main", elem_id="js_widetabs", elem_classes=["js_tabmain"]):
+    with gr.Tab(label="Main", elem_id="js_widetabs", elem_classes=["js_tabmain"]) as tab_main:
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1, size="sm")
@@ -1396,6 +1405,17 @@ with gr.Blocks(
     # trigger darkmode depending on time of day
     if (datetime.now().hour <= 8 or datetime.now().hour >= 19):
         init.then(fn=None, js=darkmode_js)
+
+    # larger height to avoid scrolling up when changing tabs
+    # this height is reset when another tab is selected to avoid cropping galleries for example
+    init.then(fn=None, js=js_longer)  # startup height
+    tab_main.select(fn=None, js=js_longer)  # long height when in Main
+    # reset height when in other tabs
+    gr.on(
+            triggers=[tab_settings.select, tab_queues.select, tab_logging.select, tab_memories_and_buffer.select],
+            fn=None,
+            js=js_reset_height,
+            )
 
     # gr.on(
     #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
