@@ -115,6 +115,8 @@ def get_text(img_path: str):
     lengths = []
     levels = []  # distance from top of the screen
     all_bbox = {}
+    if not all_words:
+        return ""  # no words found
     for word in all_words:
         all_bbox[word] = get_w_dim(word)
         bbox = all_bbox[word]
