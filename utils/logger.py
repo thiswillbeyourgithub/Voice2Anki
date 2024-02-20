@@ -279,7 +279,7 @@ def smartcache(func: Callable) -> Callable:
             while h in shared.smartcache:
                 time.sleep(0.1)
                 i += 1
-                if i % 10 == 0:
+                if i == 0 or i % 50 = 0:
                     delay = time.time() - t
                     red(f"Smartcache: waiting for {fstr} caching to finish for {delay:.2f}s: hash={h}")
             if hasattr(func, "check_call_in_cache") and not func.check_call_in_cache(*args, **kwargs):
