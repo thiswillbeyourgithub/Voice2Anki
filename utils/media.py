@@ -352,6 +352,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
             "scale": 1,
             "label": "Untitled",
             "show_label": True,
+            "min_lenth": 1,
             }
     defaults.update(kwargs)
     return gr.Microphone(**kwargs)

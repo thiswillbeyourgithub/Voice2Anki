@@ -304,7 +304,7 @@ with gr.Blocks(
         audio_slots = []
         audio_slots_txts = []
         for i in range(audio_number):
-                audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", show_label=True, render=False)
+                audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", render=False)
                 audio_slots.append(audio_mp3)
                 audio_slots_txt = gr.HTML(render=False, visible=shared.pv["enable_dirload"])
                 audio_slots_txts.append(audio_slots_txt)
@@ -385,19 +385,10 @@ with gr.Blocks(
 
         with gr.Tab(label="Edit", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
             with gr.Row():
-                audio_corrector = gr.Microphone(
-                        format="mp3",
-                        value=None,
+                audio_corrector = create_audio_compo(
                         label="AudioEdit via GPT-4",
-                        show_download_button=True,
-                        show_share_button=False,
-                        type="filepath",
-                        min_length=2,
                         container=True,
-                        show_label=True,
                         scale=0,
-                        elem_id="js_audiocomponent",
-                        min_width=300,
                         editable=True,
                         )
                 audio_corrector_txt = gr.Textbox(value=None, label="Edit via GPT-4", scale=2)
