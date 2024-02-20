@@ -131,6 +131,7 @@ def start_Voice2Anki(
         red("Will not use SSL")
         ssl_args = {}
 
+    # queueing seems to make things way slower
     # demo.queue()
     demo.launch(
             share=share,
