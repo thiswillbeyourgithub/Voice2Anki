@@ -804,12 +804,13 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     )
+                )
 
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
     logging_reload.click(fn=get_log, outputs=[output_elem])
 
-    # mark the previous car
+    # mark the previous cards
     mark_previous.click(
             fn=mark_previous_notes,
             show_progress=False,
