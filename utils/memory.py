@@ -436,9 +436,6 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         raise Exception(red("You can't memorize a prompt that was automatically split."))
         return
 
-    if "{{c1::" not in txt_chatgpt_outputstr and "}}" not in txt_chatgpt_outputstr:
-        gr.Warning(red(f"No cloze found in new memory. Make sure it's on purpose.\nCard: {txt_chatgpt_outputstr}"))
-
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
     tkn_len_in = tkn_len(content)
@@ -468,6 +465,9 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
         prev_prompts.append(to_add)
 
         prev_prompts = check_prompts(prev_prompts)
+
+        if "{{c1::" not in txt_chatgpt_outputstr and "}}" not in txt_chatgpt_outputstr:
+            gr.Warning(red(f"No cloze found in new memory. Make sure it's on purpose.\nCard: {txt_chatgpt_outputstr}"))
 
         with open(f"profiles/{txt_profile}/memories.json", "w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
