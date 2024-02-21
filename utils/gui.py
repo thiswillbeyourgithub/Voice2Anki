@@ -245,6 +245,87 @@ function tabswitcher(e) {
 document.addEventListener('keypress', shortcuts, false);
 document.addEventListener('keydown', tabswitcher, false);
 
+
+////// code related to syntax highlighting
+//const rules = [
+//  { regex: /\b(for)\b/g, replacement: '<span style="color: red;">$1</span>' },
+//  { regex: /\b(if)\b/g, replacement: '<span style="color: blue;">$1</span>' },
+//  { regex: /\b(else)\b/g, replacement: '<span style="color: green;">$1</span>' },
+//];
+//// Apply syntax highlighting
+//function applySyntaxHighlighting(html) {
+//  rules.forEach(rule => {
+//    html = html.replace(rule.regex, rule.replacement);
+//  });
+//  return html;
+//}
+//// Function to preserve caret position
+//function getCaretPosition(editableDiv) {
+//  let caretPos = 0, sel, range;
+//  if (window.getSelection) {
+//    sel = window.getSelection();
+//    if (sel.rangeCount) {
+//      range = sel.getRangeAt(0);
+//      if (range.commonAncestorContainer === editableDiv.parentElement) {
+//        caretPos = range.endOffset;
+//      }
+//    }
+//  }
+//  return caretPos;
+//}
+//// Set caret position
+//function setCaretPosition(editableDiv, position) {
+//  if (window.getSelection && document.createRange) {
+//    const range = document.createRange();
+//    range.selectNodeContents(editableDiv.parentElement);
+//    range.collapse(true);
+//    range.setStart(editableDiv.parentElement, position);
+//    range.setEnd(editableDiv.parentElement, position);
+//    const sel = window.getSelection();
+//    sel.removeAllRanges();
+//    sel.addRange(range);
+//  }
+//}
+//// Main function to handle input and styling
+//function handleInput(event) {
+//  const target = event.target;
+//  const caretPosition = getCaretPosition(target);
+//  let content = target.innerText;
+//  target.innerHTML = applySyntaxHighlighting(content);
+//  setCaretPosition(target, caretPosition);
+//}
+//
+//el=document.getElementById("js_txtchatgpt").childNodes[1].childNodes[5];
+//el.contentEditable = true;
+//el.addEventListener('input', handleInput);
+
+
+//// code to create a text input area on top of txtchatgpt:
+//// Assuming you have an existing element with id 'existingElement'
+//const existingElement = document.getElementById('js_txtchatgpt');
+//
+//// Create new text input element
+//const newTextElement = document.createElement('input');
+//newTextElement.type = 'text';
+//
+//// Get coordinates and dimensions of existingElement
+//const rect = existingElement.childNodes[1].childNodes[5].getBoundingClientRect();
+//
+//// Set style of newTextElement for exact overlay based on viewport position
+//newTextElement.style.position = 'absolute';
+//newTextElement.style.top = `${rect.top + window.scrollY}px`; // Adjust for scrolling
+//newTextElement.style.left = `${rect.left + window.scrollX}px`; // Adjust for scrolling
+//newTextElement.style.width = `${rect.width}px`;
+//newTextElement.style.height = `${rect.height}px`;
+//
+//// Link contents
+//newTextElement.oninput = () => existingElement.childNodes[1].childNodes[5].value = newTextElement.value;
+////existingElement.oninput = () => newTextElement.value = existingElement.childNodes[1].childNodes[5].value;
+//
+//// Append newTextElement to body to ensure it is positioned based on viewport coordinates
+//document.body.appendChild(newTextElement);
+
+
 </script>
 """
 
