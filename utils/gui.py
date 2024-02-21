@@ -169,6 +169,22 @@ function shortcuts(e) {
             }
         }
 
+        // switch top tabs
+        else if (e.code == "KeyT") {
+            var tabs = document.querySelectorAll(".js_toptabs");
+            tabs.forEach((tab, index) => {
+                if (tab.checkVisibility()) {
+                    if (event.shiftKey) {
+                        var newIndex = (index > 0) ? index - 1 : tabs.length - 1;
+                    } else {
+                        var newIndex = (index + 1) % tabs.length;
+                    }
+                    tabs[0].parentElement.childNodes[0].children[newIndex].click();
+                    return;
+                }
+            });
+        }
+
         // unfocus
         else if ((e.code == 'Space' && e.shiftKey) || (e.key == 'Escape') || (e.keyCode == 27)) {
             unfocus(e);
@@ -281,7 +297,7 @@ with gr.Blocks(
             sync_btn = gr.Button(value="Sync anki", variant="secondary", scale=1, elem_id="js_syncankibtn", size="sm", min_width=100)
             dark_mode_btn = gr.Button("Dark/Light", variant="secondary", scale=1, elem_id="js_darkmodebtn", size="sm", min_width=100)
 
-    with gr.Tab(label="Main", elem_id="js_widetabs", elem_classes=["js_tabmain"]) as tab_main:
+    with gr.Tab(label="Main", elem_id="js_widetabs", elem_classes=["js_toptabs", "js_tabmain"]) as tab_main:
 
         with gr.Row():
             rst_audio_btn = gr.Button(value="Clear audio", variant="primary", min_width=50, scale=1, size="sm")
@@ -409,7 +425,7 @@ with gr.Blocks(
                         show_progress=False,
                         )
 
-    with gr.Tab(label="Settings", elem_id="js_widetabs", elem_classes=["js_tabsettings"]) as tab_settings:
+    with gr.Tab(label="Settings", elem_id="js_widetabs", elem_classes=["js_toptabs", "js_tabsettings"]) as tab_settings:
         with gr.Tab(label="GUI", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
                 gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
@@ -468,7 +484,7 @@ with gr.Blocks(
                             show_label=True,
                             )
 
-    with gr.Tab(label="Queues", elem_id="js_widetabs", elem_classes=["js_tabqueues"], visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]) as tab_queues:
+    with gr.Tab(label="Queues", elem_id="js_widetabs", elem_classes=["js_toptabs", "js_tabqueues"], visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]) as tab_queues:
         with gr.Tab(label="Queued galleries", elem_id="js_widetabs", elem_classes=["js_queueqgclass", "js_subtab_queues"], visible=shared.pv["enable_queued_gallery"]) as tab_queued_galleries:
 
             with gr.Row():
@@ -523,13 +539,13 @@ with gr.Blocks(
                     column_widths=["1%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
                     )
 
-    with gr.Tab(label="Logging", elem_id="js_widetabs") as tab_logging:
+    with gr.Tab(label="Logging", elem_id="js_widetabs", elem_classes=["js_toptabs"]) as tab_logging:
         with gr.Column():
             logging_reload = gr.Button(value="Refresh", size="sm")
             output_elem = gr.Textbox(value=None, label="Logging", lines=100, max_lines=1000, interactive=False, placeholder="this string should never appear")
 
 
-    with gr.Tab(label="Memories & Buffer", elem_id="js_widetabs", elem_classes=["js_tabmemoriesandbuffer"]) as tab_memories_and_buffer:
+    with gr.Tab(label="Memories & Buffer", elem_id="js_widetabs", elem_classes=["js_toptabs", "js_tabmemoriesandbuffer"]) as tab_memories_and_buffer:
         with gr.Tab(label="Memories", elem_id="js_widetabs", elem_classes=["js_subtab_memoriesandbuffer"]) as tab_memories:
             df_memories = gr.Dataframe(
                     label="Saved memories",
@@ -550,7 +566,7 @@ with gr.Blocks(
                     column_widths=["1%", "10%", "10%", "10%", "10%", "5%"],
                     )
 
-    # with gr.Tab(label="Console", elem_id="js_widetabs"):
+    # with gr.Tab(label="Console", elem_id="js_widetabs", elem_classes=["js_toptabs"]):
     #     from pprint import pformat
     #     with gr.Column():
     #         console = gr.Chatbot(
@@ -585,7 +601,7 @@ with gr.Blocks(
     #             )
     #     console_reset.click(fn=lambda: None, outputs=[console])
 
-    # with gr.Tab(label="Files", elem_id="js_widetabs") as tab_files:
+    # with gr.Tab(label="Files", elem_id="js_widetabs", elem_classes=["js_toptabs"]) as tab_files:
     #     with gr.Accordion(label="Done", open=False):
     #         fex_done = gr.FileExplorer(
     #                 root=f"profiles/{shared.pv.profile_name}/queues/audio_done",
