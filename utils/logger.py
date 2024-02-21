@@ -269,9 +269,15 @@ def smartcache(func: Callable) -> Callable:
     def wrapper(*args, **kwargs):
         if hasattr(func, "check_call_in_cache"):
             fstr = str(func.func)
+            # ignored arguments to take into account
+            kwargs2 = kwargs.copy()
+            for ig in func.ignore:
+                if ig in kwargs2:
+                    del kwargs2[ig]
         else:
             fstr = str(func)
-        h = jhash(fstr + jhash(args) + jhash(kwargs))
+            kwargs2 = kwargs
+        h = jhash(fstr + jhash(args) + jhash(kwargs2))
         if h in shared.smartcache:
             t = shared.smartcache[h]
             red(f"Smartcache: already ongoing for {fstr} since {time.time()-t:.2f}s: hash={h}")
