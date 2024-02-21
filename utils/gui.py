@@ -804,7 +804,6 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     )
-                )
 
     # load output elem if clicked
     tab_logging.select(fn=get_log, outputs=[output_elem])
