@@ -560,7 +560,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @stripizer
 @floatizer
 @trace
-@Timeout(180)
+@Timeout(60)
 @smartcache
 @llm_cache.cache(ignore=["cache_mode", "sld_buffer"])
 def alfred(
