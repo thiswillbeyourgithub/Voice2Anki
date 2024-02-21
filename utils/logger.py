@@ -271,7 +271,7 @@ def smartcache(func: Callable) -> Callable:
             fstr = str(func.func)
         else:
             fstr = str(func)
-        h = jhash(jhash(args) + jhash(kwargs))
+        h = jhash(fstr + jhash(args) + jhash(kwargs))
         if h in shared.smartcache:
             t = shared.smartcache[h]
             red(f"Smartcache: already ongoing for {fstr} since {time.time()-t:.2f}s: hash={h}")
