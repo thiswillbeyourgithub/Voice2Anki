@@ -302,8 +302,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     to_embed = [prompt_messages[-1]["content"]]
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
-    ew_mem = Memory(f"cache/embeddings_wrapper_{shared.pv['embed_choice']}", verbose=0)
-    ew = trace(smartcache(ew_mem.cache(embedder_wrapper)))
+    ew = trace(smartcache(embedder_wrapper))
     all_embeddings = ew(to_embed)
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
