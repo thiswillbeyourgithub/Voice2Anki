@@ -265,7 +265,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
         cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
         cloz = [cl.strip() for cl in cloz if cl.strip()]
         assert cloz
-        query = ""
+        query = "added:2"
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
