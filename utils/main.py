@@ -85,7 +85,12 @@ def split_txt_audio(txt_audio: str) -> str:
     # remove leading space etc
     sp = txt_audio.split("\n\n")
     txt_audio = "\n\n".join([s.strip() for s in sp])
-    return txt_audio.strip()
+    txt_audio = txt_audio.strip()
+
+    if not txt_audio:
+        txt_audio = "Empty"
+
+    return txt_audio
 
 
 @floatizer
@@ -240,9 +245,6 @@ def thread_whisp_then_llm(audio_mp3) -> None:
 
     # if contains stop, split it
     txt_audio = split_txt_audio(txt_audio)
-
-    if not txt_audio:
-        txt_audio = "Empty"
 
     with shared.dirload_lock:
         shared.dirload_queue.loc[orig_path, "transcribed"] = txt_audio
