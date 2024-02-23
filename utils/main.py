@@ -736,10 +736,11 @@ def dirload_splitted(checkbox: bool, *audios: List) -> List[Union[dict, gr.Audio
     load the audio file that were splitted previously one by one in the
     available audio slots
     """
-    assert shared.pv["enable_dirload"], "Incoherent UI"
     if not checkbox:
         whi("Not running Dirload because checkbox is unchecked")
         return audios
+    else:
+        assert shared.pv["enable_dirload"], "Incoherent UI"
 
     # warn the user if there is one None surrounded by non None
     if not all(a is None for a in audios):
