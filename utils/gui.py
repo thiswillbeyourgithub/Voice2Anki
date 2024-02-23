@@ -878,8 +878,6 @@ with gr.Blocks(
             fn=transcribe,
             inputs=[audio_slots[0]],
             outputs=[txt_audio],
-            preprocess=False,
-            postprocess=False,
             ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
