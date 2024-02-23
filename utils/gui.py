@@ -389,10 +389,8 @@ with gr.Blocks(
         audio_slots = []
         audio_slots_txts = []
         for i in range(audio_number):
-                audio_mp3 = create_audio_compo(scale=1, label=f"Audio #{i+1}", render=False)
-                audio_slots.append(audio_mp3)
-                audio_slots_txt = gr.HTML(render=False, visible=shared.pv["enable_dirload"])
-                audio_slots_txts.append(audio_slots_txt)
+                audio_slots.append(create_audio_compo(scale=1, label=f"Audio #{i+1}", render=False))
+                audio_slots_txts.append(gr.HTML(render=False, visible=shared.pv["enable_dirload"]))
         # rendering afterwards to reverse the order
         for aud, t in zip(audio_slots[::-1], audio_slots_txts[::-1]):
             with gr.Row():
