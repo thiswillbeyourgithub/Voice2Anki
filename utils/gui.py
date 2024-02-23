@@ -723,12 +723,15 @@ with gr.Blocks(
             shared.pv[name] = value
             if value is False:
                 shared.pv["dirload_check"] = False
-            return {
+            outdict = {
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
                     force_sound_processing_btn: gr.update(visible=value),
                     gui_rolldirloadcheck: gr.update(visible=value, value=False),
                     }
+            for ast in audio_slots_txts:
+                outdict[ast] = gr.update(visible=value)
+            return outdict
 
         elif name == "enable_gallery":
             shared.pv[name] = value
