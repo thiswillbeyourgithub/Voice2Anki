@@ -171,15 +171,15 @@ function shortcuts(e) {
 
         // switch top tabs
         else if (e.code == "KeyT") {
-            var tabs = document.querySelectorAll(".js_toptabs");
-            tabs.forEach((tab, index) => {
-                if (tab.checkVisibility()) {
+            var tabs = document.querySelectorAll(".js_toptabs")[0].parentElement.childNodes[0].children;
+            Array.from(tabs).forEach((tab, index) => {
+                if (tab.ariaSelected == 'true') {
                     if (event.shiftKey) {
                         var newIndex = (index > 0) ? index - 1 : tabs.length - 1;
                     } else {
                         var newIndex = (index + 1) % tabs.length;
                     }
-                    tabs[0].parentElement.childNodes[0].children[newIndex].click();
+                    tabs[newIndex].click();
                     return;
                 }
             });
@@ -226,15 +226,15 @@ function tabswitcher(e) {
         }
 
 
-        var tabs = document.querySelectorAll(selector);
-        tabs.forEach((tab, index) => {
-            if (tab.checkVisibility()) {
+        var tabs = document.querySelectorAll(selector)[0].parentElement.childNodes[0].children;
+        Array.from(tabs).forEach((tab, index) => {
+            if (tab.ariaSelected == 'true') {
                 if (event.shiftKey) {
                     var newIndex = (index > 0) ? index - 1 : tabs.length - 1;
                 } else {
                     var newIndex = (index + 1) % tabs.length;
                 }
-                tabs[0].parentElement.childNodes[0].children[newIndex].click();
+                tabs[newIndex].click();
                 return;
             }
         });
