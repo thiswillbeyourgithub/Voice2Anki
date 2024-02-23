@@ -722,7 +722,7 @@ with gr.Blocks(
         if name == "enable_dirload":
             shared.pv[name] = value
             if value is False:
-                shared.pv["gui_rolldirloadcheck"] = False
+                shared.pv["dirload_check"] = False
             outdict = {
                     tab_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
