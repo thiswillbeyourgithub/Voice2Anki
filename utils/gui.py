@@ -342,7 +342,8 @@ js_reset_height = """() => {
 # executed on load
 js_load = """() => {
     // make sure the audios keep the same size even when they are unset
-    var h = Math.floor(2.3 * document.getElementsByClassName("js_audiocomponent")[0].clientHeight);
+    var h = Math.max(90, Math.floor(2.3 * document.getElementsByClassName("js_audiocomponent")[0].clientHeight));
+
 
     Array.from(document.getElementsByClassName("js_audiocomponent")).forEach(el => el.style.height = `${h}px`)
 
@@ -388,6 +389,7 @@ with gr.Blocks(
         audio_number = shared.audio_slot_nb
         audio_slots = []
         audio_slots_txts = []
+        audio_slots_txts_columns = []
         for i in range(audio_number):
                 audio_slots.append(create_audio_compo(scale=1, label=f"Audio #{i+1}", render=False))
                 audio_slots_txts.append(gr.HTML(render=False, visible=shared.pv["enable_dirload"]))
@@ -396,8 +398,9 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(min_width=50):
                     aud.render()
-                with gr.Column(min_width=50):
+                with gr.Column(min_width=50, visible=shared.pv["enable_dirload"]) as col:
                     t.render()
+                    audio_slots_txts_columns.append(col)
 
         # whisper and chatgpt text output
         with gr.Row():
@@ -729,6 +732,8 @@ with gr.Blocks(
                     }
             for ast in audio_slots_txts:
                 outdict[ast] = gr.update(visible=value)
+            for ast_c in audio_slots_txts_columns:
+                outdict[ast_c] = gr.update(visible=value)
             return outdict
 
         elif name == "enable_gallery":
@@ -771,7 +776,7 @@ with gr.Blocks(
             force_sound_processing_btn,
             gui_rolldirloadcheck,
             gui_enable_queued_gallery,
-            ] + audio_slots_txts
+            ] + audio_slots_txts + audio_slots_txts_columns
     gui_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
             inputs=[gui_enable_dirload],
