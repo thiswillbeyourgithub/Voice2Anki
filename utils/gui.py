@@ -724,7 +724,6 @@ with gr.Blocks(
             if value is False:
                 shared.pv["dirload_check"] = False
             return {
-                    tab_gallery: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
                     dir_load_btn: gr.update(visible=value),
                     force_sound_processing_btn: gr.update(visible=value),
