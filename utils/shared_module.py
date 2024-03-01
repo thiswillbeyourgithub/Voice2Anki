@@ -55,6 +55,7 @@ class SharedModule:
             "mistral/mistral-tiny": (0.14 / 1000 * 1.09, 0.42 / 1000 * 1.09),
             "mistral/mistral-small": (0.6 / 1000 * 1.09, 1.8 / 1000 * 1.09),
             "mistral/mistral-medium": (2.5 / 1000 * 1.09, 7.5 / 1000 * 1.09),
+            "mistral/mistral-large-latest": (7.3 / 1000 * 1.09, 22 / 1000 * 1.09),
 
             "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.27 / 1000, 0.27 / 1000),
             "openrouter/openchat/openchat-7b": (0, 0),
