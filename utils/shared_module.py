@@ -51,14 +51,15 @@ class SharedModule:
 
             # "replicate/kcaverly/dolphin-2.6-mixtral-8x7b-gguf:37491ecf805fbfc810720b8a5ff45901b148dcdef659d1fe1601118e619b3d6d": 0.000725,  # in $ per second
 
-            # mistral prices are in euros per 1M token
-            "mistral/mistral-tiny": (0.14 / 1000 * 1.09, 0.42 / 1000 * 1.09),
-            "mistral/mistral-small": (0.6 / 1000 * 1.09, 1.8 / 1000 * 1.09),
-            "mistral/mistral-medium": (2.5 / 1000 * 1.09, 7.5 / 1000 * 1.09),
-            "mistral/mistral-large-latest": (7.3 / 1000 * 1.09, 22 / 1000 * 1.09),
+            # mistral pricing: https://docs.mistral.ai/platform/pricing/
+            "mistral/open-mistral-7b": (0.00025, 0.00025),
+            "mistral/open-mixtral-8x7b": (0.007, 0.007),
+            "mistral/mistral-small-latest": (0.002, 0.006),
+            "mistral/mistral-medium-latest": (0.0027, 0.0081),
+            "mistral/mistral-large-latest": (0.008, 0.024),
 
-            "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.27 / 1000, 0.27 / 1000),
-            "openrouter/openchat/openchat-7b": (0, 0),
+            "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.00027, 0.00027),
+            "openrouter/openchat/openchat-7b": (0.00013, 0.00013),
 
             }
     # embeddings are so cheap I don't even count the number of tokens
