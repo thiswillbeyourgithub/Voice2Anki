@@ -104,7 +104,7 @@ def check_anki_models() -> None:
         call_anki(
                 action="createModel",
                 modelName="Voice2Anki",
-                inOrderFields=["body", "source", "source_extra", "source_audio", "GPToAnkiMetadata"],
+                inOrderFields=["body", "source", "source_extra", "source_audio", "Voice2AnkiMetadata"],
                 isCloze=True,
                 cardTemplates=[
                     {
@@ -157,7 +157,7 @@ def add_note_to_anki(
                     "source": source,
                     "source_extra": source_extra,
                     "source_audio": source_audio,
-                    "GPToAnkiMetadata": rtoml.dumps(note_metadata, pretty=True).replace("\n", "<br>"),
+                    "Voice2AnkiMetadata": rtoml.dumps(note_metadata, pretty=True).replace("\n", "<br>"),
                     },
                 "tags": tags,
                 "options": {"allowDuplicate": False},
