@@ -61,6 +61,8 @@ class SharedModule:
             "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.00027, 0.00027),
             "openrouter/openchat/openchat-7b": (0.00013, 0.00013),
 
+            "openrouter/databricks/dbrx-instruct": (0.0016, 0.0016),
+
             }
     # embeddings are so cheap I don't even count the number of tokens
     embedding_models = [
