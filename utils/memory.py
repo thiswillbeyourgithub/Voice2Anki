@@ -405,6 +405,7 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
     output_pr = sorted(output_pr, key=lambda x: x["pick_score"])
+    assert output_pr[1]["pick_score"] <= output_pr[-1]["pick_score"]
     # or by timestamp (most recent last):
     # output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
     # or by priority:
