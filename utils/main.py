@@ -650,22 +650,12 @@ def alfred(
     model_price = shared.llm_price[llm_choice]
     whi(f"Will use model {llm_choice}")
 
-    cnt = 0
-    while True:
-        try:
-            whi("Asking LLM")
-            cnt += 1
-            response = litellm.completion(
-                    model=llm_choice,
-                    messages=formatted_messages,
-                    temperature=temperature,
-                    )
-            break
-        except (litellm.RateLimitError, openai.RateLimitError) as err:
-            if cnt >= 2:
-                raise Exception(red("LLM: too many retries."))
-            red(f"Server overloaded #{cnt}, retrying in {2 * cnt}s : '{err}'")
-            time.sleep(2 * cnt)
+    response = litellm.completion(
+            model=llm_choice,
+            messages=formatted_messages,
+            temperature=temperature,
+            num_retries=2
+            )
 
     input_tkn_cost = response["usage"]["prompt_tokens"]
     output_tkn_cost = response["usage"]["completion_tokens"]
