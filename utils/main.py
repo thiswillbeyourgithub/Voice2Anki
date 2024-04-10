@@ -3,7 +3,7 @@ import os
 import asyncio
 import pickle
 import re
-import Levenshtein as lev
+from rapidfuzz.fuzz import ratio as levratio
 import shutil
 import queue
 import threading
@@ -440,11 +440,11 @@ def pre_alfred(
         for mb in shared.message_buffer[::-1]:
             if len(buffer_to_add) / 2 >= sld_buffer:
                 break
-            if lev.ratio(txt_audio, mb["unformatted_txt_audio"]) >= 0.95:
+            if levratio(txt_audio, mb["unformatted_txt_audio"]) >= 95:
                 # skip this one
                 red(f"Skipped buffer: {mb}")
                 continue
-            if lev.ratio(txt_audio, mb["question"]) >= 0.95:
+            if levratio(txt_audio, mb["question"]) >= 95:
                 # skip this one
                 red(f"Skipped buffer: {mb}")
                 continue
@@ -1101,12 +1101,12 @@ def Voice2Anki_db_save(
     if the result from alfred was loaded from cache for example."""
     if shared.llm_to_db_buffer:
         buffer_keys = [k for k in shared.llm_to_db_buffer.keys()]
-        dist_buffer_keys = [lev.ratio(txt_chatgpt_cloz, x) for x in buffer_keys]
-        min_dist = min(dist_buffer_keys)
-        closest_buffer_key = buffer_keys[dist_buffer_keys.index(min_dist)]
+        ratio_buffer_keys = [levratio(txt_chatgpt_cloz, x) for x in buffer_keys]
+        max_ratio = max(ratio_buffer_keys)
+        closest_buffer_key = buffer_keys[ratio_buffer_keys.index(max_ratio)]
     else:
-        min_dist = 0
-    if min_dist < 0.90:
+        max_ratio = 1
+    if max_ratio < 90:
         save_dict = {
                 "type": "anki_card",
                 "timestamp": time.time(),
