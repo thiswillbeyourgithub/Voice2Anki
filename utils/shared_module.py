@@ -45,6 +45,7 @@ class SharedModule:
     stt_models = ["openai:whisper-1", "replicate:vaibhavs10/incredibly-fast-whisper"]
 
     llm_price = {
+            "openai/gpt-4-turbo-2024-04-09": (0.01, 0.03),
             "openai/gpt-4-0125-preview": (0.01, 0.03),
             "openai/gpt-3.5-turbo-0125": (0.0005, 0.0015),
             # "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
