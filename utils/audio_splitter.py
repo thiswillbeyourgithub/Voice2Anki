@@ -1084,11 +1084,33 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
         ).to_dict()
         assert len(content["results"]["channels"]) == 1, "unexpected deepgram output"
         assert len(content["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
-        text = content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip()
-        assert text, "Empty text from deepgram transcription"
 
-        breakpoint()
-        # TODO: make the format like the other expected format
+        words = content["results"]["channels"][0]["alternatives"][0]["words"]
+        assert words, "Empty text from deepgram transcription"
+        starts = [float(w["start"]) for w in words]
+        ends = [float(w["ends"]) for w in words]
+
+        # transcript = {
+        #     "segments": [
+        #         {
+        #             "words": words,
+        #             "start": min(starts),
+        #             "ends: max(ends),
+        #         }
+        #     ]
+        # }
+
+        assert content["results"]["utterance"], "No utterances found"
+        transcript = {
+            "segments": content["results"]["utterances"],
+            "start": min(starts),
+            "ends": max(ends),
+        }
+
+        transcript["metadata"] = content["metadata"]
+
+        kwargs["repo"] = None
+        kwargs["model"] = kwargs["model"]
     else:
         raise ValueError(kwargs["repo"])
 
