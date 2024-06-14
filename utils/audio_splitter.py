@@ -1088,7 +1088,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
         words = content["results"]["channels"][0]["alternatives"][0]["words"]
         assert words, "Empty text from deepgram transcription"
         starts = [float(w["start"]) for w in words]
-        ends = [float(w["ends"]) for w in words]
+        ends = [float(w["end"]) for w in words]
 
         # transcript = {
         #     "segments": [
