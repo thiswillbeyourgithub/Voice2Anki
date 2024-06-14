@@ -12,3 +12,5 @@ utils/author_cloze_editor.py
 utils/ssl/*pem
 utils/logs
 profiles/
+.env
+.env.leave
