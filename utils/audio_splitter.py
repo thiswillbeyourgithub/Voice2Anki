@@ -1004,10 +1004,13 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
     whi(f"Starting replicate (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
+
     if kwargs["backend"] == "replicate":
         backend = "replicate"
     else:
         backend = "deepgram"
+        kwargs["repo"] = None
+
     start = time.time()
     if kwargs["repo"] == "fast" and backend == "replicate":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
@@ -1072,10 +1075,9 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
     elif backend == "deepgram":
         deepgram = DeepgramClient()
         # set options
-        del kwargs["backend"], kwargs["n_retry"]
+        del kwargs["backend"], kwargs["repo"]
         options = PrerecordedOptions(**kwargs)
-        with open(audio_path, "rb") as f:
-            payload = {"buffer": f.read()}
+        payload = {"buffer": audio_path.read()}
         content = deepgram.listen.prerecorded.v("1").transcribe_file(
             payload,
             options,
