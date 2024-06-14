@@ -14,3 +14,4 @@ utils/logs
 profiles/
 .env
 .env.leave
+.stignore
