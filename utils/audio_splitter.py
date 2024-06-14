@@ -1011,6 +1011,8 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
         backend = "deepgram"
         kwargs["repo"] = None
 
+    cached_replicate = stt_cache.cache(replicate.run)
+
     start = time.time()
     if kwargs["repo"] == "fast" and backend == "replicate":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
@@ -1023,7 +1025,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                 "diarise_audio": False,
                 }
         args.update(kwargs)
-        transcript = replicate.run(
+        transcript = cached_replicate(
                 "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
                 input=args,
                 )
@@ -1055,7 +1057,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                 "no_speech_threshold": 1,
                 }
         args.update(kwargs)
-        transcript = replicate.run(
+        transcript = cached_replicate(
                 "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
                 input=args,
                 )
@@ -1068,7 +1070,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                 "no_speech_threshold": 1,
                 }
         args.update(kwargs)
-        transcript = replicate.run(
+        transcript = cached_replicate(
                 "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
                 input=args,
                 )
@@ -1078,7 +1080,8 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
         del kwargs["backend"], kwargs["repo"]
         options = PrerecordedOptions(**kwargs)
         payload = {"buffer": audio_path.read()}
-        content = deepgram.listen.prerecorded.v("1").transcribe_file(
+        cached_deepgram = stt_cache.cache(deepgram.listen.prerecorded.v("1").transcribe_file)
+        content = cached_deepgram(
             payload,
             options,
         ).to_dict()
