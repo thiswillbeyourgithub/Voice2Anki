@@ -1109,6 +1109,11 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                     "words": content["results"]["utterances"],
                     "start": min(starts),
                     "end": max(ends),
+                    "text": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
+                    "no_speech_prob": 0,
+                    "avg_logprob": 0,
+                    "compression_ratio": 0,
+                    "temperature": 0,
                 }
             ],
         }
