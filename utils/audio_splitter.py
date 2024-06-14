@@ -20,6 +20,7 @@ import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
 import replicate
+from deepgram import DeepgramClient, PrerecordedOptions
 
 from logger import whi, yel, red, shared
 from profiles import ValueStorage
@@ -711,52 +712,85 @@ class AudioSplitter:
         failed = True
         trial_dict = [
                 {
-                    "model": "large-v2",
-                    "repo": "hnesk",
-                    "batch_size": None,
-                    "condition_on_previous_text": False,
-                    # "initial_prompt": self.prompt if not second_pass else "",
-                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    # "initial_prompt": self.prompt,
-                    "temperature": 0,
-                    # "temperature": 0 if second_pass else 0.1,
-                    "language": self.language,
-                    "no_speech_threshold": 1,
-                    "n_retry": 3,
-                    },
+                "backend":"deepgram",
+                "n_retry": 1,
+
+                # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2
+                "model": "nova-2",
+
+                "detect_language": True,
+                # not all features below are available for all languages
+
+                # intelligence
+                "summarize": False,
+                "topics": False,
+                "intents": False,
+                "sentiment": False,
+
+                # transcription
+                "smart_format": True,
+                "punctuate": True,
+                "paragraphs": True,
+                "utterances": True,
+                "diarize": False,
+
+                # "redact": None,
+                # "replace": None,
+                # "search": None,
+                # "keywords": None,
+                # "filler_words": False,
+                },
                 {
-                    "model": "large-v1",
-                    "repo": "hnesk",
-                    "batch_size": None,
-                    "condition_on_previous_text": False,
-                    # "initial_prompt": self.prompt if not second_pass else "",
-                    "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
-                    # "initial_prompt": self.prompt,
-                    "temperature": 0,
-                    # "temperature": 0 if second_pass else 0.1,
-                    "language": self.language,
-                    "no_speech_threshold": 1,
-                    "n_retry": 1,
-                    },
+                "model": "large-v2",
+                "repo": "hnesk",
+                "batch_size": None,
+                "condition_on_previous_text": False,
+                # "initial_prompt": self.prompt if not second_pass else "",
+                "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                # "initial_prompt": self.prompt,
+                "temperature": 0,
+                # "temperature": 0 if second_pass else 0.1,
+                "language": self.language,
+                "no_speech_threshold": 1,
+                "n_retry": 3,
+                "backend":"replicate",
+                },
+                {
+                "model": "large-v1",
+                "repo": "hnesk",
+                "batch_size": None,
+                "condition_on_previous_text": False,
+                # "initial_prompt": self.prompt if not second_pass else "",
+                "initial_prompt": self.prompt if not second_pass else (self.prompt + self.prompt if isinstance(self.prompt, str) else self.prompt),
+                # "initial_prompt": self.prompt,
+                "temperature": 0,
+                # "temperature": 0 if second_pass else 0.1,
+                "language": self.language,
+                "no_speech_threshold": 1,
+                "n_retry": 1,
+                "backend":"replicate",
+                },
                 # {
-                #     "model": "medium",
-                #     "repo": "hnesk",
-                #     "batch_size": None,
-                #     "condition_on_previous_text": False if not second_pass else True,
-                #     "initial_prompt": self.prompt,
-                #     "temperature": 0,
-                #     "language": self.language,
-                #     "no_speech_threshold": 1,
-                #     "n_retry": 1,
-                #     },
+                # "model": "medium",
+                # "repo": "hnesk",
+                # "batch_size": None,
+                # "condition_on_previous_text": False if not second_pass else True,
+                # "initial_prompt": self.prompt,
+                # "temperature": 0,
+                # "language": self.language,
+                # "no_speech_threshold": 1,
+                # "n_retry": 1,
+                # "backend":"replicate",
+                # },
                 # {
-                #     "model": "large-v3",
-                #     "repo": "fast",
-                #     "batch_size": 1,
-                #     "temperature": 0,
-                #     "language": self.language,
-                #     "n_retry": 1,
-                #     },
+                # "model": "large-v3",
+                # "repo": "fast",
+                # "batch_size": 1,
+                # "temperature": 0,
+                # "language": self.language,
+                # "n_retry": 1,
+                # "backend":"replicate",
+                # },
                 ]
         for iparam, params in enumerate(trial_dict):
             n_retry = params["n_retry"]
@@ -990,8 +1024,12 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
     whi(f"Starting replicate (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
+    if kwargs["backend"] == "replicate":
+        backend = "replicate"
+    else:
+        backend = "deepgram"
     start = time.time()
-    if kwargs["repo"] == "fast":
+    if kwargs["repo"] == "fast" and backend == "replicate":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
         # https://replicate.com/vaibhavs10/incredibly-fast-whisper/
         # https://github.com/chenxwh/insanely-fast-whisper
@@ -1024,7 +1062,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                         }
                     ]
 
-    elif kwargs["repo"] == "collectiveai":
+    elif kwargs["repo"] == "collectiveai" and backend == "replicate":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
         # https://github.com/collectiveai-team/whisper-wordtimestamps/
         # fork from hnesk's repo. Allows larger file to be sent apparently.
@@ -1038,7 +1076,7 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                 "collectiveai-team/whisper-wordtimestamps:781317565f264090bf5831cceb3ea6b794ed402e746fde1cdec103a8951b52df",
                 input=args,
                 )
-    elif kwargs["repo"] == "hnesk":
+    elif kwargs["repo"] == "hnesk" and backend == "replicate":
         # https://replicate.com/hnesk/whisper-wordtimestamps/
         # https://github.com/hnesk/whisper-wordtimestamps
         args = {
@@ -1051,6 +1089,24 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
                 "hnesk/whisper-wordtimestamps:4a60104c44dd709fc08a03dfeca6c6906257633dd03fd58663ec896a4eeba30e",
                 input=args,
                 )
+    elif backend == "deepgram":
+        deepgram = DeepgramClient()
+        # set options
+        del kwargs["backend"], kwargs["n_retry"]
+        options = PrerecordedOptions(**kwargs)
+        with open(audio_path, "rb") as f:
+            payload = {"buffer": f.read()}
+        content = deepgram.listen.prerecorded.v("1").transcribe_file(
+            payload,
+            options,
+        ).to_dict()
+        assert len(content["results"]["channels"]) == 1, "unexpected deepgram output"
+        assert len(content["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
+        text = content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip()
+        assert text, "Empty text from deepgram transcription"
+
+        breakpoint()
+        # TODO: make the format like the other expected format
     else:
         raise ValueError(kwargs["repo"])
 
