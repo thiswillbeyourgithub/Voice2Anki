@@ -131,8 +131,7 @@ class AudioSplitter:
         red(f"Will use profile {shared.pv.profile_name}")
 
         # replicate has to be imported after the api is loader
-        assert shared.pv["txt_replicate_api_key"].strip(), f"Missing replicate api key for profile {shared.pv.profile_name}. You must open Voice2Anki.py and set it in the settings."
-        os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
+        assert "REPLICATE_API_KEY" in os.environ or "DEEPGRAM_API_KEY" in os.environ, f"missing DEEPGRAM_API_KEY or REPLICATE_API_KEY in environment"
 
         if untouched_dir is None:
             untouched_dir = f"profiles/{profile}/queues/audio_untouched"
