@@ -1100,8 +1100,9 @@ def whisper_splitter(audio_path, audio_hash, **kwargs):
         #     ]
         # }
 
-        assert content["results"]["utterance"], "No utterances found"
+        assert content["results"]["utterances"], "No utterances found"
         transcript = {
+            "transcription": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
             "segments": content["results"]["utterances"],
             "start": min(starts),
             "ends": max(ends),
