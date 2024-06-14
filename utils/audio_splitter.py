@@ -23,7 +23,6 @@ import replicate
 from deepgram import DeepgramClient, PrerecordedOptions
 
 from logger import whi, yel, red, shared
-from profiles import ValueStorage
 
 stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=0)
 
@@ -34,7 +33,6 @@ class AudioSplitter:
     def __init__(
             self,
             prompt="Stop! ",
-            profile=None,
             debug=False,
 
             stop_list=[
@@ -64,11 +62,6 @@ class AudioSplitter:
         prompt: str, default 'Stop! '
             prompt used to guide whisper. None to disable
 
-        profile: str, default None
-            name of the profile to use when looking for the audio to split
-            as well as the replicate API key.
-            if None, will use the latest_profile used by Voice2Anki
-
         debug: bool, default False
             if True, a breakpoint() will be called before exporting the splits
             and the original audio will not be moved.
@@ -87,7 +80,7 @@ class AudioSplitter:
             is not yet implemented. The idea is to be able to do the audio
             splitting locally using whispercpp instead of relying on replicate.
 
-        untouched_dir: str or Path, default  to profiles/PROFILE/queues/audio_untouched
+        untouched_dir: str or Path
 
         splitted_dir: see untouched_dir
 
@@ -124,22 +117,9 @@ class AudioSplitter:
         if h or help:
             return help(self)
 
-        if profile is None:
-            shared.pv = ValueStorage()
-            profile = shared.pv.profile_name
-        else:
-            shared.pv = ValueStorage(profile)
-        red(f"Will use profile {shared.pv.profile_name}")
-
         # replicate has to be imported after the api is loader
         assert "REPLICATE_API_KEY" in os.environ or "DEEPGRAM_API_KEY" in os.environ, f"missing DEEPGRAM_API_KEY or REPLICATE_API_KEY in environment"
 
-        if untouched_dir is None:
-            untouched_dir = f"profiles/{profile}/queues/audio_untouched"
-        if splitted_dir is None:
-            splitted_dir = f"profiles/{profile}/queues/audio_splits"
-        if done_dir is None:
-            done_dir = f"profiles/{profile}/queues/audio_done"
         self.unsp_dir = Path(untouched_dir)
         self.sp_dir = Path(splitted_dir)
         self.done_dir = Path(done_dir)
