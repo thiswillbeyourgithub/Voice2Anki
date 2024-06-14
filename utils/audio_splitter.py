@@ -64,7 +64,7 @@ class AudioSplitter:
 
         debug: bool, default False
             if True, a breakpoint() will be called before exporting the splits
-            and the original audio will not be moved.
+            and the original audio will not be moved. Also disabled multithreading.
 
         stop_list: list, default re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE)
             list of strings that when found will trigger the audio splitting.
@@ -269,7 +269,7 @@ class AudioSplitter:
                     # whi("Saved")
                 audio.export(path, format="mp3")
             _ = joblib.Parallel(
-                    n_jobs=-1,
+                    n_jobs=-1 if not self.debug else 1,
                     backend="threading",
                     )(joblib.delayed(threaded_export)(sub, f)
                         for sub, f in zip(
@@ -289,7 +289,7 @@ class AudioSplitter:
                 Path(path).unlink()
                 return transcript
             split_transcripts = joblib.Parallel(
-                    n_jobs=-1,
+                    n_jobs=-1 if not self.debug else 1,
                     backend="threading",
                     )(
                             joblib.delayed(threaded_whisper)(tf)
@@ -828,7 +828,7 @@ class AudioSplitter:
         def threaded_export(audio, path):
             audio.export(path, format="mp3")
         joblib.Parallel(
-                n_jobs=-1,
+                n_jobs=-1 if not self.debug else 1,
                 backend="threading",
                 )(
                         joblib.delayed(threaded_export)(split, temp)
@@ -847,7 +847,7 @@ class AudioSplitter:
         def threaded_whisper(path):
             return self.run_whisper(audio_path=path, second_pass=False)
         tscripts = joblib.Parallel(
-                n_jobs=-1,
+                n_jobs=-1 if not self.debug else 1,
                 backend="threading",
                 )(
                         joblib.delayed(threaded_whisper)(t)
