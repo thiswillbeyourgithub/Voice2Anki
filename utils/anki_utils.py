@@ -17,6 +17,7 @@ import ankipandas as akp
 import time
 import urllib.request
 import json
+from py_ankiconnect import PyAnkiconnect
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
@@ -27,46 +28,20 @@ def _request_wrapper(action, **params):
     return {'action': action, 'params': params, 'version': 6}
 
 
+call_anki = PyAnkiconnect()
+
 async def anki_request_async(url, request):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=request) as response:
             return await response.json()
 
 
-def call_anki(action, **params):
-    """ bridge between local python libraries and AnnA Companion addon
-    (a fork from anki-connect) """
-
-    requestJson = json.dumps(_request_wrapper(action, **params)
-                             ).encode('utf-8')
-
-    try:
-        response = json.load(urllib.request.urlopen(
-            urllib.request.Request(
-                'http://localhost:8765',
-                requestJson)))
-    except (ConnectionRefusedError, urllib.error.URLError) as e:
-        red(f"{str(e)}: is Anki open and 'AnkiConnect' "
-            "enabled? Firewall issue?")
-        raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                        "addon' enabled? Firewall issue?")
-
-    if len(response) != 2:
-        raise Exception(red('response has an unexpected number of fields'))
-    if 'error' not in response:
-        raise Exception(red('response is missing required error field'))
-    if 'result' not in response:
-        raise Exception(red('response is missing required result field'))
-    if response['error'] is not None:
-        raise Exception(red(f"Error in call_anki: {response['error']}\nArgs: {action}, {params}"))
-    return response['result']
-
-
 async def async_call_anki(action, **params):
     """ ASYNC duplicate of call_anki"""
 
-    requestJson = json.dumps(_request_wrapper(action, **params)
-                             ).encode('utf-8')
+    requestJson = json.dumps(
+        {"action": action, "params": params, 'version': 6}
+    ).encode('utf-8')
 
     try:
         response = await anki_request_async(
