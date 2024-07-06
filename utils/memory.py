@@ -14,6 +14,7 @@ from joblib import Memory
 import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
+from iterator_cacher import IteratorCacher
 
 from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
 from .shared_module import shared
@@ -54,113 +55,30 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
-
-def check_embeddings(list_text: List[str], list_embed: List[np.ndarray]) -> bool:
-    try:
-        assert all(isinstance(t, str) for t in list_text)
-        assert not any(not(t) for t in list_text), f"Invalid texts: {[t for t in list_text if not t]}"
-        assert len(list_text) == len(list_embed), f"Incompatible length: {len(list_text)} vs {len(list_embed)}"
-        assert all(isinstance(e, np.ndarray) for e in list_embed), f"Several types: {[type(e) for e in list_embed]}"
-        assert all(e.shape == list_embed[0].shape for e in list_embed), f"Several shapes: {[e.shape for e in list_embed]}"
-    except Exception as err:
-        red(f"Error when checking validity of embeddings: {err}")
-        raise
-
-
-def embedder(text_list, result=None):
+def embedder(
+    text_list: List[str],
+    model: str = shared.pv["embed_choice"],
+    ) -> np.ndarray:
     """compute the emebdding of 1 text
     if result is not None, it is the embedding and returned right away. This
     was done to allow caching individual embeddings while still making one batch
     call to the embedder.
     """
-    assert isinstance(text_list, list)
-    if result is not None:
-        assert isinstance(result, list)
-        assert len(text_list) == len(result)
-        assert len(text_list) == 1, "Supplied result even though text_list is multiple!"
-        assert isinstance(text_list[0], str), "text_list must contain a string"
-        assert all(isinstance(a, np.ndarray) for a in result)
-        return result
-
-    tkn_sum = sum([tkn_len(t) for t in text_list])
-    red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
-
+    assert text_list
+    assert all(t.strip() for t in text_list)
     vec = litellm.embedding(
-            model=shared.pv["embed_choice"],
+            model=model,
             input=text_list,
             )
-    return [np.array(d["embedding"]).reshape(1, -1) for d in vec.data]
+    tkn_sum = sum([tkn_len(t) for t in text_list])
+    red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
+    embeds = [
+        np.array(elem["embedding"]).reshape(1, -1)
+        for elem in vec.to_dict()["data"]
+    ]
+    embeds = np.array(embeds)
+    return embeds
 
-
-def embedder_wrapper(list_text):
-    mem = Memory(cache_dir / f"{shared.pv['embed_choice']}", verbose=0)
-    cached_embedder = mem.cache(embedder, ignore=["result"])
-    assert all(isinstance(t, str) for t in list_text)
-    uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t])]
-
-    if not uncached_texts:
-        red("Everything already in cache")
-        out = [cached_embedder([t])[0] for t in list_text]
-        check_embeddings(list_text, out)
-        return out
-
-    if len(uncached_texts) >= 1:
-        present = len(list_text) - len(uncached_texts)
-        red(f"Embeddings present in cache: {present}/{len(list_text)}")
-
-    # get the embeddings for the uncached values
-    if "mistral" in shared.pv["embed_choice"]:
-        tkn_max = 12000  # their limit is 16384 but they don't
-        # use the same tokenizer maybe
-    else:
-        tkn_max = np.inf
-    batches = [[]]
-    tkn_cnt = 0
-    for t in uncached_texts:
-        new_tkn = tkn_len(t)
-        if tkn_cnt + new_tkn < tkn_max:
-            batches[-1].append(t)
-            tkn_cnt += new_tkn
-        else:
-            batches.append([t])
-            tkn_cnt = 0
-
-    if "mistral" in shared.pv["embed_choice"]:
-        wait = 2
-    else:
-        wait = 0
-    results = []
-    for batch in tqdm(batches, desc="Embedding text", unit="batch"):
-        assert batch, f"Found empty batch. Batches: {batches}"
-        out = cached_embedder(batch)
-
-        # manually recache the values for each individual memory
-        [cached_embedder([t], result=[r]) for t, r in zip(batch, out)]
-        for t in batch:
-            if not cached_embedder.check_call_in_cache([t]):
-                red(f"CacheError: Caching failed for {t}")
-
-        # mistral is very rate limiting
-        time.sleep(wait)
-
-        results.extend(out)
-
-    # combine cached and uncached results in the right order
-    to_return = []
-    it_results = iter(results)
-    cnt = 0
-    for i in range(len(list_text)):
-        if list_text[i] in uncached_texts:
-            to_return.append(next(it_results))
-            cnt += 1
-        else:
-            assert cached_embedder.check_call_in_cache([list_text[i]]), f"Supposed to be in cache: #{i} {list_text[i]}"
-            to_return.append(cached_embedder([list_text[i]])[0])
-        to_return[-1] = to_return[-1].reshape(1, -1)
-    # make sure the list was emptied
-    assert cnt == len(results)
-    check_embeddings(list_text, to_return)
-    return to_return
 
 
 @trace
@@ -302,8 +220,20 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
     to_embed = [prompt_messages[-1]["content"]]
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
-    ew = trace(smartcache(embedder_wrapper))
-    all_embeddings = ew(to_embed)
+    em_func = IteratorCacher(
+        cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["embed_choice"],
+        iter_list=["text_list"],
+        verbose=False,
+        unpacking_func = lambda ar: ar.tolist(),
+        repacking_func = lambda t: np.array(t),
+        )(
+        trace(
+            smartcache(
+                embedder
+            )
+        )
+    )
+    all_embeddings = em_func(to_embed)
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
