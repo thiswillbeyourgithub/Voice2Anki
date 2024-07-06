@@ -664,12 +664,8 @@ def alfred(
     output_tkn_cost = response["usage"]["completion_tokens"]
     tkn_cost = [input_tkn_cost, output_tkn_cost]
 
-    if isinstance(model_price, tuple):
-        tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
-    else:
-        assert isinstance(model_price, float)
-        duration = response["ended"] - response["started"]
-        tkn_cost_dol = model_price * duration / 1000
+    assert isinstance(model_price, tuple)
+    tkn_cost_dol = input_tkn_cost * model_price[0] + output_tkn_cost * model_price[1]
     shared.pv["total_llm_cost"] += tkn_cost_dol
 
     cloz = response["choices"][0]["message"]["content"]
@@ -1032,7 +1028,7 @@ def audio_edit(
     input_tkn_cost = response["usage"]["prompt_tokens"]
     output_tkn_cost = response["usage"]["completion_tokens"]
 
-    tkn_cost_dol = input_tkn_cost / 1000 * model_price[0] + output_tkn_cost / 1000 * model_price[1]
+    tkn_cost_dol = input_tkn_cost * model_price[0] + output_tkn_cost * model_price[1]
     shared.pv["total_llm_cost"] += tkn_cost_dol
     cloz = response["choices"][0]["message"]["content"]
     cloz = cloz.replace("<br/>", "\n").strip()  # for cosmetic purposes in the textbox

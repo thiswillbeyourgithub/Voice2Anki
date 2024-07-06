@@ -5,6 +5,7 @@ from pathlib import Path
 from threading import Lock
 import gradio as gr
 import pandas as pd
+import litellm
 
 # used to print in red
 col_red = "\033[91m"
@@ -44,28 +45,8 @@ class SharedModule:
 
     stt_models = ["openai:whisper-1", "replicate:vaibhavs10/incredibly-fast-whisper"]
 
-    llm_price = {
-            "openai/gpt-4o": (0.005, 0.015),
-            "openai/gpt-4-turbo-2024-04-09": (0.01, 0.03),
-            "openai/gpt-4-0125-preview": (0.01, 0.03),
-            "openai/gpt-3.5-turbo-0125": (0.0005, 0.0015),
-            # "openai/gpt-3.5-turbo-1106": (0.001, 0.002),
+    llm_price = {k: v for k, v in litellm.model_cost.items()}
 
-            # "replicate/kcaverly/dolphin-2.6-mixtral-8x7b-gguf:37491ecf805fbfc810720b8a5ff45901b148dcdef659d1fe1601118e619b3d6d": 0.000725,  # in $ per second
-
-            # mistral pricing: https://docs.mistral.ai/platform/pricing/
-            "mistral/open-mistral-7b": (0.00025, 0.00025),
-            "mistral/open-mixtral-8x7b": (0.007, 0.007),
-            "mistral/mistral-small-latest": (0.002, 0.006),
-            "mistral/mistral-medium-latest": (0.0027, 0.0081),
-            "mistral/mistral-large-latest": (0.008, 0.024),
-
-            "openrouter/cognitivecomputations/dolphin-mixtral-8x7b": (0.00027, 0.00027),
-            "openrouter/openchat/openchat-7b": (0.00013, 0.00013),
-
-            "openrouter/databricks/dbrx-instruct": (0.0016, 0.0016),
-
-            }
     # embeddings are so cheap I don't even count the number of tokens
     embedding_models = [
             "openai/text-embedding-3-large",
