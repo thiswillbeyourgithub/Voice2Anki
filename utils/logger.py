@@ -15,16 +15,26 @@ from logging import handlers
 import rtoml
 import json
 from functools import wraps
+from platformdirs import user_cache_dir, user_log_dir
 
 try:
     from .shared_module import shared
-except:
+except Exception:
     # needed when calling audio_splitter instead of Voice2Anki
     from shared_module import shared
 
-Path("utils/logs").mkdir(exist_ok=True)
-log_file = Path("utils/logs/logs.txt")
+cache_dir = Path(user_cache_dir(appname="Voice2Anki"))
+assert cache_dir.parent.exists() or cache_dir.parent.parent.exists(
+), f"Invalid cache dir location: '{cache_dir}'"
+cache_dir.mkdir(parents=True, exist_ok=True)
+
+log_dir = Path(user_log_dir(appname="Voice2Anki"))
+assert log_dir.parent.exists() or log_dir.parent.parent.exists(
+) or log_dir.parent.parent.parent.exists(), f"Invalid log_dir location: '{log_dir}'"
+log_dir.mkdir(exist_ok=True, parents=True)
+log_file = (log_dir / "logs.txt")
 log_file.touch(exist_ok=True)
+
 log_formatter = logging.Formatter(
         fmt='%(asctime)s ##%(levelname)s %(funcName)s(%(lineno)d)## %(message)s',
         datefmt='%d/%m/%Y %H:%M:%S')

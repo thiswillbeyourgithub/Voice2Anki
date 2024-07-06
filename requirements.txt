@@ -11,6 +11,7 @@ rapidfuzz >= 3.6.1
 sentence-transformers>=2.2.2
 ftfy>=6.1.1
 joblib>=1.2.0
+platformdirs >= 4.2.2
 
 # ocr mode
 ocr_with_format  # by me
