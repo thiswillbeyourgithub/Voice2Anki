@@ -10,6 +10,7 @@ opencv-python>=4.7.0.72
 rapidfuzz >= 3.6.1
 sentence-transformers>=2.2.2
 ftfy>=6.1.1
+ocr_with_format  # by me
 
 # ocr mode
 joblib>=1.2.0
