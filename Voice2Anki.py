@@ -1,6 +1,9 @@
 import os
 import fire
 from pathlib import Path
+from typing import Optional
+
+from utils.typechecker import optional_typecheck
 
 from utils.logger import whi, yel, red, print_db
 from utils.shared_module import shared
@@ -11,25 +14,26 @@ Path("./cache").mkdir(exist_ok=True)
 os.environ["PYTHONTRACEMALLOC"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
+@optional_typecheck
 def start_Voice2Anki(
-        print_db_then_exit=False,
-        nb_audio_slots=3,
+    print_db_then_exit: bool = False,
+    nb_audio_slots: int = 3,
 
-        share=False,
-        open_browser=False,
-        debug=False,
-        authentication=True,
-        localnetwork=True,
-        use_ssl=True,
-        anki_media_folder=None,
-        disable_tracing=False,
-        disable_timeout=True,
-        widen_screen=True,
-        big_font=True,
-        port=7860,
-        *args,
-        **kwargs
-        ):
+    share: bool = False,
+    open_browser: bool = False,
+    debug: bool = False,
+    authentication: bool = True,
+    localnetwork: bool = True,
+    use_ssl: bool = True,
+    anki_media_folder: Optional[str] = None,
+    disable_tracing: bool = False,
+    disable_timeout: bool = True,
+    widen_screen: bool = True,
+    big_font: bool = True,
+    port: int = 7860,
+    *args,
+    **kwargs
+    ) -> None:
     """
     Parameters
     ----------
