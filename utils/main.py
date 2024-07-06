@@ -532,16 +532,21 @@ def pre_alfred(
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
-    if tkns >= 15700:
-        red("More than 15700 tokens before calling ChatGPT. Bypassing to ask "
+    if shared.pv['llm_choice'] in litellm.model_cost:
+        input_token_limit = litellm.model_cost[shared.pv['llm_choice']]["max_input_tokens"]
+    elif shared.pv['llm_choice'].split("/", 1)[1] in litellm.model_cost:
+        input_token_limit = litellm.model_cost[shared.pv['llm_choice'].split("/", 1)[1]]["max_input_tokens"]
+    else:
+        raise ValueError(f"Couldn't find {shared.pv['llm_choice']} in litellm.model_cost")
+    assert tkns <= input_token_limit, f"Too many input tokens for model: {tkns} > {input_token_limit}"
+    if tkns >= input_token_limit:
+        red(f"More than {input_token_limit} tokens before calling LLM. Bypassing to ask "
             "with fewer tokens to make sure you have room for the answer")
         return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
 
-    assert tkns <= 15700, f"Too many tokens: {tkns}"
-
     # print prompts used for the call:
     n = len(formatted_messages)
-    whi("ChatGPT prompt:")
+    whi("LLM prompt:")
     for i, p in enumerate(formatted_messages):
         whi(f"* {i+1}/{n}: {p['role']}")
         whi(indent(p['content'], " " * 5))
