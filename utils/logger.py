@@ -90,7 +90,7 @@ def store_to_db(dictionnary: dict, db_name: str) -> bool:
     return True
 
 
-def print_db(db_filename):
+def print_db(db_filename: str):
     Path("databases").mkdir(exist_ok=True)
     assert Path(f"./databases/{db_filename}").exists(), (
         f"db not found: '{db_filename}'")

@@ -30,7 +30,7 @@ def _request_wrapper(action, **params):
 
 call_anki = PyAnkiconnect()
 
-async def anki_request_async(url, request):
+async def anki_request_async(url: str, request: str):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=request) as response:
             return await response.json()
