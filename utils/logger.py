@@ -14,6 +14,7 @@ import logging
 from logging import handlers
 import rtoml
 import json
+from functools import wraps
 
 try:
     from .shared_module import shared
@@ -56,6 +57,7 @@ def Critical(func: Callable) -> Callable:
     """if this decorator is used, any exception in the wrapped function
     will add to the error message to restart the app.
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -187,6 +189,7 @@ def trace(func: Callable) -> Callable:
     if shared.disable_tracing:
         return func
     if asyncio.iscoroutinefunction(func):
+        @wraps(func)
         async def wrapper(*args, **kwargs):
             purp(f"-> Entering {func}")
             # purp(f"-> Entering {func} {args} {kwargs}")
@@ -199,6 +202,7 @@ def trace(func: Callable) -> Callable:
                 purp(f"   Exiting {func} after {tt:.1f}s")
             return result
     else:
+        @wraps(func)
         def wrapper(*args, **kwargs):
             purp(f"-> Entering {func}")
             # purp(f"-> Entering {func} {args} {kwargs}")
@@ -227,6 +231,7 @@ def Timeout(limit: int) -> Callable:
                 async with asyncio.timeout(limit):
                     return await func(*args, **kwargs)
         else:
+            @wraps(func)
             def wrapper(*args, **kwargs):
                 # return func(*args, **kwargs)  # for debugging
                 result = []
@@ -266,6 +271,7 @@ def smartcache(func: Callable) -> Callable:
     shared.smartcache at the start of the run and removes it at the end.
     If it already exists that means the cache is already computing the same
     value so just wait for that to finish to avoid concurrent calls."""
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if hasattr(func, "check_call_in_cache"):
             fstr = str(func.func)
