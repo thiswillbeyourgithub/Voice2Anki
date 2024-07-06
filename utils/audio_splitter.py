@@ -22,9 +22,9 @@ from pydub.silence import detect_leading_silence, split_on_silence
 import replicate
 from deepgram import DeepgramClient, PrerecordedOptions
 
-from logger import whi, yel, red, shared
+from logger import whi, yel, red, shared, cache_dir
 
-stt_cache = joblib.Memory("cache/audio_splitter_cache", verbose=0)
+stt_cache = joblib.Memory(cache_dir / "audio_splitter_cache", verbose=0)
 
 d = datetime.today()
 today = f"{d.day:02d}_{d.month:02d}"

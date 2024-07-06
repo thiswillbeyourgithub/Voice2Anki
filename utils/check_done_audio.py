@@ -8,14 +8,14 @@ import fire
 from pydub import AudioSegment
 from joblib import Memory
 
-from logger import red, whi
+from logger import red, whi, cache_dir
 
 
 def hasher(text):
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
 
-audio_length_cache = Memory("cache/audio_length_checker", verbose=0)
+audio_length_cache = Memory(cache_dir / "audio_length_checker", verbose=0)
 
 @audio_length_cache.cache(ignore=["path"])
 def get_audio_length(path, filehash):

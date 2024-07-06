@@ -1,9 +1,9 @@
 from joblib import Memory
 from OCR_with_format import OCR_with_format
 
-from .logger import yel, trace, smartcache
+from .logger import yel, trace, smartcache, cache_dir
 
-memory = Memory("cache/ocr_cache", verbose=0)
+memory = Memory(cache_dir / "ocr_cache", verbose=0)
 
 ocr_engine = OCR_with_format()
 

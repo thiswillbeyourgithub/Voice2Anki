@@ -15,7 +15,7 @@ import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
 
-from .logger import whi, red, yel, trace, Timeout, smartcache
+from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
 from .shared_module import shared
 
 # string at the end of the prompt
@@ -93,7 +93,7 @@ def embedder(text_list, result=None):
 
 
 def embedder_wrapper(list_text):
-    mem = Memory(f"cache/{shared.pv['embed_choice']}", verbose=0)
+    mem = Memory(cache_dir / f"{shared.pv['embed_choice']}", verbose=0)
     cached_embedder = mem.cache(embedder, ignore=["result"])
     assert all(isinstance(t, str) for t in list_text)
     uncached_texts = [t for t in list_text if not cached_embedder.check_call_in_cache([t])]
