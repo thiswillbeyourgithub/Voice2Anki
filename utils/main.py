@@ -11,6 +11,7 @@ import hashlib
 import base64
 import json
 from textwrap import dedent, indent
+from functools import wraps
 import rtoml
 import time
 from datetime import datetime
@@ -59,6 +60,7 @@ def pop_buffer() -> None:
 
 def floatizer(func: Callable) -> Callable:
     "used to cast the ints as float to make sure the cache is used"
+    @wraps(func)
     def wrapper(*args, **kwargs):
         args = [float(ar) if (isinstance(ar, int) and not isinstance(ar, bool)) else ar for ar in args]
         kwargs = {k: float(v) if (isinstance(v, int) and not isinstance(v, bool)) else v for k, v in kwargs.items()}
@@ -67,6 +69,7 @@ def floatizer(func: Callable) -> Callable:
 
 def stripizer(func: Callable) -> Callable:
     """wrapper for alfred to make sure to strip the txt_audio"""
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if "txt_audio" in kwargs:
             kwargs["txt_audio"] = kwargs["txt_audio"].strip()
