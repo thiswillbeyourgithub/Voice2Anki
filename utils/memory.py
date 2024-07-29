@@ -4,7 +4,6 @@ import pandas as pd
 import gradio as gr
 import re
 import numpy as np
-import random
 import time
 from pathlib import Path
 from textwrap import dedent, indent
@@ -146,7 +145,7 @@ def check_prompts(prev_prompts):
 
 #@Timeout(30)
 @trace
-def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keywords):
+def prompt_filter(prev_prompts, max_token, prompt_messages, keywords):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -155,9 +154,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
         raise Exception("You want to use Mistral for embeddings but haven't supplied an API key in the settings.")
     elif "openai" in shared.pv["embed_choice"] and not shared.pv["txt_openai_api_key"]:
         raise Exception("You want to use OpenAI for embeddings but haven't supplied an API key in the settings.")
-
-    if temperature != 0:
-        whi(f"Temperature is at {temperature}: making the prompt filtering non deterministic.")
 
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"
@@ -313,14 +309,6 @@ def prompt_filter(prev_prompts, max_token, temperature, prompt_messages, keyword
                 cont1 = output_pr[dists.index(min(dists))]["content"]
                 cont2 = pr["content"]
                 red(f"Very similar prompts {min(dists)}:\n* {cont2}\n* {cont1}")
-                continue
-
-            # as the temperature incrase, increase the randomness of the picking
-            if temperature <= 0.3:
-                threshold = 0.05
-            else:
-                threshold = temperature - 0.3
-            if random.random() >= pr["pick_score"] - threshold:
                 continue
 
             # keep the most relevant previous memories in the prompt

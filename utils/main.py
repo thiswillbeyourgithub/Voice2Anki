@@ -470,7 +470,6 @@ def pre_alfred(
     prev_prompts = prompt_filter(
             prev_prompts,
             max_token,
-            temperature,
             prompt_messages=buffer_to_add + [new_prompt],
             keywords=keywords,
             )
