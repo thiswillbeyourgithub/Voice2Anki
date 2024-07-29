@@ -1,3 +1,4 @@
+import os
 from joblib import Memory
 from OCR_with_format import OCR_with_format
 
@@ -18,5 +19,7 @@ def get_text(
     default_args = {
         "img_path": img,
     }
+    if "VOICE2ANKI_DEFAULT_OCR_LANGUAGE" in os.environ:
+        default_args["language"] = os.environ["VOICE2ANKI_DEFAULT_OCR_LANGUAGE"]
     default_args.update(extra_kwargs)
     return ocr_engine.OCR(**default_args)
