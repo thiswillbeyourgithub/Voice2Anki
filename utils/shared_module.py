@@ -29,6 +29,7 @@ class SharedModule:
     the main .py files"""
     # things that are not changed when self.reset is called
     VERSION = 1.0
+    _instance = None  # singleton
     anki_media = None
     debug = None
     disable_tracing = None
@@ -168,6 +169,12 @@ class SharedModule:
 
     added_note_ids = []
 
+    def __new__(cls):
+        "make sure the isntance will be a singleton"
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def reset(self, request: gr.Request):
         "used to reset the values when the gradio page is reloaded"
         self.dirload_queue = DF(columns=self.dirload_queue_columns).set_index("path")
@@ -221,7 +228,6 @@ class SharedModule:
             object.__setattr__(self, name, value)
         else:
             raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
-
 
 
 def p(message):
