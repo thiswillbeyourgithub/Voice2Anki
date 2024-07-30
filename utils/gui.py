@@ -194,8 +194,9 @@ with gr.Blocks(
                 choice_audio_backend = gr.Dropdown(value=shared.pv["choice_audio_backend"], choices=shared.audio_backends, label="STT backend", show_label=True, scale=0, multiselect=False)
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
-                txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
-                txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
+                txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="MistralAI API key", lines=1)
+                txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="Openrouter API key", lines=1)
+                txt_deepgram_api_key = gr.Textbox(value=shared.pv["txt_deepgram_api_key"], label="Deepgram API key", lines=1)
         with gr.Tab(label="Memory retrieval", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
                 txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
@@ -654,6 +655,7 @@ with gr.Blocks(
     txt_openai_api_key.change(fn=shared.pv.save_txt_openai_api_key, inputs=[txt_openai_api_key], show_progress=False)
     txt_mistral_api_key.change(fn=shared.pv.save_txt_mistral_api_key, inputs=[txt_mistral_api_key], show_progress=False)
     txt_openrouter_api_key.change(fn=shared.pv.save_txt_openrouter_api_key, inputs=[txt_openrouter_api_key], show_progress=False)
+    txt_deepgram_api_key.change(fn=shared.pv.save_txt_deepgram_api_key, inputs=[txt_deepgram_api_key], show_progress=False)
     choice_embed.change(fn=shared.pv.save_choice_embed, inputs=[choice_embed], show_progress=False)
     choice_audio_backend.change(fn=shared.pv.save_audio_backend, inputs=[choice_audio_backend], show_progress=False)
 

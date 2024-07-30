@@ -24,6 +24,7 @@ from pydub import AudioSegment
 
 import litellm
 import openai
+from deepgram import DeepgramClient, PrerecordedOptions
 
 from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
@@ -43,6 +44,8 @@ today = f"{d.day:02d}/{d.month:02d}/{d.year:04d}"
 stt_cache = joblib.Memory("cache/transcript_cache", verbose=0)
 llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 
+# store in a dict to avoid recreating an instance each time
+deepgram_clients = {}
 
 @trace
 @optional_typecheck
@@ -119,14 +122,14 @@ def whisper_cached(
     of the content is used instead."""
     red(f"Calling whisper because not in cache: {audio_path}")
 
-    assert shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"], "Missing OpenAI or replicate API key, needed for Whisper"
+    assert shared.pv["txt_openai_api_key"] or shared.pv["txt_deepgram_api_key"], "Missing OpenAI or deepgram API key, needed for Whisper"
     if "openai" in stt_model:
         assert shared.pv["txt_openai_api_key"], "Missing OpenAI API key, needed for Whisper"
         if shared.openai_client is None:
             shared.openai_client = openai.OpenAI(api_key=shared.pv["txt_openai_api_key"].strip())
-    elif "replicate" in stt_model:
-        assert shared.pv["txt_replicate_api_key"], "Missing Replicate API key, needed for Whisper"
-        os.environ["REPLICATE_API_TOKEN"] = shared.pv["txt_replicate_api_key"].strip()
+    elif "deepgram" in stt_model:
+        assert shared.pv["txt_deepgram_api_key"], "Missing Deepgram API key, needed for Whisper"
+        os.environ["DEEPGRAM_API_TOKEN"] = shared.pv["txt_deepgram_api_key"].strip()
 
     if txt_whisp_prompt.strip() == "":
         txt_whisp_prompt = None
@@ -160,35 +163,68 @@ def whisper_cached(
                             temps = [seg["temperature"] for seg in transcript["segments"]]
                             if sum(temps) / len(temps) == 1:
                                 raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
+                        if not transcript["segments"]:
+                            gr.Warning(red(f"No audio segment found in {audio_path}"))
 
-                    elif stt_model == "replicate:vaibhavs10/incredibly-fast-whisper":
-                        if txt_whisp_lang == "fr":
-                            txt_whisp_lang = "french"
-                        elif txt_whisp_lang == "en":
-                            txt_whisp_lang = "english"
-                        transcript = replicate.run(
-                                "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
-                                input={
-                                    "audio": audio_file,
-                                    "task": "transcribe",
-                                    "model": "large-v3",
-                                    "batch_size": 1,
-                                    "temperature": sld_whisp_temp,
-                                    "language": txt_whisp_lang,
-                                    "timestamp": "chunk",
-                                    "diarise_audio": False,
-                                    }
-                                )
-                        # adjust format
-                        transcript["segments"] = transcript["chunks"]
-                        del transcript["chunks"]
-                        if "duration" not in transcript:
-                            transcript["duration"] = transcript["segments"][-1]["timestamp"][-1]
+
+                    elif stt_model == "deepgram:nova-2":
+
+                        if os.environ["DEEPGRAM_API_TOKEN"] not in deepgram_clients:
+                            while deepgram_clients:
+                                k = next(deepgram_clients.keys())
+                                del deepgram_clients[k]
+                            deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]] = DeepgramClient()
+                        assert len(deepgram_clients) == 1
+                        client = deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]
+                        # set options
+                        options = dict(
+                            # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2
+                            model="nova-2",
+                            language=txt_whisp_lang,
+
+                            detect_language=False,
+                            # not all features below are available for all languages
+
+                            # intelligence
+                            summarize=False,
+                            topics=False,
+                            intents=False,
+                            sentiment=False,
+
+                            # transcription
+                            smart_format=True,
+                            punctuate=True,
+                            paragraphs=False,
+                            utterances=True,
+                            diarize=False,
+                            dictation=False,
+                            detect_entities=False,
+                            detect_topics=False,
+                            filler_words=True,
+                            keywords=shared.pv["deepgram_keywords"],
+                            measurements=True,
+                            numerals=True,
+
+                            # redact=None,
+                            # replace=None,
+                            # search=None,
+                            # keywords=None,
+                            # filler_words=False,
+                        )
+                        options = PrerecordedOptions(**options)
+                        payload = {"buffer": audio_path.read()}
+                        transcript = deepgram.listen.prerecorded.v("1").transcribe_file(
+                            payload,
+                            options,
+                        ).to_dict()
+                        assert len(transcript["results"]["channels"]) == 1, "unexpected deepgram output"
+                        assert len(transcript["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
+                        text = transcript["results"]["channels"][0]["alternatives"][0]["transcript"].strip()
+                        assert text, "Empty text from deepgram transcription"
+                        transcript["duration"] = transcript["metadata"]["duration"]
+                        transcript["text"] = text
                     else:
                         raise ValueError(stt_model)
-
-                if not transcript["segments"]:
-                    gr.Warning(red(f"No audio segment found in {audio_path}"))
 
                 # update the df
                 if shared.pv["enable_dirload"]:
@@ -197,7 +233,7 @@ def whisper_cached(
                             tmp_df = shared.dirload_queue.reset_index().set_index("temp_path")
                             try:
                                 orig_path = tmp_df.loc[str(audio_path), "path"]
-                            except:
+                            except Exception:
                                 orig_path = tmp_df.loc[str(audio_path).replace("_proc", ""), "path"]
                             with shared.dirload_lock:
                                 tmp_df.loc[orig_path, "transcribed"] = transcript["text"]
@@ -226,7 +262,7 @@ def thread_whisp_then_llm(audio_mp3: Optional[PosixPath, str]) -> None:
     whi("Transcribing audio for the cache")
     audio_mp3 = format_audio_component(audio_mp3)
 
-    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
+    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_deepgram_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
 
     with open(audio_mp3, "rb") as f:
