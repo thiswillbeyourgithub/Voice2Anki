@@ -50,6 +50,7 @@ profile_keys = {
         "txt_openai_api_key": {},
         "txt_openrouter_api_key": {},
         "txt_mistral_api_key": {},
+        "txt_deepgram_api_key": {},
         "gallery": {},
         "txt_deck": {},
         "txt_tags": {},
