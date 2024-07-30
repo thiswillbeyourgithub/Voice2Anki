@@ -1096,11 +1096,10 @@ def whisper_splitter(audio_path: PosixPath, audio_hash: str, **kwargs) -> dict:
         assert len(content["results"]["channels"]) == 1, "unexpected deepgram output"
         assert len(content["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
 
-        words = content["results"]["channels"][0]["alternatives"][0]["words"]
-        assert words, "Empty text from deepgram transcription"
-        starts = [float(w["start"]) for w in words]
-        ends = [float(w["end"]) for w in words]
-
+        # words = content["results"]["utterances"]
+        # assert words, "Empty text from deepgram transcription"
+        # starts = [float(w["start"]) for w in words]
+        # ends = [float(w["end"]) for w in words]
         # transcript = {
         #     "segments": [
         #         {
