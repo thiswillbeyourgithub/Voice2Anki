@@ -657,7 +657,7 @@ with gr.Blocks(
     txt_openrouter_api_key.change(fn=shared.pv.save_txt_openrouter_api_key, inputs=[txt_openrouter_api_key], show_progress=False)
     txt_deepgram_api_key.change(fn=shared.pv.save_txt_deepgram_api_key, inputs=[txt_deepgram_api_key], show_progress=False)
     choice_embed.change(fn=shared.pv.save_choice_embed, inputs=[choice_embed], show_progress=False)
-    choice_audio_backend.change(fn=shared.pv.save_audio_backend, inputs=[choice_audio_backend], show_progress=False)
+    choice_audio_backend.change(fn=shared.pv.save_choice_audio_backend, inputs=[choice_audio_backend], show_progress=False)
 
     # change profile and load previous data
     txt_profile.change(
