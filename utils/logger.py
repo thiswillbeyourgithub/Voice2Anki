@@ -56,6 +56,10 @@ log.setLevel(logging.INFO)
 log.addHandler(file_handler)
 log_regex = re.compile(" ##.*?##")
 
+mess = f"This is a test to check wether the logging works: {time.time()}"
+log.info(mess)
+assert mess in log_file.read_text().splitlines()[-1], "Logs does not appear to be working"
+
 colors = {
         "red": "\033[91m",
         "yellow": "\033[93m",
