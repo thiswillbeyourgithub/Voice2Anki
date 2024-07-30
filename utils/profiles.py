@@ -48,7 +48,6 @@ profile_keys = {
         "sld_pick_weight": {"default": 1},
         "txt_extra_source": {},
         "txt_openai_api_key": {},
-        "txt_replicate_api_key": {},
         "txt_openrouter_api_key": {},
         "txt_mistral_api_key": {},
         "gallery": {},
@@ -300,8 +299,6 @@ class ValueStorage:
         # update the api key right away
         if key == "txt_openai_api_key":
             os.environ["OPENAI_API_KEY"] = item
-        elif key == "txt_replicate_api_key":
-            os.environ["REPLICATE_API_KEY"] = item
         elif key == "txt_mistral_api_key":
             os.environ["MISTRAL_API_KEY"] = item
         elif key == "txt_openrouter_api_key":

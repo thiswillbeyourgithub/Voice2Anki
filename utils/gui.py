@@ -194,7 +194,6 @@ with gr.Blocks(
                 choice_audio_backend = gr.Dropdown(value=shared.pv["choice_audio_backend"], choices=shared.audio_backends, label="STT backend", show_label=True, scale=0, multiselect=False)
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
-                txt_replicate_api_key = gr.Textbox(value=shared.pv["txt_replicate_api_key"], label="Replicate API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="mistral API key", lines=1)
                 txt_openrouter_api_key = gr.Textbox(value=shared.pv["txt_openrouter_api_key"], label="openrouter API key", lines=1)
         with gr.Tab(label="Memory retrieval", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
@@ -653,7 +652,6 @@ with gr.Blocks(
     sld_keywords_weight.change(fn=shared.pv.save_sld_keywords_weight, inputs=[sld_keywords_weight], show_progress=False)
     txt_extra_source.change(fn=shared.pv.save_txt_extra_source, inputs=[txt_extra_source], show_progress=False)
     txt_openai_api_key.change(fn=shared.pv.save_txt_openai_api_key, inputs=[txt_openai_api_key], show_progress=False)
-    txt_replicate_api_key.change(fn=shared.pv.save_txt_replicate_api_key, inputs=[txt_replicate_api_key], show_progress=False)
     txt_mistral_api_key.change(fn=shared.pv.save_txt_mistral_api_key, inputs=[txt_mistral_api_key], show_progress=False)
     txt_openrouter_api_key.change(fn=shared.pv.save_txt_openrouter_api_key, inputs=[txt_openrouter_api_key], show_progress=False)
     choice_embed.change(fn=shared.pv.save_choice_embed, inputs=[choice_embed], show_progress=False)

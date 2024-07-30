@@ -24,7 +24,6 @@ from pydub import AudioSegment
 
 import litellm
 import openai
-import replicate
 
 from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
@@ -624,7 +623,7 @@ def alfred(
     if txt_audio.count(" ") < 3:
         return red(f"Too few words in txt_audio to be plausible")
 
-    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_replicate_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
+    if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
 
     # automatically split repeated newlines as several distinct cards
