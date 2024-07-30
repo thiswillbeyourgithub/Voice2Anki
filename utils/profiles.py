@@ -72,20 +72,13 @@ profile_path.mkdir(exist_ok=True)
 class ValueStorage:
     _instance = None
 
-    def __new__(cls, profile: str = "latest"):
+    def __new__(cls):
         "make sure the instance will be a singleton"
         if cls._instance is None:
-            cls._instance = super().__new__(cls, profile=profile)
+            cls._instance = super().__new__(cls)
             return cls._instance
         else:
-            if profile == "latest":
-                raise Exception("Tried to create another instance of ValueStorage with latest profile")
-            elif profile == cls._instance.profile_name:
-                raise Exception(f"Tried to create another instance of ValueStorage but already existing for profile '{profile}'")
-            else:
-                whi(f"Creating new ValueStorage instance for profile '{profile}'")
-                cls._instance = super().__new__(cls, profile=profile)
-                return cls._instance
+            raise Exception("Tried to create another instance of ValueStorage")
 
     @trace
     def __init__(self, profile: str = "latest") -> None:
