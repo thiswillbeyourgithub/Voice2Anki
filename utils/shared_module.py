@@ -174,7 +174,7 @@ class SharedModule:
     added_note_ids: List[int] = []
 
     def __new__(cls):
-        "make sure the isntance will be a singleton"
+        "make sure the instance will be a singleton"
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance

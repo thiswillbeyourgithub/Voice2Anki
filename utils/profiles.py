@@ -68,6 +68,12 @@ profile_path.mkdir(exist_ok=True)
 
 @optional_typecheck
 class ValueStorage:
+    def __new__(cls):
+        "make sure the instance will be a singleton"
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     @trace
     def __init__(self, profile: str = "latest") -> None:
 
