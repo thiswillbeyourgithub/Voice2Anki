@@ -51,6 +51,7 @@ profile_keys = {
         "txt_openrouter_api_key": {},
         "txt_mistral_api_key": {},
         "txt_deepgram_api_key": {},
+        "txt_deepgram_keyword_boosting": {"type": str},
         "gallery": {},
         "txt_deck": {},
         "txt_tags": {},

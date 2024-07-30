@@ -192,6 +192,7 @@ with gr.Blocks(
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
             with gr.Column():
                 choice_audio_backend = gr.Dropdown(value=shared.pv["choice_audio_backend"], choices=shared.audio_backends, label="STT backend", show_label=True, scale=0, multiselect=False)
+                txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0)
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="MistralAI API key", lines=1)
@@ -658,6 +659,7 @@ with gr.Blocks(
     txt_deepgram_api_key.change(fn=shared.pv.save_txt_deepgram_api_key, inputs=[txt_deepgram_api_key], show_progress=False)
     choice_embed.change(fn=shared.pv.save_choice_embed, inputs=[choice_embed], show_progress=False)
     choice_audio_backend.change(fn=shared.pv.save_choice_audio_backend, inputs=[choice_audio_backend], show_progress=False)
+    txt_deepgram_keyword_boosting.change(fn=shared.pv.save_txt_deepgram_keyword_boosting, inputs=[txt_deepgram_keyword_boosting], show_progress=False)
 
     # change profile and load previous data
     txt_profile.change(

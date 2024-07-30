@@ -175,7 +175,12 @@ def whisper_cached(
                                 del deepgram_clients[k]
                             deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]] = DeepgramClient()
                         assert len(deepgram_clients) == 1
-                        client = deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]
+                        client = deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]]
+                        if shared.pv["txt_deepgram_keyword_boosting"]:
+                            keywords = shared.pv["txt_deepgram_keyword_boosting"].strip().splitlines()
+                        else:
+                            keywords = None
+                        keywords="&keywords=".join(shared.pv["txt_deepgram_keyword_boosting"].,
                         # set options
                         options = dict(
                             # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2
@@ -201,7 +206,7 @@ def whisper_cached(
                             detect_entities=False,
                             detect_topics=False,
                             filler_words=True,
-                            keywords=shared.pv["deepgram_keywords"],
+                            keywords=keywords,
                             measurements=True,
                             numerals=True,
 
