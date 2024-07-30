@@ -171,13 +171,13 @@ with gr.Blocks(
     with gr.Tab(label="Settings", elem_id="js_widetabs", elem_classes=["js_toptabs", "js_tabsettings"]) as tab_settings:
         with gr.Tab(label="GUI", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
-                gui_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
+                check_enable_dirload = gr.Checkbox(value=shared.pv["enable_dirload"], interactive=True, label="Dirload", show_label=True, elem_id="js_guienabledirload")
                 gui_rolldirloadcheck = gr.Checkbox(value=shared.pv["dirload_check"], interactive=True, label="Clicking on Roll loads from dirload", show_label=True)
             with gr.Row():
-                gui_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
-                gui_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
+                check_enable_gallery = gr.Checkbox(value=shared.pv["enable_gallery"], interactive=True, label="Gallery", show_label=True, elem_id="js_guienablegallery")
+                check_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
             with gr.Row():
-                gui_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
+                check_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
 
         with gr.Tab(label="Anki", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
@@ -407,7 +407,7 @@ with gr.Blocks(
                     roll_gall_btn: gr.update(visible=value),
                     tab_queued_galleries: gr.update(visible=value),
                     tab_queues: gr.update(visible=shared.pv["enable_queued_gallery"] or shared.pv["enable_dirload"]),
-                    gui_enable_queued_gallery: gr.update(visible=value, value=False),
+                    check_enable_queued_gallery: gr.update(visible=value, value=False),
                     }
 
         elif name == "enable_queued_gallery":
@@ -431,32 +431,32 @@ with gr.Blocks(
             tab_queues,
             tab_queued_galleries,
             tab_gallery,
-            gui_enable_gallery,
+            check_enable_gallery,
             roll_gall_btn,
             flag_audio_btn,
             dir_load_btn,
             force_sound_processing_btn,
             gui_rolldirloadcheck,
-            gui_enable_queued_gallery,
+            check_enable_queued_gallery,
             ] + audio_slots_txts + audio_slots_txts_columns
-    gui_enable_dirload.input(
+    check_enable_dirload.input(
             fn=partial(save_and_load_gui, name="enable_dirload"),
-            inputs=[gui_enable_dirload],
+            inputs=[check_enable_dirload],
             outputs=gui_outputs,
             )
-    gui_enable_flagging.input(
+    check_enable_flagging.input(
             fn=partial(save_and_load_gui, name="enable_flagging"),
-            inputs=[gui_enable_flagging],
+            inputs=[check_enable_flagging],
             outputs=gui_outputs,
             )
-    gui_enable_queued_gallery.input(
+    check_enable_queued_gallery.input(
             fn=partial(save_and_load_gui, name="enable_queued_gallery"),
-            inputs=[gui_enable_queued_gallery],
+            inputs=[check_enable_queued_gallery],
             outputs=gui_outputs,
             )
-    gui_enable_gallery.input(
+    check_enable_gallery.input(
             fn=partial(save_and_load_gui, name="enable_gallery"),
-            inputs=[gui_enable_gallery],
+            inputs=[check_enable_gallery],
             outputs=gui_outputs,
             )
 
@@ -1132,7 +1132,7 @@ with gr.Blocks(
 
     init.then(
             fn=update_audio_slots_txts,
-            inputs=[gui_enable_dirload] + audio_slots_txts,
+            inputs=[check_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
             postprocess=False,
             preprocess=False,
