@@ -3,14 +3,21 @@ import sys
 import fire
 from pathlib import Path
 from typing import Optional
+from beartype import BeartypeConf
+from beartype.claw import beartype_this_package
 import pdb
 import faulthandler
 import traceback
 
-from utils.typechecker import optional_typecheck
+if os.environ["VOICE2ANKI_TYPECHECKING"] == "full":
+    beartype_this_package(
+        conf=BeartypeConf(violation_type=UserWarning)
+    )
 
-from utils.logger import whi, yel, red, print_db
-from utils.shared_module import shared
+from .utils.typechecker import optional_typecheck
+from .utils.logger import whi, yel, red, print_db
+from .utils.shared_module import shared
+
 
 # misc init values
 Path("./cache").mkdir(exist_ok=True)

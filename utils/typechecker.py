@@ -1,6 +1,6 @@
 from typing import Callable
 import os
-from beartype import beartype, BeartypeConf, beartype_this_package
+from beartype import beartype, BeartypeConf
 
 
 if "VOICE2ANKI_TYPECHECKING" not in os.environ:
@@ -9,9 +9,6 @@ if "VOICE2ANKI_TYPECHECKING" not in os.environ:
 if os.environ["VOICE2ANKI_TYPECHECKING"] == "full":
     def optional_typecheck(func: Callable) -> Callable:
         return func
-    beartype_this_package(
-        conf=BeartypeConf(violation_type=UserWarning)
-    )
 elif os.environ["VOICE2ANKI_TYPECHECKING"] == "crash":
     optional_typecheck = beartype
 elif os.environ["VOICE2ANKI_TYPECHECKING"] == "warn":
