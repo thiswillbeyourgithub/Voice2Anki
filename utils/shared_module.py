@@ -195,7 +195,7 @@ class SharedModule:
         self.pv.cache_values = {k: None for k in self.pv.cache_values.keys()}
 
         os.environ["OPENAI_API_KEY"] = self.pv["txt_openai_api_key"].strip()
-        os.environ["DEEPGRAM_API_KEY"] = self.pv["txt_DEEPGRAM_api_key"].strip()
+        os.environ["DEEPGRAM_API_KEY"] = self.pv["txt_deepgram_api_key"].strip()
         os.environ["MISTRAL_API_KEY"] = self.pv["txt_mistral_api_key"].strip()
         os.environ["OPENROUTER_API_KEY"] = self.pv["txt_openrouter_api_key"].strip()
 
