@@ -46,9 +46,9 @@ class AudioSplitter:
 
         stop_source: str = "replicate",
 
-        untouched_dir: Optional[PosixPath, str] = None,
-        splitted_dir: Optional[PosixPath, str] = None,
-        done_dir: Optional[PosixPath, str] = None,
+        untouched_dir: Optional[Union[PosixPath, str]] = None,
+        splitted_dir: Optional[Union[PosixPath, str]] = None,
+        done_dir: Optional[Union[PosixPath, str]] = None,
 
         trim_splitted_silence: bool = False,
         global_slowdown_factor: Union[float, int] = 1.0,
