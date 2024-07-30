@@ -7,9 +7,9 @@ import pdb
 import faulthandler
 import traceback
 
-from .utils.typechecker import optional_typecheck
-from .utils.logger import whi, yel, red, print_db
-from .utils.shared_module import shared
+from utils.typechecker import optional_typecheck
+from utils.logger import whi, yel, red, print_db
+from utils.shared_module import shared
 
 
 # misc init values

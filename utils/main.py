@@ -180,7 +180,7 @@ def whisper_cached(
                             keywords = shared.pv["txt_deepgram_keyword_boosting"].strip().splitlines()
                         else:
                             keywords = None
-                        keywords="&keywords=".join(shared.pv["txt_deepgram_keyword_boosting"].,
+                        keywords="&keywords=".join(shared.pv["txt_deepgram_keyword_boosting"])
                         # set options
                         options = dict(
                             # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2

@@ -309,7 +309,7 @@ class ValueStorage:
             os.environ["OPENROUTER_API_KEY"] = item
 
 @optional_typecheck
-def worker_setitem(in_queue: Queue) -> None:
+def worker_setitem(in_queue: queue.Queue) -> None:
     """continuously running worker that is used to save components value to
     the appropriate profile"""
     while True:
