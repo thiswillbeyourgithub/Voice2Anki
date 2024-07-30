@@ -27,7 +27,7 @@ from .media import format_audio_component
 from .typechecker import optional_typecheck
 
 
-call_anki = PyAnkiconnect()
+call_anki = PyAnkiconnect(async_mode=False)
 async_call_anki = PyAnkiconnect(async_mode=True)
 
 @optional_typecheck

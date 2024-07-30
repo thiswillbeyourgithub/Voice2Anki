@@ -1,7 +1,7 @@
 import re
 import shutil
 import time
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 from pydub import AudioSegment
 import soundfile as sf
 from pathlib import Path, PosixPath
@@ -445,7 +445,7 @@ tail = """
 """
 
 @optional_typecheck
-def update_audio_slots_txts(gui_enable_dirload: bool, *audio_slots_txts) -> List[str]:
+def update_audio_slots_txts(gui_enable_dirload: bool, *audio_slots_txts) -> List[Optional[str]]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription and cloze
     """

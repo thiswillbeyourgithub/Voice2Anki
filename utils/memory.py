@@ -425,7 +425,9 @@ def load_prev_prompts(profile: str) -> List[str]:
 
 
 @optional_typecheck
-def display_price(sld_max_tkn: int, llm_choice: str) -> List[str]:
+def display_price(sld_max_tkn: int, llm_choice: str) -> str:
+    if llm_choice not in shared.llm_price:
+        return f"Price not found for model '{llm_choice}'"
     price = shared.llm_price[llm_choice]
     if isinstance(price, float):
         return f"${price} per second (actual price computation is probably wrong for now!)"

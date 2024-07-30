@@ -193,7 +193,7 @@ with gr.Blocks(
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
             with gr.Column():
-                txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
+                txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["txt_deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="MistralAI API key", lines=1)
@@ -568,7 +568,7 @@ with gr.Blocks(
     send_more_to_previous.submit(
         fn=add_to_more_of_previous_note,
         inputs=[send_more_to_previous],
-        output=[send_more_to_previous],
+        outputs=[send_more_to_previous],
         show_progress=False,
     )
 
