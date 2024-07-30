@@ -27,6 +27,7 @@ from .typechecker import optional_typecheck
 
 
 call_anki = PyAnkiconnect()
+async_call_anki = PyAnkiconnect(async_mode=True)
 
 @optional_typecheck
 def _request_wrapper(action: str, **params):
@@ -37,36 +38,6 @@ async def anki_request_async(url: str, request: str) -> dict:
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=request) as response:
             return await response.json()
-
-
-@optional_typecheck
-async def async_call_anki(action: str, **params) -> Any:
-    """ ASYNC duplicate of call_anki"""
-
-    requestJson = json.dumps(
-        {"action": action, "params": params, 'version': 6}
-    ).encode('utf-8')
-
-    try:
-        response = await anki_request_async(
-                url='http://localhost:8765',
-                request=requestJson)
-    except Exception as e:
-        red(f"{str(e)}: is Anki open and 'AnkiConnect' "
-            "enabled? Firewall issue?")
-        raise Exception(f"{str(e)}: is Anki open and 'AnkiConnect' "
-                        "addon' enabled? Firewall issue?")
-
-    if len(response) != 2:
-        raise Exception(red('response has an unexpected number of fields'))
-    if 'error' not in response:
-        raise Exception(red('response is missing required error field'))
-    if 'result' not in response:
-        raise Exception(red('response is missing required result field'))
-    if response['error'] is not None:
-        raise Exception(red(f"Error in call_anki: {response['error']}\nArgs: {action}, {params}"))
-    return response['result']
-
 
 @optional_typecheck
 @trace
