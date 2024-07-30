@@ -247,6 +247,7 @@ async def mark_previous_note() -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
+    assert nids
 
     bodies = get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
@@ -277,6 +278,7 @@ async def add_to_more_of_previous_note(more_content: str) -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
+    assert nids
     more_content = more_content.strip()
     assert more_content
 
@@ -297,6 +299,7 @@ async def suspend_previous_notes() -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
+    assert nids
     s_nids = [str(n) for n in nids]
     cids = await async_call_anki(
             action="findCards",
