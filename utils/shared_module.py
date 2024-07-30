@@ -59,8 +59,6 @@ class SharedModule:
             "mistral/mistral-embed",
             ]
 
-    audio_backends: List[str] = ["openai/whisper-1", "deepgram/whisper-v3"]
-
     # sox effect when loading a sound
     preprocess_sox_effects: List[str] = [
             # normalize audio

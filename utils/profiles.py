@@ -38,7 +38,6 @@ profile_keys = {
         "llm_choice": {"default": [i for i in shared.llm_price.keys()][0]},
         "stt_choice": {"default": shared.stt_models[0], "type": str},
         "choice_embed": {"default": shared.embedding_models[0]},
-        "choice_audio_backend": {"default": shared.audio_backends[0]},
         "sld_whisp_temp": {"default": 0, "type": float},
         "message_buffer": {"default": [], "type": list},
         "txt_keywords": {"default": "", "type": str},
