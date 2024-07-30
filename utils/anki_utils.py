@@ -271,7 +271,7 @@ async def sync_anki() -> None:
 
 @optional_typecheck
 @trace
-async def mark_previous_notes() -> None:
+async def mark_previous_note() -> None:
     "add or remove the tag 'marked' to the latest added notes."
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
