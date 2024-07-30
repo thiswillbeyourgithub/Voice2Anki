@@ -258,7 +258,7 @@ def whisper_cached(
 
 @optional_typecheck
 @trace
-def thread_whisp_then_llm(audio_mp3: Optional[PosixPath, str]) -> None:
+def thread_whisp_then_llm(audio_mp3: Optional[Union[PosixPath, str]]) -> None:
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -722,7 +722,7 @@ def alfred(
                     messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
                     if i == len(formatted_messages) - 2:
                         messages[0]["content"] += "---\n"
-        assert len(message) == 2
+        assert len(messages) == 2
         assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1])
         formatted_messages = messages
 

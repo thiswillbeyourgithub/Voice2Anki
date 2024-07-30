@@ -121,7 +121,7 @@ class ValueStorage:
         # create methods like "save_gallery" to save the gallery to the profile
         for key in profile_keys:
             @optional_typecheck
-            def create_save_method(key: str) -> None:
+            def create_save_method(key: str) -> Callable:
                 #@trace
                 @optional_typecheck
                 def save_method(value) -> Callable:
