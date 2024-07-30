@@ -48,8 +48,6 @@ class SharedModule:
     user_chains: Optional[Callable] = None
     anki_notetype: Optional[str] = None
 
-    stt_models: List[str] = ["openai:whisper-1", "replicate:vaibhavs10/incredibly-fast-whisper"]
-
     llm_price: dict = {k: v for k, v in litellm.model_cost.items()}
 
     # embeddings are so cheap I don't even count the number of tokens
