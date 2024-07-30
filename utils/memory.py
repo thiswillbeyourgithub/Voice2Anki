@@ -60,7 +60,7 @@ def hasher(text: str) -> str:
 @optional_typecheck
 def embedder(
     text_list: List[str],
-    model: str = shared.pv["embed_choice"],
+    model: str = shared.pv["choice_embed"],
     ) -> np.ndarray:
     """compute the emebdding of 1 text
     if result is not None, it is the embedding and returned right away. This
@@ -156,9 +156,9 @@ def prompt_filter(prev_prompts: List[dict], max_token: int, prompt_messages: Lis
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
     whi("Filtering prompts")
-    if "mistral" in shared.pv["embed_choice"] and not shared.pv["txt_mistral_api_key"]:
+    if "mistral" in shared.pv["choice_embed"] and not shared.pv["txt_mistral_api_key"]:
         raise Exception("You want to use Mistral for embeddings but haven't supplied an API key in the settings.")
-    elif "openai" in shared.pv["embed_choice"] and not shared.pv["txt_openai_api_key"]:
+    elif "openai" in shared.pv["choice_embed"] and not shared.pv["txt_openai_api_key"]:
         raise Exception("You want to use OpenAI for embeddings but haven't supplied an API key in the settings.")
 
     assert max_token >= 500, "max_token should be above 500"
@@ -223,7 +223,7 @@ def prompt_filter(prev_prompts: List[dict], max_token: int, prompt_messages: Lis
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
     em_func = IteratorCacher(
-        cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["embed_choice"],
+        cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["choice_embed"],
         iter_list=["text_list"],
         verbose=False,
         unpacking_func = lambda ar: ar.tolist(),
