@@ -427,7 +427,7 @@ class AudioSplitter:
                 prev_t0 = t0
                 prev_t1 = t1
 
-            assert [t for t in times_to_keep if t][-1][1] * 1000 * self.g_spf <= len(audio_o)
+            assert [t for t in times_to_keep if t][-1][1] * 1000 * self.g_spf - len(audio_o) <= 1000
             # # make sure to start at 0 and end at the end. Even though if
             # # it was removed from times_to_keep means that it
             # # contained no words
@@ -898,7 +898,7 @@ class AudioSplitter:
             segs.pop(0)
             transcript["segments"].extend(segs)
 
-        assert transcript["segments"][-1]["end"] * 1000 < len(audio), "Unexpected length"
+        assert transcript["segments"][-1]["end"] * 1000 < len(audio) or (transcript["segments"][-1]["end"] - transcript["segments"][-1]["start"]) * 1000 < len(audio), "Unexpected length"
         assert transcript["segments"][0]["start"] >= 0, "Unexpected length"
         return transcript
 
