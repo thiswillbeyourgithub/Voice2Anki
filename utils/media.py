@@ -335,7 +335,7 @@ def qg_add_to_new(*qg) -> List[gr.Gallery]:
 
 @optional_typecheck
 @trace
-def qg_add_to_latest(*qg) -> List[gr.Gallery:
+def qg_add_to_latest(*qg) -> List[gr.Gallery]:
     """triggered by a shortcut, will add from clipboard the image to
     the latest non empty queued gallery"""
     qg = list(qg)

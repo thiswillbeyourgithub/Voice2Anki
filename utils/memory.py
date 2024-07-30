@@ -64,7 +64,7 @@ def hasher(text: str) -> str:
 @optional_typecheck
 def embedder(
     text_list: List[str],
-    model: str = shared.pv["choice_embed"],
+    model: str,
     ) -> np.ndarray:
     """compute the emebdding of 1 text
     if result is not None, it is the embedding and returned right away. This
@@ -239,7 +239,7 @@ def prompt_filter(prev_prompts: List[dict], max_token: int, prompt_messages: Lis
             )
         )
     )
-    all_embeddings = em_func(to_embed)
+    all_embeddings = em_func(to_embed, model=shared.pv["choice_embed"])
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)

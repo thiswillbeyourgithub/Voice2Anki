@@ -716,9 +716,9 @@ def alfred(
                 messages[0]["content"] += "'''"
                 messages.append(fm)
             else:
-                if fm["role"] = "user":
+                if fm["role"] == "user":
                     messages[0]["content"] += "[User]:\n" + fm["content"] + "\n"
-                elif fm["role"] = "assistant":
+                elif fm["role"] == "assistant":
                     messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
                     if i == len(formatted_messages) - 2:
                         messages[0]["content"] += "---\n"

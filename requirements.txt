@@ -13,6 +13,7 @@ ftfy>=6.1.1
 joblib>=1.2.0
 platformdirs >= 4.2.2
 iterator_cacher  # by me
+py_ankiconnect  # by me
 
 # ocr mode
 ocr_with_format  # by me
