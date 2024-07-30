@@ -1,3 +1,4 @@
+from rapidfuzz.fuzz import ratio as levratio
 import queue
 from typing import List, Union
 from datetime import datetime
@@ -180,10 +181,10 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 @trace
 @Timeout(5)
 @optional_typecheck
-async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
+async def get_card_status(txt_chatgpt_cloz: str) -> str:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
-    assert shared.initialized, f"Demo not yet launched!"
+    assert shared.initialized, "Demo not yet launched!"
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         spec = importlib.util.spec_from_file_location(
                 "flashcard_editor.cloze_editor",
@@ -227,6 +228,21 @@ async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
         if state:
             return "Added"
         else:
+            recent = await async_call_anki(action="findNotes", query="added:2")
+            if not recent:
+                return "MISSING"
+            bodies = get_anki_content(nid=recent)
+            if txt_chatgpt_cloz in bodies:
+                return "Added"
+            if all(c in bodies for c in cloz):
+                return "Added"
+            if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
+                return "Added"
+            for b in bodies:
+                if levratio(txt_chatgpt_cloz, b) > 95:
+                    return "Added"
+                if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 95:
+                    return "Added"
             return "MISSING"
 
 
