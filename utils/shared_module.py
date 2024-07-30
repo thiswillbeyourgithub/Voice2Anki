@@ -146,7 +146,7 @@ class SharedModule:
             ]
 
     # things that are reset on self.reset
-    pv: Optional[ValueStorage] = None
+    pv: Optional = None  # ValueStorage, for 'previous values'
     initialized: int = 0
     request = None
 
@@ -177,7 +177,9 @@ class SharedModule:
         "make sure the instance will be a singleton"
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-        return cls._instance
+            return cls._instance
+        else:
+            raise Exception("Tried to create another instance of SharedModule")
 
     def reset(self, request: gr.Request) -> None:
         "used to reset the values when the gradio page is reloaded"
