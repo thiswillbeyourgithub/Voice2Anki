@@ -8,7 +8,10 @@ import pandas as pd
 import litellm
 from typing import Optional, Any, Callable, List
 
-from .typechecker import optional_typecheck
+try:
+    from typechecker import optional_typecheck
+except Exception:
+    from .typechecker import optional_typecheck
 
 # used to print in red
 col_red = "\033[91m"
