@@ -282,6 +282,9 @@ async def add_to_more_of_previous_note(more_content: str) -> None:
     more_content = more_content.strip()
     assert more_content
 
+    bodies = get_anki_content(nid=nids)
+    bodies = "* " + "\n* ".join(bodies)
+
     for nid in nids:
         await async_call_anki(
             action="updateNoteFields",
@@ -290,7 +293,7 @@ async def add_to_more_of_previous_note(more_content: str) -> None:
                 "fields": {"more": more_content},
             }
         )
-    gr.Warning(red(f"Edited anki notes: {','.join([str(n) for n in nids])}"))
+    gr.Warning(red(f"Edited anki notes 'more' field: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
 
 @optional_typecheck
 @trace
