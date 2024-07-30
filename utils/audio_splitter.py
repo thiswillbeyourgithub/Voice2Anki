@@ -44,7 +44,7 @@ class AudioSplitter:
         language: str = "fr",
         n_todo: bool = 1,
 
-        stop_source: str = "replicate",
+        stop_source: str = "api",
 
         untouched_dir: Optional[Union[PosixPath, str]] = None,
         splitted_dir: Optional[Union[PosixPath, str]] = None,
@@ -78,7 +78,7 @@ class AudioSplitter:
             number of files to split by default. Can be used to only process
             a certain batch.
 
-        stop_source: str, default 'replicate'
+        stop_source: str, default 'api'
             if 'local_json', then an output from whispercpp is expected. This
             is not yet implemented. The idea is to be able to do the audio
             splitting locally using whispercpp instead of relying on replicate.
@@ -199,7 +199,7 @@ class AudioSplitter:
         # splitting the long audio
         for iter_file, file in enumerate(tqdm(self.to_split, unit="file", desc="Splitting file", disable=not bool(len(self.to_split)-1))):
             whi(f"Splitting file {file}")
-            if self.stop_source == "replicate":
+            if self.stop_source == "api":
 
                 transcript = self.run_whisper(file, second_pass=False)
                 times_to_keep, metadata = self.split_one_transcript(transcript, second_pass=False)
@@ -1010,7 +1010,7 @@ class AudioSplitter:
 @optional_typecheck
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_splitter(audio_path: PosixPath, audio_hash: str, **kwargs) -> dict:
-    whi(f"Starting replicate (meaning cache is not used). Args: {kwargs}")
+    whi(f"Starting STT API (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
 
