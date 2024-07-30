@@ -706,6 +706,26 @@ def alfred(
         dupli = [dp for dp in contents if contents.count(dp) > 1]
         raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}")
 
+    if shared.pv["check_prompts_as_system"]:
+        messages = []
+        for i, fm in enumerate(formatted_messages):
+            if i == 0:
+                messages.append(fm)
+                messages[0]["content"] += "\n\nExamples:\n'''\n"
+            elif i == len(formatted_messages) - 1:
+                messages[0]["content"] += "'''"
+                messages.append(fm)
+            else:
+                if fm["role"] = "user":
+                    messages[0]["content"] += "[User]:\n" + fm["content"] + "\n"
+                elif fm["role"] = "assistant":
+                    messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
+                    if i == len(formatted_messages) - 2:
+                        messages[0]["content"] += "---\n"
+        assert len(message) == 2
+        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1])
+        formatted_messages = messages
+
     model_price = shared.llm_price[llm_choice]
     whi(f"Will use model {llm_choice}")
 

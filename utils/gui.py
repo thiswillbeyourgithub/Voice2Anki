@@ -187,6 +187,7 @@ with gr.Blocks(
                 txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
             txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
         with gr.Tab(label="LLM", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
+            check_prompt_as_system = gr.Checkbox(value=shared.pv["check_prompt_as_system"], interactive=True, label="Example as system pompt", show_label=True)
             with gr.Row():
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
@@ -658,6 +659,7 @@ with gr.Blocks(
     txt_deepgram_api_key.change(fn=shared.pv.save_txt_deepgram_api_key, inputs=[txt_deepgram_api_key], show_progress=False)
     choice_embed.change(fn=shared.pv.save_choice_embed, inputs=[choice_embed], show_progress=False)
     txt_deepgram_keyword_boosting.change(fn=shared.pv.save_txt_deepgram_keyword_boosting, inputs=[txt_deepgram_keyword_boosting], show_progress=False)
+    check_prompt_as_system.change(fn=shared.pv.save_check_prompt_as_system, inputs=[check_prompt_as_system], show_progress=False)
 
     # change profile and load previous data
     txt_profile.change(
