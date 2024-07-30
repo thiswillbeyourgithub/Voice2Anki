@@ -18,6 +18,7 @@ elif os.environ["VOICE2ANKI_TYPECHECKING"] == "warn":
     optional_typecheck = beartype(
         conf=BeartypeConf(violation_type=UserWarning))
 elif os.environ["VOICE2ANKI_TYPECHECKING"] == "disabled":
+    @beartype
     def optional_typecheck(func: Callable) -> Callable:
         return func
 else:

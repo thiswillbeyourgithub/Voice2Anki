@@ -8,15 +8,18 @@ from pathlib import Path
 import sys
 import importlib.util
 import numpy as np
+from typing import Any, List, Optional, Union, Tuple, Callable
 
 import gradio as gr
 
 try:
     from .logger import whi, yel, red, trace
     from .shared_module import shared
-except:
+    from .typechecker import optional_typecheck
+except Exception:
     from logger import whi, yel, red, trace
     from shared_module import shared
+    from typechecker import optional_typecheck
 
 profile_keys = {
         "enable_gallery": {"default": False, "type": bool},
@@ -63,9 +66,10 @@ profile_path = Path("./profiles")
 profile_path.mkdir(exist_ok=True)
 (profile_path / "default").mkdir(exist_ok=True)
 
+@optional_typecheck
 class ValueStorage:
     @trace
-    def __init__(self, profile="latest"):
+    def __init__(self, profile: str = "latest") -> None:
 
         profile = profile.strip()
 
@@ -104,15 +108,17 @@ class ValueStorage:
 
         # create methods like "save_gallery" to save the gallery to the profile
         for key in profile_keys:
-            def create_save_method(key):
+            @optional_typecheck
+            def create_save_method(key: str) -> None:
                 #@trace
-                def save_method(value):
+                @optional_typecheck
+                def save_method(value) -> Callable:
                     self.__setitem__(key, value)
                 return save_method
 
             setattr(self, f"save_{key}", create_save_method(key))
 
-    def __check_equality(self, a, b):
+    def __check_equality(self, a: Any, b: Any) -> bool:
         if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
             return False
         if isinstance(a, list):
@@ -138,7 +144,7 @@ class ValueStorage:
         except Exception:
             return a == b
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         assert self.thread.is_alive(), "Saving thread appears to be dead!"
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
@@ -211,7 +217,7 @@ class ValueStorage:
             self.cache_values[key] = profile_keys[key]["default"]
             return self.cache_values[key]
 
-    def __setitem__(self, key, item):
+    def __setitem__(self, key: str, item: Any) -> None:
         assert self.thread.is_alive(), "Saver worker appears to be dead!"
 
         if key not in profile_keys:
@@ -283,7 +289,8 @@ class ValueStorage:
         elif key == "txt_openrouter_api_key":
             os.environ["OPENROUTER_API_KEY"] = item
 
-def worker_setitem(in_queue):
+@optional_typecheck
+def worker_setitem(in_queue: Queue) -> None:
     """continuously running worker that is used to save components value to
     the appropriate profile"""
     while True:
@@ -325,7 +332,8 @@ def worker_setitem(in_queue):
 
 
 # @trace
-def get_profiles():
+@optional_typecheck
+def get_profiles() -> List[str]:
     profiles = [str(p.name) for p in profile_path.iterdir()]
     if "latest_profile.txt" in profiles:
         profiles.remove("latest_profile.txt")
@@ -333,8 +341,19 @@ def get_profiles():
     return profiles
 
 
+@optional_typecheck
 @trace
-def switch_profile(profile):
+def switch_profile(profile: str) -> Tuple[
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[Union[gr.Gallery, List[dict]]],
+    None,
+    None,
+    None,
+    str,
+]:
     # output is [
     #         txt_deck,
     #         txt_tags,
@@ -398,7 +417,8 @@ def switch_profile(profile):
             ]
 
 
-def load_user_functions():
+@optional_typecheck
+def load_user_functions() -> Tuple[Callable, Callable]:
     """ If the user profile directory contains a directory called "functions"
     then functions can be loaded.
     Currently supported use case are:
@@ -451,7 +471,8 @@ def load_user_functions():
     return [flashcard_editor, chains]
 
 
-def load_user_chain(*buttons):
+@optional_typecheck
+def load_user_chain(*buttons) -> List:
     if shared.user_chains is not None:
         return buttons
     if not [f
@@ -482,7 +503,8 @@ def load_user_chain(*buttons):
 
     return buttons
 
-def call_user_chain(txt_audio, evt: gr.EventData):
+@optional_typecheck
+def call_user_chain(txt_audio: str, evt: gr.EventData) -> str:
     i_ch = int(evt.target.elem_id.split("#")[1])
     chain = shared.user_chains[i_ch]
     assert chain is not None

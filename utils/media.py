@@ -4,7 +4,7 @@ import time
 from typing import List, Union, Tuple
 from pydub import AudioSegment
 import soundfile as sf
-from pathlib import Path
+from pathlib import Path, PosixPath
 import gradio as gr
 import queue
 import pickle
@@ -18,8 +18,10 @@ import torchaudio
 from .logger import whi, red, trace, Timeout
 from .ocr import get_text
 from .shared_module import shared
+from .typechecker import optional_typecheck
 
 
+@optional_typecheck
 @trace
 def get_image(gallery) -> List[gr.Gallery]:
     whi("Getting image from clipboard")
@@ -74,6 +76,7 @@ def get_image(gallery) -> List[gr.Gallery]:
         return None
 
 
+@optional_typecheck
 @trace
 def check_source(source: str) -> str:
     "makes sure the source is only an img"
@@ -93,8 +96,9 @@ def check_source(source: str) -> str:
 
 
 #@Timeout(120)
+@optional_typecheck
 @trace
-def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
+def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bool = True) -> None:
     whi("Getting source from image")
     assert shared.pv["enable_gallery"], "Incoherent UI"
 
@@ -164,8 +168,9 @@ def get_img_source(gallery, queue=queue.Queue(), use_html=True) -> None:
     except Exception as err:
         return queue.put(red(f"Error getting source: '{err}' from {gallery}"))
 
+@optional_typecheck
 @trace
-def ocr_image(gallery) -> None:
+def ocr_image(gallery: Union[List, None]) -> None:
     "use OCR to get the text of an image to display in a textbox"
     q = queue.Queue()
     get_img_source(gallery, q, use_html=False)
@@ -173,6 +178,7 @@ def ocr_image(gallery) -> None:
 
 
 # @trace
+@optional_typecheck
 def reset_gallery() -> None:
     whi("Reset images.")
     shared.pv["gallery"] = None
@@ -180,12 +186,14 @@ def reset_gallery() -> None:
 
 
 # @trace
+@optional_typecheck
 def reset_audio() -> List[dict]:
     whi("Resetting all audio")
     return [gr.update(value=None, label=f"Audio #{i+1}") for i in range(shared.audio_slot_nb)]
 
+@optional_typecheck
 @trace
-def sound_preprocessing(audio_mp3_path):
+def sound_preprocessing(audio_mp3_path: PosixPath) -> PosixPath:
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Preprocessing {audio_mp3_path}")
 
@@ -213,8 +221,9 @@ def sound_preprocessing(audio_mp3_path):
     whi(f"Done preprocessing {audio_mp3_path} to {new_path}")
     return new_path
 
+@optional_typecheck
 @trace
-def force_sound_processing():
+def force_sound_processing() -> PosixPath:
     """harsher sound processing for the currently loaded next audio. This is
     done if there are some residual long silence that are making whisper
     hallucinate. The previous audio will be moved to the dirload done_dir and
@@ -263,6 +272,7 @@ def force_sound_processing():
 
 
 # @trace
+@optional_typecheck
 def format_audio_component(audio: Union[str, gr.Audio]) -> str:
     """to make the whole UI faster and avoid sending multiple slightly
     differently processed audio to whisper: preprocessing and postprocessing
@@ -290,6 +300,7 @@ def rgb_to_bgr(image):
     return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
+@optional_typecheck
 @trace
 def roll_queued_galleries(*qg: Tuple[dict]) -> List[dict]:
     "pop the first queued gallery and send it to the main gallery"
@@ -305,8 +316,9 @@ def roll_queued_galleries(*qg: Tuple[dict]) -> List[dict]:
     return output
 
 
+@optional_typecheck
 @trace
-def qg_add_to_new(*qg):
+def qg_add_to_new(*qg) -> List[gr.Gallery]:
     """triggered by a shortcut, will add from clipboard the image to
     a new queued gallery"""
     qg = list(qg)
@@ -321,8 +333,9 @@ def qg_add_to_new(*qg):
     return qg
 
 
+@optional_typecheck
 @trace
-def qg_add_to_latest(*qg):
+def qg_add_to_latest(*qg) -> List[gr.Gallery:
     """triggered by a shortcut, will add from clipboard the image to
     the latest non empty queued gallery"""
     qg = list(qg)
@@ -337,6 +350,7 @@ def qg_add_to_latest(*qg):
     return qg
 
 
+@optional_typecheck
 def create_audio_compo(**kwargs) -> gr.Microphone:
     defaults = {
             "type": "filepath",
@@ -358,6 +372,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
     return gr.Microphone(**defaults)
 
 
+@optional_typecheck
 @trace
 def roll_audio(*slots) -> List[dict]:
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
@@ -429,7 +444,8 @@ tail = """
 </div>
 """
 
-def update_audio_slots_txts(gui_enable_dirload, *audio_slots_txts) -> List[str]:
+@optional_typecheck
+def update_audio_slots_txts(gui_enable_dirload: bool, *audio_slots_txts) -> List[str]:
     """ran frequently to update the content of the textbox of each pending
     audio to display the transcription and cloze
     """

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -17,13 +17,15 @@ from iterator_cacher import IteratorCacher
 
 from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
 from .shared_module import shared
+from .typechecker import optional_typecheck
 
 # string at the end of the prompt
 prompt_finish = "\n\n###\n\n"
 
 # used to count the number of tokens for chatgpt
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
-def tkn_len(message):
+@optional_typecheck
+def tkn_len(message: str) -> int:
     return len(tokenizer.encode(dedent(message)))
 
 transcript_template = """
@@ -51,9 +53,11 @@ default_system_prompt = {
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice"]
 
 
-def hasher(text):
+@optional_typecheck
+def hasher(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
+@optional_typecheck
 def embedder(
     text_list: List[str],
     model: str = shared.pv["embed_choice"],
@@ -80,8 +84,9 @@ def embedder(
 
 
 
+@optional_typecheck
 @trace
-def check_prompts(prev_prompts):
+def check_prompts(prev_prompts: List[dict]) -> List[dict]:
     "checks validity of the previous prompts"
     whi("Checking prompt validity")
     for i, mess in enumerate(prev_prompts):
@@ -144,8 +149,9 @@ def check_prompts(prev_prompts):
 
 
 #@Timeout(30)
+@optional_typecheck
 @trace
-def prompt_filter(prev_prompts, max_token, prompt_messages, keywords):
+def prompt_filter(prev_prompts: List[dict], max_token: int, prompt_messages: List[dict], keywords: Optional[List[str]]):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
@@ -338,8 +344,9 @@ def prompt_filter(prev_prompts, max_token, prompt_messages, keywords):
     return output_pr
 
 
+@optional_typecheck
 @trace
-def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr, txt_context, priority, llm_choice):
+def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_chatgpt_outputstr: str, txt_context: str, priority: int, llm_choice: str):
     whi("Recursively improving")
     if not txt_audio:
         raise Exception(red("No audio transcripts found."))
@@ -396,8 +403,9 @@ def recur_improv(txt_profile, txt_audio, txt_whisp_prompt, txt_chatgpt_outputstr
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
 
+@optional_typecheck
 @trace
-def load_prev_prompts(profile):
+def load_prev_prompts(profile: str) -> List[str]:
     assert Path("profiles/").exists(), "profile directory not found"
     if Path(f"profiles/{profile}/memories.json").exists():
         with open(f"profiles/{profile}/memories.json", "r") as f:
@@ -412,7 +420,8 @@ def load_prev_prompts(profile):
     return prev_prompts
 
 
-def display_price(sld_max_tkn, llm_choice):
+@optional_typecheck
+def display_price(sld_max_tkn: int, llm_choice: str) -> List[str]:
     price = shared.llm_price[llm_choice]
     if isinstance(price, float):
         return f"${price} per second (actual price computation is probably wrong for now!)"
@@ -423,8 +432,9 @@ def display_price(sld_max_tkn, llm_choice):
     message += f"\nRequests per $1: {price_per_dol:.1f} req"
     return message
 
+@optional_typecheck
 @trace
-def get_memories_df(profile):
+def get_memories_df(profile: str) -> pd.DataFrame:
     memories = load_prev_prompts(profile)
     if not memories:
         gr.Warning(red(f"No memories found for profile {profile}"))
@@ -434,8 +444,9 @@ def get_memories_df(profile):
         del memories[i]["role"]
     return pd.DataFrame(memories).reset_index().set_index("n")
 
+@optional_typecheck
 @trace
-def get_message_buffer_df():
+def get_message_buffer_df() -> pd.DataFrame:
     buffer = shared.message_buffer
     if not buffer:
         gr.Warning(red("No message buffer found"))
@@ -444,8 +455,9 @@ def get_message_buffer_df():
         buffer[i]["n"] = i + 1
     return pd.DataFrame(buffer).reset_index().set_index("n")
 
+@optional_typecheck
 @trace
-def get_dirload_df():
+def get_dirload_df() -> pd.DataFrame:
     df = shared.dirload_queue
     # make sure that the index 'n' appears first
     df = df.reset_index().set_index("n").reset_index()

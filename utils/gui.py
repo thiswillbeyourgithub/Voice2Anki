@@ -12,6 +12,7 @@ from .memory import recur_improv, display_price, get_memories_df, get_message_bu
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, qg_add_to_new, qg_add_to_latest
 from .shared_module import shared
 from .html import darkmode_js, html_head, js_longer, js_reset_height, js_load, css
+from .typechecker import optional_typecheck
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -379,7 +380,8 @@ with gr.Blocks(
 
     # events ############################################################
 
-    def save_and_load_gui(value: bool, name: str):
+    @optional_typecheck
+    def save_and_load_gui(value: bool, name: str) -> dict:
         if name == "enable_dirload":
             shared.pv[name] = value
             if value is False:
@@ -499,7 +501,8 @@ with gr.Blocks(
             )
 
     # reload tags and deck list when clicking on settings:
-    def reload_tags_decks():
+    @optional_typecheck
+    def reload_tags_decks() -> dict:
         return {
                 txt_tags: gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True),
                 txt_deck: gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True),

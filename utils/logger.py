@@ -18,9 +18,11 @@ from functools import wraps
 from platformdirs import user_cache_dir, user_log_dir
 
 try:
+    from .typechecker import optional_typecheck
     from .shared_module import shared
 except Exception:
     # needed when calling audio_splitter instead of Voice2Anki
+    from typechecker import optional_typecheck
     from shared_module import shared
 
 cache_dir = Path(user_cache_dir(appname="Voice2Anki"))
@@ -63,6 +65,7 @@ colors = {
         }
 
 
+@optional_typecheck
 def Critical(func: Callable) -> Callable:
     """if this decorator is used, any exception in the wrapped function
     will add to the error message to restart the app.
@@ -77,6 +80,7 @@ def Critical(func: Callable) -> Callable:
     return wrapper
 
 
+@optional_typecheck
 @Critical
 def store_to_db(dictionnary: dict, db_name: str) -> bool:
     """
@@ -102,7 +106,8 @@ def store_to_db(dictionnary: dict, db_name: str) -> bool:
     return True
 
 
-def print_db(db_filename: str):
+@optional_typecheck
+def print_db(db_filename: str) -> str:
     Path("databases").mkdir(exist_ok=True)
     assert Path(f"./databases/{db_filename}").exists(), (
         f"db not found: '{db_filename}'")
@@ -117,6 +122,7 @@ def print_db(db_filename: str):
     return json.dumps(dictionaries, ensure_ascii=False, indent=4)
 
 
+@optional_typecheck
 def get_coloured_logger(color_asked: str) -> Callable:
     """used to print color coded logs"""
     col = colors[color_asked]
@@ -147,6 +153,7 @@ def get_coloured_logger(color_asked: str) -> Callable:
         return inp
     return printer
 
+@optional_typecheck
 def get_log() -> str:
     "frequently called: read the most recent log entries and display it in the output field"
     global last_log_content, latest_tail
@@ -190,6 +197,7 @@ yel = get_coloured_logger("yellow")
 red = get_coloured_logger("red")
 purp = get_coloured_logger("purple")
 
+@optional_typecheck
 def trace(func: Callable) -> Callable:
     """simple wrapper to use as decorator to print when a function is used
     and for how long.
@@ -227,14 +235,17 @@ def trace(func: Callable) -> Callable:
     return wrapper
 
 
+@optional_typecheck
 def Timeout(limit: int) -> Callable:
     """wrapper to add a timeout to function. I had to use threading because
     signal could not be used outside of the main thread in gradio"""
     if shared.disable_timeout:
+        @optional_typecheck
         def decorator(func: Callable) -> Callable:
             return func
         return decorator
 
+    @optional_typecheck
     def decorator(func: Callable) -> Callable:
         if asyncio.iscoroutinefunction(func):
             async def wrapper(*args, **kwargs):
@@ -275,6 +286,7 @@ def Timeout(limit: int) -> Callable:
         return wrapper
     return decorator
 
+@optional_typecheck
 def smartcache(func: Callable) -> Callable:
     """used to decorate a function that is already decorated by a
     joblib.Memory decorator. It stores the hash of the arguments in

@@ -15,49 +15,52 @@ import time
 # import exiftool
 from tqdm import tqdm
 import fire
-from pathlib import Path
+from pathlib import Path, PosixPath
 import os
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence, split_on_silence
 import replicate
 from deepgram import DeepgramClient, PrerecordedOptions
+from typing import List, Optional, Union, Tuple
 
 from logger import whi, yel, red, shared, cache_dir
+from typechecker import optional_typecheck
 
 stt_cache = joblib.Memory(cache_dir / "audio_splitter_cache", verbose=0)
 
 d = datetime.today()
 today = f"{d.day:02d}_{d.month:02d}"
 
+@optional_typecheck
 class AudioSplitter:
     def __init__(
-            self,
-            prompt="Stop! ",
-            debug=False,
+        self,
+        prompt: str = "Stop! ",
+        debug: bool = False,
 
-            stop_list=[
-                re.compile(r"(\W|^)s?top(\W|$)", flags=re.IGNORECASE),
-                ],
-            language="fr",
-            n_todo=1,
+        stop_list: List = [
+            re.compile(r"(\W|^)s?top(\W|$)", flags=re.IGNORECASE),
+            ],
+        language: str = "fr",
+        n_todo: bool = 1,
 
-            stop_source="replicate",
+        stop_source: str = "replicate",
 
-            untouched_dir=None,
-            splitted_dir=None,
-            done_dir=None,
+        untouched_dir: Optional[PosixPath, str] = None,
+        splitted_dir: Optional[PosixPath, str] = None,
+        done_dir: Optional[PosixPath, str] = None,
 
-            trim_splitted_silence=False,
-            global_slowdown_factor=1.0,
-            second_pass_slowdown_factor=1.0,
+        trim_splitted_silence: bool = False,
+        global_slowdown_factor: Union[float, int] = 1.0,
+        second_pass_slowdown_factor: Union[float, int] = 1.0,
 
-            split_audio_longer_than=10,
+        split_audio_longer_than: int = 10,
 
-            remove_silence=True,
-            silence_method="torchaudio",
-            h=False,
-            help=False,
-            ):
+        remove_silence: bool = True,
+        silence_method: str = "torchaudio",
+        h: bool = False,
+        help: bool = False,
+        ):
         """
         prompt: str, default 'Stop! '
             prompt used to guide whisper. None to disable
@@ -246,7 +249,8 @@ class AudioSplitter:
                 for i, a in enumerate(sub_audios)
                 ]
 
-            def threaded_export(audio, path):
+            @optional_typecheck
+            def threaded_export(audio: Optional[AudioSegment], path: Optional[PosixPath]):
                 if audio is None or path is None:
                     assert audio is None and path is None
                     return
@@ -268,6 +272,7 @@ class AudioSplitter:
                     # sub_audio.speedup(spf, chunk_size=300).export(tempf.name, format="mp3")
                     # whi("Saved")
                 audio.export(path, format="mp3")
+
             _ = joblib.Parallel(
                     n_jobs=-1 if not self.debug else 1,
                     backend="threading",
@@ -282,7 +287,8 @@ class AudioSplitter:
                             ))
 
             # run whisper on each split
-            def threaded_whisper(path):
+            @optional_typecheck
+            def threaded_whisper(path: Optional[PosixPath]) -> dict:
                 if path is None:
                     return None
                 transcript = self.run_whisper(audio_path=path, second_pass=True)
@@ -518,7 +524,7 @@ class AudioSplitter:
         red("All done!")
         sys.exit(0)
 
-    def gather_todos(self):
+    def gather_todos(self) -> List[PosixPath]:
         to_split = [p for p in self.unsp_dir.iterdir() if "mp3" in p.suffix or "wav" in p.suffix]
         assert to_split, f"no mp3/wav found in {self.unsp_dir}"
         # to_split = sorted(to_split, key=lambda x: x.stat().st_mtime)
@@ -528,7 +534,7 @@ class AudioSplitter:
 
         return to_split
 
-    def split_one_transcript(self, transcript, second_pass):
+    def split_one_transcript(self, transcript: dict, second_pass: bool) -> Tuple[List[Optional[List[int]]], List[Optional[dict]]]:
         duration = transcript["segments"][-1]["end"]
         full_text = transcript["transcription"]
         if not second_pass:
@@ -672,7 +678,7 @@ class AudioSplitter:
 
         return times_to_keep, metadata
 
-    def run_whisper(self, audio_path, second_pass):
+    def run_whisper(self, audio_path: PosixPath, second_pass: bool) -> dict:
         audio_path = str(audio_path)
         if not second_pass:
             whi(f"Running whisper on {audio_path}")
@@ -795,7 +801,7 @@ class AudioSplitter:
 
         return transcript
 
-    def run_whisper_long(self, audio_path, audio):
+    def run_whisper_long(self, audio_path: PosixPath, audio: AudioSegment) -> dict:
         """for audio longer than some threshold (say 10 minutes) then in the
         first pass it makes sense to split the audio, use multithreading to
         transcribe it, then merge the transcripts (taking care of the
@@ -825,7 +831,8 @@ class AudioSplitter:
                 for i in range(len(splits))]
 
         # multithreaded export as mp3
-        def threaded_export(audio, path):
+        @optional_typecheck
+        def threaded_export(audio: AudioSegment, path: PosixPath) -> None:
             audio.export(path, format="mp3")
         joblib.Parallel(
                 n_jobs=-1 if not self.debug else 1,
@@ -844,7 +851,8 @@ class AudioSplitter:
         assert all(Path(t).exists() for t in tempfiles), "missing temp files"
 
         # run whisper on each split
-        def threaded_whisper(path):
+        @optional_typecheck
+        def threaded_whisper(path: PosixPath) -> dict:
             return self.run_whisper(audio_path=path, second_pass=False)
         tscripts = joblib.Parallel(
                 n_jobs=-1 if not self.debug else 1,
@@ -893,7 +901,7 @@ class AudioSplitter:
         assert transcript["segments"][0]["start"] >= 0, "Unexpected length"
         return transcript
 
-    def trim_silences(self, audio, dbfs_threshold=-50, depth=0):
+    def trim_silences(self, audio: AudioSegment, dbfs_threshold: int = -50, depth: int = 0) -> AudioSegment:
         if depth >= 10:
             red("Recursion limit of self.trim_silences reached, not trimming this split.")
             return audio
@@ -917,7 +925,7 @@ class AudioSplitter:
         else:
             return trimmed
 
-    def unsilence_audio(self, file):
+    def unsilence_audio(self, file: PosixPath) -> PosixPath:
         whi(f"Removing silence from {file}")
 
         audio = AudioSegment.from_mp3(file)
@@ -994,13 +1002,14 @@ class AudioSplitter:
 
         return new_filename
 
-    def exec(self, cmd):
+    def exec(self, cmd: str) -> None:
         whi(f"Shell command: {cmd}")
         os.system(cmd)
 
 
+@optional_typecheck
 @stt_cache.cache(ignore=["audio_path"])
-def whisper_splitter(audio_path, audio_hash, **kwargs):
+def whisper_splitter(audio_path: PosixPath, audio_hash: str, **kwargs) -> dict:
     whi(f"Starting replicate (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")

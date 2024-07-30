@@ -18,25 +18,29 @@ import time
 import urllib.request
 import json
 from py_ankiconnect import PyAnkiconnect
+from typing import Any
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
 from .media import format_audio_component
-
-
-def _request_wrapper(action, **params):
-    return {'action': action, 'params': params, 'version': 6}
+from .typechecker import optional_typecheck
 
 
 call_anki = PyAnkiconnect()
 
-async def anki_request_async(url: str, request: str):
+@optional_typecheck
+def _request_wrapper(action: str, **params):
+    return {'action': action, 'params': params, 'version': 6}
+
+@optional_typecheck
+async def anki_request_async(url: str, request: str) -> dict:
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=request) as response:
             return await response.json()
 
 
-async def async_call_anki(action, **params):
+@optional_typecheck
+async def async_call_anki(action: str, **params) -> Any:
     """ ASYNC duplicate of call_anki"""
 
     requestJson = json.dumps(
@@ -64,6 +68,7 @@ async def async_call_anki(action, **params):
     return response['result']
 
 
+@optional_typecheck
 @trace
 def check_anki_models() -> None:
     """checks for notetype in anki, if no appropriate model is found, create
@@ -93,6 +98,7 @@ def check_anki_models() -> None:
     whi(f"Anki notetype detected: '{shared.anki_notetype}'")
 
 
+@optional_typecheck
 @trace
 def add_note_to_anki(
         bodies: List[str],
@@ -100,7 +106,7 @@ def add_note_to_anki(
         source_extra: str,
         source_audio: str,
         notes_metadata: List[dict],
-        tags: List,
+        tags: List[str],
         deck_name: str = "Default",
         ) -> List[Union[int, str]]:
     """create a new cloze directly in anki"""
@@ -147,6 +153,7 @@ def add_note_to_anki(
     return res
 
 
+@optional_typecheck
 @trace
 def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
     whi("Sending audio to anki")
@@ -201,6 +208,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
 
 @trace
 @Timeout(5)
+@optional_typecheck
 async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
@@ -251,6 +259,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> Union[str, bool]:
             return "MISSING"
 
 
+@optional_typecheck
 @trace
 async def sync_anki() -> None:
     "trigger anki synchronization"
@@ -260,6 +269,7 @@ async def sync_anki() -> None:
     # time.sleep(1)  # wait for sync to finish, just in case
 
 
+@optional_typecheck
 @trace
 async def mark_previous_notes() -> None:
     "add or remove the tag 'marked' to the latest added notes."
@@ -290,6 +300,7 @@ async def mark_previous_notes() -> None:
         gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
 
 
+@optional_typecheck
 @trace
 async def suspend_previous_notes() -> None:
     "suspend the latest added notes."
@@ -334,6 +345,7 @@ async def suspend_previous_notes() -> None:
                 ), "cards failed to suspend?"
 
 
+@optional_typecheck
 def get_anki_content(nid: List[Union[str, int]]) -> str:
     "retrieve the content of the body of an anki note"
     nid = [int(n) for n in nid]
@@ -350,6 +362,7 @@ def get_anki_content(nid: List[Union[str, int]]) -> str:
 
 
 # @trace
+@optional_typecheck
 def get_anki_tags() -> List[str]:
     try:
         return call_anki(
@@ -360,6 +373,7 @@ def get_anki_tags() -> List[str]:
 
 
 # @trace
+@optional_typecheck
 def get_decks() -> List[str]:
     try:
         return call_anki(

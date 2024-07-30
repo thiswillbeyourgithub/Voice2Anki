@@ -1,11 +1,14 @@
 import time
 import os
 import tempfile
-from pathlib import Path
+from pathlib import Path, PosixPath
 from threading import Lock
 import gradio as gr
 import pandas as pd
 import litellm
+from typing import Optional, Any, Callable, List
+
+from .typechecker import optional_typecheck
 
 # used to print in red
 col_red = "\033[91m"
@@ -24,39 +27,40 @@ class DF(pd.DataFrame):
             raise ValueError(f"Adding new columns is not allowed: key={key} value={value}")
 
 
+@optional_typecheck
 class SharedModule:
     """module used to store information from Voice2Anki.py to
     the main .py files"""
     # things that are not changed when self.reset is called
-    VERSION = 1.0
-    _instance = None  # singleton
-    anki_media = None
-    debug = None
-    disable_tracing = None
-    disable_timeout = None
-    widen_screen = None
-    big_font = None
-    timeout_lock = Lock()
-    dirload_lock = Lock()
-    thread_lock = Lock()
-    db_lock = Lock()
-    openai_client = None
-    user_chains = None
-    anki_notetype = None
+    VERSION: str = "2.0"
+    _instance: Optional[Any] = None  # singleton
+    anki_media: Optional[PosixPath] = None
+    debug: Optional[bool] = None
+    disable_tracing: Optional[bool] = None
+    disable_timeout: Optional[bool] = None
+    widen_screen: Optional[bool] = None
+    big_font: Optional[bool] = None
+    timeout_lock: Lock = Lock()
+    dirload_lock: Lock = Lock()
+    thread_lock: Lock = Lock()
+    db_lock: Lock = Lock()
+    openai_client: Optional[Any] = None
+    user_chains: Optional[Callable] = None
+    anki_notetype: Optional[str] = None
 
-    stt_models = ["openai:whisper-1", "replicate:vaibhavs10/incredibly-fast-whisper"]
+    stt_models: List[str] = ["openai:whisper-1", "replicate:vaibhavs10/incredibly-fast-whisper"]
 
-    llm_price = {k: v for k, v in litellm.model_cost.items()}
+    llm_price: dict = {k: v for k, v in litellm.model_cost.items()}
 
     # embeddings are so cheap I don't even count the number of tokens
-    embedding_models = [
+    embedding_models: List[str] = [
             "openai/text-embedding-3-large",
             "openai/text-embedding-3-small",
             "mistral/mistral-embed",
             ]
 
     # sox effect when loading a sound
-    preprocess_sox_effects = [
+    preprocess_sox_effects: List[str] = [
             # normalize audio
             ["norm"],
 
@@ -83,7 +87,7 @@ class SharedModule:
             ]
 
     # sox effect when forcing the processing of a sound
-    force_preprocess_sox_effects = [
+    force_preprocess_sox_effects: List[str] = [
             # normalize audio
             ["norm"],
 
@@ -106,7 +110,7 @@ class SharedModule:
             ]
 
     # sox effects when splitting long audio
-    splitter_sox_effects = [
+    splitter_sox_effects: List[str] = [
             # ["norm"],  # normalize audio
 
             # isolate voice frequency
@@ -124,12 +128,12 @@ class SharedModule:
             ["norm"],
             ]
 
-    max_message_buffer = 20
+    max_message_buffer: int = 20
 
-    audio_slot_nb = None
-    queued_gallery_slot_nb = 99
+    audio_slot_nb: Optional[int] = None
+    queued_gallery_slot_nb: int = 99
 
-    dirload_queue_columns = [
+    dirload_queue_columns: List[str] = [
             "n",
             "path",
             "temp_path",
@@ -142,22 +146,22 @@ class SharedModule:
             ]
 
     # things that are reset on self.reset
-    pv = None
-    initialized = 0
+    pv: Optional[ValueStorage] = None
+    initialized: int = 0
     request = None
 
-    tmp_dir = Path(tempfile.NamedTemporaryFile().name).parent
-    splitted_dir = None
-    done_dir = None
-    unsplitted_dir = None
-    func_dir = None
+    tmp_dir: PosixPath = Path(tempfile.NamedTemporaryFile().name).parent
+    splitted_dir: Optional[PosixPath] = None
+    done_dir: Optional[PosixPath] = None
+    unsplitted_dir: Optional[PosixPath] = None
+    func_dir: Optional[PosixPath] = None
 
-    message_buffer = []
-    dirload_queue = DF(columns=dirload_queue_columns).set_index("path")
+    message_buffer: List[dict] = []
+    dirload_queue: DF = DF(columns=dirload_queue_columns).set_index("path")
 
-    llm_to_db_buffer = {}
+    llm_to_db_buffer: dict = {}
 
-    running_threads = {
+    running_threads: dict = {
             "saving_chatgpt": [],
             "saving_whisper": [],
             "transcribing_audio": [],
@@ -165,9 +169,9 @@ class SharedModule:
             "ocr": [],
             "timeout": [],
             }
-    smartcache = {}
+    smartcache: dict = {}
 
-    added_note_ids = []
+    added_note_ids: List[int] = []
 
     def __new__(cls):
         "make sure the isntance will be a singleton"
@@ -175,7 +179,7 @@ class SharedModule:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def reset(self, request: gr.Request):
+    def reset(self, request: gr.Request) -> None:
         "used to reset the values when the gradio page is reloaded"
         self.dirload_queue = DF(columns=self.dirload_queue_columns).set_index("path")
         self.llm_to_db_buffer = {}
@@ -216,7 +220,7 @@ class SharedModule:
         if self.initialized > 1:
             p(f"Shared module initialized {self.initialized} times.")
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value) -> None:
         "forbid creation of new attributes."
         if hasattr(self, name):
 
@@ -230,7 +234,8 @@ class SharedModule:
             raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
 
 
-def p(message):
+@optional_typecheck
+def p(message: str) -> None:
     print(col_red + message + col_rst)
     gr.Warning(message)
 

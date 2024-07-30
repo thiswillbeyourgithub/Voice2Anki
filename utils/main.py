@@ -1,4 +1,4 @@
-from typing import Union, List, Callable
+from typing import Union, List, Callable, Optional
 import os
 import asyncio
 import pickle
@@ -15,7 +15,7 @@ from functools import wraps
 import rtoml
 import time
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PosixPath
 
 import cv2
 import gradio as gr
@@ -32,6 +32,7 @@ from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache, Crit
 from .memory import prompt_filter, load_prev_prompts, tkn_len, transcript_template, default_system_prompt
 from .media import sound_preprocessing, get_img_source, format_audio_component
 from .profiles import ValueStorage
+from .typechecker import optional_typecheck
 
 litellm.set_verbose = False  #shared.debug
 shared.pv = ValueStorage()
@@ -45,6 +46,7 @@ llm_cache = joblib.Memory("cache/llm_cache", verbose=0)
 
 
 @trace
+@optional_typecheck
 def clear_cache() -> None:
     # reset the llm and stt cache to make sure shared.llm_to_db_buffer is up to date
     llm_cache.clear()
@@ -52,12 +54,14 @@ def clear_cache() -> None:
 
 
 @trace
+@optional_typecheck
 def pop_buffer() -> None:
     "remove the latest card from message buffer"
     removed = shared.message_buffer.pop(-1)
     shared.pv["message_buffer"] = shared.message_buffer
     red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
 
+@optional_typecheck
 def floatizer(func: Callable) -> Callable:
     "used to cast the ints as float to make sure the cache is used"
     @wraps(func)
@@ -67,6 +71,7 @@ def floatizer(func: Callable) -> Callable:
         return func(*args, **kwargs)
     return wrapper
 
+@optional_typecheck
 def stripizer(func: Callable) -> Callable:
     """wrapper for alfred to make sure to strip the txt_audio"""
     @wraps(func)
@@ -80,6 +85,7 @@ def stripizer(func: Callable) -> Callable:
         return func(*args, **kwargs)
     return wrapper
 
+@optional_typecheck
 def split_txt_audio(txt_audio: str) -> str:
     """if the txt audio contains "STOP" then it must be replaced by \n\n so
     that alfred treats them as separate notes"""
@@ -97,6 +103,7 @@ def split_txt_audio(txt_audio: str) -> str:
 
 
 @floatizer
+@optional_typecheck
 @trace
 @smartcache
 @stt_cache.cache(ignore=["audio_path"])
@@ -209,8 +216,9 @@ def whisper_cached(
         raise Exception(red(f"Error when cache transcribing audio: '{err}'"))
 
 
+@optional_typecheck
 @trace
-def thread_whisp_then_llm(audio_mp3) -> None:
+def thread_whisp_then_llm(audio_mp3: Optional[PosixPath, str]) -> None:
     """run whisper on the audio and return nothing. This is used to cache in
     advance and in parallel the transcription."""
     if audio_mp3 is None:
@@ -273,6 +281,7 @@ def thread_whisp_then_llm(audio_mp3) -> None:
         gr.Warning(red(f"Failed anticipating Alfred call: {err}"))
 
 
+@optional_typecheck
 @trace
 def transcribe(audio_mp3_1: Union[str, dict]) -> str:
     "turn the 1st audio track into text"
@@ -343,6 +352,7 @@ def transcribe(audio_mp3_1: Union[str, dict]) -> str:
         raise Exception(red(f"Error when transcribing audio: '{err}'"))
 
 
+@optional_typecheck
 @trace
 def flag_audio(
         txt_profile: str,
@@ -396,6 +406,7 @@ def flag_audio(
 
 
 @stripizer
+@optional_typecheck
 @trace
 def pre_alfred(
         txt_audio: str,
@@ -568,6 +579,7 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 
 @stripizer
 @floatizer
+@optional_typecheck
 @trace
 @Timeout(60)
 @smartcache
@@ -722,6 +734,7 @@ def alfred(
     return cloz
 
 
+@optional_typecheck
 @trace
 @Critical
 def dirload_splitted(checkbox: bool, *audios: List) -> List[Union[dict, gr.Audio, str]]:
@@ -873,6 +886,7 @@ def dirload_splitted(checkbox: bool, *audios: List) -> List[Union[dict, gr.Audio
 
     return output
 
+@optional_typecheck
 @trace
 @Critical
 def dirload_splitted_last(checkbox: bool) -> Union[str, gr.Audio, dict]:
@@ -881,6 +895,7 @@ def dirload_splitted_last(checkbox: bool) -> Union[str, gr.Audio, dict]:
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
     return dirload_splitted(checkbox, *audios)[-1]
 
+@optional_typecheck
 @trace
 def audio_edit(
         audio: Union[str, dict],
@@ -1046,6 +1061,7 @@ def audio_edit(
 
     return cloz, None, None
 
+@optional_typecheck
 @trace
 def gather_threads(thread_keys: List[str]) -> None:
     n_running = {k: sum([t.is_alive() for t in threads]) for k, threads in shared.running_threads.items() if k == thread_keys}
@@ -1060,6 +1076,7 @@ def gather_threads(thread_keys: List[str]) -> None:
             yel(f"Waiting for {sum(n_running.values())} threads to finish from {thread_keys}")
         time.sleep(0.1)
 
+@optional_typecheck
 @trace
 def wait_for_queue(q: queue.Queue, source: str, t=1):
     "source : https://stackoverflow.com/questions/19206130/does-queue-get-block-main"
@@ -1075,6 +1092,7 @@ def wait_for_queue(q: queue.Queue, source: str, t=1):
     return data
 
 
+@optional_typecheck
 @trace
 def kill_threads() -> None:
     """the threads in timeout are stored in the shared module, if they
@@ -1092,6 +1110,7 @@ def kill_threads() -> None:
             shared.smartcache.clear()
 
 
+@optional_typecheck
 @trace
 def Voice2Anki_db_save(
         txt_chatgpt_cloz: str,
@@ -1146,6 +1165,7 @@ def Voice2Anki_db_save(
         shared.running_threads["saving_whisper"].append(thread)
 
 
+@optional_typecheck
 @trace
 def to_anki(
         audio_mp3_1: Union[dict, str],

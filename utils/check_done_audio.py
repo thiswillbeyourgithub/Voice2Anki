@@ -2,16 +2,19 @@ import shutil
 import hashlib
 from tqdm import tqdm
 import time
-from pathlib import Path
+from pathlib import Path, PosixPath
 import ankipandas as akp
 import fire
 from pydub import AudioSegment
 from joblib import Memory
+from typing import Optional, List
 
 from logger import red, whi, cache_dir
 
+from typechecker import optional_typecheck
 
-def hasher(text):
+@optional_typecheck
+def hasher(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
 
@@ -22,13 +25,14 @@ def get_audio_length(path, filehash):
     audio = AudioSegment.from_mp3(path)
     return len(audio)
 
+@optional_typecheck
 class DoneAudioChecker:
     def __init__(
-            self,
-            profile,
-            anki_profile,
-            exclude_list=None,
-            ):
+        self,
+        profile: PosixPath,
+        anki_profile: str,
+        exclude_list: Optional[List] = None,
+        ):
         profile = Path("./profiles/" + profile)
         self.unsp_dir = profile / "queues/audio_untouched"
         self.sp_dir = profile / "queues/audio_splits"
