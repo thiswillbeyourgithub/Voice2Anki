@@ -270,6 +270,25 @@ async def mark_previous_note() -> None:
                 )
         gr.Warning(red(f"Marked anki notes: {','.join([str(n) for n in nids])}\nBodies:\n{bodies}"))
 
+@optional_typecheck
+@trace
+async def add_to_more_of_previous_note(more_content: str) -> None:
+    "add or remove the tag 'marked' to the latest added notes."
+    if not shared.added_note_ids:
+        raise Exception(red("No note ids found."))
+    nids = shared.added_note_ids[-1]
+    more_content = more_content.strip()
+    assert more_content
+
+    for nid in nids:
+        await async_call_anki(
+            action="updateNoteFields",
+            note={
+                "id": nid,
+                "fields": {"more": more_content},
+            }
+        )
+    gr.Warning(red(f"Edited anki notes: {','.join([str(n) for n in nids])}"))
 
 @optional_typecheck
 @trace

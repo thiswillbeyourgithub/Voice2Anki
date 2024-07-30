@@ -6,7 +6,7 @@ from gradio.themes.utils import sizes as theme_size
 
 from .profiles import get_profiles, switch_profile, load_user_functions, load_user_chain, call_user_chain
 from .main import transcribe, alfred, to_anki, dirload_splitted, dirload_splitted_last, kill_threads, audio_edit, flag_audio, pop_buffer, clear_cache
-from .anki_utils import sync_anki, get_card_status, mark_previous_note, suspend_previous_notes, get_anki_tags, get_decks
+from .anki_utils import sync_anki, get_card_status, mark_previous_note, suspend_previous_notes, get_anki_tags, get_decks, add_to_more_of_previous_note
 from .logger import get_log, red, yel
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, qg_add_to_new, qg_add_to_latest
@@ -86,6 +86,7 @@ with gr.Blocks(
         with gr.Row():
             with gr.Column(scale=2, variant="compact", min_width=100):
                 with gr.Row():
+                    send_more_to_previous = gr.Textbox(value=None, placheolder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=1, max_line=5)
                     mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=3, min_width=75)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
             with gr.Column(scale=1, min_width=100):
@@ -563,7 +564,14 @@ with gr.Blocks(
             show_progress=False,
             )
 
-    # suspend the previous cards
+    # send some text to the more field
+    send_more_to_previous.submit(
+        fn=add_to_more_of_previous_note,
+        inputs=[send_more_to_previous],
+        output=[send_more_to_previous],
+        show_progress=False,
+    )
+
     suspend_previous.click(
             fn=suspend_previous_notes,
             show_progress=False,
