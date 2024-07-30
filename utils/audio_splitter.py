@@ -22,6 +22,9 @@ from pydub.silence import detect_leading_silence, split_on_silence
 import replicate
 from deepgram import DeepgramClient, PrerecordedOptions
 from typing import List, Optional, Union, Tuple
+import pdb
+import faulthandler
+import traceback
 
 from logger import whi, yel, red, shared, cache_dir
 from typechecker import optional_typecheck
@@ -68,6 +71,7 @@ class AudioSplitter:
         debug: bool, default False
             if True, a breakpoint() will be called before exporting the splits
             and the original audio will not be moved. Also disabled multithreading.
+            Also automatically open the debugger in case of issue.
 
         stop_list: list, default re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE)
             list of strings that when found will trigger the audio splitting.
@@ -119,6 +123,30 @@ class AudioSplitter:
         """
         if h or help:
             return help(self)
+
+        if debug:
+            def handle_exception(exc_type, exc_value, exc_traceback):
+                if not issubclass(exc_type, KeyboardInterrupt):
+                    @optional_typecheck
+                    def p(message: str) -> None:
+                        "print error, in red if possible"
+                        try:
+                            red(message)
+                        except Exception as err:
+                            print(message)
+                    p("\n--verbose was used so opening debug console at the "
+                      "appropriate frame. Press 'c' to continue to the frame "
+                      "of this print.")
+                    [p(line) for line in traceback.format_tb(exc_traceback)]
+                    p(str(exc_type) + " : " + str(exc_value))
+                    pdb.post_mortem(exc_traceback)
+                    p("You are now in the exception handling frame.")
+                    breakpoint()
+                    sys.exit(1)
+
+            sys.excepthook = handle_exception
+            faulthandler.enable()
+
 
         # replicate has to be imported after the api is loader
         assert "REPLICATE_API_KEY" in os.environ or "DEEPGRAM_API_KEY" in os.environ, f"missing DEEPGRAM_API_KEY or REPLICATE_API_KEY in environment"
