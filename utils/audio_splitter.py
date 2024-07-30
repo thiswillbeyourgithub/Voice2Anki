@@ -71,7 +71,9 @@ class AudioSplitter:
         debug: bool, default False
             if True, a breakpoint() will be called before exporting the splits
             and the original audio will not be moved. Also disabled multithreading.
-            Also automatically open the debugger in case of issue.
+            Also automatically open the debugger in case of issue, and before
+            the final export opens a breakpoint() to let you check everything
+            is in order.
 
         stop_list: list, default re.compile(r"[\W^]s?top[\W$]", flags=re.IGNORECASE)
             list of strings that when found will trigger the audio splitting.
