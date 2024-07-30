@@ -11,7 +11,7 @@ from .logger import get_log, red, yel
 from .memory import recur_improv, display_price, get_memories_df, get_message_buffer_df, get_dirload_df
 from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_image, roll_queued_galleries, create_audio_compo, roll_audio, force_sound_processing, update_audio_slots_txts, qg_add_to_new, qg_add_to_latest
 from .shared_module import shared
-from .html import darkmode_js, html_head, js_longer, js_reset_height, js_load, css
+from .html_js_css import darkmode_js, html_head, js_longer, js_reset_height, js_load, css
 from .typechecker import optional_typecheck
 
 theme = gr.themes.Soft(
