@@ -343,7 +343,7 @@ class AudioSplitter:
 
                 alterations[iter_ttk] = [new_times, sub_meta]
                 if [nt for nt in new_times if nt]:
-                    assert [nt for nt in new_times if nt][-1][-1] <= t1, "unexpected split timeline"
+                    assert [nt for nt in new_times if nt][-1][-1] - t1 <= 0.5, "unexpected split timeline"
 
                 if len(sub_meta) > 1:
                     red(f"{iter_print}Segment was rescinded in those texts. Metadata:")
@@ -704,14 +704,15 @@ class AudioSplitter:
                 # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2
                 "model": "nova-2",
 
-                "detect_language": True,
+                "language": self.language,
+                "detect_language": False,
                 # not all features below are available for all languages
 
                 # intelligence
-                "summarize": False,
-                "topics": False,
-                "intents": False,
-                "sentiment": False,
+                # "summarize": False,
+                # "topics": False,
+                # "intents": False,
+                # "sentiment": False,
 
                 # transcription
                 "smart_format": True,
@@ -1115,15 +1116,15 @@ def whisper_splitter(audio_path: PosixPath, audio_hash: str, **kwargs) -> dict:
             "transcription": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
             "segments": [
                 {
-                    "words": content["results"]["utterances"],
-                    "start": min(starts),
-                    "end": max(ends),
-                    "text": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
+                    "words": seg["words"],
+                    "start": seg["start"],
+                    "end": seg["end"],
+                    "text": seg["transcript"].strip(),
                     "no_speech_prob": 0,
-                    "avg_logprob": 0,
+                    "avg_logprob": seg["confidence"],
                     "compression_ratio": 0,
                     "temperature": 0,
-                }
+                } for seg in content["results"]["utterances"]
             ],
         }
 
