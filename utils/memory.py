@@ -431,7 +431,7 @@ def display_price(sld_max_tkn: int, llm_choice: str) -> str:
     price = shared.llm_price[llm_choice]
     if isinstance(price, float):
         return f"${price} per second (actual price computation is probably wrong for now!)"
-    price_adj = price[0] * 0.9 + price[1] * 0.1
+    price_adj = price["input_cost_per_token"] * 0.9 + price["output_cost_per_token"] * 0.1
     price_per_request = price_adj * sld_max_tkn / 1000
     price_per_dol = round(1 / price_per_request, 0)
     message = f"Price if all tokens used: ${price_per_request:.5f}."
