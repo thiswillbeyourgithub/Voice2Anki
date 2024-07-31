@@ -111,10 +111,10 @@ def split_txt_audio(txt_audio: str) -> str:
 @smartcache
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_cached(
-        audio_path: str,
+        audio_path: Union[str, PosixPath],
         audio_hash: str,
-        txt_whisp_prompt: str,
-        txt_whisp_lang: str,
+        txt_whisp_prompt: Optional[str],
+        txt_whisp_lang: Optional[str],
         sld_whisp_temp: Union[float, int],
         stt_model: str,
         ) -> dict:

@@ -193,7 +193,7 @@ def reset_audio() -> List[dict]:
 
 @optional_typecheck
 @trace
-def sound_preprocessing(audio_mp3_path: PosixPath) -> PosixPath:
+def sound_preprocessing(audio_mp3_path: Union[PosixPath, str]) -> PosixPath:
     "removing silence, maybe try to enhance audio, apply filters etc"
     whi(f"Preprocessing {audio_mp3_path}")
 
