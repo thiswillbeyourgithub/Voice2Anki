@@ -179,10 +179,10 @@ with gr.Blocks(
                 check_enable_queued_gallery = gr.Checkbox(value=shared.pv["enable_queued_gallery"], interactive=True, label="Gallery queue", show_label=True, elem_id="js_guienablequeuedgallery")
             with gr.Row():
                 check_enable_flagging = gr.Checkbox(value=shared.pv["enable_flagging"], interactive=True, label="Flagging", show_label=True)
+            with gr.Row():
+                txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="V2A profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
 
         with gr.Tab(label="Anki", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
-            with gr.Row():
-                txt_profile = gr.Dropdown(value=shared.pv.profile_name, label="Profile", choices=get_profiles(), multiselect=False, allow_custom_value=True)
             with gr.Row():
                 txt_deck = gr.Dropdown(value=shared.pv["txt_deck"], label="Deck name", multiselect=False, choices=get_decks(), allow_custom_value=True)
                 txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
