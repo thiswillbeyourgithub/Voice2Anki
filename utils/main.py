@@ -191,12 +191,6 @@ def whisper_cached(
                             detect_language=False,
                             # not all features below are available for all languages
 
-                            # intelligence
-                            # summarize=False,
-                            # topics=False,
-                            # intents=False,
-                            # sentiment=False,
-
                             # transcription
                             smart_format=True,
                             punctuate=True,
@@ -206,17 +200,23 @@ def whisper_cached(
                             # dictation=False,
                             detect_entities=False,
                             detect_topics=False,
-                            filler_words=True,
+                            filler_words=False,
                             keywords=keywords,
                             measurements=True,
                             numerals=True,
-
-                            # redact=None,
-                            # replace=None,
-                            # search=None,
-                            # keywords=None,
-                            # filler_words=False,
                         )
+                        if txt_whisp_lang == "en":
+                            options.update(dict(
+                                # intelligence
+                                summarize=False,
+                                topics=False,
+                                intents=False,
+                                sentiment=False,
+
+                                filler_words=True,
+                                )
+                            )
+
                         options = PrerecordedOptions(**options)
                         payload = {"buffer": audio_path.read()}
                         transcript = client.listen.prerecorded.v("1").transcribe_file(
