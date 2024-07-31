@@ -409,7 +409,7 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
 
 @optional_typecheck
 @trace
-def load_prev_prompts(profile: str) -> List[str]:
+def load_prev_prompts(profile: str) -> List[dict]:
     assert Path("profiles/").exists(), "profile directory not found"
     if Path(f"profiles/{profile}/memories.json").exists():
         with open(f"profiles/{profile}/memories.json", "r") as f:
