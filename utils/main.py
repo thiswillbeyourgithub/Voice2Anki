@@ -203,7 +203,7 @@ def whisper_cached(
                             paragraphs=False,
                             utterances=True,
                             diarize=False,
-                            dictation=False,
+                            # dictation=False,
                             detect_entities=False,
                             detect_topics=False,
                             filler_words=True,
@@ -798,7 +798,7 @@ def alfred(
 @optional_typecheck
 @trace
 @Critical
-def dirload_splitted(checkbox: bool, *audios: List) -> List[Union[dict, gr.Audio, str]]:
+def dirload_splitted(checkbox: bool, *audios: Optional[List]) -> List[Union[dict, gr.Audio, str]]:
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
