@@ -1285,14 +1285,15 @@ def to_anki(
             shared.running_threads["ocr"].append(thread)
 
     # send audio to anki
-    add_audio_to_anki_queue = queue.Queue()
-    thread = threading.Thread(
-            target=add_audio_to_anki,
-            args=(audio_mp3_1, add_audio_to_anki_queue),
-            )
-    thread.start()
-    with shared.thread_lock:
-        shared.running_threads["add_audio_to_anki"].append(thread)
+    if audio_mp3_1 is not None:
+        add_audio_to_anki_queue = queue.Queue()
+        thread = threading.Thread(
+                target=add_audio_to_anki,
+                args=(audio_mp3_1, add_audio_to_anki_queue),
+                )
+        thread.start()
+        with shared.thread_lock:
+            shared.running_threads["add_audio_to_anki"].append(thread)
 
     # send to anki
     metadata = {
@@ -1324,7 +1325,10 @@ def to_anki(
     whi("Sending to anki:")
 
     # sending sound file to anki media
-    audio_html = wait_for_queue(add_audio_to_anki_queue, "add_audio_to_anki")
+    if audio_mp3_1 is not None:
+        audio_html = wait_for_queue(add_audio_to_anki_queue, "add_audio_to_anki")
+    else:
+        audio_html = "No audio"
     if "Error" in audio_html:  # then out is an error message and not the source
         gather_threads(["add_audio_to_anki", "ocr"])
         raise Exception(f"Error in audio_html: '{audio_html}'")
