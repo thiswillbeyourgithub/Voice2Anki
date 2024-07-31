@@ -124,7 +124,7 @@ class ValueStorage:
             def create_save_method(key: str) -> Callable:
                 #@trace
                 @optional_typecheck
-                def save_method(value) -> Callable:
+                def save_method(value) -> None:
                     self.__setitem__(key, value)
                 return save_method
 
