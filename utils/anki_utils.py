@@ -27,8 +27,9 @@ from .media import format_audio_component
 from .typechecker import optional_typecheck
 
 
-call_anki = PyAnkiconnect(async_mode=False)
-async_call_anki = PyAnkiconnect(async_mode=True)
+# PyAnkiconnect automatically use async if called from async
+call_anki = PyAnkiconnect(force_async_mode=False)
+
 
 @optional_typecheck
 def _request_wrapper(action: str, **params):
@@ -224,14 +225,14 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         for cl in cloz:
             query += f" body:\"*{cl}*\""
         query = query.strip()
-        state = await async_call_anki(action="findNotes", query=query)
+        state = await call_anki(action="findNotes", query=query)
         if state:
             return "Added"
         else:
-            recent = await async_call_anki(action="findNotes", query="added:2")
+            recent = await call_anki(action="findNotes", query="added:2")
             if not recent:
                 return "MISSING"
-            bodies = get_anki_content(nid=recent)
+            bodies = await get_anki_content(nid=recent)
             if txt_chatgpt_cloz in bodies:
                 return "Added"
             if all(c in bodies for c in cloz):
@@ -250,7 +251,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
 @trace
 async def sync_anki() -> None:
     "trigger anki synchronization"
-    sync_output = await async_call_anki(action="sync")
+    sync_output = await call_anki(action="sync")
     assert sync_output is None or sync_output == "None", (
         f"Error during sync?: '{sync_output}'")
     # time.sleep(1)  # wait for sync to finish, just in case
@@ -265,22 +266,22 @@ async def mark_previous_note() -> None:
     nids = shared.added_note_ids[-1]
     assert nids
 
-    bodies = get_anki_content(nid=nids)
+    bodies = await get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
 
-    current = [await async_call_anki(
+    current = [await call_anki(
         action="getNoteTags",
         note=int(n)) for n in nids]
 
     if all("marked" in t for t in current):
-        await async_call_anki(
+        await call_anki(
                 action="removeTags",
                 notes=nids,
                 tags="marked",
                 )
         gr.Warning(red(f"Note ids were already marked. Unmarking them.\nBodies:\n{bodies}"))
     else:
-        await async_call_anki(
+        await call_anki(
                 action="addTags",
                 notes=nids,
                 tags="marked",
@@ -298,11 +299,11 @@ async def add_to_more_of_previous_note(more_content: str) -> None:
     more_content = more_content.strip()
     assert more_content
 
-    bodies = get_anki_content(nid=nids)
+    bodies = await get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
 
     for nid in nids:
-        await async_call_anki(
+        await call_anki(
             action="updateNoteFields",
             note={
                 "id": nid,
@@ -320,37 +321,37 @@ async def suspend_previous_notes() -> None:
     nids = shared.added_note_ids[-1]
     assert nids
     s_nids = [str(n) for n in nids]
-    cids = await async_call_anki(
+    cids = await call_anki(
             action="findCards",
             query="nid:" + ",".join(s_nids),
             )
     assert cids, "No card ids found for the given note ids: {','.join(s_nids)}"
-    status = await async_call_anki(
+    status = await call_anki(
             action="areSuspended",
             cards=cids,
             )
 
-    bodies = get_anki_content(nid=nids)
+    bodies = await get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
     if all(status):
         gr.Warning(red(f"Previous notes already suspended so UNsuspending them:\n{bodies}"))
-        out = await async_call_anki(
+        out = await call_anki(
                 action="unsuspend",
                 cards=cids)
         assert not any(
-                await async_call_anki(
+                await call_anki(
                     action="areSuspended",
                     cards=cids,
                     )
                 ), f"Cards failed to unsuspend?"
     else:
         gr.Warning(red(f"Suspending notes nid:{','.join(s_nids)} with bodies:\n{bodies}"))
-        out = await async_call_anki(
+        out = await call_anki(
                 action="suspend",
                 cards=cids)
         assert out, f"Unexpected result from anki: {out} for nids {','.join(s_nids)}"
         assert all(
-                await async_call_anki(
+                await call_anki(
                     action="areSuspended",
                     cards=cids,
                     )
@@ -358,10 +359,10 @@ async def suspend_previous_notes() -> None:
 
 
 @optional_typecheck
-def get_anki_content(nid: List[Union[str, int]]) -> str:
+async def get_anki_content(nid: List[Union[str, int]]) -> str:
     "retrieve the content of the body of an anki note"
     nid = [int(n) for n in nid]
-    infos = call_anki(
+    infos = await call_anki(
             action="notesInfo",
             notes=nid,
             )
