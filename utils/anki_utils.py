@@ -397,6 +397,15 @@ def get_decks() -> List[str]:
 
 # load anki profile using ankipandas just to get the media folder
 if shared.anki_media:
+    shared.anki_media = Path(shared.anki_media)
+    assert shared.anki_media.is_folder(), f"shared.anki_media must be a dict. Path: {shared.anki_media}"
+    if shared.anki_media.name != "collection.media":
+        candidates = [f for f in shared.anki_media.iterdir() if f.is_dir() and f.name == "collection.media"]
+        assert candidates, f"No collection.media folder found at {shared.anki_media}"
+        assert len(candidates) == 1, f"Found multiple candidates for media folder: {candidates}"
+        shared.anki_media = candidates[0]
+        assert shared.anki_media
+
     db_path = Path(shared.anki_media)
     red(f"Using anki db_path found in argument: {db_path}")
 else:
@@ -419,6 +428,7 @@ if "trash" in str(db_path).lower():
 anki_media = Path(db_path).parent / "collection.media"
 assert anki_media.exists(), "Media folder not found!"
 shared.anki_media = anki_media
+assert shared.anki_media.name == "collection.media"
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 import os
 import sys
 import fire
-from pathlib import Path
-from typing import Optional
+from pathlib import Path, PosixPath
+from typing import Optional, Union
 import pdb
 import faulthandler
 import traceback
@@ -29,7 +29,7 @@ def start_Voice2Anki(
     authentication: bool = True,
     localnetwork: bool = True,
     use_ssl: bool = True,
-    anki_media_folder: Optional[str] = None,
+    anki_media_folder: Optional[Union[str, PosixPath]] = None,
     disable_tracing: bool = False,
     disable_timeout: bool = True,
     widen_screen: bool = True,
