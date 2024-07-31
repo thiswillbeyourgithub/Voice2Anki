@@ -23,7 +23,7 @@ from .typechecker import optional_typecheck
 
 @optional_typecheck
 @trace
-def get_image(gallery) -> List[gr.Gallery]:
+def get_image(gallery) -> List[Union[gr.Gallery, np.ndarray]]:
     whi("Getting image from clipboard")
     assert shared.pv["enable_gallery"], "Incoherent UI"
     try:
