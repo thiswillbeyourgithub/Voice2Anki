@@ -34,7 +34,7 @@ CONTEXT
 TRANSCRIPT
 """.strip()
 
-litellm.set_verbose = False  # shared.debug
+litellm.set_verbose = shared.debug
 
 default_system_prompt = {
             "role": "system",
