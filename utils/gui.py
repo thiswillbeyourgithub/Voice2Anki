@@ -203,10 +203,10 @@ with gr.Blocks(
             with gr.Row():
                 txt_keywords = gr.Textbox(value=shared.pv["txt_keywords"], lines=3, max_lines=2, label="Keywords", placeholder="Comma separated regex that, if present in the transcript, increase chances of matching memories to be selected. Each regex is stripped, case insensitive and can be used multiple times to increase the effect.")
             with gr.Row():
-                sld_pick_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_pick_weight"], step=0.1, label="Embeddings weight")
-                sld_prio_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_prio_weight"], step=0.1, label="Priority weight")
-                sld_timestamp_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_timestamp_weight"], step=0.1, label="Timestamp weight")
-                sld_keywords_weight = gr.Slider(minimum=0, maximum=10, value=shared.pv["sld_keywords_weight"], step=0.1, label="Keywords weight")
+                sld_pick_weight = gr.Slider(minimum=0, maximum=5, value=shared.pv["sld_pick_weight"], step=0.1, label="Embeddings weight")
+                sld_prio_weight = gr.Slider(minimum=0, maximum=5, value=shared.pv["sld_prio_weight"], step=0.1, label="Priority weight")
+                sld_timestamp_weight = gr.Slider(minimum=0, maximum=5, value=shared.pv["sld_timestamp_weight"], step=0.1, label="Timestamp weight")
+                sld_keywords_weight = gr.Slider(minimum=0, maximum=5, value=shared.pv["sld_keywords_weight"], step=0.1, label="Keywords weight")
         with gr.Tab(label="Misc", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
                 kill_threads_btn = gr.Button(value="Kill threads", variant="secondary", size="sm")
