@@ -62,22 +62,33 @@ expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", 
 def hasher(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
+@trace
 @optional_typecheck
 def embedder(
     text_list: List[str],
     model: str,
     ) -> np.ndarray:
-    """compute the emebdding of 1 text
+    """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
     if result is not None, it is the embedding and returned right away. This
     was done to allow caching individual embeddings while still making one batch
     call to the embedder.
     """
     assert text_list
     assert all(t.strip() for t in text_list)
-    vec = litellm.embedding(
-            model=model,
-            input=text_list,
-            )
+    func = litellm.embedding
+    cached = IteratorCacher(
+        cache_location=cache_dir / "embeddings_iterator_cacher" /model,
+        iter_list=["input"],
+        verbose=True,
+        unpacking_func = lambda out: out.to_dict()["data"],
+        repacking_func = lambda t: np.array(
+                [
+                    np.array(elem["embedding"]).reshape(1, -1)
+                    for elem in t
+                ]
+        )
+    )(func)
+    vec = cached(model=model, input=text_list)
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
     embeds = [
@@ -231,18 +242,8 @@ def prompt_filter(
     to_embed = [prompt_messages[-1]["content"]]
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
-    em_func = partial(trace(smartcache(
-        IteratorCacher(
-            cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["choice_embed"],
-            iter_list=["text_list"],
-            verbose=False,
-            unpacking_func = lambda ar: ar.tolist(),
-            repacking_func = lambda t: np.array(t),
-            )(embedder),
-        )),
-        model=shared.pv["choice_embed"],
-    )
-    all_embeddings = em_func(text_list=to_embed)
+
+    all_embeddings = embedder(text_list=to_embed, model=shared.pv["choice_embed"])
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
