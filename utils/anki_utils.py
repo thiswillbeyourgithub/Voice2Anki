@@ -359,7 +359,7 @@ async def suspend_previous_notes() -> None:
 
 
 @optional_typecheck
-async def get_anki_content(nid: List[Union[str, int]]) -> str:
+async def get_anki_content(nid: List[Union[str, int]]) -> List[str]:
     "retrieve the content of the body of an anki note"
     nid = [int(n) for n in nid]
     infos = await call_anki(
