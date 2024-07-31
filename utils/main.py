@@ -200,9 +200,7 @@ def whisper_cached(
                             # dictation=False,
                             detect_entities=False,
                             detect_topics=False,
-                            filler_words=False,
                             keywords=keywords,
-                            measurements=True,
                             numerals=True,
                         )
                         if txt_whisp_lang == "en":
@@ -214,11 +212,12 @@ def whisper_cached(
                                 sentiment=False,
 
                                 filler_words=True,
+                                measurements=True,
                                 )
                             )
 
                         options = PrerecordedOptions(**options)
-                        payload = {"buffer": audio_path.read()}
+                        payload = {"buffer": audio_file.read()}
                         transcript = client.listen.prerecorded.v("1").transcribe_file(
                             payload,
                             options,
@@ -307,7 +306,7 @@ def thread_whisp_then_llm(audio_mp3: Optional[Union[PosixPath, str]]) -> None:
                 txt_audio=txt_audio,
                 txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
                 profile=shared.pv.profile_name,
-                max_token=shared.pv["sld_max_tkn"],
+                max_token=int(shared.pv["sld_max_tkn"]),
                 temperature=shared.pv["sld_temp"],
                 sld_buffer=shared.pv["sld_buffer"],
                 llm_choice=shared.pv["llm_choice"],
@@ -453,9 +452,9 @@ def pre_alfred(
         txt_audio: str,
         txt_chatgpt_context: str,
         profile: str,
-        max_token: int,
+        max_token: Union[int, float],
         temperature: Union[float, int],
-        sld_buffer: int,
+        sld_buffer: Union[int, float],
         txt_keywords: str,
         prompt_management: str,
         cache_mode: bool,

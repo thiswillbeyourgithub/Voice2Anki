@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -155,7 +155,12 @@ def check_prompts(prev_prompts: List[dict]) -> List[dict]:
 #@Timeout(30)
 @optional_typecheck
 @trace
-def prompt_filter(prev_prompts: List[dict], max_token: int, prompt_messages: List[dict], keywords: Optional[List[str]]):
+def prompt_filter(
+    prev_prompts: List[dict],
+    max_token: Union[int, float],
+    prompt_messages: List[dict],
+    keywords: Optional[List[re.Pattern]],
+    ):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
     number of tokens for model"""
