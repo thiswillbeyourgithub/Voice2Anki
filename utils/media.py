@@ -273,7 +273,7 @@ def force_sound_processing() -> PosixPath:
 
 # @trace
 @optional_typecheck
-def format_audio_component(audio: Union[str, gr.Audio]) -> str:
+def format_audio_component(audio: Union[str, gr.Audio, PosixPath]) -> str:
     """to make the whole UI faster and avoid sending multiple slightly
     differently processed audio to whisper: preprocessing and postprocessing
     are disabled but this sometimes make the audio component output a dict

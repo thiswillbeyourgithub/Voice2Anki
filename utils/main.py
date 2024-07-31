@@ -192,10 +192,10 @@ def whisper_cached(
                             # not all features below are available for all languages
 
                             # intelligence
-                            summarize=False,
-                            topics=False,
-                            intents=False,
-                            sentiment=False,
+                            # summarize=False,
+                            # topics=False,
+                            # intents=False,
+                            # sentiment=False,
 
                             # transcription
                             smart_format=True,
@@ -219,7 +219,7 @@ def whisper_cached(
                         )
                         options = PrerecordedOptions(**options)
                         payload = {"buffer": audio_path.read()}
-                        transcript = deepgram.listen.prerecorded.v("1").transcribe_file(
+                        transcript = client.listen.prerecorded.v("1").transcribe_file(
                             payload,
                             options,
                         ).to_dict()
