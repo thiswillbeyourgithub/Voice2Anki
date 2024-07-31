@@ -99,6 +99,7 @@ with gr.Blocks(
                     with gr.Row():
                         sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=False)
                         improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=3)
+                check_prompt_as_system = gr.Checkbox(value=shared.pv["check_prompt_as_system"], interactive=True, label="Example as system pompt", show_label=True)
                 prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
 
             with gr.Row():
@@ -188,7 +189,6 @@ with gr.Blocks(
                 txt_whisp_lang = gr.Textbox(value=shared.pv["txt_whisp_lang"], label="SpeechToText lang", placeholder="language of the recording, e.g. fr")
             txt_tags = gr.Dropdown(value=shared.pv["txt_tags"], label="Tags", choices=get_anki_tags(), multiselect=True, allow_custom_value=True)
         with gr.Tab(label="LLM", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
-            check_prompt_as_system = gr.Checkbox(value=shared.pv["check_prompt_as_system"], interactive=True, label="Example as system pompt", show_label=True)
             with gr.Row():
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
