@@ -176,7 +176,7 @@ class ValueStorage:
             prev_q = self.running_tasks[key]
             try:
                 # Waits for X seconds, otherwise throws `Queue.Empty`
-                prev_q_val = prev_q.get(True, 1)
+                prev_q_val = prev_q.get(True, 0.01)
                 with self.lock:
                     self.running_tasks[key] = None
                 whi(f"Done waiting for task {key}")
@@ -251,7 +251,7 @@ class ValueStorage:
                 prev_q = self.running_tasks[key]
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
-                    prev_q_val = prev_q.get(True, 1)
+                    prev_q_val = prev_q.get(True, 0.01)
                     with self.lock:
                         self.running_tasks[key] = None
                     whi(f"Done waiting for task {key}")
