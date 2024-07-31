@@ -1235,7 +1235,7 @@ def to_anki(
         txt_chatgpt_context: Optional[str],
         txt_deck: str,
         txt_tags: Optional[List[str]],
-        gallery: Optional[List[Union[np.ndarray, gr.Gallery]]],
+        gallery: Optional[List[Union[np.ndarray, gr.Gallery, dict]]],
         check_marked: bool,
         txt_extra_source: Optional[str],
         ) -> None:
