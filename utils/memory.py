@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+from functools import partial
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -231,20 +232,18 @@ def prompt_filter(
     to_embed = [prompt_messages[-1]["content"]]
     to_embed += [pr["content"] for pr in candidate_prompts]
     to_embed += [pr["answer"] for pr in candidate_prompts]
-    em_func = IteratorCacher(
-        cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["choice_embed"],
-        iter_list=["text_list"],
-        verbose=False,
-        unpacking_func = lambda ar: ar.tolist(),
-        repacking_func = lambda t: np.array(t),
-        )(
-        trace(
-            smartcache(
-                embedder
-            )
-        )
+    em_func = partial(trace(smartcache(
+        IteratorCacher(
+            cache_location=cache_dir / "embeddings_iterator_cacher" / shared.pv["choice_embed"],
+            iter_list=["text_list"],
+            verbose=False,
+            unpacking_func = lambda ar: ar.tolist(),
+            repacking_func = lambda t: np.array(t),
+            )(embedder),
+        )),
+        model=shared.pv["choice_embed"],
     )
-    all_embeddings = em_func(to_embed, model=shared.pv["choice_embed"])
+    all_embeddings = em_func(text_list=to_embed)
     assert all(isinstance(item, np.ndarray) for item in all_embeddings)
     assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
