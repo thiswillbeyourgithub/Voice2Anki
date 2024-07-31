@@ -88,7 +88,6 @@ def embedder(
     return embeds
 
 
-
 @optional_typecheck
 @trace
 def check_prompts(prev_prompts: List[dict]) -> List[dict]:

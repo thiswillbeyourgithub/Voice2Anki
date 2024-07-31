@@ -627,13 +627,13 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @llm_cache.cache(ignore=["cache_mode"])
 def alfred(
         txt_audio: str,
-        txt_chatgpt_context: str,
+        txt_chatgpt_context: Optional[str],
         profile: str,
-        max_token: int,
+        max_token: Union[int, float],
         temperature: Union[int, float],
-        sld_buffer: int,
+        sld_buffer: Union[int, float],
         llm_choice: str,
-        txt_keywords: str,
+        txt_keywords: Optional[str],
         prompt_management: str,
         cache_mode: bool = False,
         ) -> str:
