@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Union, List, Callable, Optional
 import os
 import asyncio
@@ -1228,15 +1229,15 @@ def Voice2Anki_db_save(
 @optional_typecheck
 @trace
 def to_anki(
-        audio_mp3_1: Union[dict, str],
-        txt_audio: str,
+        audio_mp3_1: Optional[Union[dict, str]],
+        txt_audio: Optional[str],
         txt_chatgpt_cloz: str,
-        txt_chatgpt_context: str,
+        txt_chatgpt_context: Optional[str],
         txt_deck: str,
-        txt_tags: List,
-        gallery: List,
+        txt_tags: Optional[List[str]],
+        gallery: Optional[List[Union[np.ndarray, gr.gallery]]],
         check_marked: bool,
-        txt_extra_source: str,
+        txt_extra_source: Optional[str],
         ) -> None:
     "function called to do wrap it up and send to anki"
     whi("Entering to_anki")
