@@ -229,7 +229,10 @@ def trace(func: Callable) -> Callable:
             purp(f"-> Entering {func}")
             # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
-            result = func(*args, **kwargs)
+            if args:
+                result = func(*args, **kwargs)
+            else:
+                result = func(**kwargs)
             tt = time.time() - t
             if tt > 0.5:
                 red(f"    Exiting {func} after {tt:.1f}s")
@@ -308,7 +311,7 @@ def smartcache(func: Callable) -> Callable:
                     del kwargs2[ig]
         else:
             fstr = str(func)
-            kwargs2 = kwargs
+            kwargs2 = kwargs.copy()
         h = jhash(fstr + jhash(args) + jhash(kwargs2))
         if h in shared.smartcache:
             t = shared.smartcache[h]
@@ -329,7 +332,10 @@ def smartcache(func: Callable) -> Callable:
                 with shared.timeout_lock:
                     shared.smartcache[h] = time.time()
             try:
-                result = func(*args, **kwargs)
+                if args:
+                    result = func(*args, **kwargs)
+                else:
+                    result = func(**kwargs)
             except:
                 with shared.thread_lock:
                     with shared.timeout_lock:

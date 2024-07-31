@@ -222,6 +222,7 @@ def whisper_cached(
                             payload,
                             options,
                         ).to_dict()
+                        assert isinstance(transcript, dict)
                         assert len(transcript["results"]["channels"]) == 1, "unexpected deepgram output"
                         assert len(transcript["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
                         text = transcript["results"]["channels"][0]["alternatives"][0]["transcript"].strip()

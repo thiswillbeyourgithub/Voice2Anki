@@ -145,7 +145,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
                 cv2.imwrite(str(new), decoded)
 
             try:
-                ocr = get_text(str(new))
+                ocr = get_text(img=str(new))
             except Exception as err:
                 ocr = red(f"Error when OCRing image: '{err}'")
 
