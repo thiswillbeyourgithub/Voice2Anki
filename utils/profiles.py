@@ -430,7 +430,7 @@ def switch_profile(profile: str) -> Tuple[
 
 
 @optional_typecheck
-def load_user_functions() -> Tuple[Callable, Callable]:
+def load_user_functions() -> Tuple[str, str]:
     """ If the user profile directory contains a directory called "functions"
     then functions can be loaded.
     Currently supported use case are:
@@ -480,7 +480,7 @@ def load_user_functions() -> Tuple[Callable, Callable]:
         red("Found chains.py")
         with open((shared.func_dir / "chains.py").absolute(), "r") as f:
             chains += f.read()
-    return [flashcard_editor, chains]
+    return flashcard_editor, chains
 
 
 @optional_typecheck
