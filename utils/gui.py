@@ -977,13 +977,13 @@ with gr.Blocks(
                                 postprocess=False,
                                 #show_progress=False,
                                 ).then(
-        fn=update_audio_slots_txts,
-        inputs=[check_enable_dirload] + audio_slots_txts,
-        outputs=audio_slots_txts,
-        show_progress=False,
-        postprocess=False,
-        preprocess=False,
-        )
+                                    fn=update_audio_slots_txts,
+                                    inputs=[check_enable_dirload] + audio_slots_txts,
+                                    outputs=audio_slots_txts,
+                                    show_progress=False,
+                                    postprocess=False,
+                                    preprocess=False,
+                                    )
 
     # send to whisper
     transcript_btn.click(
