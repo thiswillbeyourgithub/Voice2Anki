@@ -67,6 +67,7 @@ def hasher(text: str) -> str:
 def embedder(
     text_list: List[str],
     model: str,
+    verbose: bool = False,
     ) -> List[np.ndarray]:
     """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
     if result is not None, it is the embedding and returned right away. This
@@ -76,14 +77,14 @@ def embedder(
     assert text_list
     assert all(t.strip() for t in text_list)
     func = litellm.embedding
-    cache_obj=Memory(cache_dir / "embeddings_iterator_cacher" /model, verbose=False)
+    cache_obj = Memory(cache_dir / "embeddings_iterator_cacher" /model, verbose=verbose)
     cached = IteratorCacher(
         memory_object=cache_obj,
         iter_list=["input"],
-        verbose=shared.debug,
+        verbose=verbose,
         res_to_list = lambda out: out.to_dict()["data"],
         batch_size=1500,
-        debug=False,
+        debug=verbose,
     )(func)
     vec: List[np.ndarray] = cached(model=model, input=text_list)
     vec = [np.array(v).squeeze() for v in vec]
