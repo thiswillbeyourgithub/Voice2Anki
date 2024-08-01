@@ -741,8 +741,7 @@ def alfred(
     output_tkn_cost = response["usage"]["completion_tokens"]
     tkn_cost = [input_tkn_cost, output_tkn_cost]
 
-    assert isinstance(model_price, tuple)
-    tkn_cost_dol = input_tkn_cost * model_price[0] + output_tkn_cost * model_price[1]
+    tkn_cost_dol = input_tkn_cost * model_price["input_cost_per_token"] + output_tkn_cost * model_price["output_cost_per_token"]
     shared.pv["total_llm_cost"] += tkn_cost_dol
 
     cloz = response["choices"][0]["message"]["content"]
