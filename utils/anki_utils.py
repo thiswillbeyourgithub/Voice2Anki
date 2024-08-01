@@ -241,7 +241,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
                 return "Added"
 
             def remove_markers(intext: str) -> str:
-                return intext.replace("{{c", "").replace("}}", "").replace("::")
+                return intext.replace("{{c", "").replace("}}", "").replace("::", "")
 
             txt_nomarkers = remove_markers(txt_chatgpt_cloz)
 
