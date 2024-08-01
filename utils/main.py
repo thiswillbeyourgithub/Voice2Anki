@@ -707,7 +707,7 @@ def alfred(
         dupli = [dp for dp in contents if contents.count(dp) > 1]
         raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}")
 
-    if shared.pv["check_prompts_as_system"]:
+    if shared.pv["check_prompt_as_system"]:
         messages = []
         for i, fm in enumerate(formatted_messages):
             if i == 0:
