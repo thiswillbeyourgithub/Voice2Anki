@@ -692,6 +692,7 @@ def alfred(
         else:
             answers = asyncio.run(async_parallel_alfred(splits, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, llm_choice, txt_keywords, prompt_management, cache_mode))
             assert len(answers) == len(splits), "Unexpected length"
+            assert isinstance(answers, list), f"unexpected answers: {answers}"
             return "\n#####\n".join(answers).strip()
 
     formatted_messages = pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
