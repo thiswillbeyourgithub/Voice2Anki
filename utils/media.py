@@ -460,7 +460,7 @@ def update_audio_slots_txts(gui_enable_dirload: bool, *audio_slots_txts) -> List
         return [f"{head}<mark>Dirload not yet loaded</mark>{tail}" for i in audio_slots_txts]
 
     try:
-        df = df[df["loaded"] == True]
+        df = df[df["loaded"] is True]
         if df.empty:
             return [f"{head}<mark>Empty</mark>{tail}" for i in audio_slots_txts]
 
