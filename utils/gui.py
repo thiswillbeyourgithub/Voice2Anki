@@ -956,6 +956,7 @@ with gr.Blocks(
             inputs=[gui_rolldirloadcheck] + audio_slots,
             outputs=audio_slots,
             #show_progress=False,
+            postprocess=False,
             ).success(
                     fn=transcribe,
                     inputs=[audio_slots[0]],
