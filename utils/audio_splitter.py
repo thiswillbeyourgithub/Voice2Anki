@@ -280,7 +280,7 @@ class AudioSplitter:
                 ]
 
             @optional_typecheck
-            def threaded_export(audio: Optional[AudioSegment], path: Optional[PosixPath]):
+            def threaded_export(audio: Optional[AudioSegment], path: Optional[Union[PosixPath, str]]) -> None:
                 if audio is None or path is None:
                     assert audio is None and path is None
                     return
