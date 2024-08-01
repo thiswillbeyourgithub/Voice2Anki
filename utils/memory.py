@@ -80,8 +80,8 @@ def embedder(
     was done to allow caching individual embeddings while still making one batch
     call to the embedder.
     """
-    assert text_list
-    assert all(t.strip() for t in text_list)
+    assert text_list, "empty text_list"
+    assert all(t.strip() for t in text_list), "text_list contained empty text"
     cache_obj = embedding_caches[model]
     cached = IteratorCacher(
         memory_object=cache_obj,
@@ -200,7 +200,7 @@ def prompt_filter(
 
     # better formatting by removing useless markup
     for i, m in enumerate(candidate_prompts):
-        assert m["role"] == "user"
+        assert m["role"] == "user", f"expecter user role but got {m['role']}"
         assert "Context: '" not in m["content"] and "Transcript: '" not in m["content"], f"Invalid prompt: {m}"
 
     # count the number of tokens added so far
@@ -255,12 +255,12 @@ def prompt_filter(
     to_embed += [pr["answer"] for pr in candidate_prompts]
 
     all_embeddings = embedder(text_list=to_embed, model=shared.pv["choice_embed"])
-    assert all(isinstance(item, np.ndarray) for item in all_embeddings)
-    assert len(all_embeddings) == 2 * len(candidate_prompts) + 1
+    assert all(isinstance(item, np.ndarray) for item in all_embeddings), f"all_embeddings contained non numpy array: {all_embeddings}"
+    assert len(all_embeddings) == 2 * len(candidate_prompts) + 1, f"ell_embeddings is of unexpected length: {len(all_embeddings)}"
     new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
     embeddings_contents = all_embeddings[:len(candidate_prompts)]
     embeddings_answers = all_embeddings[len(candidate_prompts):]
-    assert len(embeddings_contents) == len(embeddings_answers)
+    assert len(embeddings_contents) == len(embeddings_answers), f"len(embeddings_contents)={len(embeddings_contents)} but len(embeddings_answers)={len(embeddings_answers)}"
     sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
     w1, w2 = 5, 1
@@ -348,7 +348,7 @@ def prompt_filter(
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
     output_pr = sorted(output_pr, key=lambda x: x["pick_score"])
-    assert output_pr[1]["pick_score"] <= output_pr[-1]["pick_score"]
+    assert output_pr[1]["pick_score"] <= output_pr[-1]["pick_score"], "unexpected pick_score"
     # or by timestamp (most recent last):
     # output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
     # or by priority:

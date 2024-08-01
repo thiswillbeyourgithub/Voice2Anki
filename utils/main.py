@@ -82,7 +82,7 @@ def stripizer(func: Callable) -> Callable:
         if "txt_audio" in kwargs:
             kwargs["txt_audio"] = kwargs["txt_audio"].strip()
         else:
-            assert isinstance(args[0], str)
+            assert isinstance(args[0], str), f"expected string but found {args[0]}"
             args = list(args)
             args[0] = args[0].strip()
         return func(*args, **kwargs)
@@ -175,7 +175,7 @@ def whisper_cached(
                                 k = next(deepgram_clients.keys())
                                 del deepgram_clients[k]
                             deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]] = DeepgramClient()
-                        assert len(deepgram_clients) == 1
+                        assert len(deepgram_clients) == 1, f"found multiple deepgram_client: {deepgram_clients}"
                         client = deepgram_clients[os.environ["DEEPGRAM_API_TOKEN"]]
                         if shared.pv["txt_deepgram_keyword_boosting"]:
                             keywords = shared.pv["txt_deepgram_keyword_boosting"].strip().splitlines()
@@ -222,7 +222,7 @@ def whisper_cached(
                             payload,
                             options,
                         ).to_dict()
-                        assert isinstance(transcript, dict)
+                        assert isinstance(transcript, dict), f"transcript is not dict but {transcript}"
                         assert len(transcript["results"]["channels"]) == 1, "unexpected deepgram output"
                         assert len(transcript["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
                         text = transcript["results"]["channels"][0]["alternatives"][0]["transcript"].strip()

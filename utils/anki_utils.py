@@ -220,7 +220,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     else:
         cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
         cloz = [cl.strip() for cl in cloz if cl.strip()]
-        assert cloz
+        assert cloz, f"cloz issue: {cloz}"
         query = "added:2"
         for cl in cloz:
             query += f" body:\"*{cl}*\""
@@ -280,7 +280,7 @@ async def mark_previous_note() -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
-    assert nids
+    assert nids, "empty nids"
 
     bodies = await get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
@@ -311,9 +311,9 @@ async def add_to_more_of_previous_note(more_content: str) -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
-    assert nids
+    assert nids, "empty nids"
     more_content = more_content.strip()
-    assert more_content
+    assert more_content, "empty more_content"
 
     bodies = await get_anki_content(nid=nids)
     bodies = "* " + "\n* ".join(bodies)
@@ -335,7 +335,7 @@ async def suspend_previous_notes() -> None:
     if not shared.added_note_ids:
         raise Exception(red("No note ids found."))
     nids = shared.added_note_ids[-1]
-    assert nids
+    assert nids, "empty nids"
     s_nids = [str(n) for n in nids]
     cids = await call_anki(
             action="findCards",
@@ -421,7 +421,7 @@ if shared.anki_media:
         assert candidates, f"No collection.media folder found at {shared.anki_media}"
         assert len(candidates) == 1, f"Found multiple candidates for media folder: {candidates}"
         shared.anki_media = candidates[0]
-        assert shared.anki_media
+        assert shared.anki_media, "anki_media not set?"
 
     db_path = Path(shared.anki_media)
     red(f"Using anki db_path found in argument: {db_path}")

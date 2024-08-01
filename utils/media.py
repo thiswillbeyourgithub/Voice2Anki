@@ -250,12 +250,12 @@ def force_sound_processing() -> PosixPath:
 
     # saving file as wav then as mp3
     try:
-        assert not (path.parent / (path.stem + ".wav")).exists()
+        assert not (path.parent / (path.stem + ".wav")).exists(), "sound file already exists as wav"
         sf.write(str(path.parent / (path.stem + ".wav")), waveform.numpy().T, sample_rate, format='wav')
         temp = AudioSegment.from_wav(path.parent / (path.stem + ".wav"))
         red(f"Moving {path} to {out_path}")
         shutil.move(path, out_path)
-        assert not path.exists()
+        assert not path.exists(), f"{path} already exists"
         temp.export(path, format="mp3")
         Path(path.parent / (path.stem + ".wav")).unlink(missing_ok=False)
         gr.Warning(red(f"Done forced preprocessing {path}. The original is in {out_path}"))
