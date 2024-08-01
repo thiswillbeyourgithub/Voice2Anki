@@ -239,10 +239,26 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
                 return "Added"
             if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
                 return "Added"
+
+            def remove_markers(intext: str) -> str:
+                return intext.replace("{{c", "").replace("}}", "").replace("::")
+
+            txt_nomarkers = remove_markers(txt_chatgpt_cloz)
+
             for b in bodies:
-                if levratio(txt_chatgpt_cloz, b) > 95:
+                if levratio(txt_chatgpt_cloz, b) > 90:
                     return "Added"
-                if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 95:
+                if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 90:
+                    return "Added"
+                b2 = remove_markers(b)
+                if levratio(txt_chatgpt_cloz, b2) > 90:
+                    return "Added"
+                if levratio(txt_chatgpt_cloz, cloze_editor(b2)) > 90:
+                    return "Added"
+
+                if levratio(txt_nomarkers, b2) > 90:
+                    return "Added"
+                if levratio(txt_nomarkers, cloze_editor(b2)) > 90:
                     return "Added"
             return "MISSING"
 
