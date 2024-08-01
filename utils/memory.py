@@ -86,8 +86,8 @@ def embedder(
         batch_size=1500,
         debug=verbose,
     )(func)
-    vec: List[np.ndarray] = cached(model=model, input=text_list)
-    vec = [np.array(v).squeeze() for v in vec]
+    vec: List[dict] = cached(model=model, input=text_list)
+    vec = [np.array(v["embedding"]).squeeze() for v in vec]
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
     return vec
@@ -244,6 +244,8 @@ def prompt_filter(
     embeddings_contents = all_embeddings[:len(candidate_prompts)]
     embeddings_answers = all_embeddings[len(candidate_prompts):]
     assert len(embeddings_contents) == len(embeddings_answers)
+    # red(f"here 1: {new_prompt_vec}")
+    # red(f"here 1: {embeddings_contents}")
     sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
     w1, w2 = 5, 1
