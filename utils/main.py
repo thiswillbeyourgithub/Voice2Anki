@@ -324,7 +324,7 @@ def thread_whisp_then_llm(audio_mp3: Optional[Union[PosixPath, str]]) -> None:
 
 @optional_typecheck
 @trace
-def transcribe(audio_mp3_1: Union[str, dict]) -> str:
+def transcribe(audio_mp3_1: Optional[Union[str, dict]]) -> str:
     "turn the 1st audio track into text"
     whi("Transcribing audio")
 
