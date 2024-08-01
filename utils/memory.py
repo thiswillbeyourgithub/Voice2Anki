@@ -81,7 +81,7 @@ def embedder(
     cached = IteratorCacher(
         memory_object=cache_obj,
         iter_list=["input"],
-        verbose=verbose,
+        verbose=shared.debug,
         res_to_list = lambda out: out.to_dict()["data"],
         batch_size=1500,
         debug=verbose,

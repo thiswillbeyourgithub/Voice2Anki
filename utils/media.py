@@ -376,8 +376,9 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
 
 @optional_typecheck
 @trace
-def roll_audio(*slots) -> List[dict]:
+def roll_audio(*slots) -> List[Union[dict, str]]:
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
+    assert isinstance(slots, tuple), f"unexpected slots type: {slots}"
     slots = list(slots)
     if all((slot is None for slot in slots)):
         return slots
@@ -390,11 +391,15 @@ def roll_audio(*slots) -> List[dict]:
     for i, s in enumerate(slots):
         if s is None:
             continue
-        slots[i] = {
-                "__type__": "update",  # this is how gr.update works
-                "label": slots[i]["orig_name"],
-                "value": slots[i]["path"],
-                }
+        elif isinstance(s, str):
+            # it's already a path, no need to modify it
+            continue
+        elif isinstance(s, dict):
+            slots[i] = {
+                    "__type__": "update",  # this is how gr.update works
+                    "label": slots[i]["orig_name"],
+                    "value": slots[i]["path"],
+                    }
     while None in slots:
         slots.remove(None)
 
