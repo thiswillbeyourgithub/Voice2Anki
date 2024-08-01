@@ -244,8 +244,6 @@ def prompt_filter(
     embeddings_contents = all_embeddings[:len(candidate_prompts)]
     embeddings_answers = all_embeddings[len(candidate_prompts):]
     assert len(embeddings_contents) == len(embeddings_answers)
-    # red(f"here 1: {new_prompt_vec}")
-    # red(f"here 1: {embeddings_contents}")
     sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
     w1, w2 = 5, 1
