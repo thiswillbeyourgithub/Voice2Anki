@@ -86,8 +86,8 @@ with gr.Blocks(
         with gr.Row():
             with gr.Column(scale=2, variant="compact", min_width=100):
                 with gr.Row():
-                    send_more_to_previous = gr.Textbox(value=None, placeholder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=1, max_lines=5)
-                    mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=3, min_width=75)
+                    send_more_to_previous = gr.Textbox(value=None, placeholder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=1, max_lines=5, scale=1)
+                    mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=1, min_width=75)
                     check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
             with gr.Column(scale=1, min_width=100):
                 suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=75)
@@ -121,7 +121,9 @@ with gr.Blocks(
                 clear_cache_btn = gr.Button(value="Clear cache", size="sm")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm")
 
-            txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
+            with gr.Row():
+                txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["txt_deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
+                txt_extra_source = gr.Textbox(value=shared.pv["txt_extra_source"], label="Extra source", lines=1, placeholder="Will be added to the source.", visible=True, max_lines=5)
 
         # image
         with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab_main"], elem_id="js_widetabs") as tab_gallery:
@@ -193,7 +195,6 @@ with gr.Blocks(
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
                 txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
             with gr.Column():
-                txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["txt_deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
                 txt_mistral_api_key = gr.Textbox(value=shared.pv["txt_mistral_api_key"], label="MistralAI API key", lines=1)
