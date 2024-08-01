@@ -695,11 +695,11 @@ def alfred(
         raise Exception(red(f"max_token is low at {max_token} which might be why pre_alfred output no memories."))
     for i, fm in enumerate(formatted_messages):
         if i == 0:
-            assert fm["role"] == "system"
+            assert fm["role"] == "system", f"expected system role but got {fm['role']}"
         elif i % 2 == 0:
-            assert fm["role"] == "assistant"
+            assert fm["role"] == "assistant", f"expected assistant role but got {fm['role']}"
         elif i % 2 == 1:
-            assert fm["role"] == "user"
+            assert fm["role"] == "user", f"expected user role but got {fm['role']}"
 
     # check no duplicate in messages
     if len(set([fm["content"] for fm in formatted_messages])) != len(formatted_messages):
@@ -723,8 +723,8 @@ def alfred(
                     messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
                     if i == len(formatted_messages) - 2:
                         messages[0]["content"] += "---\n"
-        assert len(messages) == 2
-        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1])
+        assert len(messages) == 2, f"Len of messages if {len(messages)}"
+        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1]), "missing some content"
         formatted_messages = messages
 
     model_price = shared.llm_price[llm_choice]
