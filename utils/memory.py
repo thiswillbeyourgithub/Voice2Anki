@@ -57,6 +57,12 @@ Rules you follow:
 
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice"]
 
+# init the embedding caches here to avoid them needed recomputation each time python is launched
+embedding_caches = {
+    m: Memory(cache_dir / "embeddings_iterator_cacher" / m, verbose=False)
+    for m in shared.embedding_models
+}
+
 
 @optional_typecheck
 def hasher(text: str) -> str:
@@ -76,8 +82,7 @@ def embedder(
     """
     assert text_list
     assert all(t.strip() for t in text_list)
-    func = litellm.embedding
-    cache_obj = Memory(cache_dir / "embeddings_iterator_cacher" /model, verbose=verbose)
+    cache_obj = embedding_caches[model]
     cached = IteratorCacher(
         memory_object=cache_obj,
         iter_list=["input"],
@@ -85,9 +90,8 @@ def embedder(
         res_to_list = lambda out: out.to_dict()["data"],
         batch_size=1500,
         debug=verbose,
-    )(func)
-    sm_cached = smartcache(cached)
-    vec: List[dict] = sm_cached(model=model, input=text_list)
+    )(litellm.embedding)
+    vec: List[dict] = cached(model=model, input=text_list)
     vec = [np.array(v["embedding"]).squeeze() for v in vec]
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
