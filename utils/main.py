@@ -802,7 +802,7 @@ def alfred(
 @optional_typecheck
 @trace
 @Critical
-def dirload_splitted(checkbox: bool, *audios: Optional[List]) -> List[Union[dict, gr.Audio, str, bool]]:
+def dirload_splitted(checkbox: bool, *audios: Optional[Union[List, bool]]) -> List[Union[dict, gr.Audio, str, bool]]:
     """
     load the audio file that were splitted previously one by one in the
     available audio slots
