@@ -45,7 +45,7 @@ class AudioSplitter:
             re.compile(r"(\W|^)s?top(\W|$)", flags=re.IGNORECASE),
             ],
         language: str = "fr",
-        n_todo: bool = 1,
+        n_todo: int = 1,
 
         stop_source: str = "api",
 
