@@ -92,7 +92,19 @@ def embedder(
         debug=verbose,
     )(litellm.embedding)
     vec: List[dict] = cached(model=model, input=text_list)
-    vec = [np.array(v["embedding"]).squeeze() for v in vec]
+    vec = [
+        np.array(v["embedding"]).squeeze()
+        if isinstance(v, dict)
+        else (
+            np.array(v.to_dict()["data"][0]["embedding"]).squeeze() if len(v.to_dict()["data"]) == 1 else None
+        )
+        for v in vec
+    ]
+    nonvec = [v for v in vec if v is None]
+    if nonvec:
+        pos = [iv for iv, v in enumerate(vec) if v is None]
+        raise Exception(f"Found {len(nonvec)} None in vectors at position {pos} from length {len(vec)}")
+
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
     return vec
