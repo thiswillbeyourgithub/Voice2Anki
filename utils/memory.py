@@ -86,7 +86,8 @@ def embedder(
         batch_size=1500,
         debug=verbose,
     )(func)
-    vec: List[dict] = cached(model=model, input=text_list)
+    sm_cached = smartcache(cached)
+    vec: List[dict] = sm_cached(model=model, input=text_list)
     vec = [np.array(v["embedding"]).squeeze() for v in vec]
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
