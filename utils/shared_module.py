@@ -41,6 +41,7 @@ class SharedModule:
     debug: Optional[bool] = None
     disable_tracing: Optional[bool] = None
     disable_timeout: Optional[bool] = None
+    disable_smartcache: Optional[bool] = None
     widen_screen: Optional[bool] = None
     big_font: Optional[bool] = None
     timeout_lock: Lock = Lock()

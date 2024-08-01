@@ -300,6 +300,12 @@ def smartcache(func: Callable) -> Callable:
     shared.smartcache at the start of the run and removes it at the end.
     If it already exists that means the cache is already computing the same
     value so just wait for that to finish to avoid concurrent calls."""
+    if shared.disable_smartcache:
+        @optional_typecheck
+        def decorator(func: Callable) -> Callable:
+            return func
+        return decorator
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         if hasattr(func, "check_call_in_cache"):

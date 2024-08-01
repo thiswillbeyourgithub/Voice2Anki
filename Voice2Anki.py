@@ -32,6 +32,7 @@ def start_Voice2Anki(
     anki_media_folder: Optional[Union[str, PosixPath]] = None,
     disable_tracing: bool = False,
     disable_timeout: bool = True,
+    disable_smartcache: bool = False,
     widen_screen: bool = True,
     big_font: bool = True,
     port: int = 7860,
@@ -69,6 +70,10 @@ def start_Voice2Anki(
     disable_timeout: bool, default True
         if True, disables the decorator that creates a thread used for
         timeout of long functions
+    disable_smartcache: bool, default False
+        if True, disables smartcache, which is what tells a func to wait for
+        results if they are already being cached by another call, to avoid
+        concurrent calls
     widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
         for some widen screens, but very handy for mobile and tablet use.
@@ -145,6 +150,7 @@ def start_Voice2Anki(
     shared.debug = debug
     shared.disable_tracing = disable_tracing
     shared.disable_timeout = disable_timeout
+    shared.disable_smartcache = disable_smartcache
     shared.widen_screen = widen_screen
     shared.big_font = big_font
 
