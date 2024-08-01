@@ -67,7 +67,7 @@ def hasher(text: str) -> str:
 def embedder(
     text_list: List[str],
     model: str,
-    ) -> np.ndarray:
+    ) -> List[np.ndarray]:
     """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
     if result is not None, it is the embedding and returned right away. This
     was done to allow caching individual embeddings while still making one batch
@@ -76,27 +76,20 @@ def embedder(
     assert text_list
     assert all(t.strip() for t in text_list)
     func = litellm.embedding
+    cache_obj=Memory(cache_dir / "embeddings_iterator_cacher" /model, verbose=False)
     cached = IteratorCacher(
-        cache_location=cache_dir / "embeddings_iterator_cacher" /model,
+        memory_object=cache_obj,
         iter_list=["input"],
-        verbose=True,
-        unpacking_func = lambda out: out.to_dict()["data"],
-        repacking_func = lambda t: np.array(
-                [
-                    np.array(elem["embedding"]).reshape(1, -1)
-                    for elem in t
-                ]
-        )
+        verbose=shared.debug,
+        res_to_list = lambda out: out.to_dict()["data"],
+        batch_size=1500,
+        debug=False,
     )(func)
-    vec = cached(model=model, input=text_list)
+    vec: List[np.ndarray] = cached(model=model, input=text_list)
+    vec = [np.array(v).squeeze() for v in vec]
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
-    embeds = [
-        np.array(elem["embedding"]).reshape(1, -1)
-        for elem in vec.to_dict()["data"]
-    ]
-    embeds = np.array(embeds)
-    return embeds
+    return vec
 
 
 @optional_typecheck

@@ -12,7 +12,7 @@ sentence-transformers>=2.2.2
 ftfy>=6.1.1
 joblib>=1.2.0
 platformdirs >= 4.2.2
-iterator_cacher  # by me
+iterator_cacher >= 1.0.0  # by me
 py_ankiconnect  # by me
 
 # ocr mode
