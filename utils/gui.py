@@ -97,7 +97,7 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(scale=2, variant="compact", min_width=75):
                     with gr.Row():
-                        sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=False)
+                        sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=True)
                         improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=3)
                 check_prompt_as_system = gr.Checkbox(value=shared.pv["check_prompt_as_system"], interactive=True, label="Example as system pompt", show_label=True)
                 prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
