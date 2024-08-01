@@ -324,9 +324,13 @@ def thread_whisp_then_llm(audio_mp3: Optional[Union[PosixPath, str]]) -> None:
 
 @optional_typecheck
 @trace
-def transcribe(audio_mp3_1: Optional[Union[str, dict]]) -> str:
+def transcribe(audio_mp3_1: Optional[Union[List[Union[str, dict]], str, dict]]) -> str:
     "turn the 1st audio track into text"
     whi("Transcribing audio")
+
+    if isinstance(audio_mp3_1, list):
+        assert len(audio_mp3_1) == 1, f"Got an unexpected list as audio_mp3_1: {audio_mp3_1}"
+        audio_mp3_1 = audio_mp3_1[0]
 
     if audio_mp3_1 is None:
         raise Exception(red("Error: None audio_mp3_1"))
