@@ -976,7 +976,14 @@ with gr.Blocks(
                                 preprocess=False,
                                 postprocess=False,
                                 #show_progress=False,
-                                )
+                                ).then(
+        fn=update_audio_slots_txts,
+        inputs=[check_enable_dirload] + audio_slots_txts,
+        outputs=audio_slots_txts,
+        show_progress=False,
+        postprocess=False,
+        preprocess=False,
+        )
 
     # send to whisper
     transcript_btn.click(
@@ -1138,15 +1145,15 @@ with gr.Blocks(
             js=js_reset_height,
             )
 
-    # gr.on(
-    #         triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click],
-    #         fn=update_audio_slots_txts,
-    #         inputs=audio_slots_txts,
-    #         outputs=audio_slots_txts,
-    #         show_progress=False,
-    #         postprocess=False,
-    #         preprocess=False,
-    #         )
+    gr.on(
+            triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click, dir_load_btn.click],
+            fn=update_audio_slots_txts,
+            inputs=[check_enable_dirload] + audio_slots_txts,
+            outputs=audio_slots_txts,
+            show_progress=False,
+            postprocess=False,
+            preprocess=False,
+            )
 
     init.then(
             fn=update_audio_slots_txts,
