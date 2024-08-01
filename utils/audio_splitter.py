@@ -564,7 +564,7 @@ class AudioSplitter:
 
         return to_split
 
-    def split_one_transcript(self, transcript: dict, second_pass: bool) -> Tuple[List[Optional[List[int]]], List[Optional[dict]]]:
+    def split_one_transcript(self, transcript: dict, second_pass: bool) -> Tuple[List[Optional[List[float]]], List[Optional[dict]]]:
         duration = transcript["segments"][-1]["end"]
         full_text = transcript["transcription"]
         if not second_pass:
@@ -708,7 +708,7 @@ class AudioSplitter:
 
         return times_to_keep, metadata
 
-    def run_whisper(self, audio_path: PosixPath, second_pass: bool) -> dict:
+    def run_whisper(self, audio_path: Union[str, PosixPath], second_pass: bool) -> dict:
         audio_path = str(audio_path)
         if not second_pass:
             whi(f"Running whisper on {audio_path}")
@@ -832,7 +832,7 @@ class AudioSplitter:
 
         return transcript
 
-    def run_whisper_long(self, audio_path: PosixPath, audio: AudioSegment) -> dict:
+    def run_whisper_long(self, audio_path: Union[PosixPath, str], audio: AudioSegment) -> dict:
         """for audio longer than some threshold (say 10 minutes) then in the
         first pass it makes sense to split the audio, use multithreading to
         transcribe it, then merge the transcripts (taking care of the
@@ -863,7 +863,7 @@ class AudioSplitter:
 
         # multithreaded export as mp3
         @optional_typecheck
-        def threaded_export(audio: AudioSegment, path: PosixPath) -> None:
+        def threaded_export(audio: AudioSegment, path: Union[str, PosixPath]) -> None:
             audio.export(path, format="mp3")
         joblib.Parallel(
                 n_jobs=-1 if not self.debug else 1,
@@ -883,7 +883,7 @@ class AudioSplitter:
 
         # run whisper on each split
         @optional_typecheck
-        def threaded_whisper(path: PosixPath) -> dict:
+        def threaded_whisper(path: Union[PosixPath, str]) -> None:
             return self.run_whisper(audio_path=path, second_pass=False)
         tscripts = joblib.Parallel(
                 n_jobs=-1 if not self.debug else 1,
@@ -1040,7 +1040,7 @@ class AudioSplitter:
 
 @optional_typecheck
 @stt_cache.cache(ignore=["audio_path"])
-def whisper_splitter(audio_path: PosixPath, audio_hash: str, **kwargs) -> dict:
+def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwargs) -> dict:
     whi(f"Starting STT API (meaning cache is not used). Args: {kwargs}")
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
