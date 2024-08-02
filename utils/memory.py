@@ -46,7 +46,7 @@ Rules you follow:
 - If you have to create several flashcards from one transcript, separate them with "#####".
 - I will give you examples of good flashcards, you have to match their format and structure. This is critical.
 - In your flashcard, the answer must repeat the question (i.e. if the question starts by 'The types of cancer that' then the answer should start also by 'The types of cancer that'). This usually make it easier to memorize for me but use common sense and above all: take inspiration from the examples.
-- If you can't accomplish the task, start your reply by 'Alfred: [YOUR ISSUE]' followed by your issue and I'll help you right away.
+- If you can't accomplish the task, start your reply by 'Alfred: [YOUR ISSUE]' where YOUR ISSUE is replaced by a your issue in one sentence and I'll help you right away.
 - If the examples contain acronyms that are relevant to the transcript, feel free to reuse them directly.
 '''
 """.strip(),
