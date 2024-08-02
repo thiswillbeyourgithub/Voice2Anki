@@ -1,6 +1,6 @@
 from rapidfuzz.fuzz import ratio as levratio
 import queue
-from typing import List, Union
+from typing import List, Union, Optional, Any
 from datetime import datetime
 import rtoml
 import sys
@@ -19,7 +19,6 @@ import time
 import urllib.request
 import json
 from py_ankiconnect import PyAnkiconnect
-from typing import Any
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
