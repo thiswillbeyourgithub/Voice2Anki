@@ -547,12 +547,14 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     )
 
     # load output elem if clicked
@@ -817,24 +819,25 @@ with gr.Blocks(
             outputs=audio_slots,
             preprocess=False,
             postprocess=True,
-            #show_progress=False,
+            show_progress=False,
             ).success(
                 fn=transcribe,
                 inputs=[audio_slots[0]],
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).then(
                     lambda: None,
                     outputs=[txt_chatgpt_cloz],
                     show_progress=False,
-                ).success(
+                    ).success(
                         fn=dirload_splitted_last,
                         inputs=[gui_rolldirloadcheck],
                         outputs=[audio_slots[-1]],
                         preprocess=False,
                         postprocess=True,
-                        # show_progress=False,
+                        show_progress=False,
                         ).then(
                                 fn=get_card_status,
                                 inputs=[txt_chatgpt_cloz],
@@ -856,13 +859,14 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
-                ).success(
+                    ).success(
                         fn=dirload_splitted_last,
                         inputs=[gui_rolldirloadcheck],
                         outputs=[audio_slots[-1]],
@@ -890,6 +894,7 @@ with gr.Blocks(
                 outputs=[txt_audio],
                 preprocess=False,
                 postprocess=False,
+                show_progress=False,
                 ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -964,6 +969,7 @@ with gr.Blocks(
                     outputs=[txt_audio],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).success(
                         fn=alfred,
                         inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -993,6 +999,7 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             )
 
     # send to chatgpt
@@ -1041,6 +1048,7 @@ with gr.Blocks(
             outputs=[txt_audio],
             preprocess=False,
             postprocess=False,
+            show_progress=False,
             ).success(
                 fn=alfred,
                 inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
@@ -1144,6 +1152,7 @@ with gr.Blocks(
             triggers=[tab_settings.select, tab_queues.select, tab_logging.select, tab_memories_and_buffer.select],
             fn=None,
             js=js_reset_height,
+            show_progress=False,
             )
 
     gr.on(
