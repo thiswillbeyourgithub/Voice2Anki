@@ -81,7 +81,7 @@ def add_note_to_anki(
         notes_metadata: List[dict],
         tags: List[str],
         deck_name: str = "Default",
-        ) -> List[Union[int, str]]:
+        ) -> Optional[List[Union[int, str]]]:
     """create a new cloze directly in anki"""
     assert isinstance(tags, list), "tags have to be a list"
     if not shared.anki_notetype:
