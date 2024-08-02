@@ -320,7 +320,7 @@ def roll_queued_galleries(*qg: Optional[List[Union[List, Tuple]]]) -> List[Optio
 
 @optional_typecheck
 @trace
-def qg_add_to_new(*qg) -> List[Optional[Union[gr.Gallery, dict]]]:
+def qg_add_to_new(*qg) -> List[Optional[Union[gr.Gallery, dict, List]]]:
     """triggered by a shortcut, will add from clipboard the image to
     a new queued gallery"""
     qg = list(qg)

@@ -318,7 +318,7 @@ class AudioSplitter:
 
             # run whisper on each split
             @optional_typecheck
-            def threaded_whisper(path: Optional[str, PosixPath]) -> Optional[dict]:
+            def threaded_whisper(path: Optional[Union[str, PosixPath]]) -> Optional[dict]:
                 if path is None:
                     return None
                 transcript = self.run_whisper(audio_path=path, second_pass=True)
