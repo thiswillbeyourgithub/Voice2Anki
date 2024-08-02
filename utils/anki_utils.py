@@ -1,23 +1,17 @@
 from rapidfuzz.fuzz import ratio as levratio
 import queue
-from typing import List, Union, Optional, Any
+from typing import List, Union, Optional
 from datetime import datetime
 import rtoml
 import sys
 import importlib.util
-from functools import partial
-import asyncio
 import aiohttp
 import gradio as gr
 import re
-import threading
 import shutil
-import hashlib
 from pathlib import Path
 import ankipandas as akp
 import time
-import urllib.request
-import json
 from py_ankiconnect import PyAnkiconnect
 
 from .logger import red, whi, trace, Timeout
