@@ -883,7 +883,7 @@ class AudioSplitter:
 
         # run whisper on each split
         @optional_typecheck
-        def threaded_whisper(path: Union[PosixPath, str]) -> None:
+        def threaded_whisper(path: Union[PosixPath, str]) -> Optional[dict]:
             return self.run_whisper(audio_path=path, second_pass=False)
         tscripts = joblib.Parallel(
                 n_jobs=-1 if not self.debug else 1,
