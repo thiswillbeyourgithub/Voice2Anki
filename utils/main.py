@@ -954,7 +954,7 @@ def dirload_splitted(checkbox: bool, *audios: Optional[Union[List, bool]]) -> Li
 @optional_typecheck
 @trace
 @Critical
-def dirload_splitted_last(checkbox: bool) -> Union[str, gr.Audio, dict]:
+def dirload_splitted_last(checkbox: bool) -> Optional[Union[str, gr.Audio, dict]]:
     """wrapper for dirload_splitted to only load the last slot. This is faster
     because gradio does not have to send all 5 sounds if I just rolled"""
     audios = [True] * (shared.audio_slot_nb - 1) + [None]
