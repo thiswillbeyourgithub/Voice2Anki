@@ -322,7 +322,7 @@ def smartcache(func: Callable) -> Callable:
             kwargs2 = kwargs.copy()
 
         kwargs_sorted = {}
-        for k in sorted(kwargs2.items()):
+        for k in sorted(kwargs2.keys()):
             kwargs_sorted[k] = kwargs2[k]
 
         fstr = str(f)
