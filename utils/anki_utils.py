@@ -203,8 +203,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         assert "EMPTY" not in vals, f"Found EMPTY in {txt_chatgpt_cloz} that returned {vals}"
 
         n = len(vals)
-        missing = len([v for v in vals if v == "MISSING"])
-        present = len([v for v in vals if v == "Added"])
+        missing = len([v for v in vals if "missing" in v.lower()])
+        present = len([v for v in vals if "added" in v.lower()])
         assert missing + present == n, f"Unmatching length for {txt_chatgpt_cloz} that returned {vals}"
         if missing == 0:
             return f"Added {n}/{n}"
@@ -240,19 +240,19 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
 
             for b in bodies:
                 if levratio(txt_chatgpt_cloz, b) > 90:
-                    return "Added"
+                    return "Prob added 1"
                 if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 90:
-                    return "Added"
+                    return "Prob added 2"
                 b2 = remove_markers(b)
                 if levratio(txt_chatgpt_cloz, b2) > 90:
-                    return "Added"
+                    return "Prob added 3"
                 if levratio(txt_chatgpt_cloz, cloze_editor(b2)) > 90:
-                    return "Added"
+                    return "Prob added 4"
 
                 if levratio(txt_nomarkers, b2) > 90:
-                    return "Added"
+                    return "Prob added 5"
                 if levratio(txt_nomarkers, cloze_editor(b2)) > 90:
-                    return "Added"
+                    return "Prob added 6"
             return "MISSING"
 
 
