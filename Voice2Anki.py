@@ -38,7 +38,7 @@ def start_Voice2Anki(
     port: int = 7860,
     *args,
     **kwargs
-    ) -> None:
+    ) -> Optional[str]:
     """
     Parameters
     ----------
