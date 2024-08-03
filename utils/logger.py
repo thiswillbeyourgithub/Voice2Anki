@@ -1,4 +1,5 @@
 import gradio as gr
+import inspect
 from typing import Callable
 from joblib import hash as jhash
 import asyncio
@@ -319,6 +320,7 @@ def smartcache(func: Callable) -> Callable:
                 if ig in kwargs2:
                     del kwargs2[ig]
         else:
+            f = func
             kwargs2 = kwargs.copy()
 
         kwargs_sorted = {}
@@ -327,7 +329,7 @@ def smartcache(func: Callable) -> Callable:
 
         fstr = str(f)
 
-        to_hash = [f]
+        to_hash = [inspect.getsource(f), fstr]
         if args:
             to_hash.append(args)
         if kwargs_sorted:
