@@ -436,17 +436,33 @@ def flag_audio(
     # make sure the gallery is saved as image and not as path
     if gallery is not None:
         try:
+            new_val = []
             if hasattr(gallery, "root"):
                 gallery = gallery.root
-            assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
-            new_gal = []
-            for img in gallery:
-                try:
-                    decoded = cv2.imread(img.image.path, flags=1)
-                except Exception:
-                    decoded = cv2.imread(img["image"]["path"], flags=1)
-                new_gal.append(decoded)
+            if isinstance(gallery, list):
+                new_gal = []
+                for im in gallery:
+                    if isinstance(im, tuple):
+                        assert Path(im[0]).exists(), f"Missing image from tuple {im}"
+                        assert im[1] is None, f"Unexpected tupe: {im}"
+                        new_gal.append(
+                                rgb_to_bgr(
+                                    cv2.imread(
+                                        im[0],
+                                        flags=1)
+                                    )
+                                )
+                    else:
+                        new_gal.append(
+                                rgb_to_bgr(
+                                    cv2.imread(
+                                        im.image.path,
+                                        flags=1)
+                                    )
+                                )
+                new_gal += [decoded]
             gallery = new_gal
+            pickle.dumps(gallery)
         except Exception as err:
             gr.Warning(red(f"Failed to get the gallery to flag: '{err}'")
 
