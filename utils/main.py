@@ -1215,10 +1215,10 @@ def Voice2Anki_db_save(
     if max_ratio >= 90:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
         save_dict["save_dict_trust"] = "less"
-        save_dict["orig_save_dict_difference"] = {}
+        save_dict["orig_save_dict_diff"] = {}
         for k, v in orig_save_dict.items():
             if k not in save_dict or save_dict[k] != v:
-                save_dict["orig_save_dict_differences"][k] = v
+                save_dict["orig_save_dict_diff"][k] = v
         del shared.llm_to_db_buffer[closest_buffer_key]
     else:
         save_dict = orig_save_dict
