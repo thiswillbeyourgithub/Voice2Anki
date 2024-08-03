@@ -431,7 +431,7 @@ def flag_audio(
     if Path(new_filename).exists():
         raise Exception(red(f"Audio you're trying to flag already exists: {new_filename}"))
     shutil.copy2(aud, new_filename)
-    red(f"Flagged: copyed '{aud}' to '{new_filename}'")
+    red(f"Flagged: copied '{aud}' to '{new_filename}'")
 
     # make sure the gallery is saved as image and not as path
     if gallery is not None:
