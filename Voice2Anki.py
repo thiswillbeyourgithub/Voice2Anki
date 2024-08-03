@@ -20,7 +20,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 @optional_typecheck
 def start_Voice2Anki(
-    print_db_then_exit: bool = False,
+    print_db_then_exit: Optional[str] = None,
     nb_audio_slots: int = 3,
 
     share: bool = False,
@@ -94,7 +94,7 @@ def start_Voice2Anki(
                 f"Unexpected {print_db_then_exit} value, should be "
                 f"a value from {', '.join(db_list)}")
     else:
-        assert print_db_then_exit is False, "Invalid value for print_db_then_exit. You must specify the name of a db"
+        assert print_db_then_exit is None, "Invalid value for print_db_then_exit. You must specify the name of a db"
 
     whi("Starting Voice2Anki\n")
     if args:
