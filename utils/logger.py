@@ -312,16 +312,28 @@ def smartcache(func: Callable) -> Callable:
     @wraps(func)
     def wrapper(*args, **kwargs):
         if hasattr(func, "check_call_in_cache"):
-            fstr = str(func.func)
+            f = func.func
             # ignored arguments to take into account
             kwargs2 = kwargs.copy()
             for ig in func.ignore:
                 if ig in kwargs2:
                     del kwargs2[ig]
         else:
-            fstr = str(func)
             kwargs2 = kwargs.copy()
-        h = jhash(fstr + jhash(args) + jhash(kwargs2))
+
+        kwargs_sorted = {}
+        for k in sorted(kwargs2.items()):
+            kwargs_sorted[k] = kwargs2[k]
+
+        fstr = str(f)
+
+        to_hash = [f]
+        if args:
+            to_hash.append(args)
+        if kwargs_sorted:
+            to_hash.append(kwargs_sorted)
+        h = jhash(to_hash)
+
         if h in shared.smartcache:
             t = shared.smartcache[h]
             red(f"Smartcache: already ongoing for {fstr} since {time.time()-t:.2f}s: hash={h}")
@@ -342,9 +354,9 @@ def smartcache(func: Callable) -> Callable:
                     shared.smartcache[h] = time.time()
             try:
                 if args:
-                    result = func(*args, **kwargs)
+                    result = func(*args, **kwargs_sorted)
                 else:
-                    result = func(**kwargs)
+                    result = func(**kwargs_sorted)
             except:
                 with shared.thread_lock:
                     with shared.timeout_lock:
