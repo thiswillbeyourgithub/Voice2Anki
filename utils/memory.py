@@ -74,6 +74,7 @@ def hasher(text: str) -> str:
 
 @trace
 @optional_typecheck
+@smartcache
 def embedder(
     text_list: List[str],
     model: str,
