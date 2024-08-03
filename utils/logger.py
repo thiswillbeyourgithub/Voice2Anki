@@ -20,10 +20,13 @@ from platformdirs import user_cache_dir, user_log_dir
 try:
     from .typechecker import optional_typecheck
     from .shared_module import shared
-except Exception:
-    # needed when calling audio_splitter instead of Voice2Anki
-    from typechecker import optional_typecheck
-    from shared_module import shared
+except ImportError as err:
+    if "attempted relative import with no known parent package" not in str(err):
+        raise
+    else:
+        # needed when calling audio_splitter instead of Voice2Anki
+        from typechecker import optional_typecheck
+        from shared_module import shared
 
 cache_dir = Path(user_cache_dir(appname="Voice2Anki"))
 assert cache_dir.parent.exists() or cache_dir.parent.parent.exists(
