@@ -657,8 +657,8 @@ async def async_parallel_alfred(splits, *args, **kwargs):
 @floatizer
 @optional_typecheck
 @trace
-@Timeout(60)
 @smartcache
+@Timeout(60)
 @llm_cache.cache(ignore=["cache_mode"])
 def alfred(
         txt_audio: str,
