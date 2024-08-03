@@ -464,7 +464,7 @@ def flag_audio(
             gallery = new_gal
             pickle.dumps(gallery)
         except Exception as err:
-            gr.Warning(red(f"Failed to get the gallery to flag: '{err}'")
+            gr.Warning(red(f"Failed to get the gallery to flag: '{err}'"))
 
     # move the other component's data
     to_save = {
