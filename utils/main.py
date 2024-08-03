@@ -1194,27 +1194,35 @@ def Voice2Anki_db_save(
         closest_buffer_key = buffer_keys[ratio_buffer_keys.index(max_ratio)]
     else:
         max_ratio = 1
-    if max_ratio < 90:
-        save_dict = {
-                "type": "anki_card",
-                "timestamp": time.time(),
-                "token_cost": None,
-                "temperature": None,
-                "LLM_context": txt_chatgpt_context,
-                "Voice2Anki_profile": shared.pv.profile_name,
-                "transcribed_input": txt_audio,
-                "model_name": f"Probably:{shared.pv['llm_choice']}",
-                "last_message_from_conversation": None,
-                "nb_of_message_in_conversation": None,
-                "system_prompt": default_system_prompt["content"],
-                "cloze": txt_chatgpt_cloz,
-                "Voice2Anki_version": shared.VERSION,
-                "request_information": shared.request,
-                "anki_nids": note_ids,
-                }
-    else:
+    orig_save_dict = {
+        "type": "anki_card",
+        "timestamp": time.time(),
+        "token_cost": None,
+        "temperature": None,
+        "LLM_context": txt_chatgpt_context,
+        "Voice2Anki_profile": shared.pv.profile_name,
+        "transcribed_input": txt_audio,
+        "model_name": f"Probably:{shared.pv['llm_choice']}",
+        "last_message_from_conversation": None,
+        "nb_of_message_in_conversation": None,
+        "system_prompt": default_system_prompt["content"],
+        "cloze": txt_chatgpt_cloz,
+        "Voice2Anki_version": shared.VERSION,
+        "request_information": shared.request,
+        "anki_nids": note_ids,
+        "save_dict_trust": "high",
+    }
+    if max_ratio >= 90:
         save_dict = json.loads(shared.llm_to_db_buffer[closest_buffer_key])
+        save_dict["save_dict_trust"] = "less"
+        save_dict["orig_save_dict_difference"] = {}
+        for k, v in orig_save_dict.items():
+            if k not in save_dict or save_dict[k] != v:
+                save_dict["orig_save_dict"][k] = v
         del shared.llm_to_db_buffer[closest_buffer_key]
+    else:
+        save_dict = orig_save_dict
+
     with shared.thread_lock:
         if shared.running_threads["saving_chatgpt"]:
             [t.join() for t in shared.running_threads["saving_chatgpt"]]
