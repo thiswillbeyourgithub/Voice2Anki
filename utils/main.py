@@ -31,7 +31,7 @@ from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache, Critical
 from .memory import prompt_filter, load_prev_prompts, tkn_len, transcript_template, default_system_prompt
-from .media import sound_preprocessing, get_img_source, format_audio_component
+from .media import sound_preprocessing, get_img_source, format_audio_component, rgb_to_bgr
 from .profiles import ValueStorage
 from .typechecker import optional_typecheck
 
@@ -460,7 +460,6 @@ def flag_audio(
                                         flags=1)
                                     )
                                 )
-                new_gal += [decoded]
             gallery = new_gal
             pickle.dumps(gallery)
         except Exception as err:
