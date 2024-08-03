@@ -435,17 +435,20 @@ def flag_audio(
 
     # make sure the gallery is saved as image and not as path
     if gallery is not None:
-        if hasattr(gallery, "root"):
-            gallery = gallery.root
-        assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
-        new_gal = []
-        for img in gallery:
-            try:
-                decoded = cv2.imread(img.image.path, flags=1)
-            except Exception:
-                decoded = cv2.imread(img["image"]["path"], flags=1)
-            new_gal.append(decoded)
-        gallery = new_gal
+        try:
+            if hasattr(gallery, "root"):
+                gallery = gallery.root
+            assert isinstance(gallery, (type(None), list)), "Gallery is not a list or None"
+            new_gal = []
+            for img in gallery:
+                try:
+                    decoded = cv2.imread(img.image.path, flags=1)
+                except Exception:
+                    decoded = cv2.imread(img["image"]["path"], flags=1)
+                new_gal.append(decoded)
+            gallery = new_gal
+        except Exception as err:
+            gr.Warning(red(f"Failed to get the gallery to flag: '{err}'")
 
     # move the other component's data
     to_save = {
