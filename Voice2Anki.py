@@ -1,3 +1,4 @@
+import gradio as gr
 import os
 import sys
 import fire
@@ -38,7 +39,7 @@ def start_Voice2Anki(
     port: int = 7860,
     *args,
     **kwargs
-    ) -> Optional[str]:
+    ) -> Optional[Union[str, gr.Blocks]]:
     """
     Parameters
     ----------
@@ -185,6 +186,7 @@ def start_Voice2Anki(
             width="100%",  # used if inline is True
             **ssl_args,
             )
+    return demo
 
 if __name__ == "__main__":
-    instance = fire.Fire(start_Voice2Anki)
+    demo = fire.Fire(start_Voice2Anki)
