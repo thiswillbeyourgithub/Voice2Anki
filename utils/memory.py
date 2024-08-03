@@ -1,3 +1,4 @@
+import threading
 from typing import List, Optional, Union
 from functools import partial
 from tqdm import tqdm
@@ -423,9 +424,19 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
         #     rtoml.dump(prev_prompts, f, pretty=True, none_value=RTOML_NONEVALUE)
     except Exception as err:
         raise Exception(red(f"Error during recursive improvement: '{err}'"))
-        return
+
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
+    whi("Trying to directly embed the new memories")
+    prev_prompts = load_prev_prompts(txt_profile)
+    to_embed = [content, answer]
+    thread = threading.Thread(
+        target=embedder,
+        kwargs={"text_list": to_embed, "model": shared.pv["choice_embed"]},
+        daemon=True,
+    )
+    thread.start()
+    return
 
 @optional_typecheck
 @trace
