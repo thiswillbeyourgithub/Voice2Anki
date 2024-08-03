@@ -408,18 +408,30 @@ def flag_audio(
         txt_chatgpt_context: str,
         gallery: Union[None, List, gr.Gallery],
         ) -> None:
-    """copy audio in slot #1 to the user_directory/flagged folder"""
+    """copy audio in slot #1 to the "flagged" folder in the profile folder"""
     assert shared.pv["enable_flagging"], "Incoherent UI"
     # move audio file
     if not (shared.dirload_queue["loaded"] == True).any():
         raise Exception(red("No loaded files in shared.dirload_queue"))
+
+    # create the appropriate dir
+    if shared.splitted_dir is None:
+        flag_dir = "./flagged"
+    else:
+        flag_dir = shared.splitted_dir.parent / "flagged"
+        assert flag_dir.parent.exists(), f"Couldn't find flag_dir parent at {flag_dir.parent}"
+    if flag_dir.exists():
+        assert flag_dir.is_dir(), f"flag_dir is not a directory: {flag_dir}"
+    else:
+        flag_dir.mkdir(parents=False, exist_ok=False)
+
     aud = Path(shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name)
-    assert aud.exists(), f"File not found: {aud}"
-    new_filename = f"user_directory/flagged/{aud.name}"
+    assert aud.exists(), f"Original audio file not found: {aud}"
+    new_filename = flag_dir / aud.name
     if Path(new_filename).exists():
         raise Exception(red(f"Audio you're trying to flag already exists: {new_filename}"))
     shutil.copy2(aud, new_filename)
-    red(f"Flagged {aud} to {new_filename}")
+    red(f"Flagged: copyed '{aud}' to '{new_filename}'")
 
     # make sure the gallery is saved as image and not as path
     if gallery is not None:
@@ -430,7 +442,7 @@ def flag_audio(
         for img in gallery:
             try:
                 decoded = cv2.imread(img.image.path, flags=1)
-            except:
+            except Exception:
                 decoded = cv2.imread(img["image"]["path"], flags=1)
             new_gal.append(decoded)
         gallery = new_gal
@@ -446,8 +458,9 @@ def flag_audio(
             "gallery": gallery,
             "request_information": shared.request,
             }
-    with open(f"user_directory/flagged/{aud.name}.pickle", "wb") as f:
+    with (new_filename.parent / (new_filename.name + ".pickle")).open("wb") as f:
         pickle.dump(to_save, f)
+    gr.Warning(red(f"Done flagging audio and metadata, output is ")
 
 
 @stripizer
