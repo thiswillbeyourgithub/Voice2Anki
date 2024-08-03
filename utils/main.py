@@ -460,7 +460,7 @@ def flag_audio(
             }
     with (new_filename.parent / (new_filename.name + ".pickle")).open("wb") as f:
         pickle.dump(to_save, f)
-    gr.Warning(red(f"Done flagging audio and metadata, output is ")
+    gr.Warning(red(f"Done flagging audio and metadata, output is "))
 
 
 @stripizer
