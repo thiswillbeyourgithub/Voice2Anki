@@ -469,6 +469,8 @@ def load_prev_prompts(profile: str) -> List[dict]:
 def display_price(sld_max_tkn: int, llm_choice: str) -> str:
     if llm_choice not in shared.llm_price:
         return f"Price not found for model '{llm_choice}'"
+    if sld_max_tkn == 0:
+        return "Can't set 'Max token' to 0"
     price = shared.llm_price[llm_choice]
     if isinstance(price, float):
         return f"${price} per second (actual price computation is probably wrong for now!)"
