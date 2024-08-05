@@ -304,7 +304,7 @@ def rgb_to_bgr(image):
 
 @optional_typecheck
 @trace
-def roll_queued_galleries(*qg: Optional[List[Union[List, Tuple]]]) -> List[Optional[Union[gr.Gallery, dict]]]:
+def roll_queued_galleries(*qg: Optional[List[Union[List, Tuple]]]) -> List[Optional[Union[gr.Gallery, dict, List]]]:
     "pop the first queued gallery and send it to the main gallery"
     assert shared.pv["enable_queued_gallery"], "Incoherent UI"
     output = list(qg) + [None]
