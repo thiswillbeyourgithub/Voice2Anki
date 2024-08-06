@@ -177,7 +177,7 @@ def start_Voice2Anki(
             quiet=False,
             debug=debug,
             prevent_thread_lock=True if debug else False,
-            max_threads=5,  # default 40
+            max_threads=5,  # if not debug else 1,  # default 40
             show_error=True,
             show_api=False,
             server_name=server,
