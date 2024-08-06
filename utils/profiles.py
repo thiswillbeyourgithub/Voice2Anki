@@ -163,7 +163,9 @@ class ValueStorage:
             mess = self.out_queue.get_nowait()
         except queue.Empty:
             return
+        red(f"\n\nMessage from the valuestorage worker:")
         red(mess)
+        time.sleep(3)
 
     def __getitem__(self, key: str) -> Any:
         self.__check_message__()
@@ -268,12 +270,18 @@ def worker_setitem(in_queues: dict, out_queue: queue.Queue) -> None:
     while True:
         profile = None
         while profile is None:
+            time.sleep(0.1)
             for key, q in in_queues.items():
-                try:
-                    profile, item = q.get_nowait()
-                    break
-                except queue.Empty:
-                    time.sleep(0.01)
+                if q.empty():
+                    continue
+                size = q.qsize()
+                if q.full():
+                    out_queue.put(f"Queue of key {key} appears to be full. Size: {size}")
+                    raise Exception()
+                if size > 5:
+                    out_queue.put(f"Unexpected size of queue of {key}: {size}")
+                profile, item = q.get_nowait()
+                break
 
         kp = key + ".pickle"
         if key.startswith("queued_gallery_"):
