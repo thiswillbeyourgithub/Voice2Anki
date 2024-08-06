@@ -823,7 +823,7 @@ def alfred(
                     "request_information": shared.request,
                     })
 
-    yel(f"\n\nLLM answer:\n{cloz}\n\n")
+    yel(f"\n\nLLM answer: '{cloz}'")
     whi(f"LLM cost: {shared.pv['total_llm_cost']} (${tkn_cost_dol:.3f}, not counting whisper)")
     red(f"Total LLM cost so far: ${shared.pv['total_llm_cost']:.4f} (not counting whisper)")
 
