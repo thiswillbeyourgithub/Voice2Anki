@@ -1,6 +1,6 @@
 import gradio as gr
 import inspect
-from typing import Callable
+from typing import Callable, Optional
 from joblib import hash as jhash
 import asyncio
 import threading
@@ -9,7 +9,7 @@ import sqlite3
 import zlib
 import re
 import os
-from pathlib import Path
+from pathlib import Path, PosixPath
 from tqdm import tqdm
 import logging
 from logging import handlers
@@ -207,6 +207,52 @@ red = get_coloured_logger("red")
 purp = get_coloured_logger("purple")
 ital = get_coloured_logger("italic")
 
+def match_queue(*args, **kwargs) -> Optional[str]:
+    "check the arguments to know to which dirloadqueue a given @trace refers to"
+    if shared.dirload_queue is None:
+        return ""
+    if shared.dirload_queue.empty:
+        return ""
+    df = shared.dirload_queue.reset_index().set_index("n").loc[:, ["path", "temp_path", "transcribed", "alfreded"]]
+    vals = list(args) + list(kwargs.values())
+    vals = [str(i) if isinstance(i, PosixPath) else i for i in vals]
+    for i, v in enumerate(vals):
+        if isinstance(v, list):
+            vals.extend(v[:3])
+            vals.extend(v[-3:])
+            vals[i] = None
+    vals = [v for v in vals if v is not None]
+    candidates = {}
+
+    for ind, row in df.items():
+        if not row.get("temp_path"):
+            continue
+        match = 0
+        for cell in row:
+            for val in vals:
+                try:
+                    if str(val) in str(cell):
+                        match += 1
+                except Exception as err:
+                    red(err)
+                    pass
+        if match:
+            if ind not in candidates:
+                candidates[ind] = match
+            else:
+                candidates[ind] += match
+    if not candidates:
+        return ""
+
+    assert max(list(candidates.values())) > 0
+    sorted_cand = sorted(candidates.keys(), keys=lambda k: candidates[k])
+    best = sorted_cand[0]
+    rest = sorted_cand[1:]
+    if rest:
+        rest = f" or maybe: {','.join(rest)}"
+    return f" for index: {best}{rest}"
+
+
 @optional_typecheck
 def trace(func: Callable) -> Callable:
     """simple wrapper to use as decorator to print when a function is used
@@ -219,20 +265,28 @@ def trace(func: Callable) -> Callable:
     if asyncio.iscoroutinefunction(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            ital(f"-> Entering {func}")
+            cand = match_queue(*args, **kwargs)
+            if not cand:
+                ital(f"-> Entering {func}")
+            else:
+                purp(f"-> Entering {func}{cand}")
             # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             result = await func(*args, **kwargs)
             tt = time.time() - t
-            if tt > 0.5:
-                red(f"    Exiting {func} after {tt:.1f}s")
+            if tt > 0.5 or cand:
+                red(f"    Exiting {func}{cand} after {tt:.1f}s")
             else:
                 ital(f"   Exiting {func} after {tt:.1f}s")
             return result
     else:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            ital(f"-> Entering {func}")
+            cand = match_queue(*args, **kwargs)
+            if not cand:
+                ital(f"-> Entering {func}")
+            else:
+                purp(f"-> Entering {func}{cand}")
             # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             if args:
@@ -240,8 +294,8 @@ def trace(func: Callable) -> Callable:
             else:
                 result = func(**kwargs)
             tt = time.time() - t
-            if tt > 0.5:
-                red(f"    Exiting {func} after {tt:.1f}s")
+            if tt > 0.5 or cand:
+                red(f"    Exiting {func}{cand} after {tt:.1f}s")
             else:
                 ital(f"   Exiting {func} after {tt:.1f}s")
             return result
