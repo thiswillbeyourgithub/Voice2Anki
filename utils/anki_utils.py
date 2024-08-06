@@ -222,16 +222,18 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         if state:
             return "Added"
         else:
-            recent = await call_anki(action="findNotes", query="added:2")
+            recent = await call_anki(action="findNotes", query="added:4")
             if not recent:
                 return "MISSING"
             bodies = await get_anki_content(nid=recent)
             if txt_chatgpt_cloz in bodies:
                 return "Added"
-            if all(c in bodies for c in cloz):
-                return "Added"
-            if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
-                return "Added"
+            for b in bodies:
+                if all(c in b for c in cloz):
+                    return "Added"
+            for b in bodies:
+                if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
+                    return "Added"
 
             def remove_markers(intext: str) -> str:
                 return intext.replace("{{c", "").replace("}}", "").replace("::", "")
