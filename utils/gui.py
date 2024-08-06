@@ -129,7 +129,7 @@ with gr.Blocks(
         with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab_main"], elem_id="js_widetabs") as tab_gallery:
             with gr.Column():
                 roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
-                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="cover", container=True)
+                gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="scale-down", container=True)
                 with gr.Group():
                     with gr.Row():
                         rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
