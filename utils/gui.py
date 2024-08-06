@@ -283,7 +283,7 @@ with gr.Blocks(
                     interactive=False,
                     wrap=True,
                     height=2000,
-                    column_widths=["1%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
+                    column_widths=["5%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
                     )
 
     with gr.Tab(label="Logging", elem_id="js_widetabs", elem_classes=["js_toptabs"]) as tab_logging:
@@ -300,7 +300,7 @@ with gr.Blocks(
                     interactive=False,
                     wrap=True,
                     height=2000,
-                    column_widths=["1%", "25%", "5%", "5%", "25%", "10%", "10%", "5%", "5%", "10%"],
+                    column_widths=["5%", "25%", "5%", "5%", "25%", "10%", "10%", "5%", "5%", "10%"],
                     )
 
         with gr.Tab(label="Message buffer", elem_id="js_widetabs", elem_classes=["js_subtab_memoriesandbuffer"]) as tab_buffer:

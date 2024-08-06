@@ -268,7 +268,7 @@ def prompt_filter(
     assert len(embeddings_contents) == len(embeddings_answers), f"len(embeddings_contents)={len(embeddings_contents)} but len(embeddings_answers)={len(embeddings_answers)}"
     sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
-    w1, w2 = 5, 1
+    w1, w2 = 3, 1
     sim_combined = ((sim_content * w1 + sim_answer * w2) / (w1 + w2)).squeeze()
 
     max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
