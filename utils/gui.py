@@ -1165,16 +1165,16 @@ with gr.Blocks(
             preprocess=False,
             )
 
-    init.then(
-            fn=update_audio_slots_txts,
-            inputs=[check_enable_dirload] + audio_slots_txts,
-            outputs=audio_slots_txts,
-            show_progress=False,
-            postprocess=False,
-            preprocess=False,
-            every=0.25,
-            trigger_mode="once",
-            )
+    # init.then(
+    #         fn=update_audio_slots_txts,
+    #         inputs=[check_enable_dirload] + audio_slots_txts,
+    #         outputs=audio_slots_txts,
+    #         show_progress=False,
+    #         postprocess=False,
+    #         preprocess=False,
+    #         every=0.25,
+    #         trigger_mode="once",
+    #         )
     init.then(
             fn=sync_anki,
             show_progress=False,
