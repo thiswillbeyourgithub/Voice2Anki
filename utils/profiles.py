@@ -1,7 +1,7 @@
 import time
 import os
 import json
-import multiprocessing
+import threading
 import queue
 import pickle
 from pathlib import Path
@@ -102,10 +102,9 @@ class ValueStorage:
             f.write(profile)
 
         self.in_queues = {k: queue.Queue() for k in profile_keys}
-        self.out_queue = queue.Queue()
-        self.worker = multiprocessing.Process(
+        self.worker = threading.Thread(
                 target=worker_setitem,
-                kwargs={"in_queues": self.in_queues, "out_queue": self.out_queue},
+                kwargs={"in_queues": self.in_queues},
                 daemon=True,
                 )
         self.worker.start()
@@ -157,18 +156,7 @@ class ValueStorage:
         except Exception:
             return a == b
 
-    def __check_message__(self) -> None:
-        "read the message left in the out_queue by the worker"
-        try:
-            mess = self.out_queue.get_nowait()
-        except queue.Empty:
-            return
-        red(f"\n\nMessage from the valuestorage worker:")
-        red(mess)
-        time.sleep(3)
-
     def __getitem__(self, key: str) -> Any:
-        self.__check_message__()
         assert self.worker.is_alive(), "Saving worker appears to be dead!"
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
@@ -227,7 +215,6 @@ class ValueStorage:
             elif key == "txt_openrouter_api_key":
                 os.environ["OPENROUTER_API_KEY"] = item
 
-        self.__check_message__()
         assert self.worker.is_alive(), "Saver worker appears to be dead!"
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
@@ -264,55 +251,56 @@ class ValueStorage:
                 red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
 
 @optional_typecheck
-def worker_setitem(in_queues: dict, out_queue: queue.Queue) -> None:
+def worker_setitem(in_queues: dict) -> None:
     """continuously running worker that is used to save components value to
     the appropriate profile"""
     while True:
-        profile = None
-        while profile is None:
-            time.sleep(0.1)
-            for key, q in in_queues.items():
-                if q.empty():
-                    continue
-                size = q.qsize()
-                if q.full():
-                    out_queue.put(f"Queue of key {key} appears to be full. Size: {size}")
-                    raise Exception()
-                if size > 5:
-                    out_queue.put(f"Unexpected size of queue of {key}: {size}")
+        time.sleep(0.5)
+        for key, q in in_queues.items():
+            if q.empty():
+                continue
+            size = q.qsize()
+            if size > 100:
+                red(f"Unexpected size of queue of {key}: {size}")
+            if q.full():
+                red(f"Queue of key {key} appears to be full. Size: {size}")
+                raise Exception()
+
+            profile, item = q.get_nowait()
+            while not q.empty():  # always get the last value
                 profile, item = q.get_nowait()
-                break
+            # red(f"Saving {key}")  # for debugging
 
-        kp = key + ".pickle"
-        if key.startswith("queued_gallery_"):
-            kf = profile / "queues" / "galleries" / kp
-        else:
-            kf = profile / kp
+            kp = key + ".pickle"
+            if key.startswith("queued_gallery_"):
+                kf = profile / "queues" / "galleries" / kp
+            else:
+                kf = profile / kp
 
-        kf.unlink(missing_ok=True)
+            kf.unlink(missing_ok=True)
 
-        if item is profile_keys[key]["default"]:
-            # if it's the default value, simply delete it and don't create
-            # the new file
-            continue
+            if item is profile_keys[key]["default"]:
+                # if it's the default value, simply delete it and don't create
+                # the new file
+                continue
 
-        if key == "message_buffer":
-            try:
-                with open(str(kf), "w") as f:
-                    json.dump(item, f, indent=4, ensure_ascii=False)
-            except Exception as err:
-                out_queue.put(f"Error when saving message_buffer as json for key {key} in pickle: '{err}'")
-        else:
-            try:
-                with open(str(kf), "w") as f:
-                    pickle.dump(item, f)
-            except Exception:
+            if key == "message_buffer":
                 try:
-                    # try as binary
-                    with open(str(kf), "wb") as f:
-                        pickle.dump(item, f)
+                    with open(str(kf), "w") as f:
+                        json.dump(item, f, indent=4, ensure_ascii=False)
                 except Exception as err:
-                    out_queue.put(f"Error when setting {kf}: '{err}'")
+                    red(f"Error when saving message_buffer as json for key {key} in pickle: '{err}'")
+            else:
+                try:
+                    with open(str(kf), "w") as f:
+                        pickle.dump(item, f)
+                except Exception:
+                    try:
+                        # try as binary
+                        with open(str(kf), "wb") as f:
+                            pickle.dump(item, f)
+                    except Exception as err:
+                        red(f"Error when setting {kf}: '{err}'")
 
 
 # @trace
