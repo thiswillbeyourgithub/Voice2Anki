@@ -547,16 +547,16 @@ with gr.Blocks(
             fn=transcribe,
             inputs=[audio_slots[0]],
             outputs=[txt_audio],
-            preprocess=False,
-            postprocess=False,
-            show_progress=False,
+            preprocess=True,
+            postprocess=True,
+            show_progress=True,
             ).success(
                     fn=alfred,
                     inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
                     outputs=[txt_chatgpt_cloz],
-                    preprocess=False,
-                    postprocess=False,
-                    show_progress=False,
+                    preprocess=True,
+                    postprocess=True,
+                    show_progress=True,
                     )
 
     # load output elem if clicked
