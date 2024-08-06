@@ -787,6 +787,20 @@ def alfred(
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
     cloz = "\n".join([cl.strip() for cl in cloz.splitlines() if cl.strip()])
 
+    if "<thoughts>" in cloz:
+        if "</thoughts>" not in cloz:
+            red("Missing <thoughts> clozing !")
+        else:
+            thoughts = cloz.split("<thoughts>", 1)[1].split("</thoughts>", 1)[0]
+            before_thought, nonthought = cloz.split(thoughts, 1)
+            if before_thought.strip():
+                yel(f"Found before thought text: '{before_thought}'")
+            if "<thoughts>" in nonthought or "</thoughts>" in nonthought:
+                red("Found </?thoughts> tags in the cloze!")
+            else:
+                red(f"Thoughts: {thoughts}")
+                # cloz = nonthought
+
     # if contains cloze in multiple parts but in the same line, merge them
     sl = cloz.splitlines()
     if len(sl) == 2:

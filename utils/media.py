@@ -485,6 +485,8 @@ def update_audio_slots_txts(gui_enable_dirload: bool, *audio_slots_txts) -> List
             o = re.sub(" fred", " <mark>alfred</mark>", o, flags=re.IGNORECASE)
             o = re.sub("carte", "<mark>carte</mark>", o, flags=re.IGNORECASE)
             o = re.sub("note", "<mark>note</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("<thoughts>", "<mark>note</mark>", o, flags=re.IGNORECASE)
+            o = re.sub("</thoughts>", "<mark>note</mark>", o, flags=re.IGNORECASE)
 
             o = re.sub(r"\Wstop ?\W", "<mark>stop</mark>", o, flags=re.IGNORECASE)
             o = re.sub(r"\W#####\W", "<mark>#####</mark>", o, flags=re.IGNORECASE)
