@@ -7,6 +7,7 @@ import gradio as gr
 import pandas as pd
 import litellm
 from typing import Optional, Any, Callable, List
+from dataclasses import MISSING
 
 try:
     from typechecker import optional_typecheck
@@ -193,8 +194,7 @@ class SharedModule:
             self.running_threads[k] = []
         self.smartcache = {}
         self.added_note_ids = []
-        self.pv.running_tasks = {k: None for k in self.pv.running_tasks.keys()}
-        self.pv.cache_values = {k: None for k in self.pv.cache_values.keys()}
+        self.pv.cache_values = {k: MISSING for k in self.pv.cache_values.keys()}
 
         os.environ["OPENAI_API_KEY"] = self.pv["txt_openai_api_key"].strip()
         os.environ["DEEPGRAM_API_KEY"] = self.pv["txt_deepgram_api_key"].strip()

@@ -1,7 +1,7 @@
 import time
 import os
 import json
-import threading
+import multiprocessing
 import queue
 import pickle
 from pathlib import Path
@@ -9,6 +9,7 @@ import sys
 import importlib.util
 import numpy as np
 from typing import Any, List, Optional, Union, Tuple, Callable
+from dataclasses import MISSING
 
 import gradio as gr
 
@@ -100,19 +101,16 @@ class ValueStorage:
         with open(str(profile_path / "latest_profile.txt"), "w") as f:
             f.write(profile)
 
-        self.in_queue = queue.Queue()
-        self.lock = threading.Lock()
-        self.thread = threading.Thread(
+        self.in_queues = {k: queue.Queue() for k in profile_keys}
+        self.out_queue = queue.Queue()
+        self.worker = multiprocessing.Process(
                 target=worker_setitem,
-                args=[self.in_queue],
-                daemon=False,
+                kwargs={"in_queues": self.in_queues, "out_queue": self.out_queue},
+                daemon=True,
                 )
-        self.thread.start()
+        self.worker.start()
 
-        self.running_tasks = {k: None for k in profile_keys}
-        self.cache_values = {k: None for k in profile_keys}
-
-        self.time_limit = 10  # number of seconds to wait for a queue
+        self.cache_values = {k: MISSING for k in profile_keys}
 
         self.profile_name = profile
         whi(f"Profile loaded: {self.p.name}")
@@ -131,6 +129,9 @@ class ValueStorage:
             setattr(self, f"save_{key}", create_save_method(key))
 
     def __check_equality(self, a: Any, b: Any) -> bool:
+        assert a is not MISSING
+        if b is MISSING:
+            return False
         if not (isinstance(a, type(b)) and type(a) == type(b) and isinstance(b, type(a))):
             return False
         if isinstance(a, list):
@@ -156,41 +157,21 @@ class ValueStorage:
         except Exception:
             return a == b
 
+    def __check_message__(self) -> None:
+        "read the message left in the out_queue by the worker"
+        try:
+            mess = self.out_queue.get_nowait()
+        except queue.Empty:
+            return
+        red(mess)
+
     def __getitem__(self, key: str) -> Any:
-        assert self.thread.is_alive(), "Saving thread appears to be dead!"
+        self.__check_message__()
+        assert self.worker.is_alive(), "Saving worker appears to be dead!"
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
 
-        # make sure to wait for the previous setitem of the same key to finish
-        prev_q = self.running_tasks[key]
-        if prev_q is None:
-            prev_q_val = True
-        start = time.time()
-        i = 0
-        while prev_q is not None:
-            i += 1
-            if i % 100 == 0:
-                assert self.thread.is_alive(), "Saving thread appears to be dead!"
-                elapsed = time.time() - start
-                if elapsed > self.time_limit:
-                    red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
-                    prev_q_val = True
-                    break
-            prev_q = self.running_tasks[key]
-            try:
-                # Waits for X seconds, otherwise throws `Queue.Empty`
-                prev_q_val = prev_q.get(True, 0.001)
-                with self.lock:
-                    self.running_tasks[key] = None
-                whi(f"Done waiting for task {key}")
-                break
-            except queue.Empty:
-                red(f"Waiting for {key} queue to output in getitem")
-        if prev_q_val is not True:
-            assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
-            raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
-
-        if self.cache_values[key] is not None:
+        if self.cache_values[key] is not MISSING:
             if "type" in profile_keys[key]:
                 # cast as specific type
                 return profile_keys[key]["type"](self.cache_values[key])
@@ -233,40 +214,24 @@ class ValueStorage:
             return self.cache_values[key]
 
     def __setitem__(self, key: str, item: Any) -> None:
-        assert self.thread.is_alive(), "Saver worker appears to be dead!"
+        # update the api key right away
+        if "api_key" in key:
+            if key == "txt_openai_api_key":
+                os.environ["OPENAI_API_KEY"] = item
+            elif key == "txt_deepgram_api_key":
+                os.environ["DEEPGRAM_API_KEY"] = item
+            elif key == "txt_mistral_api_key":
+                os.environ["MISTRAL_API_KEY"] = item
+            elif key == "txt_openrouter_api_key":
+                os.environ["OPENROUTER_API_KEY"] = item
 
+        self.__check_message__()
+        assert self.worker.is_alive(), "Saver worker appears to be dead!"
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
 
         if not self.__check_equality(item, self.cache_values[key]):
-            # make sure to wait for the previous setitem of the same key to finish
-            prev_q = self.running_tasks[key]
-            if prev_q is None:
-                prev_q_val = True
-            start = time.time()
-            i = 0
-            while prev_q is not None:
-                i += 1
-                if i % 100 == 0:
-                    assert self.thread.is_alive(), "Saving thread appears to be dead!"
-                    elapsed = time.time() - start
-                    if elapsed > self.time_limit:
-                        red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
-                        prev_q_val = True
-                        break
-                prev_q = self.running_tasks[key]
-                try:
-                    # Waits for X seconds, otherwise throws `Queue.Empty`
-                    prev_q_val = prev_q.get(True, 0.001)
-                    with self.lock:
-                        self.running_tasks[key] = None
-                    whi(f"Done waiting for task {key}")
-                    break
-                except queue.Empty:
-                    red(f"Waiting for {key} queue to output in setitem")
-            if prev_q_val is not True:
-                assert isinstance(prev_q_val, str), f"Unexpected prev_q_val: '{prev_q_val}'"
-                raise Exception(f"Didn't save key {key} because previous saving went wrong: '{prev_q_val}'")
+
             if item != self.cache_values[key]:
                 # cast as required type
                 if "type" in profile_keys[key]:
@@ -275,10 +240,9 @@ class ValueStorage:
                 # save to cache
                 self.cache_values[key] = item
 
-                # save to file
-                out_q = queue.Queue()
-                self.in_queue.put([self.p, key, item, out_q])
-                self.running_tasks[key] = out_q
+            # save to file
+            self.in_queues[key].put((self.p, item))
+
         else:
             # item is the same as in the cache value
             # but if it's None etc, then the cache value must be destroyed
@@ -297,22 +261,20 @@ class ValueStorage:
             except Exception as err:
                 red(f"Error when setting {key}=={item} being the same as in the cache dir: '{err}'")
 
-        # update the api key right away
-        if key == "txt_openai_api_key":
-            os.environ["OPENAI_API_KEY"] = item
-        elif key == "txt_deepgram_api_key":
-            os.environ["DEEPGRAM_API_KEY"] = item
-        elif key == "txt_mistral_api_key":
-            os.environ["MISTRAL_API_KEY"] = item
-        elif key == "txt_openrouter_api_key":
-            os.environ["OPENROUTER_API_KEY"] = item
-
 @optional_typecheck
-def worker_setitem(in_queue: queue.Queue) -> None:
+def worker_setitem(in_queues: dict, out_queue: queue.Queue) -> None:
     """continuously running worker that is used to save components value to
     the appropriate profile"""
     while True:
-        profile, key, item, out_queue = in_queue.get()
+        profile = None
+        while profile is None:
+            for key, q in in_queues.items():
+                try:
+                    profile, item = q.get_nowait()
+                    break
+                except queue.Empty:
+                    time.sleep(0.01)
+
         kp = key + ".pickle"
         if key.startswith("queued_gallery_"):
             kf = profile / "queues" / "galleries" / kp
@@ -324,27 +286,23 @@ def worker_setitem(in_queue: queue.Queue) -> None:
         if item is profile_keys[key]["default"]:
             # if it's the default value, simply delete it and don't create
             # the new file
-            out_queue.put(True)
             continue
 
         if key == "message_buffer":
             try:
                 with open(str(kf), "w") as f:
                     json.dump(item, f, indent=4, ensure_ascii=False)
-                out_queue.put(True)
             except Exception as err:
-                out_queue.put(red(f"Error when saving message_buffer as json in pickle: '{err}'"))
+                out_queue.put(f"Error when saving message_buffer as json for key {key} in pickle: '{err}'")
         else:
             try:
                 with open(str(kf), "w") as f:
                     pickle.dump(item, f)
-                out_queue.put(True)
             except Exception:
                 try:
                     # try as binary
                     with open(str(kf), "wb") as f:
                         pickle.dump(item, f)
-                    out_queue.put(True)
                 except Exception as err:
                     out_queue.put(f"Error when setting {kf}: '{err}'")
 
