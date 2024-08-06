@@ -265,8 +265,8 @@ def thread_whisp_then_llm(audio_mp3: Optional[Union[PosixPath, str]]) -> None:
     if audio_mp3 is None:
         return
 
-    whi("Transcribing audio for the cache")
     audio_mp3 = format_audio_component(audio_mp3)
+    whi(f"Transcribing audio for the cache: {audio_mp3}")
 
     if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_deepgram_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
@@ -797,7 +797,7 @@ def alfred(
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
-        red(f"LLM's reason to stop was not 'stop' but '{reason}'")
+        gr.Warning(red(f"LLM's reason to stop was not 'stop' but '{reason}'"))
 
     # add to the shared module the infonrmation of this card creation.
     # if a card is created then this will be added to the db to
