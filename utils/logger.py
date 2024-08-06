@@ -70,6 +70,7 @@ colors = {
         "reset": "\033[0m",
         "white": "\033[0m",
         "purple": "\033[95m",
+        "italic": "\033[3m",
         }
 
 
@@ -204,6 +205,7 @@ whi = get_coloured_logger("white")
 yel = get_coloured_logger("yellow")
 red = get_coloured_logger("red")
 purp = get_coloured_logger("purple")
+ital = get_coloured_logger("italic")
 
 @optional_typecheck
 def trace(func: Callable) -> Callable:
@@ -217,7 +219,7 @@ def trace(func: Callable) -> Callable:
     if asyncio.iscoroutinefunction(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            purp(f"-> Entering {func}")
+            ital(f"-> Entering {func}")
             # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             result = await func(*args, **kwargs)
@@ -225,12 +227,12 @@ def trace(func: Callable) -> Callable:
             if tt > 0.5:
                 red(f"    Exiting {func} after {tt:.1f}s")
             else:
-                purp(f"   Exiting {func} after {tt:.1f}s")
+                ital(f"   Exiting {func} after {tt:.1f}s")
             return result
     else:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            purp(f"-> Entering {func}")
+            ital(f"-> Entering {func}")
             # purp(f"-> Entering {func} {args} {kwargs}")
             t = time.time()
             if args:
@@ -241,7 +243,7 @@ def trace(func: Callable) -> Callable:
             if tt > 0.5:
                 red(f"    Exiting {func} after {tt:.1f}s")
             else:
-                purp(f"   Exiting {func} after {tt:.1f}s")
+                ital(f"   Exiting {func} after {tt:.1f}s")
             return result
     return wrapper
 
