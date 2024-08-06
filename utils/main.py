@@ -630,12 +630,12 @@ def pre_alfred(
             "with fewer tokens to make sure you have room for the answer")
         return pre_alfred(txt_audio, txt_chatgpt_context, profile, max_token-500, temperature, sld_buffer, txt_keywords, prompt_management, cache_mode)
 
-    # print prompts used for the call:
-    n = len(formatted_messages)
-    whi("LLM prompt:")
-    for i, p in enumerate(formatted_messages):
-        whi(f"* {i+1}/{n}: {p['role']}")
-        whi(indent(p['content'], " " * 5))
+    # # print prompts used for the call:
+    # n = len(formatted_messages)
+    # whi("LLM prompt:")
+    # for i, p in enumerate(formatted_messages):
+    #     whi(f"* {i+1}/{n}: {p['role']}")
+    #     whi(indent(p['content'], " " * 5))
 
     return formatted_messages
 
