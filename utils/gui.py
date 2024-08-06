@@ -26,12 +26,14 @@ theme = gr.themes.Soft(
         )
 
 
+cache_minute = 10
 with gr.Blocks(
         analytics_enabled=False,
         title=f"Voice2Anki V{shared.VERSION}",
         theme=theme,
         css=css,
         head=html_head,
+        delete_cache=(60 * cache_minute, 60 * cache_minute),
         ) as demo:
 
     with gr.Group():
