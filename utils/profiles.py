@@ -166,17 +166,20 @@ class ValueStorage:
         if prev_q is None:
             prev_q_val = True
         start = time.time()
+        i = 0
         while prev_q is not None:
-            assert self.thread.is_alive(), "Saving thread appears to be dead!"
-            elapsed = time.time() - start
-            if elapsed > self.time_limit:
-                red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
-                prev_q_val = True
-                break
+            i += 1
+            if i % 100 == 0:
+                assert self.thread.is_alive(), "Saving thread appears to be dead!"
+                elapsed = time.time() - start
+                if elapsed > self.time_limit:
+                    red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
+                    prev_q_val = True
+                    break
             prev_q = self.running_tasks[key]
             try:
                 # Waits for X seconds, otherwise throws `Queue.Empty`
-                prev_q_val = prev_q.get(True, 0.01)
+                prev_q_val = prev_q.get(True, 0.001)
                 with self.lock:
                     self.running_tasks[key] = None
                 whi(f"Done waiting for task {key}")
@@ -241,17 +244,20 @@ class ValueStorage:
             if prev_q is None:
                 prev_q_val = True
             start = time.time()
+            i = 0
             while prev_q is not None:
-                assert self.thread.is_alive(), "Saving thread appears to be dead!"
-                elapsed = time.time() - start
-                if elapsed > self.time_limit:
-                    red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
-                    prev_q_val = True
-                    break
+                i += 1
+                if i % 100 == 0:
+                    assert self.thread.is_alive(), "Saving thread appears to be dead!"
+                    elapsed = time.time() - start
+                    if elapsed > self.time_limit:
+                        red(f"Waited {elapsed:.2f}s for the queue, Let's consider it done.")
+                        prev_q_val = True
+                        break
                 prev_q = self.running_tasks[key]
                 try:
                     # Waits for X seconds, otherwise throws `Queue.Empty`
-                    prev_q_val = prev_q.get(True, 0.01)
+                    prev_q_val = prev_q.get(True, 0.001)
                     with self.lock:
                         self.running_tasks[key] = None
                     whi(f"Done waiting for task {key}")
