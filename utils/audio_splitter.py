@@ -729,7 +729,7 @@ class AudioSplitter:
         trial_dict = [
             {
                 "backend":"deepgram",
-                "n_retry": 1,
+                "n_retry": 3,
 
                 # docs: https://playground.deepgram.com/?endpoint=listen&smart_format=true&language=en&model=nova-2
                 "model": "nova-2",
