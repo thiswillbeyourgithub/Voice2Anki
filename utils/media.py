@@ -376,7 +376,7 @@ def create_audio_compo(**kwargs) -> gr.Microphone:
 
 @optional_typecheck
 @trace
-def roll_audio(*slots) -> List[Union[dict, str]]:
+def roll_audio(*slots) -> List[Optional[Union[dict, str]]]:
     assert len(slots) > 1, f"invalid number of audio slots: {len(slots)}"
     assert isinstance(slots, tuple), f"unexpected slots type: {slots}"
     slots = list(slots)
