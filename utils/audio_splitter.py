@@ -825,6 +825,7 @@ class AudioSplitter:
                     break
                 except Exception as err:
                     red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
+                    time.sleep(10 * iter_retry)
             if not failed:
                 break
 
