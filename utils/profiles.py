@@ -69,6 +69,8 @@ profile_path = Path("./profiles")
 profile_path.mkdir(exist_ok=True)
 (profile_path / "default").mkdir(exist_ok=True)
 
+WORKER_TIMEOUT = 60 * 60  # 1 hour
+
 @optional_typecheck
 class ValueStorage:
     _instance = None
@@ -127,6 +129,19 @@ class ValueStorage:
 
             setattr(self, f"save_{key}", create_save_method(key))
 
+        self.__check_worker__()
+
+    def __check_worker__(self) -> None:
+        if not self.worker.is_alive():
+            red("Worker was not alive, restarting it")
+            self.worker = threading.Thread(
+                    target=worker_setitem,
+                    kwargs={"in_queues": self.in_queues},
+                    daemon=True,
+                    )
+            self.worker.start()
+        assert self.worker.is_alive(), "Saver worker appears to be dead!"
+
     def __check_equality(self, a: Any, b: Any) -> bool:
         assert a is not MISSING
         if b is MISSING:
@@ -157,7 +172,7 @@ class ValueStorage:
             return a == b
 
     def __getitem__(self, key: str) -> Any:
-        assert self.worker.is_alive(), "Saving worker appears to be dead!"
+        self.__check_worker__()
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be reload from profiles: '{key}'")
 
@@ -215,7 +230,7 @@ class ValueStorage:
             elif key == "txt_openrouter_api_key":
                 os.environ["OPENROUTER_API_KEY"] = item
 
-        assert self.worker.is_alive(), "Saver worker appears to be dead!"
+        self.__check_worker__()
         if key not in profile_keys:
             raise Exception(f"Unexpected key was trying to be set from profiles: '{key}'")
 
@@ -254,8 +269,14 @@ class ValueStorage:
 def worker_setitem(in_queues: dict) -> None:
     """continuously running worker that is used to save components value to
     the appropriate profile"""
+    # time since last
+    t = None
     while True:
         time.sleep(0.5)
+        if t and time.time() - t > WORKER_TIMEOUT:
+            red("Worker: crashing because timeout")
+            return
+
         for key, q in in_queues.items():
             if q.empty():
                 continue
@@ -270,6 +291,7 @@ def worker_setitem(in_queues: dict) -> None:
             while not q.empty():  # always get the last value
                 profile, item = q.get_nowait()
             # red(f"Saving {key}")  # for debugging
+            t = time.time()
 
             kp = key + ".pickle"
             if key.startswith("queued_gallery_"):
