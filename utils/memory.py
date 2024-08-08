@@ -91,12 +91,21 @@ def embedder(
     assert text_list, "empty text_list"
     assert all(t.strip() for t in text_list), "text_list contained empty text"
     cache_obj = embedding_caches[model]
+
+    batchsize = 100
+    if model.startswith("openai"):
+        batchsize = 1500
+    elif model.startswith("mistral"):
+        batchsize = 200
+    elif model.startswith("ollama"):
+        batchsize = 100
+
     cached = IteratorCacher(
         memory_object=cache_obj,
         iter_list=["input"],
         verbose=shared.debug,
         res_to_list = lambda out: out.to_dict()["data"],
-        batch_size=1500,
+        batch_size=batchsize,
         debug=verbose,
     )(litellm.embedding)
     vec: List[dict] = cached(model=model, input=text_list)
