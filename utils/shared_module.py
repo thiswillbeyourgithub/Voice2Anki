@@ -62,6 +62,7 @@ class SharedModule:
             "openai/text-embedding-3-large",
             "openai/text-embedding-3-small",
             "mistral/mistral-embed",
+            "ollama/bge-m3"
             ]
 
     # sox effect when loading a sound
