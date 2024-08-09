@@ -28,9 +28,13 @@ def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
     assert shared.pv["enable_gallery"], "Incoherent UI"
     try:
         # load from clipboard
-        pasted = pyclip.paste()
-        decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
-        decoded = rgb_to_bgr(decoded)
+        try:
+            pasted = pyclip.paste()
+            decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
+            decoded = rgb_to_bgr(decoded)
+        except Exception as err:
+            gr.Warning(red(f"Error when decoding image from clipboard: '{err}'"))
+            return gallery
 
         if decoded is None:
             whi("Image from clipboard was Nonetype")
