@@ -366,8 +366,9 @@ def smartcache(func: Callable) -> Callable:
                     with shared.timeout_lock:
                         del shared.smartcache[h]
                 raise
-            with shared.thread_lock:
-                with shared.timeout_lock:
-                    del shared.smartcache[h]
+            if h in shared.smartcache:
+                with shared.thread_lock:
+                    with shared.timeout_lock:
+                        del shared.smartcache[h]
             return result
     return wrapper
