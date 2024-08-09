@@ -789,19 +789,19 @@ def alfred(
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
     cloz = "\n".join([cl.strip() for cl in cloz.splitlines() if cl.strip()])
 
-    if "<thoughts>" in cloz:
-        if "</thoughts>" not in cloz:
-            red("Missing <thoughts> clozing !")
-        else:
-            thoughts = cloz.split("<thoughts>", 1)[1].split("</thoughts>", 1)[0]
-            before_thought, nonthought = cloz.split(thoughts, 1)
-            if before_thought.strip():
-                yel(f"Found before thought text: '{before_thought}'")
-            if "<thoughts>" in nonthought or "</thoughts>" in nonthought:
-                red("Found </?thoughts> tags in the cloze!")
-            else:
-                red(f"Thoughts: {thoughts}")
-                # cloz = nonthought
+    # if "<thinking>" in cloz:
+    #     if "</thinking>" not in cloz:
+    #         red("Missing <thinking> clozing !")
+    #     else:
+    #         thoughts = cloz.split("<thinking>", 1)[1].split("</thinking>", 1)[0]
+    #         before_thought, nonthought = cloz.split(thoughts, 1)
+    #         if before_thought.strip():
+    #             yel(f"Found before thought text: '{before_thought}'")
+    #         if "<thinking>" in nonthought or "</thinking>" in nonthought:
+    #             red("Found </thinking> tags in the cloze!")
+    #         else:
+    #             red(f"Thoughts: {thoughts}")
+    #             # cloz = nonthought
 
     # if contains cloze in multiple parts but in the same line, merge them
     sl = cloz.splitlines()
@@ -1314,6 +1314,26 @@ def to_anki(
     if txt_chatgpt_cloz.startswith("Error with ChatGPT"):
         raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
+    if "<thinking>" in txt_chatgpt_cloz:
+        prethinking, thinking = txt_chatgpt_cloz.split("<thinking>", 1)
+        thinking, postthinking = thinking.split("</thinking>", 1)
+        if "<thinking>" in prethinking + postthinking or "</thinking>" in prethinking + postthinking:
+            raise Exception(red("Found <thinking> tags ind pre or post thinking"))
+        prethinking = prethinking.strip()
+        postthinking = postthinking.strip()
+        if not prethinking and postthinking:
+            red(f"Parsed cloze content as postthinking: '{postthinking}'")
+            clozetext = postthinking
+        elif prethinking and not postthinking:
+            red(f"Parsed cloze content as prethinking: '{prethinking}'")
+            clozetext = prethinking
+        else:
+            raise Exception("Failed to parse thinking from cloze.")
+    else:
+        clozetext = txt_chatgpt_cloz
+        thinking = ""
+
+
     # make sure the audio is a valid path
     if isinstance(audio_mp3_1, dict):
         audio_mp3_oname = audio_mp3_1["orig_name"]
@@ -1322,12 +1342,12 @@ def to_anki(
         audio_mp3_oname = audio_mp3_1
 
     # checks clozes validity
-    clozes = [c.strip() for c in txt_chatgpt_cloz.split("#####") if c.strip()]
-    if not clozes or "{{c1::" not in txt_chatgpt_cloz:
-        raise Exception(red(f"Invalid cloze: '{txt_chatgpt_cloz}'"))
+    clozes = [c.strip() for c in clozetext.split("#####") if c.strip()]
+    if not clozes or "{{c1::" not in clozetext:
+        raise Exception(red(f"Invalid cloze: '{clozetext}'"))
 
-    if "alfred" in txt_chatgpt_cloz.lower():
-        raise Exception(red(f"COMMUNICATION REQUESTED:\n'{txt_chatgpt_cloz}'"))
+    if "alfred" in clozetext.lower():
+        raise Exception(red(f"COMMUNICATION REQUESTED:\n'{clozetext}'"))
 
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
@@ -1472,13 +1492,13 @@ def to_anki(
                                 }
                             )
     else:
-        if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and txt_chatgpt_cloz not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
+        if txt_audio not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and clozetext not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
             shared.message_buffer.append(
                     {
                         "unformatted_txt_audio": txt_audio,
                         "unformatted_txt_chatgpt_cloz": txt_chatgpt_cloz,
                         "question": transcript_template.replace("CONTEXT", txt_chatgpt_context).replace("TRANSCRIPT", txt_audio),
-                        "answer": txt_chatgpt_cloz.replace("\n", "<br/>"),
+                        "answer": clozetext.replace("\n", "<br/>"),
                         "was_split": False,
                         }
                     )
@@ -1487,6 +1507,11 @@ def to_anki(
     shared.message_buffer = shared.message_buffer[-shared.max_message_buffer:]
     shared.pv["message_buffer"] = shared.message_buffer
 
-    Voice2Anki_db_save(txt_chatgpt_cloz, txt_chatgpt_context, txt_audio, results)
+    Voice2Anki_db_save(
+        txt_chatgpt_cloz=txt_chatgpt_cloz,
+        txt_chatgpt_context=txt_chatgpt_context,
+        txt_audio=txt_audio,
+        note_ids=results,
+    )
 
     gather_threads(["audio_to_anki", "ocr", "saving_chatgpt"])
