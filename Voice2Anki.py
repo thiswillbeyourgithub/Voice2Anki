@@ -136,7 +136,7 @@ def start_Voice2Anki(
         faulthandler.enable()
 
     if authentication or share:
-        auth_args = {"auth": ("v2a", "v2a"), "auth_message": "Please login"}
+        auth_args = {"auth": [("v2a", "v2a"), ("V2a", "v2a")], "auth_message": "Please login"}
         yel("Authentication enabled")
     else:
         auth_args = {}
