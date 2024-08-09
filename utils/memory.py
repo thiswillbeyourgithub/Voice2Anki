@@ -55,6 +55,7 @@ Rules you follow:
 - If the examples contain acronyms that are relevant to the transcript, feel free to reuse them directly.
 - If the text contains units, use abbreviations as much as possible.
 - Take a deep breath before answering. If you need to think for a bit before answering, you can use a <thoughts> and </thoughts> pair of labels before answering. If you are positive there is a mistake in the input text and hesitate to correct it or not, mention it in the thoughts prominently or refer to the next rule.
+- Don't mention in your thoughts if you're just correcting an obvious transcription mistake.
 - If you can't accomplish the task, start your reply by 'Alfred: [YOUR ISSUE]' where YOUR ISSUE is replaced by a your issue in one sentence and I'll help you right away.
 '''
 """.strip(),
