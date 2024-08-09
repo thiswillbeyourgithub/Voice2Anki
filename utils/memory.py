@@ -1,3 +1,4 @@
+import os
 import threading
 from typing import List, Optional, Union
 from functools import partial
@@ -93,12 +94,16 @@ def embedder(
     cache_obj = embedding_caches[model]
 
     batchsize = 100
+    api_base =  None
     if model.startswith("openai"):
         batchsize = 1500
     elif model.startswith("mistral"):
         batchsize = 200
     elif model.startswith("ollama"):
         batchsize = 100
+        assert "OLLAMA_HOST" in os.environ, "When using ollama, a OLLAMA_HOST env variable on the client is needed"
+        api_base = os.environ["OLLAMA_HOST"]
+        assert api_base, "When using ollama, a OLLAMA_HOST env variable on the client is needed"
 
     cached = IteratorCacher(
         memory_object=cache_obj,
@@ -107,8 +112,13 @@ def embedder(
         res_to_list = lambda out: out.to_dict()["data"],
         batch_size=batchsize,
         debug=verbose,
+        ignore=["api_base"],
     )(litellm.embedding)
-    vec: List[dict] = cached(model=model, input=text_list)
+    vec: List[dict] = cached(
+        model=model,
+        input=text_list,
+        api_base=api_base,
+    )
     vec = [
         np.array(v["embedding"]).squeeze()
         if isinstance(v, dict)
