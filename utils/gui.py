@@ -1158,7 +1158,7 @@ with gr.Blocks(
             )
 
     gr.on(
-            triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click, dir_load_btn.click, update_status_btn.click],
+            triggers=[a.change for a in audio_slots] + [transcript_btn.click, chatgpt_btn.click, update_status_btn.click],
             fn=update_audio_slots_txts,
             inputs=[check_enable_dirload] + audio_slots_txts,
             outputs=audio_slots_txts,
