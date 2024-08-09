@@ -184,7 +184,7 @@ def start_Voice2Anki(
             server_port=port,
             # inline=True,
             width="100%",  # used if inline is True
-            enable_monitoring=True,
+            enable_monitoring=False,
             allowed_paths=["/tmp/gradio"],
             **ssl_args,
             )
