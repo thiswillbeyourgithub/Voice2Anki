@@ -1146,7 +1146,8 @@ def audio_edit(
                 }
             ]
 
-    model_to_use = "openai/gpt-4-1106-preview"
+    #model_to_use = "openai/gpt-4o"
+    model_to_use = shared.pv["llm_choice"]
     model_price = shared.llm_price[model_to_use]
 
     whi(f"Editing via {model_to_use}:")

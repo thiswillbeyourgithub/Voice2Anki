@@ -137,15 +137,15 @@ with gr.Blocks(
                         rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
                         img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
 
-        with gr.Tab(label="Edit", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
+        with gr.Tab(label="Edit by voice", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
             with gr.Row():
                 audio_corrector = create_audio_compo(
-                        label="AudioEdit via GPT-4",
+                        label="Edit by voice",
                         container=True,
                         scale=0,
                         editable=True,
                         )
-                audio_corrector_txt = gr.Textbox(value=None, label="Edit via GPT-4", scale=2)
+                audio_corrector_txt = gr.Textbox(value=None, label="Edit by voice", scale=2)
                 auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False, size="sm")
                 semiauto_btn = gr.Button(
                         value="1+2",
