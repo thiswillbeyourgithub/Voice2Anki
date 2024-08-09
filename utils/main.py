@@ -742,7 +742,8 @@ def alfred(
     if len(set([fm["content"] for fm in formatted_messages])) != len(formatted_messages):
         contents = [pm["content"] for pm in formatted_messages]
         dupli = [dp for dp in contents if contents.count(dp) > 1 and "alfred:" not in dp.lower()]
-        raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}")
+        if dupli:
+            raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}:" + "\n* " + "\n* ".join(list(set(dupli))))
 
     if shared.pv["check_prompt_as_system"]:
         messages = []
