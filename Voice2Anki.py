@@ -184,6 +184,7 @@ def start_Voice2Anki(
             server_port=port,
             # inline=True,
             width="100%",  # used if inline is True
+            allowed_paths=["/tmp"],
             **ssl_args,
             )
     return demo
