@@ -33,7 +33,7 @@ with gr.Blocks(
         theme=theme,
         css=css,
         head=html_head,
-        delete_cache=(60 * cache_minute, 60 * cache_minute),
+        # delete_cache=(60 * cache_minute, 60 * cache_minute),
         ) as demo:
 
     with gr.Group():
