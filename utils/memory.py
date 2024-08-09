@@ -112,7 +112,6 @@ def embedder(
         res_to_list = lambda out: out.to_dict()["data"],
         batch_size=batchsize,
         debug=verbose,
-        ignore=["api_base"],
     )(litellm.embedding)
     vec: List[dict] = cached(
         model=model,
