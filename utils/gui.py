@@ -116,6 +116,7 @@ with gr.Blocks(
             with gr.Row():
                 llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_price.keys()], label="LLM", show_label=True, scale=0, multiselect=False)
                 txt_price = gr.Textbox(value=lambda: display_price(shared.pv["sld_max_tkn"], shared.pv["llm_choice"]), label="Price", interactive=False, max_lines=2, lines=2, scale=5)
+                txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
 
             with gr.Row():
                 flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
@@ -195,7 +196,6 @@ with gr.Blocks(
         with gr.Tab(label="LLM", elem_id="js_widetabs", elem_classes=["js_subtab_settings"]):
             with gr.Row():
                 txt_whisp_prompt = gr.Textbox(value=shared.pv["txt_whisp_prompt"], lines=2, label="SpeechToText context", placeholder="context for whisper")
-                txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT")
             with gr.Column():
                 choice_embed = gr.Dropdown(value=shared.pv["choice_embed"], choices=shared.embedding_models, label="Embedding model", show_label=True, scale=0, multiselect=False)
                 txt_openai_api_key = gr.Textbox(value=shared.pv["txt_openai_api_key"], label="OpenAI API key", lines=1)
