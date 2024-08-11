@@ -85,6 +85,7 @@ def embedder(
     text_list: List[str],
     model: str,
     verbose: bool = False,
+    L2_norm: bool = True,
     ) -> List[np.ndarray]:
     """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
     if result is not None, it is the embedding and returned right away. This
@@ -121,10 +122,10 @@ def embedder(
         api_base=api_base,
     )
     vec = [
-        np.array(v["embedding"]).squeeze().reshape(1, -1)
+        np.array(v["embedding"]).squeeze()
         if isinstance(v, dict)
         else (
-            np.array(v.to_dict()["data"][0]["embedding"]).squeeze().reshape(1, -1) if len(v.to_dict()["data"]) == 1 else None
+            np.array(v.to_dict()["data"][0]["embedding"]).squeeze() if len(v.to_dict()["data"]) == 1 else None
         )
         for v in vec
     ]
@@ -132,6 +133,11 @@ def embedder(
     if nonvec:
         pos = [iv for iv, v in enumerate(vec) if v is None]
         raise Exception(f"Found {len(nonvec)} None in vectors at position {pos} from length {len(vec)}")
+
+    if L2_norm:
+        vec = [np.linalg.norm(v).reshape(1, -1) for v in vec]
+
+    vec = [np.reshape(1, -1) for v in vec]
 
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
