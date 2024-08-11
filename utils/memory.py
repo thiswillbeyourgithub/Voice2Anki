@@ -50,6 +50,7 @@ Rules you follow:
 '''
 - Often the transcribed text will contain mistakes because it couldn't parse technical words, correct those mistakes.
 - If you have to create several flashcards from one transcript, separate them with a line containing "#####".
+- If the question implies giving a choice, order the choice by alphabetical order to make sure I don't memorize by heuristics.
 - Throughout this conversation, you will see plenty of examples so be sure to match the format, structure and formulation of the previous examples when replying. This is critical.
 - As long as I don't tell you that your answer is bad, that means your reply was perfect so keep doing the format you used before.
 - If the notion contains an enumeration, you should follow a specific list format. Otherwise, the flashcard answer must rephrase the question (i.e. if the question starts by 'The types of cancer that' then the answer should start also by 'The types of cancer that'). This make it easier for me to memorize but use common sense and above all: follow the previous examples.
