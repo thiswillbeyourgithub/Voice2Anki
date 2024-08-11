@@ -284,16 +284,44 @@ def prompt_filter(
     # get the embedding for all memories in another way (because this way
     # we get all embeddings from the memories in a single call, provided the
     # memories.json file hasn't changed since)
-    to_embed = [prompt_messages[-1]["content"]]
-    to_embed += [pr["content"] for pr in candidate_prompts]
-    to_embed += [pr["answer"] for pr in candidate_prompts]
+    # to_embed = [prompt_messages[-1]["content"]]
+    # to_embed += [pr["content"] for pr in candidate_prompts]
+    # to_embed += [pr["answer"] for pr in candidate_prompts]
+    #
+    # all_embeddings = embedder(text_list=to_embed, model=shared.pv["choice_embed"])
+    # assert all(isinstance(item, np.ndarray) for item in all_embeddings), f"all_embeddings contained non numpy array: {all_embeddings}"
+    # assert len(all_embeddings) == 2 * len(candidate_prompts) + 1, f"ell_embeddings is of unexpected length: {len(all_embeddings)}"
+    # new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
+    # embeddings_contents = all_embeddings[:len(candidate_prompts)]
+    # embeddings_answers = all_embeddings[len(candidate_prompts):]
 
-    all_embeddings = embedder(text_list=to_embed, model=shared.pv["choice_embed"])
-    assert all(isinstance(item, np.ndarray) for item in all_embeddings), f"all_embeddings contained non numpy array: {all_embeddings}"
-    assert len(all_embeddings) == 2 * len(candidate_prompts) + 1, f"ell_embeddings is of unexpected length: {len(all_embeddings)}"
-    new_prompt_vec = all_embeddings.pop(0).squeeze().reshape(1, -1)
-    embeddings_contents = all_embeddings[:len(candidate_prompts)]
-    embeddings_answers = all_embeddings[len(candidate_prompts):]
+    emb_f = partial(embedder, model=shared.pv["choice_embed"])
+
+    new_prompt_vec = emb_f([prompt_messages[-1]["content"]])
+    embeddings_answers = emb_f([pr["answer"] for pr in candidate_prompts])
+    contexts = list(set([pr["content"].splitlines()[0] for pr in candidate_prompts]))
+    contexts = [c.strip() for c in contexts if c.strip()]  # remove empty
+    contexts_embeds = emb_f(contexts)
+    embeddings_contents_wo_context = emb_f(
+            [
+            "".join(pr["content"].splitlines(keepends=True)[1:])
+            for pr in candidate_prompts
+            ]
+    )
+    assert len(embeddings_contents_wo_context) == len(embeddings_answers)
+    assert len(embeddings_contents_wo_context) == len(candidate_prompts)
+    embeddings_contents = []
+    for ica, cand in enumerate(candidate_prompts):
+        cont = cand["content"]
+        matches = [(ic, c) for ic, c in enumerate(contexts) if cont.startswith(c)]
+        icontext = sorted(matches, key= lambda x,y: len(y))[-1]  # find the longest match
+        cont_vec = contexts_embeds[icontext]
+        v = embeddings_contents_wo_context[ica] - cont_vec
+        v_norm = np.linalg.norm(v)
+        assert v_norm.shape == v.shape
+        embeddings_contents.append(v)
+
+
     assert len(embeddings_contents) == len(embeddings_answers), f"len(embeddings_contents)={len(embeddings_contents)} but len(embeddings_answers)={len(embeddings_answers)}"
     sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
     sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
