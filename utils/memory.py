@@ -121,10 +121,10 @@ def embedder(
         api_base=api_base,
     )
     vec = [
-        np.array(v["embedding"]).squeeze()
+        np.array(v["embedding"]).squeeze().reshape(1, -1)
         if isinstance(v, dict)
         else (
-            np.array(v.to_dict()["data"][0]["embedding"]).squeeze() if len(v.to_dict()["data"]) == 1 else None
+            np.array(v.to_dict()["data"][0]["embedding"]).squeeze().reshape(1, -1) if len(v.to_dict()["data"]) == 1 else None
         )
         for v in vec
     ]
