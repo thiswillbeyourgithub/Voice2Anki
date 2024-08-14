@@ -141,6 +141,9 @@ def embedder(
 
     vec = [np.reshape(1, -1) for v in vec]
 
+    for ivec, v in enumerate(vec):
+        assert np.any(v != 0), f"Vector {ivec} is 0"
+
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
     return vec
