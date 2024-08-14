@@ -360,7 +360,7 @@ def qg_add_to_latest(*qg) -> List[Optional[Union[gr.Gallery, dict]]]:
 def create_audio_compo(**kwargs) -> gr.Microphone:
     defaults = {
             "type": "filepath",
-            "format": "mp3",
+            "format": ".mp3",
             "value": None,
             "min_length": 1,
             "label": "Untitled",
