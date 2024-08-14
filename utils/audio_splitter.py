@@ -6,6 +6,7 @@ import copy
 import soundfile as sf
 import tempfile
 import pyrubberband as pyrb
+import torch
 from datetime import datetime
 import shutil
 import hashlib
@@ -994,11 +995,14 @@ class AudioSplitter:
             # load from file
             shutil.copy2(file, new_filename)
 
-            # reuse the same code form media
             waveform, sample_rate = torchaudio.load(new_filename)
 
+            # Remove median noise
+            median_amplitude = torch.median(waveform, dim=1, keepdim=True).values
+            clean_waveform = waveform - median_amplitude
+
             waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
-                    waveform,
+                    clean_waveform,
                     sample_rate,
                     shared.splitter_sox_effects,
                     )
