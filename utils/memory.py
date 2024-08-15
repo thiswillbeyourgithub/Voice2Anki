@@ -14,7 +14,6 @@ import json
 # import rtoml
 import hashlib
 from joblib import Memory
-import tiktoken
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
 from iterator_cacher import IteratorCacher
@@ -27,10 +26,9 @@ from .typechecker import optional_typecheck
 prompt_finish = "\n\n###\n\n"
 
 # used to count the number of tokens for chatgpt
-tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 @optional_typecheck
 def tkn_len(message: str) -> int:
-    return len(tokenizer.encode(dedent(message)))
+    return litellm.token_count(model=shared.pv["llm_choice"], text=message)
 
 # RTOML_NONEVALUE="THISISARTOMLNONEVALUE1234567890"
 
