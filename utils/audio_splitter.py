@@ -1008,6 +1008,9 @@ class AudioSplitter:
                 median_noise = torch.median(window, dim=1, keepdim=True).values
                 clean_waveform[:, i] = waveform[:, i] - median_noise[:, pad_size]
 
+            # Apply the cleaning to the original waveform
+            waveform = clean_waveform
+
             waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
                     clean_waveform,
                     sample_rate,
