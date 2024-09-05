@@ -997,9 +997,16 @@ class AudioSplitter:
 
             waveform, sample_rate = torchaudio.load(new_filename)
 
-            # Remove median noise
-            median_amplitude = torch.median(waveform, dim=1, keepdim=True).values
-            clean_waveform = waveform - median_amplitude
+            # Apply rolling window median noise removal
+            window_size = 5 * 60 * sample_rate  # 5 minutes
+            pad_size = window_size // 2
+            padded_waveform = torch.nn.functional.pad(waveform, (pad_size, pad_size), mode='reflect')
+            
+            clean_waveform = torch.zeros_like(waveform)
+            for i in range(waveform.shape[1]):
+                window = padded_waveform[:, i:i+window_size]
+                median_noise = torch.median(window, dim=1, keepdim=True).values
+                clean_waveform[:, i] = waveform[:, i] - median_noise[:, pad_size]
 
             waveform, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
                     clean_waveform,
