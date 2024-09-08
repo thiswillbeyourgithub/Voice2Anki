@@ -1,6 +1,7 @@
 import gradio as gr
 from datetime import datetime
 from functools import partial
+import os
 
 from gradio.themes.utils import sizes as theme_size
 
@@ -13,6 +14,11 @@ from .media import get_image, reset_audio, reset_gallery, get_img_source, ocr_im
 from .shared_module import shared
 from .html_js_css import darkmode_js, html_head, js_longer, js_reset_height, js_load, css
 from .typechecker import optional_typecheck
+
+autolaunch_dirload = False
+if "V2A_DIRLOAD" in os.environ and os.environ["V2A_DIRLOAD"] == "true":
+    print("Auto launch dirload")
+    autolaunch_dirload = True
 
 theme = gr.themes.Soft(
         primary_hue="violet",
@@ -1182,6 +1188,15 @@ with gr.Blocks(
             show_progress=False,
             )
     init.then(fn=None, js=js_load)
+
+    if autolaunch_dirload:
+        init.then(
+            fn=dirload_splitted,
+            inputs=[gui_rolldirloadcheck] + audio_slots,
+            outputs=audio_slots,
+            #show_progress=False,
+            postprocess=False,
+        )
 
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
