@@ -588,22 +588,23 @@ def pre_alfred(
 
     elif prompt_management == "stuff":
         # second way: add the messages as example in the system prompt
-        new = dedent("""
+        inputs = """
 
-        Here are examples of input followed by the appropriate output:
-        """)
-        inputs = []
+Here are examples of input (me) and appropriate outputs (you):
+<examples>
+"""
         for m in prev_prompts:
-            inputs.append(f"INPUT: '{m['content']}'\nOUTPUT: '{m['answer']}'")
+            inputs += f"<ex>\n<input>{m['content']}</input>\n<output>{m['answer']}</output>\n</ex>"
         for m in buffer_to_add:
             if m["role"] == "user":
-                inputs.append(f"INPUT: '{m['content']}'")
+                inputs += f"<ex>\n<input>{m['content']}</input>"
             elif m["role"] == "assistant":
-                inputs[-1] += (f"\nOUTPUT: '{m['content']}'")
+                inputs += f"\n<output>{m['content']}</output>\n</ex>"
             else:
                 raise ValueError(m["role"])
-        new += "'''\n" + "\n---\n".join(inputs) + "\n'''"
-        formatted_messages[-1]["content"] += new
+        assert inputs.endsith("</output>\n</ex>"), f"Unexpected end of inputs:\n{inputs}"
+        inputs += "\n</examples>"
+        formatted_messages[-1]["content"] += inputs
 
     else:
         raise ValueError(f"Invalid prompt managment: {prompt_management}")
