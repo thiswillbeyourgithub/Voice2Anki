@@ -28,7 +28,7 @@ prompt_finish = "\n\n###\n\n"
 # used to count the number of tokens for chatgpt
 @optional_typecheck
 def tkn_len(message: str) -> int:
-    return litellm.token_count(model=shared.pv["llm_choice"], text=message)
+    return litellm.token_counter(model=shared.pv["llm_choice"], text=message)
 
 # RTOML_NONEVALUE="THISISARTOMLNONEVALUE1234567890"
 
