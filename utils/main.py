@@ -3,6 +3,7 @@ from typing import Union, List, Callable, Optional
 import os
 import asyncio
 import pickle
+from pprint import pprint
 import re
 from rapidfuzz.fuzz import ratio as levratio
 import shutil
@@ -767,6 +768,9 @@ def alfred(
 
     model_price = shared.llm_price[llm_choice]
     whi(f"Will use model {llm_choice}")
+
+    pprint("Prompt for LLM:")
+    pprint(formatted_messages)
 
     response = litellm.completion(
             model=llm_choice,
