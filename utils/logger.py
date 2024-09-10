@@ -1,6 +1,6 @@
 import gradio as gr
 import inspect
-from typing import Callable
+from typing import Callable, Any
 from joblib import hash as jhash
 import asyncio
 import threading
@@ -138,7 +138,7 @@ def get_coloured_logger(color_asked: str) -> Callable:
 
     # all logs are considered "errors" otherwise the datascience libs just
     # overwhelm the logs
-    def printer(string: str, **args) -> str:
+    def printer(string: Any, **args) -> str:
         inp = string
         if isinstance(string, dict):
             try:
