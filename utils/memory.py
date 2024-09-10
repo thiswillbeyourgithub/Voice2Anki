@@ -1,7 +1,7 @@
 import os
 import threading
 from typing import List, Optional, Union
-from functools import partial, lru_cache
+from functools import partial
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -77,7 +77,6 @@ embedding_caches = {
 def hasher(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
-@lru_cache(maxsize=None)
 @trace
 @optional_typecheck
 @smartcache
