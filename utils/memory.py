@@ -323,7 +323,7 @@ def prompt_filter(
 
     emb_f = partial(embedder, model=shared.pv["choice_embed"])
 
-    new_prompt_vec = emb_f([prompt_messages[-1]["content"]])
+    new_prompt_vec = emb_f([prompt_messages[-1]["content"]])[0].squeeze().reshape(1, -1)
     embeddings_answers = emb_f([pr["answer"] for pr in candidate_prompts])
     contexts = list(set([pr["content"].splitlines()[0] for pr in candidate_prompts]))
     contexts = [c.strip() for c in contexts if c.strip()]  # remove empty
