@@ -141,30 +141,23 @@ def embedder(
         model=model,
         input=text_list,
         api_base=api_base,
-    ).to_dict()["data"]
+    )
+    vec = vec.to_dict()["data"]
 
     vec = [
-        np.array(v["embedding"]).squeeze()
-        if isinstance(v, dict)
-        else (
-            np.array(v.to_dict()["data"][0]["embedding"]).squeeze() if len(v.to_dict()["data"]) == 1 else None
-        )
+        np.array(v["embedding"]).squeeze().reshape(1, -1)
         for v in vec
     ]
-    nonvec = [v for v in vec if v is None]
-    if nonvec:
-        pos = [iv for iv, v in enumerate(vec) if v is None]
-        raise Exception(f"Found {len(nonvec)} None in vectors at position {pos} from length {len(vec)}")
-
     if L2_norm:
         vec = [np.linalg.norm(v).reshape(1, -1) for v in vec]
 
     vec = [np.reshape(1, -1) for v in vec]
 
     for ivec, v in enumerate(vec):
-        assert np.any(v != 0), f"Vector {ivec} is 0"
+        assert np.any(v != 0), f"Vector {ivec} is only 0"
 
     assert all(isinstance(v, np.ndarray) for v in vec)
+    assert all(max(v.shape) > 10 for v in vec), f"Unexpected vector shapes: {vec}"
 
     # store to cache
     shared.pv.embed_cache.mset(
@@ -337,6 +330,7 @@ def prompt_filter(
     contexts = list(set([pr["content"].splitlines()[0] for pr in candidate_prompts]))
     contexts = [c.strip() for c in contexts if c.strip()]  # remove empty
     contexts_embeds = emb_f(contexts)
+    assert all(isinstance(v, np.ndarray) for v in contexts_embeds), f"Unexpected context_embeds: {context_embeds}"
     embeddings_contents_wo_context = emb_f(
             [
             "".join(pr["content"].splitlines(keepends=True)[1:])
