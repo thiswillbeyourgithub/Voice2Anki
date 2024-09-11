@@ -91,7 +91,8 @@ def embedder(
     assert depth <= 2, f"Unexpected depth reached: {depth}"
 
     # use a simpler cache first
-    cached_values = shared.pv.embed_cache.mget(text_list)
+    hashes = [hasher(t) for t in text_list]
+    cached_values = shared.pv.embed_cache.mget(hashes)
     assert len(cached_values) == len(text_list)
     if not any(c is None for c in cached_values):
         return cached_values
@@ -158,7 +159,7 @@ def embedder(
     # store to cache
     shared.pv.embed_cache.mset(
         [
-            (text_list[i], vec[i])
+            (hashes[i], vec[i])
             for i in range(len(text_list))
         ]
     )
