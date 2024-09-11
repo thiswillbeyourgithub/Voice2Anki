@@ -85,6 +85,7 @@ def embedder(
     model: str,
     verbose: bool = False,
     L2_norm: bool = True,
+    depth: int = 0,
     ) -> List[np.ndarray]:
     """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
     if result is not None, it is the embedding and returned right away. This
@@ -93,7 +94,31 @@ def embedder(
     """
     assert text_list, "empty text_list"
     assert all(t.strip() for t in text_list), "text_list contained empty text"
-    cache_obj = embedding_caches[model]
+    assert depth <= 2, f"Unexpected depth reached: {depth}"
+
+    # use a simpler cache first
+    cached_values = shared.pv.embed_cache.mget(text_list)
+    assert len(cached_values) == len(text_list)
+    if not any(c is None for c in cached_values):
+        return cached_values
+    if not all(c is None for c in cached_values):
+        todo = [t for i, t in enumerate(text_list) if cached_values[i] is None]
+        new_vals = embedder(
+            text_list=todo,
+            model=model,
+            verbose=verbose,
+            L2_norm=L2_norm,
+            depth = depth + 1,
+        )
+        temp = new_vals.copy()
+        output = [
+            c if c is not None else temp.pop(0)
+            for c in cached_values
+        ]
+        assert len(output) == len(text_list)
+        assert all(o is not None for o in output)
+        return output
+    assert all(c is None for c in cached_values)
 
     batchsize = 100
     api_base =  None
@@ -107,19 +132,12 @@ def embedder(
         api_base = os.environ["OLLAMA_HOST"]
         assert api_base, "When using ollama, a OLLAMA_HOST env variable on the client is needed"
 
-    cached = IteratorCacher(
-        memory_object=cache_obj,
-        iter_list=["input"],
-        verbose=shared.debug,
-        res_to_list = lambda out: out.to_dict()["data"],
-        batch_size=batchsize,
-        debug=verbose,
-    )(litellm.embedding)
-    vec: List[dict] = cached(
+    vec = litellm.embedding(
         model=model,
         input=text_list,
         api_base=api_base,
-    )
+    ).to_dict()["data"]
+
     vec = [
         np.array(v["embedding"]).squeeze()
         if isinstance(v, dict)
@@ -140,6 +158,16 @@ def embedder(
 
     for ivec, v in enumerate(vec):
         assert np.any(v != 0), f"Vector {ivec} is 0"
+
+    assert all(isinstance(v, np.ndarray) for v in vec)
+
+    # store to cache
+    shared.pv.embed_cache.mset(
+        [
+            (text_list[i], vec[i])
+            for i in range(len(text_list))
+        ]
+    )
 
     tkn_sum = sum([tkn_len(t) for t in text_list])
     red(f"Computing embedding of {len(text_list)} texts for a total of {tkn_sum} tokens")
