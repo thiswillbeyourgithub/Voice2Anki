@@ -351,8 +351,8 @@ def prompt_filter(
 
 
     assert len(embeddings_contents) == len(embeddings_answers), f"len(embeddings_contents)={len(embeddings_contents)} but len(embeddings_answers)={len(embeddings_answers)}"
-    sim_content = cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze())
-    sim_answer = cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze())
+    sim_content = (cosine_similarity(new_prompt_vec, np.array(embeddings_contents).squeeze()) + 1) / 2
+    sim_answer = (cosine_similarity(new_prompt_vec, np.array(embeddings_answers).squeeze()) + 1) / 2
     assert np.max(sim_content) <= 1, f"Max similarity is above 1: {np.max(sim_content)}"
     assert np.min(sim_content) >= 0, f"Min similarity is below 0: {np.min(sim_content)}"
     assert np.max(sim_answer) <= 1, f"Max similarity is above 1: {np.max(sim_answer)}"
