@@ -341,8 +341,9 @@ def prompt_filter(
     for ica, cand in enumerate(candidate_prompts):
         cont = cand["content"]
         matches = [(ic, c) for ic, c in enumerate(contexts) if cont.startswith(c)]
-        icontext = sorted(matches, key= lambda x,y: len(y))[-1]  # find the longest match
-        cont_vec = contexts_embeds[icontext]
+        assert matches, f"A candidate prompt does not match any embeddings: '{cont}'"
+        icontext = sorted(matches, key=lambda x: len(x[1]))[-1]  # find the longest match
+        cont_vec = contexts_embeds[icontext[0]]
         v = embeddings_contents_wo_context[ica] - cont_vec
         v_norm = v / np.linalg.norm(v)
         assert v_norm.shape == v.shape, f"{v_norm.shape} != {v.shape}\nv_norm: {v_norm}\nv: {v}"
