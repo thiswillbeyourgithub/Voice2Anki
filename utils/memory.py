@@ -16,6 +16,7 @@ import hashlib
 from joblib import Memory
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
+from dataclasses import MISSING
 
 from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
 from .shared_module import shared
@@ -81,23 +82,31 @@ def embedder(
     L2_norm: bool = True,
     depth: int = 0,
     ) -> List[np.ndarray]:
-    """compute the embedding of a text list 1 by 1 thanks to iteratorcacher
-    if result is not None, it is the embedding and returned right away. This
+    """compute the embedding of a text list 1 by 1 thanks to LocalFileStore
+    if result is not MISSING, it is the embedding and returned right away. This
     was done to allow caching individual embeddings while still making one batch
     call to the embedder.
     """
     assert text_list, "empty text_list"
     assert all(t.strip() for t in text_list), "text_list contained empty text"
-    assert depth <= 2, f"Unexpected depth reached: {depth}"
 
     # use a simpler cache first
     hashes = [hasher(t) for t in text_list]
     cached_values = shared.pv.embed_cache.mget(hashes)
     assert len(cached_values) == len(text_list)
-    if not any(c is None for c in cached_values):
+    if not any(c is MISSING for c in cached_values):
+        assert depth == 0, f"depth of 0 but no MISSING embeddings: text_list is\n{text_list}"
+        red(f"All {len(text_list)} embeddings are already cached, returning them.")
         return cached_values
-    if not all(c is None for c in cached_values):
-        todo = [t for i, t in enumerate(text_list) if cached_values[i] is None]
+    elif all(c is MISSING for c in cached_values):
+        assert depth in [0, 1]
+        red(f"No cached_values found in embedder. Will compute {len(text_list)} embeddings (depth={depth})")
+    else:
+        assert depth == 0
+        todo = [t for i, t in enumerate(text_list) if cached_values[i] is MISSING]
+        assert len(todo) <= len(text_list)
+        red(f"Detected {len(todo)} uncached texts among {len(text_list)}")
+
         new_vals = embedder(
             text_list=todo,
             model=model,
@@ -107,13 +116,14 @@ def embedder(
         )
         temp = new_vals.copy()
         output = [
-            c if c is not None else temp.pop(0)
+            c if c is not MISSING else temp.pop(0)
             for c in cached_values
         ]
         assert len(output) == len(text_list)
-        assert all(o is not None for o in output)
+        assert all(o is not MISSING for o in output)
         return output
-    assert all(c is None for c in cached_values)
+    assert all(c is MISSING for c in cached_values)
+    assert depth in [0, 1], f"Unexpected depth: {depth}"
 
     batchsize = 100
     api_base =  None
