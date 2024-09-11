@@ -149,9 +149,7 @@ def embedder(
         for v in vec
     ]
     if L2_norm:
-        vec = [np.linalg.norm(v).reshape(1, -1) for v in vec]
-
-    vec = [np.reshape(1, -1) for v in vec]
+        vec = [(v / np.linalg.norm(v)).reshape(1, -1) for v in vec]
 
     for ivec, v in enumerate(vec):
         assert np.any(v != 0), f"Vector {ivec} is only 0"
@@ -346,8 +344,8 @@ def prompt_filter(
         icontext = sorted(matches, key= lambda x,y: len(y))[-1]  # find the longest match
         cont_vec = contexts_embeds[icontext]
         v = embeddings_contents_wo_context[ica] - cont_vec
-        v_norm = np.linalg.norm(v)
-        assert v_norm.shape == v.shape
+        v_norm = v / np.linalg.norm(v)
+        assert v_norm.shape == v.shape, f"{v_norm.shape} != {v.shape}\nv_norm: {v_norm}\nv: {v}"
         embeddings_contents.append(v)
 
 
