@@ -328,7 +328,7 @@ def prompt_filter(
     contexts = list(set([pr["content"].splitlines()[0] for pr in candidate_prompts]))
     contexts = [c.strip() for c in contexts if c.strip()]  # remove empty
     contexts_embeds = emb_f(contexts)
-    assert all(isinstance(v, np.ndarray) for v in contexts_embeds), f"Unexpected context_embeds: {context_embeds}"
+    assert all(isinstance(v, np.ndarray) for v in contexts_embeds), f"Unexpected context_embeds: {contexts_embeds}"
     embeddings_contents_wo_context = emb_f(
             [
             "".join(pr["content"].splitlines(keepends=True)[1:])
