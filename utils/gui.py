@@ -15,11 +15,6 @@ from .shared_module import shared
 from .html_js_css import darkmode_js, html_head, js_longer, js_reset_height, js_load, css
 from .typechecker import optional_typecheck
 
-autolaunch_dirload = False
-if "V2A_DIRLOAD" in os.environ and os.environ["V2A_DIRLOAD"] == "true":
-    print("Auto launch dirload")
-    autolaunch_dirload = True
-
 theme = gr.themes.Soft(
         primary_hue="violet",
         secondary_hue="purple",
@@ -1189,7 +1184,8 @@ with gr.Blocks(
             )
     init.then(fn=None, js=js_load)
 
-    if autolaunch_dirload:
+    if "V2A_DIRLOAD" in os.environ and os.environ["V2A_DIRLOAD"] == "true":
+        print("Auto launch dirload")
         init.then(
             fn=dirload_splitted,
             inputs=[gui_rolldirloadcheck] + audio_slots,
