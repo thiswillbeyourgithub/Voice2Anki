@@ -135,9 +135,9 @@ class ValueStorage:
 
         # create embeddings cache
         ec = self["choice_embed"]
-        embed_cache = shared.pv.p / "embed_cache" / ec
+        embed_cache = self.p / "embed_cache" / ec
         embed_cache.mkdir(exist_ok=True, parents=True)
-        shared.embed_cache = LocalFileStore(
+        self.embed_cache = LocalFileStore(
             root_path=embed_cache,
             compress=False,
             update_atime=True,

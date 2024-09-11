@@ -16,7 +16,6 @@ import hashlib
 from joblib import Memory
 import litellm
 from sklearn.metrics.pairwise import cosine_similarity
-from iterator_cacher import IteratorCacher
 
 from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
 from .shared_module import shared
@@ -67,11 +66,6 @@ You are my excellent assistant Alfred. Your task today is the to transform audio
 expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice"]
 
 # init the embedding caches here to avoid them needed recomputation each time python is launched
-embedding_caches = {
-    m: Memory(cache_dir / "embeddings_iterator_cacher" / m, verbose=False)
-    for m in shared.embedding_models
-}
-
 
 @optional_typecheck
 def hasher(text: str) -> str:
