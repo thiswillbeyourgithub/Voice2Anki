@@ -10,7 +10,7 @@ import importlib.util
 import numpy as np
 import re
 import zlib
-from typing import Any, List, Optional, Union, Tuple, Callable, Iterator, Sequence
+from typing import Any, List, Optional, Union, Tuple, Callable, Iterator, Sequence, Any
 from dataclasses import MISSING
 
 import gradio as gr
@@ -634,7 +634,7 @@ class LocalFileStore:
             if self.chmod_dir is not None:
                 os.chmod(dir, self.chmod_dir)
 
-    def mget(self, keys: Sequence[str]) -> List[Optional[bytes]]:
+    def mget(self, keys: Sequence[str]) -> List[Union[MISSING, Any]]:
         """Get the values associated with the given keys.
 
         Args:
@@ -642,13 +642,15 @@ class LocalFileStore:
 
         Returns:
             A sequence of optional values associated with the keys.
-            If a key is not found, the corresponding value will be None.
+            If a key is not found, the corresponding value will be dataclasses.MISSING
         """
-        values: List[Optional[bytes]] = []
+        values = []
         for key in keys:
             full_path = self._get_full_path(key)
             if full_path.exists():
-                value = full_path.read_bytes()
+                with full_path.open("rb") as f:
+                    value = pickle.load(f)
+                assert value is not MISSING, f"Loaded a missing value for key '{key}'"
                 if self.compress:
                     try:
                         value = zlib.decompress(value)
@@ -657,18 +659,20 @@ class LocalFileStore:
                         # This happens if the user enables 'compress' without
                         # changing the root_dir, so overwriting the file to the
                         # compressed version
-                        full_path.write_bytes(zlib.compress(value, level=self.compress))
+                        with full_path.open("wb") as f:
+                            com_val = zlib.compress(value, level=self.compress)
+                            pickle.dump(com_val, f)
 
                 values.append(value)
                 if self.update_atime:
                     # update access time only; preserve modified time
                     os.utime(full_path, (time.time(), os.stat(full_path).st_mtime))
             else:
-                values.append(None)
+                values.append(MISSING)
         return values
 
 
-    def mset(self, key_value_pairs: Sequence[Tuple[str, bytes]]) -> None:
+    def mset(self, key_value_pairs: Sequence[Tuple[str, Any]]) -> None:
         """Set the values for the given keys.
 
         Args:
@@ -678,13 +682,16 @@ class LocalFileStore:
             None
         """
         for key, value in key_value_pairs:
+            assert value is not MISSING, f"Trying to store a MISSING value for key '{key}'"
             full_path = self._get_full_path(key)
             self._mkdir_for_store(full_path.parent)
             if self.compress:
                 com_val = zlib.compress(value, level=self.compress)
-                full_path.write_bytes(com_val)
+                with full_path.open("wb") as f:
+                    pickle.dump(com_val, f)
             else:
-                full_path.write_bytes(value)
+                with full_path.open("wb") as f:
+                    pickle.dump(value, f)
             if self.chmod_file is not None:
                 os.chmod(full_path, self.chmod_file)
 
