@@ -1,6 +1,6 @@
 import os
 import threading
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 from functools import partial
 from tqdm import tqdm
 import pandas as pd
@@ -24,6 +24,8 @@ from .typechecker import optional_typecheck
 
 # string at the end of the prompt
 prompt_finish = "\n\n###\n\n"
+
+REG_THINKING = re.compile("<thinking>.*?</thinking>", flags=re.DOTALL|re.MULTILINE)
 
 # used to count the number of tokens for chatgpt
 @optional_typecheck
@@ -480,25 +482,8 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
         raise Exception(red("You can't memorize a prompt that was automatically split."))
         return
 
-    if "<thinking>" in txt_chatgpt_outputstr:
-        prethinking, thinking = txt_chatgpt_outputstr.split("<thinking>", 1)
-        thinking, postthinking = thinking.split("</thinking>", 1)
-        if "<thinking>" in prethinking + postthinking or "</thinking>" in prethinking + postthinking:
-            raise Exception(red("Found <thinking> tags ind pre or post thinking"))
-        prethinking = prethinking.strip()
-        postthinking = postthinking.strip()
-        if not prethinking and postthinking:
-            red(f"Parsed cloze content as postthinking: '{postthinking}'")
-            clozetext = postthinking
-        elif prethinking and not postthinking:
-            red(f"Parsed cloze content as prethinking: '{prethinking}'")
-            clozetext = prethinking
-        else:
-            raise Exception("Failed to parse thinking from cloze.")
-    else:
-        clozetext = txt_chatgpt_outputstr
-        thinking = ""
-    txt_chatgpt_outputstr = clozetext
+    cleaned, thinking = split_thinking(txt_chatgpt_outputstr)
+    txt_chatgpt_outputstr = cleaned
 
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
@@ -625,3 +610,18 @@ def get_dirload_df() -> pd.DataFrame:
     # make sure that the index 'n' appears first
     df = df.reset_index().set_index("n").reset_index()
     return df
+
+@trace
+@optional_typecheck
+def split_thinking(prompt: str) -> Tuple[str, str]:
+    thoughts = re.findall(REG_THINKING, prompt)
+    for thought in thoughts:
+        prompt = prompt.replace(thought, "")
+    assert "<thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{prompt}"
+    assert "</thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{prompt}"
+    thinking = "\n".join(thoughts)
+    if thinking:
+        red("Removed thoughts in prompt")
+    return prompt, thinking
+
+

@@ -30,7 +30,7 @@ from deepgram import DeepgramClient, PrerecordedOptions
 from .anki_utils import add_note_to_anki, add_audio_to_anki
 from .shared_module import shared
 from .logger import red, whi, yel, store_to_db, trace, Timeout, smartcache, Critical
-from .memory import prompt_filter, load_prev_prompts, tkn_len, transcript_template, default_system_prompt
+from .memory import prompt_filter, load_prev_prompts, tkn_len, transcript_template, default_system_prompt, split_thinking
 from .media import sound_preprocessing, get_img_source, format_audio_component, rgb_to_bgr
 from .profiles import ValueStorage
 from .typechecker import optional_typecheck
@@ -1321,25 +1321,7 @@ def to_anki(
     if txt_chatgpt_cloz.startswith("Error with ChatGPT"):
         raise Exception(red(f"Error with chatgpt: '{txt_chatgpt_cloz}'"))
 
-    if "<thinking>" in txt_chatgpt_cloz:
-        prethinking, thinking = txt_chatgpt_cloz.split("<thinking>", 1)
-        thinking, postthinking = thinking.split("</thinking>", 1)
-        if "<thinking>" in prethinking + postthinking or "</thinking>" in prethinking + postthinking:
-            raise Exception(red("Found <thinking> tags ind pre or post thinking"))
-        prethinking = prethinking.strip()
-        postthinking = postthinking.strip()
-        if not prethinking and postthinking:
-            red(f"Parsed cloze content as postthinking: '{postthinking}'")
-            clozetext = postthinking
-        elif prethinking and not postthinking:
-            red(f"Parsed cloze content as prethinking: '{prethinking}'")
-            clozetext = prethinking
-        else:
-            raise Exception("Failed to parse thinking from cloze.")
-    else:
-        clozetext = txt_chatgpt_cloz
-        thinking = ""
-
+    clozetext, thinking = split_thinking(txt_chatgpt_cloz)
 
     # make sure the audio is a valid path
     if isinstance(audio_mp3_1, dict):
