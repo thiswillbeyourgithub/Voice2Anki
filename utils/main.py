@@ -602,7 +602,7 @@ Here are examples of input (me) and appropriate outputs (you):
                 inputs += f"\n<output>{m['content']}</output>\n</ex>"
             else:
                 raise ValueError(m["role"])
-        assert inputs.endsith("</output>\n</ex>"), f"Unexpected end of inputs:\n{inputs}"
+        assert inputs.endswith("</output>\n</ex>"), f"Unexpected end of inputs:\n{inputs}"
         inputs += "\n</examples>"
         formatted_messages[-1]["content"] += inputs
 
