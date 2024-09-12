@@ -18,6 +18,7 @@ from .logger import red, whi, trace, Timeout
 from .shared_module import shared
 from .media import format_audio_component
 from .typechecker import optional_typecheck
+from .memory import split_thinking
 
 
 # PyAnkiconnect automatically use async if called from async
@@ -179,6 +180,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, "Demo not yet launched!"
+    txt_chatgpt_cloz = split_thinking(txt_chatgpt_cloz)[0]
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         spec = importlib.util.spec_from_file_location(
                 "flashcard_editor.cloze_editor",
