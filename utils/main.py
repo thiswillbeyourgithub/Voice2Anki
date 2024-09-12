@@ -570,7 +570,7 @@ def pre_alfred(
             {"role": "system", "content": default_system_prompt["content"]}
             )
 
-    if prompt_management == "messages":
+    if prompt_management == "1 per mess":
         # first way: add the examples one after the other
         # add the selected prompts
         for m in prev_prompts:
@@ -585,8 +585,9 @@ def pre_alfred(
                 "content": m["answer"]})
         # add message buffer
         formatted_messages.extend(buffer_to_add)
+        formatted_messages.append(new_prompt)
 
-    elif prompt_management == "stuff":
+    elif prompt_management == "Stuff as XML in sys":
         # second way: add the messages as example in the system prompt
         inputs = """
 
@@ -604,34 +605,35 @@ Here are examples of input (me) and appropriate outputs (you):
                 raise ValueError(m["role"])
         assert inputs.endswith("</output>\n</ex>"), f"Unexpected end of inputs:\n{inputs}"
         inputs += "\n</examples>"
+        assert len(formatted_messages) == 1
         formatted_messages[-1]["content"] += inputs
+        formatted_messages.append(new_prompt)
 
-    elif prompt_management == "ex_as_sys_prompt":
-        messages = []
-        for i, fm in enumerate(formatted_messages):
-            if i == 0:
-                messages.append(fm)
-                messages[0]["content"] += "\n\nExamples:\n'''\n"
-            elif i == len(formatted_messages) - 1:
-                messages[0]["content"] += "'''"
-                messages.append(fm)
+    elif prompt_management == "Stuff as XML in user":
+        inputs = """
+
+Here are examples of input (me) and appropriate outputs (you):
+<examples>
+"""
+        for m in prev_prompts:
+            inputs += f"<ex>\n<input>{m['content']}</input>\n<output>{m['answer']}</output>\n</ex>"
+        for m in buffer_to_add:
+            if m["role"] == "user":
+                inputs += f"<ex>\n<input>{m['content']}</input>"
+            elif m["role"] == "assistant":
+                inputs += f"\n<output>{m['content']}</output>\n</ex>"
             else:
-                if fm["role"] == "user":
-                    messages[0]["content"] += "[User]:\n" + fm["content"] + "\n"
-                elif fm["role"] == "assistant":
-                    messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
-                    if i == len(formatted_messages) - 2:
-                        messages[0]["content"] += "---\n"
-        assert len(messages) == 2, f"Len of messages if {len(messages)}"
-        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1]), "missing some content"
-        formatted_messages = messages
-
+                raise ValueError(m["role"])
+        assert inputs.endswith("</output>\n</ex>"), f"Unexpected end of inputs:\n{inputs}"
+        inputs += "\n</examples>"
+        assert len(formatted_messages) == 1
+        formatted_messages.append(
+            {"role": "user", "content": inputs}
+        )
+        formatted_messages[-1]["content"] += f"\n\n<user_input>\n{new_prompt['content']}\n</user_input>\n\nNow answer the user_input."
 
     else:
         raise ValueError(f"Invalid prompt managment: {prompt_management}")
-
-    # add the current prompt
-    formatted_messages.append(new_prompt)
 
     # check the number of token is fine and format the previous
     # prompts in chatgpt format

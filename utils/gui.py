@@ -102,7 +102,7 @@ with gr.Blocks(
                     with gr.Row():
                         sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=True)
                         improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=100, scale=3)
-                prompt_manag = gr.Radio(choices=["messages", "stuff"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
+                prompt_manag = gr.Radio(choices=["1 per mess", "Stuff as XML in sys", "Stuff as XML in user"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
 
             with gr.Row():
                 with gr.Column(scale=10):
