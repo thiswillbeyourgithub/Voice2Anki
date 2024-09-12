@@ -617,9 +617,10 @@ def split_thinking(prompt: str) -> Tuple[str, str]:
     thoughts = re.findall(REG_THINKING, prompt)
     for thought in thoughts:
         prompt = prompt.replace(thought, "")
+    prompt = prompt.strip()
     assert "<thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{prompt}"
     assert "</thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{prompt}"
-    thinking = "\n".join(thoughts)
+    thinking = "\n".join(thoughts).strip()
     if thinking:
         red("Removed thoughts in prompt")
     return prompt, thinking
