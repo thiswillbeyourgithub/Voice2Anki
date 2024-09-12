@@ -606,6 +606,27 @@ Here are examples of input (me) and appropriate outputs (you):
         inputs += "\n</examples>"
         formatted_messages[-1]["content"] += inputs
 
+    elif prompt_management == "ex_as_sys_prompt":
+        messages = []
+        for i, fm in enumerate(formatted_messages):
+            if i == 0:
+                messages.append(fm)
+                messages[0]["content"] += "\n\nExamples:\n'''\n"
+            elif i == len(formatted_messages) - 1:
+                messages[0]["content"] += "'''"
+                messages.append(fm)
+            else:
+                if fm["role"] == "user":
+                    messages[0]["content"] += "[User]:\n" + fm["content"] + "\n"
+                elif fm["role"] == "assistant":
+                    messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
+                    if i == len(formatted_messages) - 2:
+                        messages[0]["content"] += "---\n"
+        assert len(messages) == 2, f"Len of messages if {len(messages)}"
+        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1]), "missing some content"
+        formatted_messages = messages
+
+
     else:
         raise ValueError(f"Invalid prompt managment: {prompt_management}")
 
@@ -745,26 +766,6 @@ def alfred(
         dupli = [dp for dp in contents if contents.count(dp) > 1 and "alfred:" not in dp.lower()]
         if dupli:
             raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}:" + "\n* " + "\n* ".join(list(set(dupli))))
-
-    if shared.pv["check_prompt_as_system"]:
-        messages = []
-        for i, fm in enumerate(formatted_messages):
-            if i == 0:
-                messages.append(fm)
-                messages[0]["content"] += "\n\nExamples:\n'''\n"
-            elif i == len(formatted_messages) - 1:
-                messages[0]["content"] += "'''"
-                messages.append(fm)
-            else:
-                if fm["role"] == "user":
-                    messages[0]["content"] += "[User]:\n" + fm["content"] + "\n"
-                elif fm["role"] == "assistant":
-                    messages[0]["content"] += "[Alfred]:\n" + fm["content"] + "\n"
-                    if i == len(formatted_messages) - 2:
-                        messages[0]["content"] += "---\n"
-        assert len(messages) == 2, f"Len of messages if {len(messages)}"
-        assert all(m["content"] in messages[0]["content"] for m in formatted_messages[:-1]), "missing some content"
-        formatted_messages = messages
 
     model_price = shared.llm_price[llm_choice]
     whi(f"Will use model {llm_choice}")

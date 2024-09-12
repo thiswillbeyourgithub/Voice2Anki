@@ -57,7 +57,6 @@ profile_keys = {
     "gallery": {},
     "txt_deck": {},
     "txt_tags": {},
-    "check_prompt_as_system": {"default": False, type: bool},
 }
 for i in range(1, shared.queued_gallery_slot_nb + 1):
     profile_keys[f"queued_gallery_{i:03d}"] = {}
