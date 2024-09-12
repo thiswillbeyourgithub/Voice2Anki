@@ -480,6 +480,26 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
         raise Exception(red("You can't memorize a prompt that was automatically split."))
         return
 
+    if "<thinking>" in txt_chatgpt_outputstr:
+        prethinking, thinking = txt_chatgpt_outputstr.split("<thinking>", 1)
+        thinking, postthinking = thinking.split("</thinking>", 1)
+        if "<thinking>" in prethinking + postthinking or "</thinking>" in prethinking + postthinking:
+            raise Exception(red("Found <thinking> tags ind pre or post thinking"))
+        prethinking = prethinking.strip()
+        postthinking = postthinking.strip()
+        if not prethinking and postthinking:
+            red(f"Parsed cloze content as postthinking: '{postthinking}'")
+            clozetext = postthinking
+        elif prethinking and not postthinking:
+            red(f"Parsed cloze content as prethinking: '{prethinking}'")
+            clozetext = prethinking
+        else:
+            raise Exception("Failed to parse thinking from cloze.")
+    else:
+        clozetext = txt_chatgpt_outputstr
+        thinking = ""
+    txt_chatgpt_outputstr = clozetext
+
     content = dedent(transcript_template.replace("CONTEXT", txt_context).replace("TRANSCRIPT", txt_audio)).strip()
     answer = dedent(txt_chatgpt_outputstr.replace("\n", "<br/>")).strip()
     tkn_len_in = tkn_len(content)
