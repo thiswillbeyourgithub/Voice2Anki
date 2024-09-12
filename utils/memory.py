@@ -443,8 +443,11 @@ def prompt_filter(
     red(f"Tokens of the kept prompts after {cnt} iterations: {tkns} (of all prompts: {all_tkns} tokens)")
     yel(f"Total number of prompts saved in memories: '{len(prev_prompts)}'")
 
+    assert len(output_pr) >= 2, f"Found only {len(output_pr)} prompts after filtering, this is suspiciously low."
+
+
     output_pr = sorted(output_pr, key=lambda x: x["pick_score"])
-    assert output_pr[1]["pick_score"] <= output_pr[-1]["pick_score"], "unexpected pick_score"
+    assert output_pr[1]["pick_score"] <= output_pr[-1]["pick_score"], f"Unexpected pick_score ordering: {output_pr}"
     # or by timestamp (most recent last):
     # output_pr = sorted(output_pr, key=lambda x: x["timestamp"])
     # or by priority:
