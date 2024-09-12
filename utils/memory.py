@@ -270,6 +270,8 @@ def prompt_filter(
     tkns += new_prompt_len  # current question + message buffer
     all_tkns = sum([pr["tkn_len_in"] + pr["tkn_len_out"] for pr in candidate_prompts])
 
+    assert tkns <= max_token, f"The number of tokens including only the system prompt and the current prompt ({tkns}) is already above the max threshold ({max_token}). Please increase max_token"
+
     # score based on priority. Closer to 1 means higher chances of being picked
     max_prio = max([pr["priority"] for pr in candidate_prompts])
     min_prio = min([pr["priority"] for pr in candidate_prompts])
