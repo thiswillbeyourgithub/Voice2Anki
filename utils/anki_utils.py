@@ -191,7 +191,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         spec.loader.exec_module(editor_module)
         cloze_editor = editor_module.cloze_editor
     else:
-        cloze_editor = lambda x: x
+        def cloze_editor(*args):
+            return args
 
     cloz = cloze_editor(txt_chatgpt_cloz)
     cloz = cloz.replace("\"", "\\\"")
