@@ -627,6 +627,7 @@ def split_thinking(prompt: str) -> Tuple[str, str]:
         assert "<thinking>" not in prompt, state
         assert "</thinking>" not in prompt, state
         assert not re.findall(REG_THINKING, prompt), state
+        assert prompt, state
     except Exception:
         gr.Warning(red(state))
         return orig_prompt, ""
