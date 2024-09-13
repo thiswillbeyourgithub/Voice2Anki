@@ -800,13 +800,13 @@ def alfred(
     cont, th = split_thinking(cloz)
     cloz = f"{cont}\n{th}"
 
-    # if contains cloze in multiple parts but in the same line, merge them
-    sl = cloz.splitlines()
-    if len(sl) == 2:
-        if "{{c" not in sl[0] and "}}" not in sl[0]:
-            if sl[1].count("{{c1::") > 1:
-                sl[1] = re.sub("}}(.*?){{c1::", r"\1", sl[1])
-            cloz = "\n".join(sl)
+    # # if contains cloze in multiple parts but in the same line, merge them
+    # sl = cloz.splitlines()
+    # if len(sl) == 2:
+    #     if "{{c" not in sl[0] and "}}" not in sl[0]:
+    #         if sl[1].count("{{c1::") > 1:
+    #             sl[1] = re.sub("}}(.*?){{c1::", r"\1", sl[1])
+    #         cloz = "\n".join(sl)
 
     reason = response["choices"][0]["finish_reason"]
     if reason.lower() != "stop":
