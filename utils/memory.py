@@ -1,4 +1,5 @@
 import os
+import copy
 import threading
 from typing import List, Optional, Union, Tuple
 from functools import partial
@@ -614,14 +615,22 @@ def get_dirload_df() -> pd.DataFrame:
 @trace
 @optional_typecheck
 def split_thinking(prompt: str) -> Tuple[str, str]:
-    orig_prompt = prompt
-    thoughts = re.findall(REG_THINKING, prompt)
+    orig_prompt = copy.deepcopy(prompt)
+    thoughts = REG_THINKING.findall(prompt)
     for thought in thoughts:
-        prompt = prompt.replace(thought, "")
+        prompt = prompt.replace(thought, "", 1)
     prompt = prompt.strip()
-    assert "<thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{orig_prompt}"
-    assert "</thinking>" not in prompt, f"Failed to remove thoughts? Prompt:\n{orig_prompt}"
     thinking = "\n".join(thoughts).strip()
+
+    state = f"Error when removing thoughts:\nOriginal prompt: '{orig_prompt}'\nThoughts: '{thoughts}'\nOutput prompt: '{prompt}'"
+    try:
+        assert "<thinking>" not in prompt, state
+        assert "</thinking>" not in prompt, state
+        assert not re.findall(REG_THINKING, prompt), state
+    except Exception:
+        gr.Warning(red(state))
+        return orig_prompt, ""
+
     if thinking:
         red("Removed thoughts in prompt")
     return prompt, thinking

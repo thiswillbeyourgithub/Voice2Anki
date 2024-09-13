@@ -796,12 +796,9 @@ def alfred(
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
 
     # make sure the thoughts are at the end
-    cloz = [c.strip() for c in cloz.splitlines() if c.strip()]
-    for ic, c in enumerate(cloz):
-        cont, th = split_thinking(c)
-        cloz[ic] = f"{cont}\n{th}"
-
-    cloz = "\n".join(cloz)
+    cloz = "\n".join([c.strip() for c in cloz.splitlines() if c.strip()])
+    cont, th = split_thinking(cloz)
+    cloz = f"{cont}\n{th}"
 
     # if contains cloze in multiple parts but in the same line, merge them
     sl = cloz.splitlines()
