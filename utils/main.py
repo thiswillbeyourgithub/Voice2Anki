@@ -793,6 +793,7 @@ def alfred(
 
     cloz = response["choices"][0]["message"]["content"]
     # for cosmetic purposes in the textbox
+    cloz = cloz.replace(" •", "     -")
     cloz = cloz.replace("<br>", "\n")
     cloz = cloz.replace("<br/>", "\n")
     cloz = cloz.replace("\n- {{c1::", "\n{{c1::- ")
