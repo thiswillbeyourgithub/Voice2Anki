@@ -762,6 +762,8 @@ def alfred(
         elif i % 2 == 1:
             assert fm["role"] == "user", f"expected user role but got {fm['role']}"
 
+        formatted_messages[i]["content"] = fm["content"].replace("<br\>", "\n").replace("<br>", "\n")
+
     # check no duplicate in messages
     if len(set([fm["content"] for fm in formatted_messages])) != len(formatted_messages):
         contents = [pm["content"] for pm in formatted_messages]
