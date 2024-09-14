@@ -1327,6 +1327,8 @@ def to_anki(
 
     if "alfred" in clozetext.lower():
         raise Exception(red(f"COMMUNICATION REQUESTED:\n'{clozetext}'"))
+    if re.findall("{{c\d:}}", clozetext.lower()):
+        raise Exception(red(f"EMPTY CLOZE DETECTED:\n'{clozetext}'"))
 
     # load the source text of the image in the gallery
     txt_source_queue = queue.Queue()
