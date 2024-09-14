@@ -251,7 +251,7 @@ with gr.Blocks(
             queued_galleries = []
             for qg in range(1, shared.queued_gallery_slot_nb + 1):
                 with gr.Row(equal_height=False):
-                    with gr.Column(scale=10):
+                    with gr.Column(scale=100):
                         gal_ = gr.Gallery(
                             # value=None,
                             value=shared.pv[f"queued_gallery_{qg:03d}"],
@@ -265,12 +265,12 @@ with gr.Blocks(
                             show_download_button=True,
                             preview=False,
                             )
-                    with gr.Column(scale=0):
-                        send_ = gr.Button(value="Send to gallery", variant="primary", min_width=50, scale=10, size="sm")
-                        add_ = gr.Button(value="Add image from clipboard", min_width=50, scale=10, size="sm")
+                    with gr.Column(scale=1):
+                        send_ = gr.Button(value="Send to gallery", variant="primary", min_width=50, scale=1, size="sm")
+                        add_ = gr.Button(value="Add image from clipboard", min_width=50, scale=1, size="sm")
                         with gr.Row():
                             rst_ = gr.Button(value="Clear", variant="primary", min_width=50, scale=0, size="sm")
-                            ocr_ = gr.Button("OCR", variant="secondary", scale=1, size="sm")
+                            ocr_ = gr.Button("OCR", variant="secondary", scale=10, size="sm")
                 queued_galleries.append([rst_, gal_, send_, add_, ocr_])
 
             btn_qg_new = gr.Button(visible=False, elem_id="js_btnqgnew")
