@@ -793,6 +793,7 @@ def alfred(
     # for cosmetic purposes in the textbox
     cloz = cloz.replace("<br>", "\n")
     cloz = cloz.replace("<br/>", "\n")
+    cloz = cloz.replace("\n- {{c1::", "\n{{c1::- ")
     cloz = cloz.replace("&nbsp;", " ")
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
 
