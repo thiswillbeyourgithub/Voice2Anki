@@ -724,7 +724,7 @@ def alfred(
             # gr.Warning(mess)
             return red(mess)
     if txt_audio.count(" ") < 3:
-        return red(f"Too few words in txt_audio to be plausible")
+        return red("Too few words in txt_audio to be plausible")
 
     if not (shared.pv["txt_openai_api_key"] or shared.pv["txt_mistral_api_key"] or shared.pv["txt_openrouter_api_key"]):
         raise Exception(red("No API key provided for any LLM. Do it in the settings."))
