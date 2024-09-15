@@ -334,10 +334,19 @@ css = """
 
 /* remove source selector */
 .mic-select {display: none !important; flex-grow:0 !important;}
+"""
 
+if shared.big_font:
+    css += """
 /* Larger font for some text elements */
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
+"""
+else:
+    css += """
+/* Larger font for some text elements */
+#js_txtchatgpt > label > textarea {font-size: 17px;}
+#js_txtwhisper > label > textarea {font-size: 17px;}
 """
 
 if shared.widen_screen:
