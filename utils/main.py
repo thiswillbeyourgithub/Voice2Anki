@@ -801,7 +801,7 @@ def alfred(
     cloz = cloz.replace("&nbsp;", " ")
     cloz = cloz.replace("#####", "\n#####\n")  # make sure to separate cleanly the clozes
 
-    # make sure the thoughts are at the end
+    # make sure the thinking are at the end
     cloz = "\n".join([c.strip() for c in cloz.splitlines() if c.strip()])
     cont, th = split_thinking(cloz)
     cloz = f"{cont}\n{th}"
@@ -1465,7 +1465,7 @@ def to_anki(
     # add the latest generated cards to the message buffer
     if len(audio_split) > 1:
         if len(audio_split) != len(clozes):
-            red("No saving card to message buffer because the number of split in txt_audio is not the same as in clozes.")
+            red("Not saving card to message buffer because the number of split in txt_audio is not the same as in clozes.")
         else:
             for aud, cl in zip(audio_split, clozes):
                 if aud not in [mb["unformatted_txt_audio"] for mb in shared.message_buffer] and cl not in [mb["unformatted_txt_chatgpt_cloz"] for mb in shared.message_buffer]:
