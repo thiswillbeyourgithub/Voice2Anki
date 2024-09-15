@@ -132,11 +132,11 @@ with gr.Blocks(
         with gr.Tab(label="Gallery", visible=shared.pv["enable_gallery"], elem_classes=["js_subtab_main"], elem_id="js_widetabs") as tab_gallery:
             with gr.Column():
                 gallery = gr.Gallery(value=shared.pv["gallery"], label="Source images", columns=[1], rows=[1], object_fit="cover", container=True)
-                roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm")
                 with gr.Group():
                     with gr.Row():
-                        rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm")
-                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm")
+                        rst_img_btn = gr.Button(value="Clear", variant="primary", min_width=50, size="sm", scale=1)
+                        img_btn = gr.Button(value="Add image from clipboard", variant="secondary", min_width=50, size="sm", scale=2)
+                        roll_gall_btn = gr.Button(value="Roll gallery", min_width=50, visible=shared.pv["enable_queued_gallery"], elem_id="js_rollgallbtn", size="sm", scale=1)
 
         with gr.Tab(label="Edit by voice", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
             with gr.Row():
