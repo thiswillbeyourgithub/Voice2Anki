@@ -699,6 +699,7 @@ def alfred(
         ) -> str:
     "send the previous prompt and transcribed speech to the LLM"
     red(f"Calling Alfred in cache_mode={cache_mode} for transcript '{txt_audio}'")
+    assert max_token > 0, f"Invalid value for max_token: {max_token}"
     if not txt_audio:
         gr.Warning(red("Empty transcription."))
         return "Empty transcription"
