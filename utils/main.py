@@ -160,12 +160,14 @@ def whisper_cached(
                             response_format="verbose_json",
                             )
                         transcript = json.loads(transcript.json())
-                        if sld_whisp_temp == 0:
-                            temps = [seg["temperature"] for seg in transcript["segments"]]
-                            if sum(temps) / len(temps) == 1:
-                                raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
                         if not transcript["segments"]:
                             gr.Warning(red(f"No audio segment found in {audio_path}"))
+                        if sld_whisp_temp == 0:
+                            temps = [seg["temperature"] for seg in transcript["segments"]]
+                            if not temps:
+                                gr.Warning(red(f"No audio temperature found in {audio_path}"))
+                            elif sum(temps) / len(temps) == 1:
+                                raise Exception(red(f"Whisper increased temperature to maximum, probably because no words could be heard."))
 
 
                     elif stt_model == "deepgram:nova-2":
