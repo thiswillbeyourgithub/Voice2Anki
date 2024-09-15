@@ -543,13 +543,13 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
 
 @optional_typecheck
 @lru_cache
-def cached_load_memories(path: str, modtime: int) -> dict:
+def cached_load_memories(path: str, modtime: int) -> List[dict]:
     "actual code that load the memories, but cached"
     path = Path(path)
     assert path.exists(), f"File not found: {path}"
     content = path.read_text()
     d = json.loads(content)
-    assert isinstance(d, dict), f"Loaded content is not a dict but {type(d)}"
+    assert isinstance(d, list) and all(isinstance(el, dict) for el in d), "Loaded content is not a list of dict"
     return d
 
 @optional_typecheck
