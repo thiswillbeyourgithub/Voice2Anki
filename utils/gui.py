@@ -141,9 +141,9 @@ with gr.Blocks(
             with gr.Row():
                 audio_corrector = create_audio_compo(
                         label="Edit by voice",
-                        container=True,
-                        scale=0,
-                        editable=True,
+                        container=False,
+                        scale=1,
+                        editable=False,
                         )
                 audio_corrector_txt = gr.Textbox(value=None, label="Edit by voice", scale=2)
                 auto_btn = gr.Button(value="1+2+3", variant="secondary", scale=1, min_width=50, visible=False, size="sm")
