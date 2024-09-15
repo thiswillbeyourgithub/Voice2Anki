@@ -86,14 +86,6 @@ with gr.Blocks(
                 chatgpt_btn = gr.Button(value="Clozify", variant="secondary", elem_id="js_transcriptbtn", size="sm", min_width=100)
                 anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
 
-        with gr.Row():
-            with gr.Row():
-                send_more_to_previous = gr.Textbox(value=None, placeholder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=2, max_lines=5, scale=1)
-                with gr.Column(scale=2, variant="compact", min_width=100):
-                    mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=1, min_width=75)
-                    suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=75)
-                check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75, display=False)  # todo: remove
-
         # quick settings
         with gr.Tab(label="Controls", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
             with gr.Row():
@@ -122,6 +114,14 @@ with gr.Blocks(
                 force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
                 clear_cache_btn = gr.Button(value="Clear cache", size="sm")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm", display=(shared.audio_slot_nb==1))
+
+            with gr.Row():
+                with gr.Row():
+                    send_more_to_previous = gr.Textbox(value=None, placeholder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=2, max_lines=5, scale=1)
+                    with gr.Column(scale=2, variant="compact", min_width=100):
+                        mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=1, min_width=75)
+                        suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=75)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75, display=False)  # todo: remove
 
             with gr.Row():
                 txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["txt_deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
