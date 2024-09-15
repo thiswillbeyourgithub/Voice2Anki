@@ -36,7 +36,7 @@ def start_Voice2Anki(
     disable_timeout: bool = True,
     disable_smartcache: bool = False,
     widen_screen: bool = True,
-    big_font: bool = True,
+    big_font: bool = False,
     port: int = 7860,
     *args,
     **kwargs
@@ -79,7 +79,7 @@ def start_Voice2Anki(
     widen_screen: bool, default True
         if True, will force width of app to be 100%. Might be a problem
         for some widen screens, but very handy for mobile and tablet use.
-    big_font: bool, default True
+    big_font: bool, default False
         increase font size of text elements
     port: int, default 7860
         default port to use
