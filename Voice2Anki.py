@@ -192,4 +192,7 @@ def start_Voice2Anki(
     return demo
 
 if __name__ == "__main__":
-    demo = fire.Fire(start_Voice2Anki)
+    try:
+        demo = fire.Fire(start_Voice2Anki)
+    except IndexError as e:
+        print(f"Quitting ('{e}'))")
