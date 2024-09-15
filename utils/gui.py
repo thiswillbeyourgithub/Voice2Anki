@@ -91,7 +91,7 @@ with gr.Blocks(
                 with gr.Row():
                     send_more_to_previous = gr.Textbox(value=None, placeholder="Press enter to send this text to the 'more' fields of the previous notes", label="More field", lines=1, max_lines=5, scale=1)
                     mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=1, min_width=75)
-                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75)
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75, display=False)  # todo: remove
             with gr.Column(scale=1, min_width=100):
                 suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=75)
 
