@@ -60,6 +60,7 @@ def clear_cache() -> None:
 @optional_typecheck
 def pop_buffer() -> None:
     "remove the latest card from message buffer"
+    assert shared.audio_slot_nb == 1, "Can only use pop_buffer if audio_slot_nb is 1"
     removed = shared.message_buffer.pop(-1)
     shared.pv["message_buffer"] = shared.message_buffer
     red(f"Message buffer size is now {len(shared.message_buffer)} after removing '{removed}'")
