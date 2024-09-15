@@ -559,7 +559,7 @@ def load_prev_prompts(profile: str) -> List[dict]:
     mem_file = Path(f"profiles/{profile}/memories.json")
     if mem_file.exists():
         abs_path = mem_file.resolve().absolute().__str__()
-        modtime = mem_file.stat().st_modtime
+        modtime = mem_file.stat().st_mtime
         prev_prompts= cached_load_memories(path=abs_path, modtime=modtime)
 
         # with open(f"profiles/{profile}/memories.json", "r") as f:
