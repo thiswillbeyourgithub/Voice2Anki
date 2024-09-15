@@ -3,6 +3,7 @@ import copy
 import threading
 from typing import List, Optional, Union, Tuple
 from functools import partial
+from functools import lru_cache
 from tqdm import tqdm
 import pandas as pd
 import gradio as gr
@@ -541,12 +542,28 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
     return
 
 @optional_typecheck
+@lru_cache
+def cached_load_memories(path: str, modtime: int) -> dict:
+    "actual code that load the memories, but cached"
+    path = Path(path)
+    assert path.exists(), f"File not found: {path}"
+    content = path.read_text()
+    d = json.loads(content)
+    assert isinstance(d, dict), f"Loaded content is not a dict but {type(d)}"
+    return d
+
+@optional_typecheck
 @trace
 def load_prev_prompts(profile: str) -> List[dict]:
     assert Path("profiles/").exists(), "profile directory not found"
-    if Path(f"profiles/{profile}/memories.json").exists():
-        with open(f"profiles/{profile}/memories.json", "r") as f:
-            prev_prompts = json.load(f)
+    mem_file = Path(f"profiles/{profile}/memories.json")
+    if mem_file.exists():
+        abs_path = mem_file.resolve().absolute().__str__()
+        modtime = mem_file.stat().st_modtime
+        prev_prompts= cached_load_memories(path=abs_path, modtime=modtime)
+
+        # with open(f"profiles/{profile}/memories.json", "r") as f:
+        #     prev_prompts = json.load(f)
         # if Path(f"profiles/{profile}/memories.toml").exists():
         #     try:
         #         with open(f"profiles/{profile}/memories.toml", "r") as f:
