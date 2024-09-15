@@ -8,7 +8,7 @@ import pdb
 import faulthandler
 import traceback
 
-from utils.typechecker import optional_typecheck
+from utils.typechecker import optional_typecheck, beartype
 from utils.logger import whi, yel, red, print_db
 from utils.shared_module import shared
 
@@ -19,7 +19,8 @@ Path("./cache").mkdir(exist_ok=True)
 os.environ["PYTHONTRACEMALLOC"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
-@optional_typecheck
+#@optional_typecheck
+@beartype
 def start_Voice2Anki(
     print_db_then_exit: Optional[str] = None,
     nb_audio_slots: int = 3,
