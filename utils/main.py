@@ -1374,6 +1374,7 @@ def to_anki(
             "timestamp": time.time(),
             "user-agent": shared.request["user-agent"],
             "mp3": str(audio_mp3_1),
+            "thinking": thinking,
             }
     results = []
 
