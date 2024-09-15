@@ -93,7 +93,7 @@ with gr.Blocks(
                     with gr.Row():
                         sld_improve = gr.Number(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=True)
                         improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=50, scale=3)
-                        sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=(shared.pv["sld_buffer"] if (shared.audio_slot_nb==1) else 0), label="Buffer size", scale=1, display=(shared.audio_slot_nb==1))
+                        sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=(shared.pv["sld_buffer"] if (shared.audio_slot_nb==1) else 0), label="Buffer size", scale=1, visible=(shared.audio_slot_nb==1))
                 prompt_manag = gr.Radio(choices=["1 per mess", "Stuff as XML in sys", "Stuff as XML in user"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
 
             with gr.Row():
@@ -121,7 +121,7 @@ with gr.Blocks(
                     with gr.Column(scale=2, variant="compact", min_width=100):
                         mark_previous = gr.Button(value="Mark prev.", elem_id="js_markpreviousbtn", size="sm", scale=1, min_width=75)
                         suspend_previous = gr.Button(value="Suspend prev.", elem_id="js_suspendpreviousbtn", size="sm", scale=2, min_width=75)
-                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75, display=False)  # todo: remove
+                    check_marked = gr.Checkbox(value=False, interactive=True, label="Mark next", show_label=False, elem_id="js_marknext", scale=1, min_width=75, visible=False)  # todo: remove
 
             with gr.Row():
                 txt_deepgram_keyword_boosting = gr.Textbox(value=shared.pv["txt_deepgram_keyword_boosting"], label="Deepgram keyword boosting", lines=2, max_lines=10, placeholder="One keyword per line, format: word:intensifier\nword1:2", show_label=True, scale=0, visible="deepgram" in shared.pv["stt_choice"])
