@@ -101,7 +101,7 @@ with gr.Blocks(
                     with gr.Row():
                         llm_choice = gr.Dropdown(value=shared.pv["llm_choice"], choices=[llm for llm in shared.llm_info.keys()], label="LLM", show_label=True, scale=0, multiselect=False)
                         sld_max_tkn = gr.Number(minimum=0, maximum=15000, value=shared.pv["sld_max_tkn"], step=100.0, label="LLM avail. tkn.", scale=1)
-                        sld_temp = gr.Slider(minimum=0, maximum=2, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
+                        sld_temp = gr.Slider(minimum=0, maximum=1.0, value=shared.pv["sld_temp"], step=0.1, label="LLM temp", scale=1)
                         txt_chatgpt_context = gr.Textbox(value=shared.pv["txt_chatgpt_context"], lines=2, label="LLM context", placeholder="context for ChatGPT", min_width=100)
 
             with gr.Row():
