@@ -830,7 +830,8 @@ class AudioSplitter:
             if not failed:
                 break
 
-        assert not failed, "Failed to get transcript."
+        if failed:
+            raise Exception("Failed to get transcript: ") from err
 
         return transcript
 
