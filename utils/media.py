@@ -448,12 +448,16 @@ mark {
 }
 
 .scrollablecontent {
-    max-height: 250px !important;
+    min-height: 220px !important;
+    max-height: 220px !important;
     overflow-y: auto;
 }
 </style>
 <div class="scrollablecontent">
 """
+# min-height: 5em !important;
+# max-height: 5em !important;
+# line-height: 1em;
 div_separator = '  <div class="separator">-</div>  '
 tail = """
 </div>
