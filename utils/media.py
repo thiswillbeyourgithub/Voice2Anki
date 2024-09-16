@@ -1,3 +1,4 @@
+import os
 import re
 import shutil
 import time
@@ -33,7 +34,10 @@ def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
             decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
             decoded = rgb_to_bgr(decoded)
         except Exception as err:
-            gr.Warning(red(f"Error when decoding image from clipboard: '{err}'"))
+            if "DISPLAY" not in os.environ:
+                gr.Warning(red(f"Error when decoding image from clipboard. Maybe try to set the DISPLAY env variable.\nError was: '{err}'"))
+            else:
+                gr.Warning(red(f"Error when decoding image from clipboard: '{err}'"))
             return gallery
 
         if decoded is None:
