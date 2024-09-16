@@ -342,12 +342,12 @@ if shared.big_font:
 #js_txtchatgpt > label > textarea {font-size: 20px;}
 #js_txtwhisper > label > textarea {font-size: 20px;}
 """
-else:
-    css += """
-/* Larger font for some text elements */
-#js_txtchatgpt > label > textarea {font-size: 17px;}
-#js_txtwhisper > label > textarea {font-size: 17px;}
-"""
+# else:
+#     css += """
+# /* Larger font for some text elements */
+# #js_txtchatgpt > label > textarea {font-size: 17px;}
+# #js_txtwhisper > label > textarea {font-size: 17px;}
+# """
 
 if shared.widen_screen:
     css += "\n.app { max-width: 100% !important; }"
