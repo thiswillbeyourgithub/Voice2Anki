@@ -645,9 +645,9 @@ Here are examples of input (me) and appropriate outputs (you):
 
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
-    if shared.pv['llm_choice'] in litellm.model_cost:
+    if shared.pv['llm_choice'] in shared.llm_info:
         modelinfo = litellm.model_cost[shared.pv['llm_choice']]
-    elif shared.pv['llm_choice'].split("/", 1)[1] in litellm.
+    elif shared.pv['llm_choice'].split("/", 1)[1] in shared.llm_info:
         modelinfo = litellm.model_cost[shared.pv['llm_choice'].split("/", 1)[1]]
     else:
         raise ValueError(f"Couldn't find model info about '{shared.pv['llm_choice']}' in litellm")
