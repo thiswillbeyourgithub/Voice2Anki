@@ -80,11 +80,11 @@ with gr.Blocks(
                 update_status_btn = gr.Button(value="Card status", variant="secondary", scale=0, interactive=True, elem_id="js_cardstatusbtn", size="lg", min_width=100)
 
         # 1/2/3
-        with gr.Group():
-            with gr.Row():
-                transcript_btn = gr.Button(value="Transcribe", variant="secondary", elem_id="js_transcribebtn", size="sm", min_width=100)
-                chatgpt_btn = gr.Button(value="Clozify", variant="secondary", elem_id="js_transcriptbtn", size="sm", min_width=100)
-                anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
+        # with gr.Group():
+        with gr.Row():
+            transcript_btn = gr.Button(value="Transcribe", variant="secondary", elem_id="js_transcribebtn", size="sm", min_width=100)
+            chatgpt_btn = gr.Button(value="Clozify", variant="secondary", elem_id="js_transcriptbtn", size="sm", min_width=100)
+            anki_btn = gr.Button(value="Ankify", variant="secondary", elem_id="js_toankibtn", size="sm", min_width=100)
 
         # quick settings
         with gr.Tab(label="Controls", elem_classes=["js_subtab_main"], elem_id="js_widetabs"):
