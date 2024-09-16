@@ -55,7 +55,7 @@ class SharedModule:
 
     stt_models: List[str] = ["openai:whisper-1", "deepgram:nova-2"]
 
-    llm_price: dict = {k: v for k, v in litellm.model_cost.items()}
+    llm_info: dict = {k: v for k, v in litellm.model_cost.items()}
 
     # embeddings are so cheap I don't even count the number of tokens
     embedding_models: List[str] = [

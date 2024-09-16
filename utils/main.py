@@ -779,7 +779,7 @@ def alfred(
         if dupli:
             raise Exception(f"{len(dupli)} duplicate prompts found: {dupli}:" + "\n* " + "\n* ".join(list(set(dupli))))
 
-    model_price = shared.llm_price[llm_choice]
+    model_price = shared.llm_info[llm_choice]
     whi(f"Will use model {llm_choice}")
 
     pprint("Prompt for LLM:")
@@ -1158,7 +1158,7 @@ def audio_edit(
 
     #model_to_use = "openai/gpt-4o"
     model_to_use = shared.pv["llm_choice"]
-    model_price = shared.llm_price[model_to_use]
+    model_price = shared.llm_info[model_to_use]
 
     whi(f"Editing via {model_to_use}:")
     whi(prompt)
