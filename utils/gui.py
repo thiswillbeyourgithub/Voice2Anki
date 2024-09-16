@@ -68,8 +68,8 @@ with gr.Blocks(
 
         # whisper and chatgpt text output
         with gr.Row():
-            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=25, placeholder="The transcript of the audio recording will appear here", container=True, interactive=True, scale=1, elem_id="js_txtwhisper", show_label=True)
-            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=25, placeholder="The anki flashcard will appear here", container=True, interactive=True, scale=1, elem_id="js_txtchatgpt", show_label=True)
+            txt_audio = gr.Textbox(label="Transcript", lines=15, max_lines=15, placeholder="The transcript of the audio recording will appear here", container=True, interactive=True, scale=1, elem_id="js_txtwhisper", show_label=True)
+            txt_chatgpt_cloz = gr.Textbox(label="LLM cloze(s)", lines=15, max_lines=15, placeholder="The anki flashcard will appear here", container=True, interactive=True, scale=1, elem_id="js_txtchatgpt", show_label=True)
 
         # rolls
         with gr.Group():
