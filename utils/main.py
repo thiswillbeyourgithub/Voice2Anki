@@ -787,12 +787,15 @@ def alfred(
     pprint("Prompt for LLM:")
     pprint(formatted_messages)
 
-    response = litellm.completion(
-            model=llm_choice,
-            messages=formatted_messages,
-            temperature=temperature,
-            num_retries=2
-            )
+    try:
+        response = litellm.completion(
+                model=llm_choice,
+                messages=formatted_messages,
+                temperature=temperature,
+                num_retries=2
+                )
+    except Exception as e:
+        raise Exception(f"Error when calling {llm_choice} with temperature {temperature}: ") from e
 
     input_tkn_cost = response["usage"]["prompt_tokens"]
     output_tkn_cost = response["usage"]["completion_tokens"]
