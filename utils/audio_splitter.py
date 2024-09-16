@@ -726,7 +726,6 @@ class AudioSplitter:
         with open(audio_path, "rb") as f:
             audio_hash = hashlib.sha256(f.read()).hexdigest()
 
-        failed = True
         trial_dict = [
             {
                 "backend":"deepgram",
@@ -810,6 +809,7 @@ class AudioSplitter:
             #     "backend":"replicate",
             #     },
         ]
+        failed = True
         for iparam, params in enumerate(trial_dict):
             n_retry = params["n_retry"]
             del params["n_retry"]
@@ -825,13 +825,12 @@ class AudioSplitter:
                         red(f"Successfuly transcribed using parameters: {json.dumps(params)}")
                     break
                 except Exception as err:
+                    if iter_retry + 1 == n_retry:
+                        raise Exception("Failed to get transcript: ") from err
                     red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
                     time.sleep(10 * iter_retry)
             if not failed:
                 break
-
-        if failed:
-            raise Exception("Failed to get transcript: ") from err
 
         return transcript
 
