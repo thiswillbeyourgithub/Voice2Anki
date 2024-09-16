@@ -651,10 +651,12 @@ Here are examples of input (me) and appropriate outputs (you):
         modelinfo = litellm.model_cost[shared.pv['llm_choice'].split("/", 1)[1]]
     else:
         raise ValueError(f"Couldn't find model info about '{shared.pv['llm_choice']}' in litellm")
-    if "max_input_tokens" not in modelinfo:
-        raise ValueError(f"Couldn't find max_input_tokens in modelinfo:\n{modelinfo}")
-    else:
+    if "max_input_tokens" in modelinfo:
         input_token_limit = modelinfo["max_input_tokens"]
+    elif "max_tokens" in modelinfo:
+        input_token_limit = modelinfo["max_tokens"]
+    else:
+        raise ValueError(f"Couldn't find neither max_input_tokens nor max_tokens in modelinfo:\n{modelinfo}")
 
     assert tkns <= input_token_limit, f"Too many input tokens for model: {tkns} > {input_token_limit}"
     if tkns >= input_token_limit:
