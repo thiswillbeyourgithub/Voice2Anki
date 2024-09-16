@@ -646,11 +646,16 @@ Here are examples of input (me) and appropriate outputs (you):
     yel(f"Number of messages that will be sent to ChatGPT: {len(formatted_messages)} (representing {tkns} tokens)")
 
     if shared.pv['llm_choice'] in litellm.model_cost:
-        input_token_limit = litellm.model_cost[shared.pv['llm_choice']]["max_input_tokens"]
-    elif shared.pv['llm_choice'].split("/", 1)[1] in litellm.model_cost:
-        input_token_limit = litellm.model_cost[shared.pv['llm_choice'].split("/", 1)[1]]["max_input_tokens"]
+        modelinfo = litellm.model_cost[shared.pv['llm_choice']]
+    elif shared.pv['llm_choice'].split("/", 1)[1] in litellm.
+        modelinfo = litellm.model_cost[shared.pv['llm_choice'].split("/", 1)[1]]
     else:
-        raise ValueError(f"Couldn't find {shared.pv['llm_choice']} in litellm.model_cost")
+        raise ValueError(f"Couldn't find model info about '{shared.pv['llm_choice']}' in litellm")
+    if "max_input_tokens" not in modelinfo:
+        raise ValueError(f"Couldn't find max_input_tokens in modelinfo:\n{modelinfo}")
+    else:
+        input_token_limit = modelinfo["max_input_tokens"]
+
     assert tkns <= input_token_limit, f"Too many input tokens for model: {tkns} > {input_token_limit}"
     if tkns >= input_token_limit:
         red(f"More than {input_token_limit} tokens before calling LLM. Bypassing to ask "
