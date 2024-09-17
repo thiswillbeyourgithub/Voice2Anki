@@ -258,7 +258,7 @@ def prompt_filter(
         raise Exception("You want to use OpenAI for embeddings but haven't supplied an API key in the settings.")
 
     assert max_token >= 500, "max_token should be above 500"
-    assert max_token <= 15500, "max_token should be under 15500"
+    assert max_token <= 15500, "max_token should be under 15500"  # TODO: don't hardcode this
 
     candidate_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
     assert not any(pr["role"] == "system" for pr in prev_prompts), "Found system prompt in prompt_filter!"
