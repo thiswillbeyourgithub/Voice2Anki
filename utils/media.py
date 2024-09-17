@@ -15,6 +15,7 @@ import numpy as np
 import pyclip
 import hashlib
 import torchaudio
+import copy
 
 from .logger import whi, red, trace, Timeout
 from .ocr import get_text
@@ -27,18 +28,54 @@ from .typechecker import optional_typecheck
 def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
     whi("Getting image from clipboard")
     assert shared.pv["enable_gallery"], "Incoherent UI"
+    orig_gallery = copy.deepcopy(gallery)
+    if hasattr(gallery, "root"):
+        gallery = gallery.root
     try:
         # load from clipboard
         try:
             pasted = pyclip.paste()
-            decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
-            decoded = rgb_to_bgr(decoded)
         except Exception as err:
             if "DISPLAY" not in os.environ:
-                gr.Warning(red(f"Error when decoding image from clipboard. Maybe try to set the DISPLAY env variable.\nError was: '{err}'"))
+                gr.Warning(red(f"Error when getting clipboard content. Maybe try to set the DISPLAY env variable.\nError was: '{err}'"))
             else:
-                gr.Warning(red(f"Error when decoding image from clipboard: '{err}'"))
-            return gallery
+                gr.Warning(red(f"Error when getting clipboardcontent: '{err}'"))
+            return orig_gallery
+
+        try:
+            pasted_str = pasted.decode().strip()
+            pasted_path = Path(pasted_str)
+            if pasted_path.exists():
+                pasted = pasted_str
+            else:
+                red(f"pasted: {pasted}")
+        except Exception as e:
+            red(e)
+        if isinstance(pasted, str):
+            red(f"Received str from clipboard: {pasted}")
+            path = Path(pasted)
+            assert path.exists(), f"Pasted string but not a path: {path}"
+            if path.is_dir():
+                assert gallery is None, "If pasting path to a dir, the target gallery must be None"
+                files = [f for f in path.iterdir() if f.suffix.lower()[1:] in ["png", "jpg", "jpeg"]]
+                assert files, f"No files ending in png, jpg or jpeg found in {path}"
+                files = sorted(files, key=lambda f: f.stat().st_ctime)
+                red(f"Will paste those files: {files}")
+                images = [rgb_to_bgr(cv2.imread(f.resolve().absolute().__str__(), flags=1)) for f in files]
+                red("Done loading those images")
+                return images
+            elif path.is_file():
+                assert path.suffix.lower()[1:] in ["png", "jpg", "jpeg"], f"Only expecting path to files that end in png, jpg or jpeg. Received {path}"
+                decoded = rgb_to_bgr(cv2.imread(path.resolve().absolute().__str__(), flags=1))
+            else:
+                gr.Warning(red(f"Unexpected type of path: {path}"))
+                return orig_gallery
+        elif isinstance(pasted, bytes):
+            decoded = cv2.imdecode(np.frombuffer(pasted, np.uint8), flags=1)
+            decoded = rgb_to_bgr(decoded)
+        else:
+            gr.Warning(red(f"Unexpected type of pasted: {pasted}"))
+            return orig_gallery
 
         if decoded is None:
             whi("Image from clipboard was Nonetype")
@@ -46,42 +83,38 @@ def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
 
         if gallery is None:
             return [decoded]
-
-        if hasattr(gallery, "root"):
-            gallery = gallery.root
-        if isinstance(gallery, list):
-            out = []
-            for im in gallery:
-                if isinstance(im, tuple):
-                    assert Path(im[0]).exists(), f"Missing image from tuple {im}"
-                    assert im[1] is None, f"Unexpected tupe: {im}"
-                    out.append(
-                            rgb_to_bgr(
-                                cv2.imread(
-                                    im[0],
-                                    flags=1)
-                                )
-                            )
-                else:
-                    out.append(
-                            rgb_to_bgr(
-                                cv2.imread(
-                                    im.image.path,
-                                    flags=1)
-                                )
-                            )
-            out += [decoded]
-
-            whi("Loaded image from clipboard.")
-            return out
-
-        else:
+        if not isinstance(gallery, list):
             red(f'gallery is not list or None but {type(gallery)}')
             return None
 
+        out = []
+        for im in gallery:
+            if isinstance(im, tuple):
+                assert Path(im[0]).exists(), f"Missing image from tuple {im}"
+                assert im[1] is None, f"Unexpected tupe: {im}"
+                out.append(
+                        rgb_to_bgr(
+                            cv2.imread(
+                                im[0],
+                                flags=1)
+                            )
+                        )
+            else:
+                out.append(
+                        rgb_to_bgr(
+                            cv2.imread(
+                                im.image.path,
+                                flags=1)
+                            )
+                        )
+        out += [decoded]
+
+        whi("Loaded image from clipboard.")
+        return out
+
     except Exception as err:
-        red(f"Error: {err}")
-        return None
+        gr.Warning(red(f"Error: {err}"))
+        return orig_gallery
 
 
 @optional_typecheck
