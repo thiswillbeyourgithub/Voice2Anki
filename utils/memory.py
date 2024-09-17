@@ -261,7 +261,7 @@ def prompt_filter(
     assert max_token <= 15500, "max_token should be under 15500"
 
     candidate_prompts = sorted(prev_prompts, key=lambda x: x["timestamp"], reverse=True)
-    assert not any(pr["role"] == "system" for pr in prev_prompts), "Found systel prompt in prompt_filter!"
+    assert not any(pr["role"] == "system" for pr in prev_prompts), "Found system prompt in prompt_filter!"
 
     # better formatting by removing useless markup
     for i, m in enumerate(candidate_prompts):
