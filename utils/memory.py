@@ -277,6 +277,7 @@ def prompt_filter(
     if dis_cnt:
         red(f"Removed {dis_cnt} prompts that were manually marked as 'disabled'")
         candidate_prompts = [c for c in candidate_prompts if c is not None]
+
     # count the number of tokens added so far
     new_prompt_len = sum([tkn_len(p["content"]) for p in prompt_messages])
     tkns = 0
@@ -536,7 +537,6 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
         #     rtoml.dump(prev_prompts, f, pretty=True, none_value=RTOML_NONEVALUE)
     except Exception as err:
         raise Exception(red(f"Error during recursive improvement: '{err}'"))
-
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
     whi("Trying to directly embed the new memories")
