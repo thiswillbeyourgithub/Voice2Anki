@@ -69,7 +69,7 @@ You are my excellent assistant Alfred. Your task today is the to transform audio
             }
 
 
-expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice"]
+expected_mess_keys = ["role", "content", "timestamp", "priority", "tkn_len_in", "tkn_len_out", "answer", "llm_model", "stt_model", "hash", "llm_choice", "disabled", "disabled_note"]
 
 # init the embedding caches here to avoid them needed recomputation each time python is launched
 
@@ -250,7 +250,7 @@ def prompt_filter(
     ):
     """goes through the list of previous prompts of the profile, check
     correctness of the key/values, then returns only what's under the maximum
-    number of tokens for model"""
+    number of tokens for model. Also disregard prompts marked as disabled."""
     whi("Filtering prompts")
     if "mistral" in shared.pv["choice_embed"] and not shared.pv["txt_mistral_api_key"]:
         raise Exception("You want to use Mistral for embeddings but haven't supplied an API key in the settings.")
@@ -268,6 +268,15 @@ def prompt_filter(
         assert m["role"] == "user", f"expecter user role but got {m['role']}"
         assert "Context: '" not in m["content"] and "Transcript: '" not in m["content"], f"Invalid prompt: {m}"
 
+    # remove disabled prompts
+    dis_cnt = 0
+    for i, m in enumerate(candidate_prompts):
+        if m["disabled"]:
+            candidate_prompts[i] = None
+            dis_cnt += 1
+    if dis_cnt:
+        red(f"Removed {dis_cnt} prompts that were manually marked as 'disabled'")
+        candidate_prompts = [c for c in candidate_prompts if c is not None]
     # count the number of tokens added so far
     new_prompt_len = sum([tkn_len(p["content"]) for p in prompt_messages])
     tkns = 0
