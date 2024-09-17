@@ -1155,6 +1155,16 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
         #     ]
         # }
 
+        if not content["results"]["utterances"]:
+            red(f"No utterances found in {audio_path.name}, creating an empty one")
+            content["results"]["utterances"] = [
+                {
+                    "words": [],
+                    "start": 0,
+                    "end": content["duration"],
+                    "text": content["results"]["channels"][0]["alternatives"][0]["transcript"],
+                }
+            ]
         assert content["results"]["utterances"], "No utterances found"
         transcript = {
             "transcription": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
