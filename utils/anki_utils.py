@@ -184,6 +184,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         return "null"
     if txt_chatgpt_cloz.startswith("Image change detected: '"):
         return "null"
+    if "{{c1::" not in txt_chatgpt_cloz and "}}" not in txt_chatgpt_cloz:
+        return "null"
     txt_chatgpt_cloz = split_thinking(txt_chatgpt_cloz)[0]
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         spec = importlib.util.spec_from_file_location(
