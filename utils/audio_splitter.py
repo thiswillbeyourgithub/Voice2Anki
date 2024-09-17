@@ -466,7 +466,7 @@ class AudioSplitter:
             # times_to_keep[0][0] = 0
 
             if self.debug:
-                red("\n\nOpening debugger because debug argument.\nPress 'c then enter' to continue.")
+                red("\n\nOpening debugger because debug argument.\nThis does not mean something went wrong.\nPress 'c then enter' to continue.")
                 breakpoint()
 
             if len(times_to_keep) == 1:
