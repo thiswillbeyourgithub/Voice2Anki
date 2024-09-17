@@ -16,3 +16,4 @@ profiles/
 .env.leave
 .stignore
 .aider*
+diy_scripts
