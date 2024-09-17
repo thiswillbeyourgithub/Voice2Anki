@@ -521,6 +521,8 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
                 "tkn_len_in": tkn_len_in,
                 "tkn_len_out": tkn_len_out,
                 "hash": hasher(content),
+                "disabled": False,
+                "disabled_note": "",
                 }
         if to_add["hash"] in [pp["hash"] for pp in prev_prompts]:
             raise Exception(red("Prompt already in the memory.json!"))
