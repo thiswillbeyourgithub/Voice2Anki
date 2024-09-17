@@ -177,7 +177,7 @@ def embedder(
 
 @optional_typecheck
 @trace
-def check_prompts(prev_prompts: List[dict]) -> List[dict]:
+def check_prompts(prev_prompts: List[dict], less_verbose: bool = False) -> List[dict]:
     "checks validity of the previous prompts"
     whi("Checking prompt validity")
     for i, mess in enumerate(prev_prompts):
@@ -228,7 +228,8 @@ def check_prompts(prev_prompts: List[dict]) -> List[dict]:
             if k not in keys:
                 to_del.append(k)
         for dele in to_del:
-            red(f"Removed unexpected key from prompt: {dele}")
+            if not less_verbose:
+                red(f"Removed unexpected key from prompt: {dele}")
             del prev_prompts[i][dele]
 
         # make sure it's stripped
@@ -528,7 +529,7 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
             raise Exception(red("Prompt already in the memory.json!"))
         prev_prompts.append(to_add)
 
-        prev_prompts = check_prompts(prev_prompts)
+        prev_prompts = check_prompts(prev_prompts, less_verbose=True)
 
         if "{{c1::" not in txt_chatgpt_outputstr and "}}" not in txt_chatgpt_outputstr:
             gr.Warning(red(f"No cloze found in new memory. Make sure it's on purpose.\nCard: {txt_chatgpt_outputstr}"))
