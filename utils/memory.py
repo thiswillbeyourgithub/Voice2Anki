@@ -586,7 +586,7 @@ def load_prev_prompts(profile: str) -> List[dict]:
     else:
         red(f"No memories in profile {profile} found, creating it")
         prev_prompts = check_prompts([default_system_prompt.copy()])
-        with open(f"profiles/{profile}/memories.json", "w") as f:
+        with mem_file.open("w") as f:
             json.dump(prev_prompts, f, indent=4, ensure_ascii=False)
         # with open(f"profiles/{profile}/memories.toml", "w") as f:
         #     rtoml.dump(prev_prompts, f, pretty=True, none_value=RTOML_NONEVALUE)
