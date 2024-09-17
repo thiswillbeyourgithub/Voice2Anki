@@ -180,6 +180,10 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, "Demo not yet launched!"
+    if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
+        return "null"
+    if txt_chatgpt_cloz.startswith("Image change detected: '"):
+        return "null"
     txt_chatgpt_cloz = split_thinking(txt_chatgpt_cloz)[0]
     if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
         spec = importlib.util.spec_from_file_location(
