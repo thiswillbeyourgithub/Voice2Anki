@@ -91,7 +91,7 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(scale=2, variant="compact", min_width=75):
                     with gr.Row():
-                        sld_improve = gr.Slider(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", min_width=100, scale=1, elem_id="js_mempriority", show_label=True)
+                        sld_improve = gr.Slider(minimum=0, maximum=10, value=5.0, step=1.0, label="Mem priority", scale=1, elem_id="js_mempriority", show_label=True)
                         improve_btn = gr.Button(value="Memorize", variant="secondary", elem_id="js_llmfeedbackbtn", size="sm", min_width=50, scale=3)
                         sld_buffer = gr.Number(minimum=0, maximum=float(shared.max_message_buffer), step=1.0, value=(shared.pv["sld_buffer"] if (shared.audio_slot_nb==1) else 0), label="Buffer size", scale=1, visible=(shared.audio_slot_nb==1))
                 prompt_manag = gr.Radio(choices=["1 per mess", "Stuff as XML in sys", "Stuff as XML in user"], value=shared.pv["prompt_management"], interactive=True, label="Prompt style", show_label=False, scale=1)
