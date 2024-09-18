@@ -351,4 +351,5 @@ if shared.big_font:
 
 if shared.widen_screen:
     css += "\n.app { max-width: 100% !important; }"
+    css += "\n.app { width: 100% !important; }"
 
