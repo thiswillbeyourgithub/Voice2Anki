@@ -284,7 +284,7 @@ with gr.Blocks(
                     label="Queued audio",
                     interactive=False,
                     wrap=True,
-                    height=2000,
+                    height="100%",
                     column_widths=["5%", "20%", "20%", "5%", "5%", "20%", "20%", "5%", "5%"],
                     )
 
@@ -301,7 +301,7 @@ with gr.Blocks(
                     value=None,
                     interactive=False,
                     wrap=True,
-                    height=2000,
+                    height="100%",
                     column_widths=["5%", "25%", "5%", "5%", "25%", "10%", "10%", "5%", "5%", "10%"],
                     )
 
@@ -311,7 +311,7 @@ with gr.Blocks(
                     value=None,
                     interactive=False,
                     wrap=True,
-                    height=2000,
+                    height="100%",
                     column_widths=["1%", "10%", "10%", "10%", "10%", "5%"],
                     )
 
