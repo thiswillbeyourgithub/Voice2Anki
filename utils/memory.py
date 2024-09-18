@@ -258,6 +258,9 @@ def prompt_filter(
     elif "openai" in shared.pv["choice_embed"] and not shared.pv["txt_openai_api_key"]:
         raise Exception("You want to use OpenAI for embeddings but haven't supplied an API key in the settings.")
 
+    for pr in prev_prompts:
+        assert "role" in pr, f"No role key found in pr:\n{pr}"
+
     assert max_token >= 500, "max_token should be above 500"
     assert max_token <= 15500, "max_token should be under 15500"  # TODO: don't hardcode this
 
