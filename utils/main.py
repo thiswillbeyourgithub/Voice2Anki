@@ -249,6 +249,8 @@ def whisper_cached(
                     except Exception as err:
                         red(f"Couldn't update df to set transcript of {audio_path}: {err}")
 
+                transcript["text"] = transcript["text"].replace("Sous-titres réalisés par la communauté d'Amara.org", "")
+                transcript["text"] = transcript["text"].replace("Abonnez-vous à la chaine !", "")
                 return transcript
             except openai.RateLimitError as err:
                 if cnt >= 5:
