@@ -838,14 +838,15 @@ with gr.Blocks(
                         preprocess=False,
                         postprocess=True,
                         show_progress=False,
-                        ).then(
-                                fn=get_card_status,
-                                inputs=[txt_chatgpt_cloz],
-                                outputs=[update_status_btn],
-                                preprocess=False,
-                                postprocess=False,
-                                show_progress=False,
-                                )
+                        )
+                                # .then(
+                                # fn=get_card_status,
+                                # inputs=[txt_chatgpt_cloz],
+                                # outputs=[update_status_btn],
+                                # preprocess=False,
+                                # postprocess=False,
+                                # show_progress=False,
+                                # )
     rollaudio_12_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -873,14 +874,15 @@ with gr.Blocks(
                         # preprocess=False,
                         # postprocess=False,
                         show_progress=False,
-                        ).then(
-                                fn=get_card_status,
-                                inputs=[txt_chatgpt_cloz],
-                                outputs=[update_status_btn],
-                                preprocess=False,
-                                postprocess=False,
-                                show_progress=False,
-                                )
+                        )
+                                # .then(
+                                # fn=get_card_status,
+                                # inputs=[txt_chatgpt_cloz],
+                                # outputs=[update_status_btn],
+                                # preprocess=False,
+                                # postprocess=False,
+                                # show_progress=False,
+                                # )
     rollaudio_123_btn.click(
             fn=roll_audio,
             inputs=audio_slots,
@@ -922,14 +924,15 @@ with gr.Blocks(
                                 inputs=[gui_rolldirloadcheck],
                                 outputs=[audio_slots[-1]],
                                 show_progress=False,
-                                ).then(
-                                        fn=get_card_status,
-                                        inputs=[txt_chatgpt_cloz],
-                                        outputs=[update_status_btn],
-                                        preprocess=False,
-                                        postprocess=False,
-                                        show_progress=False,
-                                        )
+                                )
+                                    # .then(
+                                    #     fn=get_card_status,
+                                    #     inputs=[txt_chatgpt_cloz],
+                                    #     outputs=[update_status_btn],
+                                    #     preprocess=False,
+                                    #     postprocess=False,
+                                    #     show_progress=False,
+                                    #     )
     # # roll texts then set status to Rolling
     # gr.on(
     #         triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
