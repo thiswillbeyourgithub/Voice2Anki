@@ -4,7 +4,6 @@ import threading
 from typing import List, Optional, Union, Tuple
 from functools import partial
 from functools import lru_cache
-from tqdm import tqdm
 import pandas as pd
 import gradio as gr
 import re
@@ -20,7 +19,7 @@ import litellm
 from sklearn.metrics.pairwise import cosine_similarity
 from dataclasses import MISSING
 
-from .logger import whi, red, yel, trace, Timeout, smartcache, cache_dir
+from .logger import whi, red, yel, trace, Timeout, smartcache
 from .shared_module import shared
 from .typechecker import optional_typecheck
 
