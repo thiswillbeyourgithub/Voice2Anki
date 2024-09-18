@@ -943,11 +943,11 @@ with gr.Blocks(
 
     # write Rolling in the status button
     gr.on(
-            triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
-            fn=lambda: "Rolling",
-            outputs=[update_status_btn],
-            show_progress=False,
-            )
+        triggers=[rollaudio_1_btn.click, rollaudio_12_btn.click, rollaudio_123_btn.click],
+        fn=lambda: "Rolling",
+        outputs=[update_status_btn],
+        show_progress=False,
+    )
 
     # reset check for mark next
     gr.on(
