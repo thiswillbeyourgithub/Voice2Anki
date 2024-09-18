@@ -112,7 +112,7 @@ with gr.Blocks(
             with gr.Row():
                 flag_audio_btn = gr.Button(value="Flag audio", visible=shared.pv["enable_flagging"], size="sm")
                 force_sound_processing_btn = gr.Button(value="Extra sound processing", visible=shared.pv["enable_dirload"], size="sm")
-                clear_cache_btn = gr.Button(value="Clear cache", size="sm")
+                clear_cache_btn = gr.Button(value="Clear caches", size="sm")
                 pop_buffer_btn = gr.Button(value="Pop buffer", variant="secondary", size="sm", visible=(shared.audio_slot_nb == 1))
 
             with gr.Row():
