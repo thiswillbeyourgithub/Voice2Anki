@@ -623,7 +623,10 @@ def get_memories_df(profile: str) -> pd.DataFrame:
         return pd.DataFrame()
     for i in range(len(memories)):
         memories[i]["n"] = i + 1
-        del memories[i]["role"]
+        if "role" in memories[i]:
+            del memories[i]["role"]
+        else:
+            red(f"Role not found in memory: '{memories[i]}'")
     return pd.DataFrame(memories).reset_index().set_index("n")
 
 @optional_typecheck
