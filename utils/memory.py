@@ -510,7 +510,7 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
             f"with a surprising amount of token: '{tkn_len_in + tkn_len_out}' This can have "
             "adverse effects.")
 
-    prev_prompts = load_prev_prompts(txt_profile)
+    prev_prompts = load_prev_prompts(txt_profile).copy()
     try:
         to_add = {
                 "role": "user",
@@ -545,7 +545,7 @@ def recur_improv(txt_profile: str, txt_audio: str, txt_whisp_prompt: str, txt_ch
     gr.Warning(whi(f"Recursively improved: {len(prev_prompts)} total examples"))
 
     whi("Trying to directly embed the new memories")
-    prev_prompts = load_prev_prompts(txt_profile)
+    prev_prompts = load_prev_prompts(txt_profile).copy()
     to_embed = [content, answer]
     thread = threading.Thread(
         target=embedder,
@@ -574,7 +574,7 @@ def load_prev_prompts(profile: str) -> List[dict]:
     if mem_file.exists():
         abs_path = mem_file.resolve().absolute().__str__()
         modtime = mem_file.stat().st_mtime
-        prev_prompts= cached_load_memories(path=abs_path, modtime=modtime)
+        prev_prompts=cached_load_memories(path=abs_path, modtime=modtime)
 
         # with open(f"profiles/{profile}/memories.json", "r") as f:
         #     prev_prompts = json.load(f)
@@ -616,7 +616,7 @@ def display_price(sld_max_tkn: int, llm_choice: str) -> str:
 @optional_typecheck
 @trace
 def get_memories_df(profile: str) -> pd.DataFrame:
-    memories = load_prev_prompts(profile)
+    memories = load_prev_prompts(profile).copy()
     if not memories:
         gr.Warning(red(f"No memories found for profile {profile}"))
         return pd.DataFrame()

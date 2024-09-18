@@ -515,7 +515,7 @@ def pre_alfred(
         keywords = []
 
     # load prompts from memory.json
-    prev_prompts = load_prev_prompts(profile)
+    prev_prompts = load_prev_prompts(profile).copy()
 
     # format the new prompt
     new_prompt = {
