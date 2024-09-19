@@ -1058,6 +1058,7 @@ class AudioSplitter:
 @stt_cache.cache(ignore=["audio_path"])
 def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwargs) -> dict:
     whi(f"Starting STT API (meaning cache is not used). Args: {kwargs}")
+    orig_audio_path = audio_path
     if not audio_path.startswith("http"):
         audio_path = open(audio_path, "rb")
 
@@ -1130,7 +1131,7 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
             transcript=transcript,
             kwargs=kwargs,
             backend=backend,
-            audio_path=audio_path,
+            audio_path=orig_audio_path,
         )
     except Exception as e:
         raise Exception(f"Failed to parse transcript from backend '{backend}'.\nkwargs: {kwargs}\nTranscript: {transcript}") from e
@@ -1143,7 +1144,7 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
     return parsed
 
 @optional_typecheck
-def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: PosixPath) -> dict:
+def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: Union[str, PosixPath]) -> dict:
     "modify the output of replicate to match the same format"
     if (
         (kwargs["repo"] == "fast" and backend == "replicate")
@@ -1174,6 +1175,7 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: P
         assert len(transcript["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
 
         if not transcript["results"]["utterances"]:
+            audio_path = Path(audio_path)
             red(f"No utterances found in {audio_path.name}, creating an empty one")
             if "duration" not in transcript:
                 raise Exception(f"No 'duration' key in transcript:\n{transcript}")
