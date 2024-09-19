@@ -1115,6 +1115,8 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
     elif backend == "deepgram":
         deepgram = DeepgramClient()
         # set options
+        old_backend = kwargs["backend"]
+        old_repo = kwargs["repo"]
         del kwargs["backend"], kwargs["repo"]
         options = PrerecordedOptions(**kwargs)
         payload = {"buffer": audio_path.read()}
@@ -1122,6 +1124,8 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
             payload,
             options,
         ).to_dict()
+        kwargs["repo"] = old_repo
+        kwargs["backend"] = old_backend
 
     else:
         raise ValueError(kwargs["repo"])
@@ -1213,7 +1217,7 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: U
         kwargs["model"] = kwargs["model"]
 
     else:
-        raise ValueError(kwargs["repo"])
+        raise ValueError("Invalid condition for parser")
 
     return transcript
 
