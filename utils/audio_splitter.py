@@ -1204,7 +1204,7 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: U
                     "words": seg["words"],
                     "start": seg["start"],
                     "end": seg["end"],
-                    "text": seg["transcript"].strip(),
+                    "text": seg["transcript"].strip() if "transcript" in seg else "",
                     "no_speech_prob": 0,
                     "avg_logprob": seg["confidence"],
                     "compression_ratio": 0,
