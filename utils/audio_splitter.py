@@ -1183,6 +1183,9 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: U
         if not transcript["results"]["utterances"]:
             audio_path = Path(audio_path)
             red(f"No utterances found in {audio_path.name}, creating an empty one")
+            if "duration" not in transcript and ("metadata" in transcript and "duration" in transcript["metadata"]):
+                red(f"Had to move the duration key manually in transcript:\n{transcript}")
+                transcript["duration"] = transcript["metadata"]["duration"]
             if "duration" not in transcript:
                 raise Exception(f"No 'duration' key in transcript:\n{transcript}")
             transcript["results"]["utterances"] = [
