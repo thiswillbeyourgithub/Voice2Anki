@@ -827,8 +827,9 @@ class AudioSplitter:
                 except Exception as err:
                     if iter_retry + 1 == n_retry:
                         raise Exception("Failed to get transcript: ") from err
-                    red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'")
-                    time.sleep(30 * (iter_retry + 1))
+                    to_wait = 30 * (iter_retry + 1)
+                    red(f"[{iparam+1}/{len(trial_dict)}] #{iter_retry + 1}/{n_retry}: Error when calling whisper_splitter with parameters: {json.dumps(params)}\nError: '{err}'\nWill wait for {to_wait}s before retrying")
+                    time.sleep(to_wait)
             if not failed:
                 break
 
