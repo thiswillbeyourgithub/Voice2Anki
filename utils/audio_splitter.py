@@ -1134,7 +1134,9 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
             audio_path=orig_audio_path,
         )
     except Exception as e:
-        raise Exception(f"Failed to parse transcript from backend '{backend}'.\nkwargs: {kwargs}\nTranscript: {transcript}") from e
+        raise Exception(
+            f"Transcript: {transcript}\n\nFailed to parse transcript from backend '{backend}'.\nkwargs: {kwargs}\nError: {e}"
+        ) from e
 
     parsed["modelname"] = kwargs["model"]
     parsed["repo"] = kwargs["repo"]
