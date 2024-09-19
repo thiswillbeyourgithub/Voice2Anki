@@ -1439,7 +1439,7 @@ def to_anki(
 
     if not shared.dirload_queue.empty:
         with shared.dirload_lock:
-            audio_row["ankified"] = "started"
+            audio_row.loc[:, "ankified"] = "started"
 
     # if the txt_audio contains multiple cloze, either the number of created
     # cloze correspond to the number of sections in txt_audio, then the
