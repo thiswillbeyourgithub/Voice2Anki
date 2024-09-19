@@ -1194,6 +1194,8 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: U
                     "start": 0,
                     "end": transcript["duration"],
                     "text": transcript["results"]["channels"][0]["alternatives"][0]["transcript"],
+                    "transcript": transcript["results"]["channels"][0]["alternatives"][0]["transcript"],
+                    "confidence": 0.0,
                 }
             ]
         assert transcript["results"]["utterances"], "No utterances found"
@@ -1204,7 +1206,7 @@ def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: U
                     "words": seg["words"],
                     "start": seg["start"],
                     "end": seg["end"],
-                    "text": seg["transcript"].strip() if "transcript" in seg else "",
+                    "text": seg["transcript"].strip(),
                     "no_speech_prob": 0,
                     "avg_logprob": seg["confidence"],
                     "compression_ratio": 0,
