@@ -1067,7 +1067,6 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
         backend = "deepgram"
         kwargs["repo"] = None
 
-
     start = time.time()
     if kwargs["repo"] == "fast" and backend == "replicate":
         raise NotImplementedError("Fast repo is disabled because it seems to produce overlapping segments.")
@@ -1084,23 +1083,6 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
                 "vaibhavs10/incredibly-fast-whisper:c6433aab18b7318bbae316495f1a097fc067deef7d59dc2f33e45077ae5956c7",
                 input=args,
                 )
-
-        # fix the format to have the same type as hnesk and collectiveai
-        transcript["segments"] = transcript.pop("chunks")
-        transcript["transcription"] = transcript.pop("text")
-        # del transcript["chunks"], transcript["text"]
-        for iter_chunk, chunk in enumerate(transcript["segments"]):
-            transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
-            transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
-            # del transcript["segments"][iter_chunk]["timestamp"]
-
-            transcript["segments"][iter_chunk]["words"] = [
-                    {
-                        "word": chunk["text"],
-                        "start": chunk["timestamp"][0],
-                        "end": chunk["timestamp"][1],
-                        }
-                    ]
 
     elif kwargs["repo"] == "collectiveai" and backend == "replicate":
         # https://replicate.com/collectiveai-team/whisper-wordtimestamps/
@@ -1135,42 +1117,77 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
         del kwargs["backend"], kwargs["repo"]
         options = PrerecordedOptions(**kwargs)
         payload = {"buffer": audio_path.read()}
-        content = deepgram.listen.prerecorded.v("1").transcribe_file(
+        transcript = deepgram.listen.prerecorded.v("1").transcribe_file(
             payload,
             options,
         ).to_dict()
-        assert len(content["results"]["channels"]) == 1, "unexpected deepgram output"
-        assert len(content["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
 
-        # words = content["results"]["utterances"]
-        # assert words, "Empty text from deepgram transcription"
-        # starts = [float(w["start"]) for w in words]
-        # ends = [float(w["end"]) for w in words]
-        # transcript = {
-        #     "segments": [
-        #         {
-        #             "words": words,
-        #             "start": min(starts),
-        #             "ends: max(ends),
-        #         }
-        #     ]
-        # }
+    else:
+        raise ValueError(kwargs["repo"])
 
-        if not content["results"]["utterances"]:
+    try:
+        parsed = parse_transcript(
+            transcript=transcript,
+            kwargs=kwargs,
+            backend=backend,
+            audio_path=audio_path,
+        )
+    except Exception as e:
+        raise Exception(f"Failed to parse transcript from backend '{backend}'.\nkwargs: {kwargs}\nTranscript: {transcript}") from e
+
+    parsed["modelname"] = kwargs["model"]
+    parsed["repo"] = kwargs["repo"]
+    parsed["replicate_arguments"] = kwargs
+
+    whi(f"Finished with replicate in {int(time.time()-start)} second")
+    return parsed
+
+@optional_typecheck
+def parse_transcript(transcript: dict, kwargs: dict, backend: str, audio_path: PosixPath) -> dict:
+    "modify the output of replicate to match the same format"
+    if (
+        (kwargs["repo"] == "fast" and backend == "replicate")
+         or
+        (kwargs["repo"] == "collectiveai" and backend == "replicate")
+        or
+        (kwargs["repo"] == "hnesk" and backend == "replicate")
+    ):
+        # fix the format to have the same type as hnesk and collectiveai
+        transcript["segments"] = transcript.pop("chunks")
+        transcript["transcription"] = transcript.pop("text")
+        # del transcript["chunks"], transcript["text"]
+        for iter_chunk, chunk in enumerate(transcript["segments"]):
+            transcript["segments"][iter_chunk]["start"] = chunk["timestamp"][0]
+            transcript["segments"][iter_chunk]["end"] = chunk["timestamp"][1]
+            # del transcript["segments"][iter_chunk]["timestamp"]
+
+            transcript["segments"][iter_chunk]["words"] = [
+                    {
+                        "word": chunk["text"],
+                        "start": chunk["timestamp"][0],
+                        "end": chunk["timestamp"][1],
+                        }
+                    ]
+
+    elif backend == "deepgram":
+        assert len(transcript["results"]["channels"]) == 1, "unexpected deepgram output"
+        assert len(transcript["results"]["channels"][0]["alternatives"]) == 1, "unexpected deepgram output"
+
+        if not transcript["results"]["utterances"]:
             red(f"No utterances found in {audio_path.name}, creating an empty one")
-            if "duration" not in content:
-                raise Exception(f"No 'duration' key in content:\n{content}")
-            content["results"]["utterances"] = [
+            if "duration" not in transcript:
+                raise Exception(f"No 'duration' key in transcript:\n{transcript}")
+            transcript["results"]["utterances"] = [
                 {
                     "words": [],
                     "start": 0,
-                    "end": content["duration"],
-                    "text": content["results"]["channels"][0]["alternatives"][0]["transcript"],
+                    "end": transcript["duration"],
+                    "text": transcript["results"]["channels"][0]["alternatives"][0]["transcript"],
                 }
             ]
-        assert content["results"]["utterances"], "No utterances found"
-        transcript = {
-            "transcription": content["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
+        assert transcript["results"]["utterances"], "No utterances found"
+        new_transcript = {
+            "transcription": transcript["results"]["channels"][0]["alternatives"][0]["paragraphs"]["transcript"].strip(),
             "segments": [
                 {
                     "words": seg["words"],
@@ -1181,22 +1198,19 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
                     "avg_logprob": seg["confidence"],
                     "compression_ratio": 0,
                     "temperature": 0,
-                } for seg in content["results"]["utterances"]
+                } for seg in transcript["results"]["utterances"]
             ],
         }
 
-        transcript["metadata"] = content["metadata"]
+        new_transcript["metadata"] = transcript["metadata"]
+        transcript = new_transcript
 
         kwargs["repo"] = None
         kwargs["model"] = kwargs["model"]
+
     else:
         raise ValueError(kwargs["repo"])
 
-    transcript["modelname"] = kwargs["model"]
-    transcript["repo"] = kwargs["repo"]
-    transcript["replicate_arguments"] = kwargs
-
-    whi(f"Finished with replicate in {int(time.time()-start)} second")
     return transcript
 
 if __name__ == "__main__":
