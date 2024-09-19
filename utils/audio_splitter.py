@@ -1158,6 +1158,8 @@ def whisper_splitter(audio_path: Union[str, PosixPath], audio_hash: str, **kwarg
 
         if not content["results"]["utterances"]:
             red(f"No utterances found in {audio_path.name}, creating an empty one")
+            if "duration" not in content:
+                raise Exception(f"No 'duration' key in content:\n{content}")
             content["results"]["utterances"] = [
                 {
                     "words": [],
