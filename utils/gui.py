@@ -947,12 +947,12 @@ with gr.Blocks(
     )
 
     # reset check for mark next
-    gr.on(
-            triggers=[anki_btn.click, txt_chatgpt_cloz.change],
-            fn=lambda: False,
-            outputs=[check_marked],
-            show_progress=False,
-            )
+    # gr.on(
+    #         triggers=[anki_btn.click, txt_chatgpt_cloz.change],
+    #         fn=lambda: False,
+    #         outputs=[check_marked],
+    #         show_progress=False,
+    #         )
 
     # clicking this button will load from a user directory the next sounds and
     # images. This allow to use Voice2Anki on the computer but record the audio
@@ -1028,10 +1028,10 @@ with gr.Blocks(
             preprocess=False,
             postprocess=False,
             show_progress=False,
-            ).then(
-                    fn=lambda: False,
-                    outputs=[check_marked],
-                    #show_progress=False,
+            # ).then(
+            #         fn=lambda: False,
+            #         outputs=[check_marked],
+            #         #show_progress=False,
                     ).then(
                             fn=get_card_status,
                             inputs=[txt_chatgpt_cloz],
@@ -1071,10 +1071,10 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     show_progress=False,
-                    ).then(
-                            fn=lambda: False,
-                            outputs=[check_marked],
-                            show_progress=False,
+                    # ).then(
+                    #         fn=lambda: False,
+                    #         outputs=[check_marked],
+                    #         show_progress=False,
                             )
 
     # 1+2+3
@@ -1106,10 +1106,10 @@ with gr.Blocks(
                     preprocess=False,
                     postprocess=False,
                     show_progress=False,
-                    ).then(
-                            fn=lambda: False,
-                            outputs=[check_marked],
-                            #show_progress=False,
+                    # ).then(
+                    #         fn=lambda: False,
+                    #         outputs=[check_marked],
+                    #         #show_progress=False,
                             )
 
     improve_btn.click(
