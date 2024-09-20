@@ -96,7 +96,7 @@ class Cli:
                 pyclip.copy(old)
             gallery = gr.Gallery(temp_gal).value
             assert gallery
-            breakpoint()
+            very_high_vis("Loaded gallery")
         else:
             gallery = None
 
@@ -143,7 +143,8 @@ class Cli:
             very_high_vis(f"Status:\n{status}")
 
             if status == "MISSING":
-                ans = input("Enter to proceed, 'debug' to breakpoint, anything else to quit").lower()
+                very_high_vis("Enter to proceed, 'debug' to breakpoint, anything else to quit")
+                ans = input().lower()
                 if ans.startswith("debug"):
                     breakpoint()
                 if ans:
