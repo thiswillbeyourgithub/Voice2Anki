@@ -115,7 +115,7 @@ class Cli:
                 False,
             )
             high_vis(f"Cloze: {cloze}")
-            status = asyncio.run(get_card_status, cloze)
+            status = asyncio.run(get_card_status(cloze))
             high_vis(f"Status: {status}")
             breakpoint()
 
