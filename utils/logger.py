@@ -74,8 +74,8 @@ colors = {
     "bold": "\033[1m",
     "underline": "\033[4m",
 }
-# make interactions more visible
-colors["interac"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"]
+# make highvisions more visible
+colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"]
 
 
 @optional_typecheck
@@ -212,7 +212,7 @@ purp = get_coloured_logger("purple")
 ital = get_coloured_logger("italic")
 bold = get_coloured_logger("bold")
 underline = get_coloured_logger("underline")
-interact = get_coloured_logger("interac")
+high_vis = get_coloured_logger("high_vis")
 
 @optional_typecheck
 def trace(func: Callable) -> Callable:
