@@ -1,3 +1,4 @@
+import time
 import asyncio
 import re
 from pathlib import Path, PosixPath
@@ -7,10 +8,10 @@ from typing import Union, Optional
 
 from utils.profiles import ValueStorage
 from utils.typechecker import optional_typecheck, beartype
-from utils.logger import whi, yel, red, high_vis
+from utils.logger import whi, yel, red, very_high_vis, high_vis
 from utils.shared_module import shared
 from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
-from utils.anki_utils import call_anki, get_decks, get_card_status
+from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
 
 @optional_typecheck
 class Cli:
@@ -80,16 +81,17 @@ class Cli:
 
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
-        high_vis("Done dirloading, press enter to continue")
+        time.sleep(1)
+        very_high_vis("Done dirloading, press <enter> to continue")
         input()
 
         for audio in tqdm(audio_todo, unit="audio"):
             row = shared.dirload_queue.loc[audio.__str__(), :]
             assert not row.empty, f"Empty row: {row}"
             temp_path = row["temp_path"]
-            red(f"Audio file: {temp_path}")
+            high_vis(f"Audio file: {temp_path}")
             text = transcribe(temp_path)
-            high_vis(f"Transcript: {text}")
+            high_vis(f"Transcript:\n{text}")
             # for some reason using kwargs don't work
             # cloze = alfred(
             #     txt_audio=text,
@@ -115,23 +117,59 @@ class Cli:
                 shared.pv["prompt_management"],
                 False,
             )
-            high_vis(f"Cloze: {cloze}")
+            high_vis(f"Cloze:\n{cloze}")
             status = asyncio.run(get_card_status(cloze))
-            high_vis(f"Status: {status}")
+            very_high_vis(f"Status:\n{status}")
+
+            if status == "MISSING":
+                ans = input("Enter to proceed, 'debug' to breakpoint, anything else to quit").lower()
+                if ans.startswith("debug"):
+                    breakpoint()
+                if ans:
+                    very_high_vis("Quitting")
+
+            try:
+                out = to_anki(
+                    audio_mp3_1=temp_path,
+                    txt_audio=text,
+                    txt_chatgpt_cloz=cloze,
+                    txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                    txt_deck=shared.pv["txt_deck"],
+                    txt_tags=shared.pv["txt_tags"],
+                    gallery=None,
+                    check_marked=False,
+                    txt_extra_source=None,
+                )
+                if out is None:
+                    out = "Success"
+            except Exception as e:
+                if "cannot create note because it is a duplicate" in str(e).lower():
+                    out = "DUPLICATE"
+
+            very_high_vis(f"Output:\n{out}")
+
+            audio_slots = dirload_splitted_last(True)
             breakpoint()
 
-            out = to_anki(
-                audio_mp3_1=temp_path,
-                txt_audio=text,
-                txt_chatgpt_cloz=cloze,
-                txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
-                txt_deck=shared.pv["txt_deck"],
-                txt_tags=shared.pv["txt_tags"],
-                gallery=None,
-                check_marked=False,
-                txt_extra_source=None,
-            )
-            high_vis(f"Output: {out}")
+            very_high_vis("What next? [s(uspend previous) - m(ark previous) -a(add to more)]\nEnter to roll to the next audio")
+            ans = input().lower()
+            if not ans:
+                high_vis(f"Continuing to next audio")
+                continue
+            else:
+                if "suspend" in ans:
+                    asyncio.run(suspend_previous_notes())
+                    high_vis("Suspended previous note")
+                if "mark" in ans:
+                    asyncio.run(mark_previous_note())
+                    high_vis("Marked previous note")
+                if "add" in ans:
+                    more = input("Enter the content youwant to add to the More field")
+                    asyncio.run(add_to_more_of_previous_note(more))
+                    high_vis(f"Added to previous notes")
+
+
+
 
         # transcribe -> alfred -> get_card_status
         # roll3:
