@@ -84,8 +84,8 @@ colors = {
     "bg_white": "\033[47m",
 }
 # make highvisions more visible
-colors["very_high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["blink"] + colors["bg_cyan"]
-colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["bg_cyan"]
+colors["very_high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["red"] + colors["blink"] + colors["bg_cyan"]
+colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["red"] + colors["bg_cyan"]
 
 
 @optional_typecheck
