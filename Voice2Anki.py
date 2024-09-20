@@ -25,6 +25,7 @@ def start_Voice2Anki(
     print_db_then_exit: Optional[str] = None,
     nb_audio_slots: int = 3,
 
+    gui: bool = True,
     share: bool = False,
     open_browser: bool = False,
     debug: bool = False,
@@ -50,6 +51,8 @@ def start_Voice2Anki(
         Example value: "anki_whisper.db"
     nb_audio_slots: int, default 3
         Number of audio slot
+    gui: bool, default True
+        False to use cli
     share: bool, default False
         will create a url reachable from the global internet
     open_browser: bool, default False
@@ -101,8 +104,8 @@ def start_Voice2Anki(
     whi("Starting Voice2Anki\n")
     if args:
         raise Exception(f"Unexpected arguments: {args}")
-    if kwargs:
-        raise Exception(f"Unexpected arguments: {kwargs}")
+    if kwargs and gui:
+        raise Exception(f"Unexpected kwarguments if using gui: {kwargs}")
 
     if share:
         yel("Sharing enabled")
@@ -155,8 +158,7 @@ def start_Voice2Anki(
     shared.disable_smartcache = disable_smartcache
     shared.widen_screen = widen_screen
     shared.big_font = big_font
-
-    from utils.gui import demo
+    shared.client_type = "gui" if gui else "cli"
 
     if (not share) and use_ssl and Path("./utils/ssl").exists() and Path("./utils/ssl/key.pem").exists() and Path("./utils/ssl/cert.pem").exists():
         ssl_args = {
@@ -169,27 +171,42 @@ def start_Voice2Anki(
         red("Will not use SSL")
         ssl_args = {}
 
-    # queueing seems to make things way slower
-    # demo.queue()
-    demo.launch(
-            share=share,
-            **auth_args,
-            inbrowser=open_browser,
-            quiet=False,
-            debug=debug,
-            # prevent_thread_lock=True if debug else False,
-            max_threads=5,  # if not debug else 1,  # default 40
-            show_error=True,
-            show_api=False,
-            server_name=server,
-            server_port=port,
-            # inline=True,
-            width="100%",  # used if inline is True
-            enable_monitoring=False,
-            allowed_paths=["/tmp/gradio"],
-            **ssl_args,
+    if gui:
+        whi("Launching GUI")
+        from utils.gui import demo
+
+        # queueing seems to make things way slower
+        # demo.queue()
+        demo.launch(
+                share=share,
+                **auth_args,
+                inbrowser=open_browser,
+                quiet=False,
+                debug=debug,
+                # prevent_thread_lock=True if debug else False,
+                max_threads=5,  # if not debug else 1,  # default 40
+                show_error=True,
+                show_api=False,
+                server_name=server,
+                server_port=port,
+                # inline=True,
+                width="100%",  # used if inline is True
+                enable_monitoring=False,
+                allowed_paths=["/tmp/gradio"],
+                **ssl_args,
+                )
+        return demo
+    else:
+        whi("Not launching GUI, using cli mode")
+        from utils.cli import Cli
+        try:
+            _ = Cli(
+                **kwargs,
             )
-    return demo
+        except KeyboardInterrupt as e:
+            raise SystemExit("Quitting")
+        return None
+
 
 if __name__ == "__main__":
     try:

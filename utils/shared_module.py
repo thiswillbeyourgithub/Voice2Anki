@@ -38,6 +38,7 @@ class SharedModule:
     # things that are not changed when self.reset is called
     VERSION: str = "2.0"
     _instance: Optional[Any] = None  # singleton
+    client_type: str = MISSING   # gui or cli
     anki_media: Optional[PosixPath] = None
     debug: Optional[bool] = None
     disable_tracing: Optional[bool] = None

@@ -1389,6 +1389,7 @@ def to_anki(
         "user-agent": shared.request["user-agent"],
         "mp3": str(audio_mp3_1),
         "thinking": thinking,
+        "client_type": "gui" if shared.client_type == "gui" else "cli",
     }
     results = []
 
