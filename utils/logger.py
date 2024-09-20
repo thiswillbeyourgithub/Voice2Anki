@@ -71,6 +71,7 @@ colors = {
         "white": "\033[0m",
         "purple": "\033[95m",
         "italic": "\033[3m",
+        "bold": "\033[1m",
         }
 
 
@@ -206,6 +207,7 @@ yel = get_coloured_logger("yellow")
 red = get_coloured_logger("red")
 purp = get_coloured_logger("purple")
 ital = get_coloured_logger("italic")
+bold = get_coloured_logger("bold")
 
 @optional_typecheck
 def trace(func: Callable) -> Callable:
