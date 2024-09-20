@@ -1,3 +1,5 @@
+import gradio as gr
+import pyclip
 import time
 import asyncio
 import re
@@ -12,6 +14,7 @@ from utils.logger import whi, yel, red, very_high_vis, high_vis
 from utils.shared_module import shared
 from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
 from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
+from utils.media import get_image
 
 @optional_typecheck
 class Cli:
@@ -79,6 +82,24 @@ class Cli:
             nb_audio_slots = len(audio_todo)
             shared.audio_slot_nb = nb_audio_slots
 
+        if "gallery_pdf" in kwargs:
+            # load just the pathnames but might maybe cause issue with ocr caching?:
+            # temp_gal = [f.absolute().resolve().__str__() for f in Path(kwargs["gallery_pdf"]).iterdir()]
+            # load the image directly
+            try:
+                old = pyclip.paste()
+            except Exception:
+                old = MISSING
+            pyclip.copy(kwargs["gallery_pdf"])
+            temp_gal = get_image(None)
+            if old is not MISSING:
+                pyclip.copy(old)
+            gallery = gr.Gallery(temp_gal).value
+            assert gallery
+            breakpoint()
+        else:
+            gallery = None
+
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
         time.sleep(1)
@@ -136,7 +157,7 @@ class Cli:
                     txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
                     txt_deck=shared.pv["txt_deck"],
                     txt_tags=shared.pv["txt_tags"],
-                    gallery=None,
+                    gallery=gallery,
                     check_marked=False,
                     txt_extra_source=None,
                 )
