@@ -883,7 +883,7 @@ def dirload_splitted(checkbox: bool, *audios: Optional[Union[List, bool]]) -> Li
         for i, a in enumerate(audios):
             if a is None:
                 if check:
-                    gr.Warning(red(f"There seems to be a missing audios in the slots. This can indicate a bug so you are advised to restart the app;"))
+                    gr.Warning(red("There seems to be a missing audios in the slots. This can indicate a bug so you are advised to restart the app;"))
                     break
                 check = True
 
