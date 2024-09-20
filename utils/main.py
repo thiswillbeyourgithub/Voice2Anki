@@ -1386,7 +1386,7 @@ def to_anki(
         "stt_used": shared.pv["stt_choice"],
         "version": shared.VERSION,
         "timestamp": time.time(),
-        "user-agent": shared.request["user-agent"],
+        "user-agent": shared.request["user-agent"] if shared.request else None,
         "mp3": str(audio_mp3_1),
         "thinking": thinking,
         "client_type": "gui" if shared.client_type == "gui" else "cli",
