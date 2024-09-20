@@ -73,9 +73,11 @@ colors = {
     "italic": "\033[3m",
     "bold": "\033[1m",
     "underline": "\033[4m",
+    "blink": "\033[5m",
+    "bg_red": "\033[41m",
 }
 # make highvisions more visible
-colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"]
+colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["blink"] + colors["bg_reg"]
 
 
 @optional_typecheck
