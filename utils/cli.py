@@ -171,24 +171,29 @@ class Cli:
             very_high_vis(f"Output:\n{out}")
 
             audio_slots = dirload_splitted_last(True)
-            breakpoint()
 
-            very_high_vis("What next? [s(uspend previous) - m(ark previous) -a(add to more)]\nEnter to roll to the next audio")
-            ans = input().lower()
-            if not ans:
-                high_vis(f"Continuing to next audio")
-                continue
-            else:
-                if "suspend" in ans:
+            while True:
+                very_high_vis("What next? [s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
+                ans = input().lower()
+                if not ans:
+                    very_high_vis("Continuing to next audio")
+                    break
+                elif ans.startswith("d"):
+                    very_high_vis("Opening debugger then exiting")
+                    breakpoint()
+                    raise SystemExit(1)
+                elif ans.startswith("s"):
                     asyncio.run(suspend_previous_notes())
-                    high_vis("Suspended previous note")
-                if "mark" in ans:
+                    very_high_vis("Suspended previous note")
+                elif ans.startswith("m"):
                     asyncio.run(mark_previous_note())
-                    high_vis("Marked previous note")
-                if "add" in ans:
+                    very_high_vis("Marked previous note")
+                elif ans.startswith("a"):
                     more = input("Enter the content youwant to add to the More field")
                     asyncio.run(add_to_more_of_previous_note(more))
-                    high_vis("Added to 'More' field of the previous notes")
+                    very_high_vis("Added to 'More' field of the previous notes")
+                else:
+                    very_high_vis("Unexpected answer.")
 
         very_high_vis("Done with that batch!\nOpening debugger just in case:")
         breakpoint()
