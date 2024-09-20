@@ -239,7 +239,7 @@ class SharedModule:
                 assert sorted(value.columns.tolist()) == sorted(getattr(self, name).columns.tolist()), f"The new df has different columns: {name}"
             object.__setattr__(self, name, value)
         else:
-            raise TypeError(f'Cannot set name {name} on object of type {self.__class__.__name__}')
+            raise TypeError(f'SharedModule forbids the creation of new attribute "{name}"')
 
 
 @optional_typecheck
