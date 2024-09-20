@@ -16,6 +16,10 @@ from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted
 from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
 from utils.media import get_image
 
+vhv = very_high_vis
+hv = high_vis
+
+
 @optional_typecheck
 class Cli:
     def __init__(
@@ -96,23 +100,23 @@ class Cli:
                 pyclip.copy(old)
             gallery = gr.Gallery(temp_gal).value
             assert gallery
-            very_high_vis("Loaded gallery")
+            vhv("Loaded gallery")
         else:
             gallery = None
 
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
         time.sleep(1)
-        very_high_vis("Done dirloading, press <enter> to continue")
+        vhv("Done dirloading, press <enter> to continue")
         input()
 
         for audio in tqdm(audio_todo, unit="audio"):
             row = shared.dirload_queue.loc[audio.__str__(), :]
             assert not row.empty, f"Empty row: {row}"
             temp_path = row["temp_path"]
-            high_vis(f"Audio file: {temp_path}")
+            hv(f"Audio file: {temp_path}")
             text = transcribe(temp_path)
-            high_vis(f"Transcript:\n{text}")
+            hv(f"Transcript:\n{text}")
             # for some reason using kwargs don't work
             # cloze = alfred(
             #     txt_audio=text,
@@ -138,17 +142,17 @@ class Cli:
                 shared.pv["prompt_management"],
                 False,
             )
-            high_vis(f"Cloze:\n{cloze}")
+            hv(f"Cloze:\n{cloze}")
             status = asyncio.run(get_card_status(cloze))
-            very_high_vis(f"Status:\n{status}")
+            vhv(f"Status:\n{status}")
 
             if status == "MISSING":
-                very_high_vis("Enter to proceed, 'debug' to breakpoint, anything else to quit")
+                vhv("Enter to proceed, 'debug' to breakpoint, anything else to quit")
                 ans = input().lower()
                 if ans.startswith("debug"):
                     breakpoint()
                 if ans:
-                    very_high_vis("Quitting")
+                    vhv("Quitting")
 
             try:
                 out = to_anki(
@@ -168,32 +172,41 @@ class Cli:
                 if "cannot create note because it is a duplicate" in str(e).lower():
                     out = "DUPLICATE"
 
-            very_high_vis(f"Output:\n{out}")
+            vhv(f"Output:\n{out}")
 
             audio_slots = dirload_splitted_last(True)
 
             while True:
-                very_high_vis("What next? [s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
+                vhv("What next? [s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
                 ans = input().lower()
                 if not ans:
-                    very_high_vis("Continuing to next audio")
+                    vhv("Continuing to next audio")
                     break
                 elif ans.startswith("d"):
-                    very_high_vis("Opening debugger then exiting")
+                    vhv("Opening debugger then exiting")
                     breakpoint()
                     raise SystemExit(1)
                 elif ans.startswith("s"):
-                    asyncio.run(suspend_previous_notes())
-                    very_high_vis("Suspended previous note")
+                    try:
+                        out = asyncio.run(suspend_previous_notes())
+                        vhv(f"Suspended previous note: {out}")
+                    except Exception as e:
+                        vhv(f"Error when suspending: {e}")
                 elif ans.startswith("m"):
-                    asyncio.run(mark_previous_note())
-                    very_high_vis("Marked previous note")
+                    try:
+                        out = asyncio.run(mark_previous_note())
+                        vhv(f"Marked previous note: {out}")
+                    except Exception as e:
+                        vhv(f"Error when marking: {e}")
                 elif ans.startswith("a"):
-                    more = input("Enter the content youwant to add to the More field")
-                    asyncio.run(add_to_more_of_previous_note(more))
-                    very_high_vis("Added to 'More' field of the previous notes")
+                    more = input("Enter the content you want to add to the More field")
+                    try:
+                        asyncio.run(add_to_more_of_previous_note(more))
+                        vhv("Added to 'More' field of the previous notes")
+                    except Exception as e:
+                        vhv(f"Error when adding to more: {e}")
                 else:
-                    very_high_vis("Unexpected answer.")
+                    vhv("Unexpected answer.")
 
-        very_high_vis("Done with that batch!\nOpening debugger just in case:")
+        vhv("Done with that batch!\nOpening debugger just in case:")
         breakpoint()
