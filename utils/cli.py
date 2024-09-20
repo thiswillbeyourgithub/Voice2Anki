@@ -199,7 +199,7 @@ class Cli:
                     except Exception as e:
                         vhv(f"Error when marking: {e}")
                 elif ans.startswith("a"):
-                    more = input("Enter the content you want to add to the More field")
+                    more = input("Enter the content you want to add to the More field:\n>")
                     try:
                         asyncio.run(add_to_more_of_previous_note(more))
                         vhv("Added to 'More' field of the previous notes")
