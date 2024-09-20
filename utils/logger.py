@@ -65,14 +65,17 @@ log.info(mess)
 assert mess in log_file.read_text().splitlines()[-1], "Logs does not appear to be working"
 
 colors = {
-        "red": "\033[91m",
-        "yellow": "\033[93m",
-        "reset": "\033[0m",
-        "white": "\033[0m",
-        "purple": "\033[95m",
-        "italic": "\033[3m",
-        "bold": "\033[1m",
-        }
+    "red": "\033[91m",
+    "yellow": "\033[93m",
+    "reset": "\033[0m",
+    "white": "\033[0m",
+    "purple": "\033[95m",
+    "italic": "\033[3m",
+    "bold": "\033[1m",
+    "underline": "\033[4m",
+}
+# make interactions more visible
+colors["interac"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"]
 
 
 @optional_typecheck
@@ -208,6 +211,8 @@ red = get_coloured_logger("red")
 purp = get_coloured_logger("purple")
 ital = get_coloured_logger("italic")
 bold = get_coloured_logger("bold")
+underline = get_coloured_logger("underline")
+interact = get_coloured_logger("interac")
 
 @optional_typecheck
 def trace(func: Callable) -> Callable:
