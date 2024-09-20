@@ -177,7 +177,8 @@ class Cli:
             audio_slots = dirload_splitted_last(True)
 
             while True:
-                vhv("What next? [s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
+                vhv("What next?")
+                hv("[s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
                 ans = input().lower()
                 if not ans:
                     vhv("Continuing to next audio")
