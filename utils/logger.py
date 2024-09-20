@@ -84,7 +84,8 @@ colors = {
     "bg_white": "\033[47m",
 }
 # make highvisions more visible
-colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["blink"] + colors["bg_cyan"]
+colors["very_high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["blink"] + colors["bg_cyan"]
+colors["high_vis"] = colors["bold"] + colors["underline"] + colors["italic"] + colors["purple"] + colors["bg_cyan"]
 
 
 @optional_typecheck
@@ -222,6 +223,7 @@ ital = get_coloured_logger("italic")
 bold = get_coloured_logger("bold")
 underline = get_coloured_logger("underline")
 high_vis = get_coloured_logger("high_vis")
+very_high_vis = get_coloured_logger("very_high_vis")
 
 @optional_typecheck
 def trace(func: Callable) -> Callable:
