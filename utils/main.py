@@ -1379,17 +1379,17 @@ def to_anki(
 
     # send to anki
     metadata = {
-            "author": "Voice2Anki",
-            "transcripted_text": txt_audio,
-            "chatgpt_context": txt_chatgpt_context,
-            "llm_used": shared.pv["llm_choice"],
-            "stt_used": shared.pv["stt_choice"],
-            "version": shared.VERSION,
-            "timestamp": time.time(),
-            "user-agent": shared.request["user-agent"],
-            "mp3": str(audio_mp3_1),
-            "thinking": thinking,
-            }
+        "author": "Voice2Anki",
+        "transcripted_text": txt_audio,
+        "chatgpt_context": txt_chatgpt_context,
+        "llm_used": shared.pv["llm_choice"],
+        "stt_used": shared.pv["stt_choice"],
+        "version": shared.VERSION,
+        "timestamp": time.time(),
+        "user-agent": shared.request["user-agent"],
+        "mp3": str(audio_mp3_1),
+        "thinking": thinking,
+    }
     results = []
 
     # mention in the metadata the original mp3 name
