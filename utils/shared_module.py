@@ -203,12 +203,16 @@ class SharedModule:
         os.environ["MISTRAL_API_KEY"] = self.pv["txt_mistral_api_key"].strip()
         os.environ["OPENROUTER_API_KEY"] = self.pv["txt_openrouter_api_key"].strip()
 
-        self.request = {
-                "user-agent": request.headers["user-agent"],
-                "headers": dict(request.headers),
-                "IP adress": f"{request.client.host}:{request.client.port}",
-                "query_params": request.query_params._dict,
-                }
+        if request is not None:
+            self.request = {
+                    "user-agent": request.headers["user-agent"],
+                    "headers": dict(request.headers),
+                    "IP adress": f"{request.client.host}:{request.client.port}",
+                    "query_params": request.query_params._dict,
+                    }
+        else:
+            assert self.client_type == "cli", f"Unexpected client type: {self.client_type}"
+            self.request = None
 
         self.splitted_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_splits")
         self.done_dir = Path("profiles/" + self.pv.profile_name + "/queues/audio_done")

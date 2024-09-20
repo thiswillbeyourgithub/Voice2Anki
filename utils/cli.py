@@ -1,11 +1,13 @@
+import asyncio
 import re
 from pathlib import Path, PosixPath
 from tqdm import tqdm
 from dataclasses import MISSING
 from typing import Union, Optional
 
+from utils.profiles import ValueStorage
 from utils.typechecker import optional_typecheck, beartype
-from utils.logger import whi, yel, red
+from utils.logger import whi, yel, red, high_vis
 from utils.shared_module import shared
 from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
 from utils.anki_utils import call_anki, get_decks, get_card_status
@@ -40,6 +42,9 @@ class Cli:
 
         if profile is MISSING:
             profile = "latest"
+        # shared.pv.__class__._instance = None  # otherwise it forbids creating new instances
+        shared.reset(request=None)
+        ValueStorage.__init__(shared.pv, profile)
         if txt_whisp_prompt:
             txt_whisp_prompt = shared.pv["txt_whisp_prompt"]
         if txt_whisp_lang:
@@ -50,8 +55,6 @@ class Cli:
         # force preprocessing of sound
         red("Forcing sound preprocessing")
         shared.preprocess_sox_effects = shared.force_preprocess_sox_effects
-
-        shared.pv.__init__(profile=profile)
 
         untouched_dir = shared.pv.p / "queues" / "audio_untouched"
         splitted_dir = shared.pv.p / "queues" / "audio_splits"
@@ -77,25 +80,57 @@ class Cli:
 
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
-        for audio in tqdm(total=audio_todo, unit="audio"):
+        input("Done dirloading, press enter to continue")
+
+        for audio in tqdm(audio_todo, unit="audio"):
             row = shared.dirload_queue.loc[audio.__str__(), :]
-            assert row, f"Error with row: {row}"
-            tmp_path = row["tmp_path"]
-            text = transcribe(tmp_path)
+            assert not row.empty, f"Empty row: {row}"
+            temp_path = row["temp_path"]
+            red(f"Audio file: {temp_path}")
+            text = transcribe(temp_path)
+            high_vis(f"Transcript: {text}")
+            # for some reason using kwargs don't work
+            # cloze = alfred(
+            #     txt_audio=text,
+            #     txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+            #     profile=shared.pv.profile_name,
+            #     max_token=shared.pv["sld_max_tkn"],
+            #     temperature=shared.pv["sld_temp"],
+            #     sld_buffer=shared.pv["sld_buffer"],
+            #     llm_choice=shared.pv["llm_choice"],
+            #     txt_keywords=shared.pv["txt_keywords"],
+            #     prompt_manag=shared.pv["prompt_management"],
+            #     cache_mode=False,
+            # )
             cloze = alfred(
-                txt_audio=text,
-                txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
-                profile=shared.pv.p.name,
-                max_token=shared.pv["sld_max_tkn"],
-                temperature=shared.pv["sld_temp"],
-                sld_buffer=shared.pv["sld_buffer"],
-                llm_choice=shared.pv["llm_choice"],
-                txt_keywords=shared.pv["txt_keywords"],
-                prompt_manag=shared.pv["prompt_manag"],
-                cache_mode=False,
+                text,
+                shared.pv["txt_chatgpt_context"],
+                shared.pv.profile_name,
+                shared.pv["sld_max_tkn"],
+                shared.pv["sld_temp"],
+                shared.pv["sld_buffer"],
+                shared.pv["llm_choice"],
+                shared.pv["txt_keywords"],
+                shared.pv["prompt_management"],
+                False,
             )
-            status = get_card_status(cloze)
+            high_vis(f"Cloze: {cloze}")
+            status = asyncio.run(get_card_status, cloze)
+            high_vis(f"Status: {status}")
             breakpoint()
+
+            out = to_anki(
+                audio_mp3_1=temp_path,
+                txt_audio=text,
+                txt_chatgpt_cloz=cloze,
+                txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                txt_deck=shared.pv["txt_deck"],
+                txt_tags=shared.pv["txt_tags"],
+                gallery=None,
+                check_marked=False,
+                txt_extra_source=None,
+            )
+            high_vis(f"Output: {out}")
 
         # transcribe -> alfred -> get_card_status
         # roll3:
