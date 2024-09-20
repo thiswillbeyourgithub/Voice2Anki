@@ -188,19 +188,7 @@ class Cli:
                 if "add" in ans:
                     more = input("Enter the content youwant to add to the More field")
                     asyncio.run(add_to_more_of_previous_note(more))
-                    high_vis(f"Added to previous notes")
+                    high_vis("Added to 'More' field of the previous notes")
 
-
-
-
-        # transcribe -> alfred -> get_card_status
-        # roll3:
-            # transcribe -> alfred -> to_anki
-
+        very_high_vis("Done with that batch!\nOpening debugger just in case:")
         breakpoint()
-        # for audio in tqdm(audio_todo, desc="Starting whisp then LLM on splits"):
-        #     thread_whisp_then_llm(audio_mp3=audio)
-        #     breakpoint()
-
-        breakpoint()
-
