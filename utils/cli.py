@@ -80,7 +80,8 @@ class Cli:
 
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
-        input("Done dirloading, press enter to continue")
+        high_vis("Done dirloading, press enter to continue")
+        input()
 
         for audio in tqdm(audio_todo, unit="audio"):
             row = shared.dirload_queue.loc[audio.__str__(), :]
