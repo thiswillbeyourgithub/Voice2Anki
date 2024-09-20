@@ -23,7 +23,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 @beartype
 def start_Voice2Anki(
     print_db_then_exit: Optional[str] = None,
-    nb_audio_slots: int = 3,
+    nb_audio_slots: Union[str, int] = 3,
 
     gui: bool = True,
     share: bool = False,
@@ -49,8 +49,8 @@ def start_Voice2Anki(
         if a string, must be the name of a database from ./databases
         Will just output the content of the database as json then quit.
         Example value: "anki_whisper.db"
-    nb_audio_slots: int, default 3
-        Number of audio slot
+    nb_audio_slots: int or str, default 3
+        Number of audio slot. If 'auto', only used by cli
     gui: bool, default True
         False to use cli
     share: bool, default False
@@ -104,8 +104,10 @@ def start_Voice2Anki(
     whi("Starting Voice2Anki\n")
     if args:
         raise Exception(f"Unexpected arguments: {args}")
-    if kwargs and gui:
-        raise Exception(f"Unexpected kwarguments if using gui: {kwargs}")
+    if gui:
+        assert not kwargs, f"Unexpected kwarguments if using gui: {kwargs}"
+        assert isinstance(nb_audio_slots, int), "nb_audio_slots must be int if using gui"
+
 
     if share:
         yel("Sharing enabled")
@@ -201,6 +203,7 @@ def start_Voice2Anki(
         from utils.cli import Cli
         try:
             _ = Cli(
+                nb_audio_slots=nb_audio_slots,
                 **kwargs,
             )
         except KeyboardInterrupt as e:

@@ -7,8 +7,8 @@ from typing import Union, Optional
 from utils.typechecker import optional_typecheck, beartype
 from utils.logger import whi, yel, red
 from utils.shared_module import shared
-from utils.main import to_anki, thread_whisp_then_llm
-from utils.anki_utils import call_anki, get_decks
+from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
+from utils.anki_utils import call_anki, get_decks, get_card_status
 
 @optional_typecheck
 class Cli:
@@ -18,6 +18,7 @@ class Cli:
         txt_chatgpt_context: str,
         txt_deck: str,
         txt_tags: str,
+        nb_audio_slots: Union[str, int],
 
         profile: Optional[str] = MISSING,
         txt_whisp_prompt: Optional[str] = MISSING,
@@ -50,25 +51,60 @@ class Cli:
         red("Forcing sound preprocessing")
         shared.preprocess_sox_effects = shared.force_preprocess_sox_effects
 
-        self.profile = profile
+        shared.pv.__init__(profile=profile)
 
-        untouched_dir = Path(".") / "profile" / profile / "queues" / "audio_untouched"
-        splitted_dir = Path(".") / "profile" / profile / "queues" / "audio_splits"
-        done_dir = Path(".") / "profile" / profile / "queues" / "audio_done"
+        untouched_dir = shared.pv.p / "queues" / "audio_untouched"
+        splitted_dir = shared.pv.p / "queues" / "audio_splits"
+        done_dir = shared.pv.p / "queues" / "audio_done"
 
-        assert untouched_dir.exists()
-        assert splitted_dir.exists()
-        assert done_dir.exists()
+        assert untouched_dir.exists(), untouched_dir
+        assert splitted_dir.exists(), splitted_dir
+        assert done_dir.exists(), done_dir
+        shared.unsplitted_dir = untouched_dir
+        shared.done_dir = done_dir
+        shared.splitted_dir = splitted_dir
 
         audio_todo = [f for f in splitted_dir.iterdir()]
         whi(f"Found {len(audio_todo)} audio splits before filtering")
         audio_todo = [f for f in audio_todo if audio_regex.match(f.name)]
+        audio_todo = sorted(audio_todo, key=lambda f: f.stat().st_ctime)
         assert audio_todo, "No audio todo"
         whi(f"Found {len(audio_todo)} audio splits to do")
 
-        for audio in tqdm(audio_todo, desc="Starting whisp then LLM on splits"):
-            thread_whisp_then_llm(audio_mp3=audio)
+        if nb_audio_slots == "auto":
+            nb_audio_slots = len(audio_todo)
+            shared.audio_slot_nb = nb_audio_slots
+
+        audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
+
+        for audio in tqdm(total=audio_todo, unit="audio"):
+            row = shared.dirload_queue.loc[audio.__str__(), :]
+            assert row, f"Error with row: {row}"
+            tmp_path = row["tmp_path"]
+            text = transcribe(tmp_path)
+            cloze = alfred(
+                txt_audio=text,
+                txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                profile=shared.pv.p.name,
+                max_token=shared.pv["sld_max_tkn"],
+                temperature=shared.pv["sld_temp"],
+                sld_buffer=shared.pv["sld_buffer"],
+                llm_choice=shared.pv["llm_choice"],
+                txt_keywords=shared.pv["txt_keywords"],
+                prompt_manag=shared.pv["prompt_manag"],
+                cache_mode=False,
+            )
+            status = get_card_status(cloze)
             breakpoint()
+
+        # transcribe -> alfred -> get_card_status
+        # roll3:
+            # transcribe -> alfred -> to_anki
+
+        breakpoint()
+        # for audio in tqdm(audio_todo, desc="Starting whisp then LLM on splits"):
+        #     thread_whisp_then_llm(audio_mp3=audio)
+        #     breakpoint()
 
         breakpoint()
 
