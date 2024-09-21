@@ -171,6 +171,8 @@ class Cli:
             except Exception as e:
                 if "cannot create note because it is a duplicate" in str(e).lower():
                     out = "DUPLICATE"
+                else:
+                    out = str(e)
 
             vhv(f"Output:\n{out}")
 
