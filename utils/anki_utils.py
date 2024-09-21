@@ -235,73 +235,72 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
             return f"Added {n}/{n}"
         else:
             return f"MISSING {n-missing}/{n}"
-    else:
         if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
             return "null"
-        if txt_chatgpt_cloz.startswith("Image change detected: '"):
-            return "null"
-        cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
-        cloz = [cl.strip() for cl in cloz if cl.strip()]
-        assert cloz, f"cloz issue: {cloz}"
-        query = "added:2"
-        for cl in cloz:
-            query += f" body:\"*{cl}*\""
-        query = query.strip()
-        state = await call_anki(action="findNotes", query=query)
-        if state:
-            return "Added"
-        recent = await call_anki(action="findNotes", query="added:2")
-        if not recent:
-            return "MISSING"
-        recent = [int(n) for n in recent]
-        recent = sorted(recent, reverse=True)  # sort to get the most recent first
-        # bodies = await get_anki_content(nid=recent)
-        # tasks = [cached_get_anki_content(n) for n in recent]
-        # bodies = await asyncio.gather(*tasks)
-
-        semaphore = asyncio.Semaphore(10)
-        async def limited_process(item):
-            async with semaphore:
-                return await cached_get_anki_content(item)
-        tasks = {r: asyncio.create_task(limited_process(r)) for r in recent}
-        bodies = [MISSING] * len(recent)
-        should_return = False
-        txt_nomarkers = remove_markers(txt_chatgpt_cloz)
-        for r, task in tasks.items():
-            if should_return:
-                task.cancel()
-                continue
-            body = await task
-            body = body[0]
-            assert body is not MISSING
-            assert bodies[recent.index(r)] is MISSING
-            bodies[recent.index(r)] = body
-
-            body2 = cloze_editor(body)
-            body3 = remove_markers(body)
-            body4 = remove_markers(body2)
-            subbodies = [body, body2, body3, body4]
-
-            for ib, b in enumerate(subbodies):
-                if txt_chatgpt_cloz in b:
-                    should_return = "Added"
-                    break
-                elif all(c in b for c in cloz):
-                    should_return = "Added"
-                    break
-                elif all(c in b for c in cloz):
-                    should_return = "Added"
-                    break
-                elif levratio(txt_chatgpt_cloz, b) > 90:
-                    should_return = "Prob added " + str(int(ib + 1))
-                    break
-                elif levratio(txt_nomarkers, b) > 90:
-                    should_return = "Prob added " + str(int(ib + 1 + len(subbodies)))
-                    break
-        assert MISSING not in bodies
-        if should_return:
-            return should_return
+    if txt_chatgpt_cloz.startswith("Image change detected: '"):
+        return "null"
+    cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
+    cloz = [cl.strip() for cl in cloz if cl.strip()]
+    assert cloz, f"cloz issue: {cloz}"
+    query = "added:2"
+    for cl in cloz:
+        query += f" body:\"*{cl}*\""
+    query = query.strip()
+    state = await call_anki(action="findNotes", query=query)
+    if state:
+        return "Added"
+    recent = await call_anki(action="findNotes", query="added:2")
+    if not recent:
         return "MISSING"
+    recent = [int(n) for n in recent]
+    recent = sorted(recent, reverse=True)  # sort to get the most recent first
+    # bodies = await get_anki_content(nid=recent)
+    # tasks = [cached_get_anki_content(n) for n in recent]
+    # bodies = await asyncio.gather(*tasks)
+
+    semaphore = asyncio.Semaphore(10)
+    async def limited_process(item):
+        async with semaphore:
+            return await cached_get_anki_content(item)
+    tasks = {r: asyncio.create_task(limited_process(r)) for r in recent}
+    bodies = [MISSING] * len(recent)
+    should_return = False
+    txt_nomarkers = remove_markers(txt_chatgpt_cloz)
+    for r, task in tasks.items():
+        if should_return:
+            task.cancel()
+            continue
+        body = await task
+        body = body[0]
+        assert body is not MISSING
+        assert bodies[recent.index(r)] is MISSING
+        bodies[recent.index(r)] = body
+
+        body2 = cloze_editor(body)
+        body3 = remove_markers(body)
+        body4 = remove_markers(body2)
+        subbodies = [body, body2, body3, body4]
+
+        for ib, b in enumerate(subbodies):
+            if txt_chatgpt_cloz in b:
+                should_return = "Added"
+                break
+            elif all(c in b for c in cloz):
+                should_return = "Added"
+                break
+            elif all(c in b for c in cloz):
+                should_return = "Added"
+                break
+            elif levratio(txt_chatgpt_cloz, b) > 90:
+                should_return = "Prob added " + str(int(ib + 1))
+                break
+            elif levratio(txt_nomarkers, b) > 90:
+                should_return = "Prob added " + str(int(ib + 1 + len(subbodies)))
+                break
+    assert MISSING not in bodies
+    if should_return:
+        return should_return
+    return "MISSING"
 
 
 @optional_typecheck
