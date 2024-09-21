@@ -720,7 +720,7 @@ def alfred(
         raise Exception(red("No txt_chatgpt_context found."))
     assert isinstance(prompt_management, str), f"Invalid type of prompt_management: {prompt_management}"
     assert isinstance(cache_mode, bool), f"Invalid type of cache_mode: {cache_mode}"
-    if txt_audio.starts_with("Very short audio, so unreliable transcript: "):
+    if txt_audio.startswith("Very short audio, so unreliable transcript: "):
         if cache_mode:
             return red(txt_audio)
         else:
