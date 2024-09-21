@@ -4,6 +4,7 @@ import magic
 import re
 import shutil
 import time
+from joblib import Parallel, delayed
 from typing import List, Union, Tuple, Optional
 from pydub import AudioSegment
 import soundfile as sf
@@ -172,6 +173,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
         if len(gallery) == 0:
             return queue.put(red("0 image found in gallery."))
 
+        sources = []
         source = ""
         for img in gallery:
             try:
@@ -205,11 +207,12 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
             new = shared.anki_media / f"{img_hash}.png"
             if not new.exists():
                 shutil.copy2(str(path), str(new))
+            assert new.exists(), new
+            sources.append(new)
 
-            try:
-                ocr = get_text(img=str(new))
-            except Exception as err:
-                ocr = red(f"Error when OCRing image: '{err}'")
+        texts = Parallel(n_jobs=1, backend="threading")(delayed(get_text)(str(new)) for new in sources)
+
+        for ocr in texts:
 
             if use_html:
                 if ocr:
