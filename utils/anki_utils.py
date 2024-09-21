@@ -293,10 +293,10 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
                     should_return = "Added"
                     break
                 elif levratio(txt_chatgpt_cloz, b) > 90:
-                    should_return = "Prob added " + (ib + 1)
+                    should_return = "Prob added " + str(int(ib + 1))
                     break
                 elif levratio(txt_nomarkers, b) > 90:
-                    should_return = "Prob added " + (ib + 1 + len(subbodies))
+                    should_return = "Prob added " + str(int(ib + 1 + len(subbodies)))
                     break
         assert MISSING not in bodies
         if should_return:
