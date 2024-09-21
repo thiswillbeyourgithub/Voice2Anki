@@ -792,8 +792,8 @@ def alfred(
     model_price = shared.llm_info[llm_choice]
     whi(f"Will use model {llm_choice}")
 
-    pprint("Prompt for LLM:")
-    pprint(formatted_messages)
+    # pprint("Prompt for LLM:")
+    # pprint(formatted_messages)
 
     try:
         response = litellm.completion(
