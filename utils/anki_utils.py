@@ -15,7 +15,7 @@ import ankipandas as akp
 import time
 from py_ankiconnect import PyAnkiconnect
 from functools import cache
-from cachetools.func import ttl_cache
+from cache import AsyncTTL
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
@@ -186,7 +186,7 @@ def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
 
 @trace
 @optional_typecheck
-@ttl_cache(maxsize=1000, ttl=60)
+@AsyncTTL(maxsize=1000, time_to_live=60)
 async def cached_get_anki_content(nid: Union[int, str]) -> Coroutine:
     "TTL cached that expire after n seconds to get the content of a single anki note"
     return await get_anki_content([nid])
