@@ -256,6 +256,9 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         return "MISSING"
     recent = [int(n) for n in recent]
     recent = sorted(recent, reverse=True)  # sort to get the most recent first
+    if len(recent) > 100:
+        red(f"More than 100 recent cards, keeping only the 100 latest instead of {len(recent)}")
+        recent = recent[:100]
     # bodies = await get_anki_content(nid=recent)
     # tasks = [cached_get_anki_content(n) for n in recent]
     # bodies = await asyncio.gather(*tasks)
