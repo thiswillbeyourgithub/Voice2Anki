@@ -175,9 +175,15 @@ class Cli:
             vhv(f"Output:\n{out}")
 
             vhv("Rolling")
-            audio_slots = roll_audio(audio_slots)
+            if not isinstance(audio_slots[0], dict):
+                vhv("Popping first element: ")
+                hv(str(audio_slots.pop(0)))
+            audio_slots = [gr.Audio(a["value"]).value for a in audio_slots]
+            audio_slots = roll_audio(*audio_slots)
+
             vhv("Loading next audio")
-            audio_slots = dirload_splitted_last(True)
+            audio_slots[-1] = dirload_splitted_last(True)
+            assert len(audio_slots) == shared.nb_audio_slots
 
             while True:
                 vhv("What next?")
