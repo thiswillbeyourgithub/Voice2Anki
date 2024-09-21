@@ -188,7 +188,7 @@ def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
 
 # @trace
 @optional_typecheck
-@AsyncTTL(maxsize=10000, time_to_live=60)
+@AsyncTTL(maxsize=10000, time_to_live=120)
 async def cached_get_anki_content(nid: Union[int, str]) -> Coroutine:
     "TTL cached that expire after n seconds to get the content of a single anki note"
     return await get_anki_content([nid])
