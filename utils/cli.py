@@ -38,6 +38,7 @@ class Cli:
         untouched_dir: Optional[Union[PosixPath, str]] = None,
         splitted_dir: Optional[Union[PosixPath, str]] = None,
         done_dir: Optional[Union[PosixPath, str]] = None,
+        unsupervised: int = 0,
         **kwargs,
     ) -> None:
         whi("Starting CLI")
@@ -85,6 +86,10 @@ class Cli:
         if nb_audio_slots == "auto":
             nb_audio_slots = len(audio_todo)
             shared.audio_slot_nb = nb_audio_slots
+
+        if unsupervised:
+            vhv(f"Activating 'unsupervised' mode: {unsupervised}")
+            txt_tags += [f"VoiceToAnki::unsupervised::{unsupervised}"]
 
         if "gallery_pdf" in kwargs:
             # load just the pathnames but might maybe cause issue with ocr caching?:
@@ -151,13 +156,14 @@ class Cli:
             vhv(f"Status:\n{status}")
             vhv("=" * 10)
 
-            if status == "MISSING":
-                vhv("Enter to proceed, 'debug' to breakpoint, anything else to quit")
-                ans = input().lower()
-                if ans.startswith("debug"):
-                    breakpoint()
-                if ans:
-                    vhv("Quitting")
+            if unsupervised:
+                if status == "MISSING":
+                    vhv("Enter to proceed, 'debug' to breakpoint, anything else to quit")
+                    ans = input().lower()
+                    if ans.startswith("debug"):
+                        breakpoint()
+                    if ans:
+                        vhv("Quitting")
 
             try:
                 out = to_anki(
@@ -194,6 +200,9 @@ class Cli:
 
             while True:
                 vhv("What next?")
+                if unsupervised:
+                    hv("Unsupervised so continuing directly")
+                    break
                 hv("[s(uspend previous) - m(ark previous) - a(dd to more) - d(ebug) - f(lag)]\nEnter to roll to the next audio")
                 ans = input().lower()
                 if not ans:
