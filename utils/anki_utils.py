@@ -263,7 +263,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     # tasks = [cached_get_anki_content(n) for n in recent]
     # bodies = await asyncio.gather(*tasks)
 
-    semaphore = asyncio.Semaphore(10)
+    semaphore = asyncio.Semaphore(5)
     async def limited_process(item):
         async with semaphore:
             return await cached_get_anki_content(item)
