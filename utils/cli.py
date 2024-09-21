@@ -51,7 +51,10 @@ class Cli:
         if profile is MISSING:
             profile = "latest"
         # shared.pv.__class__._instance = None  # otherwise it forbids creating new instances
-        shared.reset(request=None)
+        if hasattr(shared.reset, "__beartype_wrapper") and shared.reset.__beartype_wrapper:
+            shared.reset.__func__(request=None)
+        else:
+            shared.reset(request=None)
         ValueStorage.__init__(shared.pv, profile)
         if txt_whisp_prompt:
             txt_whisp_prompt = shared.pv["txt_whisp_prompt"]
