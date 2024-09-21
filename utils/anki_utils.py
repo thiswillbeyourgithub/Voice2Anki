@@ -168,6 +168,7 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
+@trace
 @cache
 @optional_typecheck
 def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
