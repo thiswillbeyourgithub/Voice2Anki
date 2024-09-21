@@ -112,8 +112,11 @@ class Cli:
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
         time.sleep(1)
-        vhv("Done dirloading, press <enter> to continue")
-        input()
+        if not unsupervised:
+            vhv("Done dirloading, press <enter> to continue")
+            input()
+        else:
+            vhv("Done dirloading")
 
         for audio in tqdm(audio_todo, unit="audio"):
             row = shared.dirload_queue.loc[audio.__str__(), :]
