@@ -100,16 +100,19 @@ def embedder(
     assert len(cached_values) == len(text_list)
     if not any(c is MISSING for c in cached_values):
         assert depth == 0, f"depth of 0 but no MISSING embeddings: text_list is\n{text_list}"
-        red(f"All {len(text_list)} embeddings are already cached, returning them.")
+        if not shared.disable_tracing:
+            red(f"All {len(text_list)} embeddings are already cached, returning them.")
         return cached_values
     elif all(c is MISSING for c in cached_values):
         assert depth in [0, 1]
-        red(f"No cached_values found in embedder. Will compute {len(text_list)} embeddings (depth={depth})")
+        if not shared.disable_tracing:
+            red(f"No cached_values found in embedder. Will compute {len(text_list)} embeddings (depth={depth})")
     else:
         assert depth == 0
         todo = [t for i, t in enumerate(text_list) if cached_values[i] is MISSING]
         assert len(todo) <= len(text_list)
-        red(f"Detected {len(todo)} uncached texts among {len(text_list)}")
+        if not shared.disable_tracing:
+            red(f"Detected {len(todo)} uncached texts among {len(text_list)}")
 
         new_vals = embedder(
             text_list=todo,
