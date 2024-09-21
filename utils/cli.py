@@ -14,7 +14,7 @@ from utils.logger import whi, yel, red, very_high_vis, high_vis
 from utils.shared_module import shared
 from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
 from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
-from utils.media import get_image
+from utils.media import get_image, roll_audio
 
 vhv = very_high_vis
 hv = high_vis
@@ -174,6 +174,9 @@ class Cli:
 
             vhv(f"Output:\n{out}")
 
+            vhv("Rolling")
+            audio_slots = roll_audio(audio_slots)
+            vhv("Loading next audio")
             audio_slots = dirload_splitted_last(True)
 
             while True:
