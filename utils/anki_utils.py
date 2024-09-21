@@ -1,3 +1,4 @@
+import asyncio
 from rapidfuzz.fuzz import ratio as levratio
 import queue
 from typing import List, Union, Optional, Callable
@@ -14,6 +15,7 @@ import ankipandas as akp
 import time
 from py_ankiconnect import PyAnkiconnect
 from functools import cache
+from cachetools.func import ttl_cache
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
@@ -183,6 +185,13 @@ def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
     return cloze_editor
 
 @trace
+@optional_typecheck
+@ttl_cache(maxsize=1000, ttl=60)
+async def cached_get_anki_content(nid: Union[int, str]) -> List[str]:
+    "TTL cached that expire after n seconds to get the content of a single anki note"
+    return await get_anki_content([nid])
+
+@trace
 @Timeout(5)
 @optional_typecheck
 async def get_card_status(txt_chatgpt_cloz: str) -> str:
@@ -212,7 +221,9 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
 
     if "#####" in cloz:  # multiple cards
         splits = [cl.strip() for cl in cloz.split("#####") if cl.strip()]
-        vals = [await get_card_status(sp) for sp in splits]
+        # vals = [await get_card_status(sp) for sp in splits]
+        tasks = [get_card_status(sp) for sp in splits]
+        vals = await asyncio.gather(*tasks)
         assert "EMPTY" not in vals, f"Found EMPTY in {txt_chatgpt_cloz} that returned {vals}"
 
         n = len(vals)
@@ -238,7 +249,9 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
             recent = await call_anki(action="findNotes", query="added:4")
             if not recent:
                 return "MISSING"
-            bodies = await get_anki_content(nid=recent)
+            # bodies = await get_anki_content(nid=recent)
+            tasks = [cached_get_anki_content(n) for n in recent]
+            bodies = await asyncio.gather(*tasks)
             if txt_chatgpt_cloz in bodies:
                 return "Added"
             for b in bodies:
