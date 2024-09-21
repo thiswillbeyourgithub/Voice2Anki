@@ -720,6 +720,12 @@ def alfred(
         raise Exception(red("No txt_chatgpt_context found."))
     assert isinstance(prompt_management, str), f"Invalid type of prompt_management: {prompt_management}"
     assert isinstance(cache_mode, bool), f"Invalid type of cache_mode: {cache_mode}"
+    if txt_audio.starts_with("Very short audio, so unreliable transcript: ")
+        if cache_mode:
+            return red(txt_audio)
+        else:
+            # gr.Warning(mess)
+            return red(txt_audio)
     if (("fred" in txt_audio.lower() and "image" in txt_audio.lower()) or ("change d'image" in txt_audio.lower())) and len(txt_audio) < 40:
         mess = f"Image change detected: '{txt_audio}'"
         if cache_mode:
