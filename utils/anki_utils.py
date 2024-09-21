@@ -186,7 +186,7 @@ def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
     cloze_editor = editor_module.cloze_editor
     return cloze_editor
 
-@trace
+# @trace
 @optional_typecheck
 @AsyncTTL(maxsize=10000, time_to_live=60)
 async def cached_get_anki_content(nid: Union[int, str]) -> Coroutine:
