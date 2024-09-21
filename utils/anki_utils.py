@@ -191,6 +191,9 @@ async def cached_get_anki_content(nid: Union[int, str]) -> Coroutine:
     "TTL cached that expire after n seconds to get the content of a single anki note"
     return await get_anki_content([nid])
 
+def remove_markers(intext: str) -> str:
+    return intext.replace("{{c", "").replace("}}", "").replace("::", "")
+
 @trace
 @Timeout(5)
 @optional_typecheck
@@ -259,9 +262,6 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         for b in bodies:
             if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
                 return "Added"
-
-        def remove_markers(intext: str) -> str:
-            return intext.replace("{{c", "").replace("}}", "").replace("::", "")
 
         txt_nomarkers = remove_markers(txt_chatgpt_cloz)
 
