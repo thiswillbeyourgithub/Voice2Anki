@@ -194,7 +194,7 @@ class Cli:
 
             while True:
                 vhv("What next?")
-                hv("[s(uspend previous) - m(ark previous) - a(add to more) - d(ebug) - f(lag)]\nEnter to roll to the next audio")
+                hv("[s(uspend previous) - m(ark previous) - a(dd to more) - d(ebug) - f(lag)]\nEnter to roll to the next audio")
                 ans = input().lower()
                 if not ans:
                     vhv("Continuing to next audio")
