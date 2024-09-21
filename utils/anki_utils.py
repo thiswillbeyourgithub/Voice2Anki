@@ -248,7 +248,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         state = await call_anki(action="findNotes", query=query)
         if state:
             return "Added"
-        recent = await call_anki(action="findNotes", query="added:4")
+        recent = await call_anki(action="findNotes", query="added:2")
         if not recent:
             return "MISSING"
         recent = [int(n) for n in recent]
