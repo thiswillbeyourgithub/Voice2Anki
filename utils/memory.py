@@ -385,8 +385,9 @@ def prompt_filter(
 
     max_sim = [sim_combined.max(), candidate_prompts[sim_combined.argmax()]["content"]]
     min_sim = [sim_combined.min(), candidate_prompts[sim_combined.argmin()]["content"]]
-    whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
-    whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
+    if not shared.disable_tracing:
+        whi(f"Memory with lowest similarity is: {round(min_sim[0], 4)} '{min_sim[1]}'")
+        whi(f"Memory with highest similarity is: {round(max_sim[0], 4)} '{max_sim[1]}'")
 
     # scaling
     sim_combined -= sim_combined.min()
