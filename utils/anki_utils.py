@@ -265,8 +265,19 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
 
     semaphore = asyncio.Semaphore(5)
     async def limited_process(item):
-        async with semaphore:
-            return await cached_get_anki_content(item)
+        trial = 0
+        n_trials = 5
+        while True:
+            try:
+                async with semaphore:
+                    return await cached_get_anki_content(item)
+            except Exception as e:
+                red(f"Ran into exception: {e}")
+                time.sleep(0.5)
+                trial += 1
+                if trial >= n_trials:
+                    raise e
+
     tasks = {r: asyncio.create_task(limited_process(r)) for r in recent}
     bodies = [MISSING] * len(recent)
     should_return = False
