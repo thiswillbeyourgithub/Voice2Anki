@@ -1,6 +1,6 @@
 from rapidfuzz.fuzz import ratio as levratio
 import queue
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Callable
 from datetime import datetime
 import rtoml
 import sys
@@ -9,10 +9,11 @@ import aiohttp
 import gradio as gr
 import re
 import shutil
-from pathlib import Path
+from pathlib import Path, PosixPath
 import ankipandas as akp
 import time
 from py_ankiconnect import PyAnkiconnect
+from functools import cache
 
 from .logger import red, whi, trace, Timeout
 from .shared_module import shared
@@ -82,19 +83,14 @@ def add_note_to_anki(
         check_anki_models()
     model_name = shared.anki_notetype
 
-    if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
-        red("Found flashcard_editor.py")
-        spec = importlib.util.spec_from_file_location(
-                "flashcard_editor.cloze_editor",
-                (shared.func_dir / "flashcard_editor.py").absolute()
-                )
-        editor_module = importlib.util.module_from_spec(spec)
-        sys.modules["editor_module"] = editor_module
-        spec.loader.exec_module(editor_module)
-        cloze_editor = editor_module.cloze_editor
+    cloze_ed_file = shared.func_dir / "flashcard_editor.py"
+    if cloze_ed_file.exists():
+        ctime = cloze_ed_file.stat().st_ctime
+        cloze_editor = cached_load_flashcard_editor(path=cloze_ed_file, ctime=ctime)
     else:
         red("No flashcard_editor.py found")
-        cloze_editor = lambda x: x
+        def cloze_editor(x: str) -> str:
+            return x
 
     notes = [
             {
@@ -172,6 +168,18 @@ def add_audio_to_anki(audio_mp3: Union[str, dict], queue: queue.Queue) -> None:
     except Exception as err:
         queue.put(red(f"\n\nError when copying audio to anki media: '{err}'"))
 
+@cache
+@optional_typecheck
+def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
+    spec = importlib.util.spec_from_file_location(
+            "flashcard_editor.cloze_editor",
+            (path).absolute()
+            )
+    editor_module = importlib.util.module_from_spec(spec)
+    sys.modules["editor_module"] = editor_module
+    spec.loader.exec_module(editor_module)
+    cloze_editor = editor_module.cloze_editor
+    return cloze_editor
 
 @trace
 @Timeout(5)
@@ -187,18 +195,13 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     if "{{c1::" not in txt_chatgpt_cloz and "}}" not in txt_chatgpt_cloz:
         return "null"
     txt_chatgpt_cloz = split_thinking(txt_chatgpt_cloz)[0]
-    if [f for f in shared.func_dir.iterdir() if f.name.endswith("flashcard_editor.py")]:
-        spec = importlib.util.spec_from_file_location(
-                "flashcard_editor.cloze_editor",
-                (shared.func_dir / "flashcard_editor.py").absolute()
-                )
-        editor_module = importlib.util.module_from_spec(spec)
-        sys.modules["editor_module"] = editor_module
-        spec.loader.exec_module(editor_module)
-        cloze_editor = editor_module.cloze_editor
+    cloze_ed_file = shared.func_dir / "flashcard_editor.py"
+    if cloze_ed_file.exists():
+        ctime = cloze_ed_file.stat().st_ctime
+        cloze_editor = cached_load_flashcard_editor(path=cloze_ed_file, ctime=ctime)
     else:
-        def cloze_editor(*args):
-            return args
+        def cloze_editor(x: str) -> str:
+            return x
 
     cloz = cloze_editor(txt_chatgpt_cloz)
     cloz = cloz.replace("\"", "\\\"")
