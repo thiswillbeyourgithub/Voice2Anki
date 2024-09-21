@@ -183,7 +183,7 @@ class Cli:
 
             vhv("Loading next audio")
             audio_slots[-1] = dirload_splitted_last(True)
-            assert len(audio_slots) == shared.nb_audio_slots
+            assert len(audio_slots) == shared.audio_slot_nb
 
             while True:
                 vhv("What next?")
