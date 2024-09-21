@@ -1184,12 +1184,40 @@ with gr.Blocks(
     if "V2A_DIRLOAD" in os.environ and os.environ["V2A_DIRLOAD"] == "true":
         print("Auto launch dirload")
         init.then(
-            fn=dirload_splitted,
-            inputs=[gui_rolldirloadcheck] + audio_slots,
-            outputs=audio_slots,
-            #show_progress=False,
-            postprocess=False,
-        )
+                fn=dirload_splitted,
+                inputs=[gui_rolldirloadcheck] + audio_slots,
+                outputs=audio_slots,
+                #show_progress=False,
+                postprocess=False,
+                ).success(
+                        fn=transcribe,
+                        inputs=[audio_slots[0]],
+                        outputs=[txt_audio],
+                        preprocess=False,
+                        postprocess=False,
+                        show_progress=False,
+                        ).success(
+                            fn=alfred,
+                            inputs=[txt_audio, txt_chatgpt_context, txt_profile, sld_max_tkn, sld_temp, sld_buffer, llm_choice, txt_keywords, prompt_manag],
+                            outputs=[txt_chatgpt_cloz],
+                            preprocess=False,
+                            postprocess=False,
+                            ).then(
+                                    fn=get_card_status,
+                                    inputs=[txt_chatgpt_cloz],
+                                    outputs=[update_status_btn],
+                                    preprocess=False,
+                                    postprocess=False,
+                                    #show_progress=False,
+                                    ).then(
+                                        fn=update_audio_slots_txts,
+                                        inputs=[check_enable_dirload] + audio_slots_txts,
+                                        outputs=audio_slots_txts,
+                                        show_progress=False,
+                                        postprocess=False,
+                                        preprocess=False,
+                                        )
+
 
     if shared.pv.profile_name == "default":
         gr.Warning("Enter a profile then press enter.")
