@@ -1478,7 +1478,7 @@ def to_anki(
         raise Exception(red(f"Some flashcards were not added:{','.join(errors)}"))
     if not shared.dirload_queue.empty:
         with shared.dirload_lock:
-            audio_row["ankified"] = True
+            audio_row.loc[:, "ankified"] = True
 
     whi("Finished adding card.\n\n")
 
