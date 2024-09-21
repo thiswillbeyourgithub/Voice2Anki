@@ -239,6 +239,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
             return "null"
     if txt_chatgpt_cloz.startswith("Image change detected: '"):
         return "null"
+    if txt_chatgpt_cloz.lower().startswith("alfred"):
+        return "null"
     cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
     cloz = [cl.strip() for cl in cloz if cl.strip()]
     assert cloz, f"cloz issue: {cloz}"
