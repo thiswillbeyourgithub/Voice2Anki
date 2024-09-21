@@ -1,4 +1,6 @@
 import os
+import shutil
+import magic
 import re
 import shutil
 import time
@@ -23,8 +25,26 @@ from .shared_module import shared
 from .typechecker import optional_typecheck
 
 
-@optional_typecheck
 @trace
+@optional_typecheck
+def is_image_magic(file_path: Union[str, PosixPath]) -> bool:
+    mime = magic.Magic(mime=True)
+    file_type = mime.from_file(file_path)
+    return file_type.startswith('image/')
+
+@trace
+@optional_typecheck
+def is_image_cv2(file_path: Union[str, PosixPath]) -> bool:
+    try:
+        # Attempt to read the image header
+        img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
+        return img is not None
+    except cv2.error:
+        return False
+
+
+@trace
+@optional_typecheck
 def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
     whi("Getting image from clipboard")
     assert shared.pv["enable_gallery"], "Incoherent UI"
@@ -137,8 +157,8 @@ def check_source(source: str) -> str:
 
 
 #@Timeout(120)
-@optional_typecheck
 @trace
+@optional_typecheck
 def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bool = True) -> None:
     whi("Getting source from image")
     assert shared.pv["enable_gallery"], "Incoherent UI"
@@ -155,7 +175,8 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
         source = ""
         for img in gallery:
             try:
-                decoded = cv2.imread(img.image.path, flags=1)
+                path = img.image.path
+                assert is_image_magic(path) or is_image_cv2(path), f"Not an image: {path}"
             except:
                 try:
                     path = img["image"]["path"]
@@ -163,27 +184,27 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
                         path = path.split("file=")[1]
                     cnt = 0
                     while not Path(path).exists():
-                        time.sleep(1)
+                        time.sleep(0.1)
                         cnt += 1
                         if cnt == 10:
                             raise Exception(f"img not found in path: {path}")
-                    decoded = cv2.imread(path, flags=1)
-                except:
+                    assert is_image_magic(path) or is_image_cv2(path), f"Not an image: {path}"
+                except Exception:
                     # must be a tuple
                     assert isinstance(img, tuple), f"Invalid img type: {img}"
                     assert len(img) == 2, f"Invalid img: {img}"
                     assert img[1] is None, f"Invalid img: {img}"
                     cnt = 0
                     while not Path(img[0]).exists():
-                        time.sleep(1)
+                        time.sleep(0.1)
                         cnt += 1
                         if cnt == 10:
                             raise Exception(f"img not found: {img[0]}")
-                    decoded = cv2.imread(img[0], flags=1)
-            img_hash = hashlib.md5(decoded).hexdigest()
+                    assert is_image_magic(path) or is_image_cv2(path), f"Not an image: {path}"
+            img_hash = hashlib.md5(open(path, 'rb').read()).hexdigest()[:10]
             new = shared.anki_media / f"{img_hash}.png"
             if not new.exists():
-                cv2.imwrite(str(new), decoded)
+                shutil.copy2(str(path), str(new))
 
             try:
                 ocr = get_text(img=str(new))
