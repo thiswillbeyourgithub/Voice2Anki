@@ -12,7 +12,7 @@ from utils.profiles import ValueStorage
 from utils.typechecker import optional_typecheck, beartype
 from utils.logger import whi, yel, red, very_high_vis, high_vis
 from utils.shared_module import shared
-from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki
+from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki, flag_audio
 from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
 from utils.media import get_image, roll_audio
 
@@ -187,7 +187,7 @@ class Cli:
 
             while True:
                 vhv("What next?")
-                hv("[s(uspend previous) - m(ark previous) - a(add to more) - d(ebug)]\nEnter to roll to the next audio")
+                hv("[s(uspend previous) - m(ark previous) - a(add to more) - d(ebug) - f(lag)]\nEnter to roll to the next audio")
                 ans = input().lower()
                 if not ans:
                     vhv("Continuing to next audio")
@@ -215,6 +215,20 @@ class Cli:
                         vhv("Added to 'More' field of the previous notes")
                     except Exception as e:
                         vhv(f"Error when adding to more: {e}")
+                elif ans.startswith("f"):
+                    try:
+                        flag_audio(
+                            txt_profile=shared.pv.profile_name,
+                            txt_audio=text,
+                            txt_whisp_lang=shared.pv["txt_whisp_lang"],
+                            txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
+                            txt_chatgpt_cloz=cloze,
+                            txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                            gallery=gallery,
+                        )
+                        vhv("Flagged audio")
+                    except Exception as e:
+                        vhv(f"Error flagging audio: {e}")
                 else:
                     vhv("Unexpected answer.")
 
