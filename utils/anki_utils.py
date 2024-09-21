@@ -251,6 +251,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         recent = await call_anki(action="findNotes", query="added:4")
         if not recent:
             return "MISSING"
+        recent = [int(n) for n in recent]
+        recent = sorted(recent, reverse=True)  # sort to get the most recent first
         # bodies = await get_anki_content(nid=recent)
         tasks = [cached_get_anki_content(n) for n in recent]
         bodies = await asyncio.gather(*tasks)
