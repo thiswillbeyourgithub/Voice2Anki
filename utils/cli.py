@@ -116,7 +116,9 @@ class Cli:
             temp_path = row["temp_path"]
             hv(f"Audio file: {temp_path}")
             text = transcribe(temp_path)
+            vhv("=" * 10)
             hv(f"Transcript:\n{text}")
+            vhv("=" * 10)
             # for some reason using kwargs don't work
             # cloze = alfred(
             #     txt_audio=text,
@@ -142,9 +144,12 @@ class Cli:
                 shared.pv["prompt_management"],
                 False,
             )
-            hv(f"Cloze:\n{cloze}")
+            vhv("=" * 10)
+            vhv("Cloze:")
+            hv(cloze)
             status = asyncio.run(get_card_status(cloze))
             vhv(f"Status:\n{status}")
+            vhv("=" * 10)
 
             if status == "MISSING":
                 vhv("Enter to proceed, 'debug' to breakpoint, anything else to quit")
