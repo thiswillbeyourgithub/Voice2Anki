@@ -249,5 +249,4 @@ class Cli:
                 else:
                     vhv("Unexpected answer.")
 
-        vhv("Done with that batch!\nOpening debugger just in case:")
-        breakpoint()
+        vhv("Done with that batch!")
