@@ -203,10 +203,6 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     """return depending on if the card written in
     txt_chatgpt_cloz is already in anki or not"""
     assert shared.initialized, "Demo not yet launched!"
-    if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
-        return "null"
-    if txt_chatgpt_cloz.startswith("Image change detected: '"):
-        return "null"
     if "{{c1::" not in txt_chatgpt_cloz and "}}" not in txt_chatgpt_cloz:
         return "null"
     txt_chatgpt_cloz = split_thinking(txt_chatgpt_cloz)[0]
@@ -240,6 +236,10 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         else:
             return f"MISSING {n-missing}/{n}"
     else:
+        if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
+            return "null"
+        if txt_chatgpt_cloz.startswith("Image change detected: '"):
+            return "null"
         cloz = re.sub(r"{{c\d+::.*?}}", "CLOZCONTENT", cloz).split("CLOZCONTENT")
         cloz = [cl.strip() for cl in cloz if cl.strip()]
         assert cloz, f"cloz issue: {cloz}"
