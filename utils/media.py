@@ -210,7 +210,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
             assert new.exists(), new
             sources.append(new)
 
-        texts = Parallel(n_jobs=1, backend="threading")(delayed(get_text)(str(new)) for new in sources)
+        texts = Parallel(n_jobs=4, backend="threading")(delayed(get_text)(str(new)) for new in sources)
 
         for ocr in texts:
 
