@@ -888,6 +888,7 @@ with gr.Blocks(
             preprocess=False,
             postprocess=True,
             #show_progress=False,
+            show_progress=False,
             ).success(
                 fn=transcribe,
                 inputs=[audio_slots[0]],
@@ -901,6 +902,7 @@ with gr.Blocks(
                     outputs=[txt_chatgpt_cloz],
                     preprocess=False,
                     postprocess=False,
+                    show_progress=False,
                     ).success(
                             fn=to_anki,
                             inputs=[
