@@ -1,7 +1,7 @@
 import asyncio
 from rapidfuzz.fuzz import ratio as levratio
 import queue
-from typing import List, Union, Optional, Callable
+from typing import List, Union, Optional, Callable, Coroutine
 from datetime import datetime
 import rtoml
 import sys
@@ -187,7 +187,7 @@ def cached_load_flashcard_editor(path: PosixPath, ctime: float) -> Callable:
 @trace
 @optional_typecheck
 @ttl_cache(maxsize=1000, ttl=60)
-async def cached_get_anki_content(nid: Union[int, str]) -> List[str]:
+async def cached_get_anki_content(nid: Union[int, str]) -> Coroutine:
     "TTL cached that expire after n seconds to get the content of a single anki note"
     return await get_anki_content([nid])
 
