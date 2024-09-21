@@ -46,7 +46,7 @@ class Cli:
         audio_regex = re.compile(audio_regex)
         txt_tags = txt_tags.split(" ")
         assert txt_tags, "Missing txt_tags after splitting by a space"
-        txt_tags += "VoiceToAnki::cli_mode"
+        txt_tags += ["VoiceToAnki::cli_mode"]
 
         if profile is MISSING:
             profile = "latest"
