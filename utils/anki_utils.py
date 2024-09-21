@@ -245,43 +245,42 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         state = await call_anki(action="findNotes", query=query)
         if state:
             return "Added"
-        else:
-            recent = await call_anki(action="findNotes", query="added:4")
-            if not recent:
-                return "MISSING"
-            # bodies = await get_anki_content(nid=recent)
-            tasks = [cached_get_anki_content(n) for n in recent]
-            bodies = await asyncio.gather(*tasks)
-            if txt_chatgpt_cloz in bodies:
-                return "Added"
-            for b in bodies:
-                if all(c in b for c in cloz):
-                    return "Added"
-            for b in bodies:
-                if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
-                    return "Added"
-
-            def remove_markers(intext: str) -> str:
-                return intext.replace("{{c", "").replace("}}", "").replace("::", "")
-
-            txt_nomarkers = remove_markers(txt_chatgpt_cloz)
-
-            for b in bodies:
-                if levratio(txt_chatgpt_cloz, b) > 90:
-                    return "Prob added 1"
-                if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 90:
-                    return "Prob added 2"
-                b2 = remove_markers(b)
-                if levratio(txt_chatgpt_cloz, b2) > 90:
-                    return "Prob added 3"
-                if levratio(txt_chatgpt_cloz, cloze_editor(b2)) > 90:
-                    return "Prob added 4"
-
-                if levratio(txt_nomarkers, b2) > 90:
-                    return "Prob added 5"
-                if levratio(txt_nomarkers, cloze_editor(b2)) > 90:
-                    return "Prob added 6"
+        recent = await call_anki(action="findNotes", query="added:4")
+        if not recent:
             return "MISSING"
+        # bodies = await get_anki_content(nid=recent)
+        tasks = [cached_get_anki_content(n) for n in recent]
+        bodies = await asyncio.gather(*tasks)
+        if txt_chatgpt_cloz in bodies:
+            return "Added"
+        for b in bodies:
+            if all(c in b for c in cloz):
+                return "Added"
+        for b in bodies:
+            if all(c in [cloze_editor(b) for b in bodies] for c in cloz):
+                return "Added"
+
+        def remove_markers(intext: str) -> str:
+            return intext.replace("{{c", "").replace("}}", "").replace("::", "")
+
+        txt_nomarkers = remove_markers(txt_chatgpt_cloz)
+
+        for b in bodies:
+            if levratio(txt_chatgpt_cloz, b) > 90:
+                return "Prob added 1"
+            if levratio(txt_chatgpt_cloz, cloze_editor(b)) > 90:
+                return "Prob added 2"
+            b2 = remove_markers(b)
+            if levratio(txt_chatgpt_cloz, b2) > 90:
+                return "Prob added 3"
+            if levratio(txt_chatgpt_cloz, cloze_editor(b2)) > 90:
+                return "Prob added 4"
+
+            if levratio(txt_nomarkers, b2) > 90:
+                return "Prob added 5"
+            if levratio(txt_nomarkers, cloze_editor(b2)) > 90:
+                return "Prob added 6"
+        return "MISSING"
 
 
 @optional_typecheck
