@@ -156,7 +156,7 @@ class Cli:
             vhv(f"Status:\n{status}")
             vhv("=" * 10)
 
-            if unsupervised:
+            if not unsupervised:
                 if status == "MISSING":
                     vhv("Enter to proceed, 'debug' to breakpoint, anything else to quit")
                     ans = input().lower()
