@@ -270,6 +270,7 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
     txt_nomarkers = remove_markers(txt_chatgpt_cloz)
     for r, task in tasks.items():
         if should_return:
+            bodies[recent.index(r)] = None
             task.cancel()
             continue
         body = await task
