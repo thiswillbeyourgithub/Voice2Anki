@@ -7,6 +7,7 @@ from pathlib import Path, PosixPath
 from tqdm import tqdm
 from dataclasses import MISSING
 from typing import Union, Optional
+from pydub import AudioSegment
 
 from utils.profiles import ValueStorage
 from utils.typechecker import optional_typecheck, beartype
@@ -14,7 +15,7 @@ from utils.logger import whi, yel, red, very_high_vis, high_vis
 from utils.shared_module import shared
 from utils.main import thread_whisp_then_llm, dirload_splitted, dirload_splitted_last, transcribe, alfred, to_anki, flag_audio
 from utils.anki_utils import call_anki, get_decks, get_card_status, mark_previous_note, suspend_previous_notes, add_to_more_of_previous_note
-from utils.media import get_image, roll_audio
+from utils.media import get_image, roll_audio, force_sound_processing
 
 vhv = very_high_vis
 hv = high_vis
@@ -157,9 +158,48 @@ class Cli:
             vhv("=" * 10)
             vhv("Cloze:")
             hv(cloze)
-            status = asyncio.run(get_card_status(cloze))
-            vhv(f"Status:\n{status}")
-            vhv("=" * 10)
+            trial = 1
+            n_trial = 3
+            while True:
+                try:
+                    status = asyncio.run(get_card_status(cloze))
+                    break
+                except Exception as e:
+                    vhv(f"Error when getting status for {trial} time: {e}")
+                    trial += 1
+                    if trial >= n_trial:
+                        raise e
+                    loaded_audio = AudioSegment.from_mp3(audio)
+                    duration = len(loaded_audio)/1000
+                    if duration < 10:
+                        raise Exception(f"Audio is surprisingly short: {duration}\nError: ") from e
+                    vhv(f"Duration of the current audio: {duration:.2f}s")
+                    audio2 = force_sound_processing(temp_path)
+                    assert audio2.stat() != audio.stat()
+                    assert audio2.absolute().resolve().__str__() == temp_path
+                    loaded_audio = AudioSegment.from_mp3(audio2)
+                    duration2 = len(loaded_audio)/1000
+                    vhv(f"Duration of the processed audio: {duration2:.2f}s")
+                    assert duration2 <= duration, f"Unexpected duration: {duration2} vs {duration}"
+                    text2 = transcribe(audio2)
+                    assert text2 != text, "Force processing did not change the text"
+                    cloze2 = alfred(
+                        text2,
+                        shared.pv["txt_chatgpt_context"],
+                        shared.pv.profile_name,
+                        shared.pv["sld_max_tkn"],
+                        shared.pv["sld_temp"],
+                        shared.pv["sld_buffer"],
+                        shared.pv["llm_choice"],
+                        shared.pv["txt_keywords"],
+                        shared.pv["prompt_management"],
+                        False,
+                    )
+                    assert cloze2 != cloze, "Force processing did not change the cloze"
+                    cloze = cloze2
+
+                vhv(f"Status:\n{status}")
+                vhv("=" * 10)
 
             if not unsupervised:
                 if status == "MISSING":
