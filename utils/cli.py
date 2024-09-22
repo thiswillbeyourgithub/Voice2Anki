@@ -77,6 +77,8 @@ class Cli:
         shared.done_dir = done_dir
         shared.splitted_dir = splitted_dir
 
+        shared.pv["sld_max_tkn"] = 2500
+
         audio_todo = [f for f in splitted_dir.iterdir()]
         whi(f"Found {len(audio_todo)} audio splits before filtering")
         audio_todo = [f for f in audio_todo if audio_regex.match(f.name)]
