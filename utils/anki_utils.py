@@ -235,8 +235,8 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
             return f"Added {n}/{n}"
         else:
             return f"MISSING {n-missing}/{n}"
-        if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
-            return "null"
+    if txt_chatgpt_cloz.startswith("Too few words in txt_audio to be plausible "):
+        return "null"
     if txt_chatgpt_cloz.startswith("Image change detected: '"):
         return "null"
     if txt_chatgpt_cloz.lower().startswith("alfred"):
