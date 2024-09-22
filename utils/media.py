@@ -75,7 +75,7 @@ def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
             assert path.exists(), f"Pasted string but not a path: {path}"
             if path.is_dir():
                 assert gallery is None, "If pasting path to a dir, the target gallery must be None"
-                files = [f for f in path.iterdir() if f.suffix.lower()[1:] in ["png", "jpg", "jpeg"]]
+                files = sorted([f for f in path.iterdir() if f.suffix.lower()[1:] in ["png", "jpg", "jpeg"]])
                 assert files, f"No files ending in png, jpg or jpeg found in {path}"
                 files = sorted(files, key=lambda f: f.stat().st_ctime)
                 red(f"Will paste those files: {files}")
