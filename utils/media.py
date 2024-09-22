@@ -26,14 +26,12 @@ from .shared_module import shared
 from .typechecker import optional_typecheck
 
 
-@trace
 @optional_typecheck
 def is_image_magic(file_path: Union[str, PosixPath]) -> bool:
     mime = magic.Magic(mime=True)
     file_type = mime.from_file(file_path)
     return file_type.startswith('image/')
 
-@trace
 @optional_typecheck
 def is_image_cv2(file_path: Union[str, PosixPath]) -> bool:
     try:
