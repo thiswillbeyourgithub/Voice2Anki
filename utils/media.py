@@ -41,7 +41,6 @@ def is_image_cv2(file_path: Union[str, PosixPath]) -> bool:
     except cv2.error:
         return False
 
-
 @trace
 @optional_typecheck
 def get_image(gallery) -> Optional[List[Union[gr.Gallery, np.ndarray]]]:
