@@ -210,7 +210,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
                 paths.append(new)
 
         ocrs = Parallel(
-            n_jobs=4,
+            n_jobs=2,
             backend="threading",
         )(delayed(get_text)(str(new))
             for new in paths
