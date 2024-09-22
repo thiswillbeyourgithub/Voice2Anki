@@ -288,7 +288,7 @@ def sound_preprocessing(audio_mp3_path: Union[PosixPath, str]) -> PosixPath:
 
 @optional_typecheck
 @trace
-def force_sound_processing() -> PosixPath:
+def force_sound_processing(path: Optional[Union[str, PosixPath]] = None) -> PosixPath:
     """harsher sound processing for the currently loaded next audio. This is
     done if there are some residual long silence that are making whisper
     hallucinate. The previous audio will be moved to the dirload done_dir and
@@ -296,8 +296,14 @@ def force_sound_processing() -> PosixPath:
     assert shared.pv["enable_dirload"], "Incoherent UI"
     assert not shared.dirload_queue.empty, "Dirload queue is empty"
 
-    path = shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name
-    path = Path(path)
+    expected_path = Path(shared.dirload_queue[shared.dirload_queue["loaded"] == True].iloc[0].name)
+    if path is None:
+        path = expected_path
+    else:
+        path = Path(path)
+        if path != expected_path:
+            red(f"Forced processing sound of {path} but expected probably {expected_path}")
+
     assert path.exists(), f"Missing {path}"
     red(f"Forcing harsher sound processing of {path}")
 
@@ -311,7 +317,6 @@ def force_sound_processing() -> PosixPath:
             sample_rate,
             shared.force_preprocess_sox_effects,
             )
-
 
     # saving file as wav then as mp3
     try:
