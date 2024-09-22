@@ -205,7 +205,10 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
             if not new.exists():
                 shutil.copy2(str(path), str(new))
             assert new.exists(), new
-            sources.append(new)
+            if new in paths:
+                red(f"There's at least one image appearing multiple times in the gallery. Ignoring duplicates: {new}")
+            else:
+                paths.append(new)
 
         texts = Parallel(n_jobs=4, backend="threading")(delayed(get_text)(str(new)) for new in sources)
 
