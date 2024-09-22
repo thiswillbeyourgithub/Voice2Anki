@@ -176,7 +176,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
             try:
                 path = img.image.path
                 assert is_image_magic(path) or is_image_cv2(path), f"Not an image: {path}"
-            except:
+            except Exception:
                 try:
                     path = img["image"]["path"]
                     if path.startswith("http"):
