@@ -79,7 +79,9 @@ class Cli:
         audio_todo = [f for f in splitted_dir.iterdir()]
         whi(f"Found {len(audio_todo)} audio splits before filtering")
         audio_todo = [f for f in audio_todo if audio_regex.match(f.name)]
-        audio_todo = sorted(audio_todo, key=lambda f: f.stat().st_ctime)
+        # audio_todo = sorted(audio_todo, key=lambda f: f.stat().st_ctime)
+        # fix: sort by name actualy because force processing would move the audio at the end
+        audio_todo = sorted(audio_todo, key=lambda f:f.name)
         assert audio_todo, "No audio todo"
         whi(f"Found {len(audio_todo)} audio splits to do")
 
