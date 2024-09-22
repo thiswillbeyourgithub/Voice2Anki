@@ -170,8 +170,7 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
         if len(gallery) == 0:
             return queue.put(red("0 image found in gallery."))
 
-        sources = []
-        source = ""
+        paths = []
         for img in gallery:
             try:
                 path = img.image.path
@@ -210,16 +209,22 @@ def get_img_source(gallery: Union[List, None], queue=queue.Queue(), use_html: bo
             else:
                 paths.append(new)
 
-        texts = Parallel(n_jobs=4, backend="threading")(delayed(get_text)(str(new)) for new in sources)
+        ocrs = Parallel(
+            n_jobs=4,
+            backend="threading",
+        )(delayed(get_text)(str(new))
+            for new in paths
+        )
 
-        for ocr in texts:
+        source = ""
+        for path, ocr in zip(paths, ocrs):
 
             if use_html:
                 if ocr:
                     ocr = ocr.replace("\"", "").replace("'", "")
                     ocr = f"title=\"{ocr}\" "
 
-                newsource = f'<img src="{new.name}" {ocr}type="made_by_Voice2Anki">'
+                newsource = f'<img src="{path.name}" {ocr}type="made_by_Voice2Anki">'
 
                 # only add if not duplicate, somehow
                 if newsource not in source:
