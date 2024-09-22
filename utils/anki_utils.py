@@ -228,9 +228,13 @@ async def get_card_status(txt_chatgpt_cloz: str) -> str:
         assert "EMPTY" not in vals, f"Found EMPTY in {txt_chatgpt_cloz} that returned {vals}"
 
         n = len(vals)
+        nulls = len([v for v in vals if "null" in v.lower()])
         missing = len([v for v in vals if "missing" in v.lower()])
         present = len([v for v in vals if "added" in v.lower()])
-        assert missing + present == n, f"Unmatching length for {txt_chatgpt_cloz} that returned {vals}"
+        assert nulls + missing + present == n, f"Unmatching length for {txt_chatgpt_cloz} that returned {vals}"
+        n -= nulls
+        assert n >= 0
+        assert n-missing >= 0
         if missing == 0:
             return f"Added {n}/{n}"
         else:
