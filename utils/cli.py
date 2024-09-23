@@ -83,6 +83,8 @@ class Cli:
         shared.splitted_dir = splitted_dir
 
         shared.pv["sld_max_tkn"] = 2500
+        shared.pv["txt_deck"] = txt_deck
+        shared.pv["txt_tags"] = txt_tags
 
         audio_todo = [f for f in splitted_dir.iterdir()]
         whi(f"Found {len(audio_todo)} audio splits before filtering")
@@ -101,10 +103,7 @@ class Cli:
             autocontext = True
         else:
             autocontext = False
-
-        shared.pv["txt_deck"] = txt_deck
-        shared.pv["txt_tags"] = txt_tags
-
+            shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
 
         if "gallery_pdf" in kwargs:
             # load just the pathnames but might maybe cause issue with ocr caching?:
@@ -123,7 +122,6 @@ class Cli:
             vhv("Loaded gallery")
         else:
             gallery = None
-
         shared.pv["gallery"] = gallery
 
         shared.pv["sld_buffer"] = sld_buffer
@@ -151,7 +149,7 @@ class Cli:
                     red(f"New context: '{context}'")
                     txt_chatgpt_context = context
 
-            shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
+                shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
 
             row = shared.dirload_queue.loc[audio.__str__(), :]
             assert not row.empty, f"Empty row: {row}"
@@ -162,18 +160,6 @@ class Cli:
             hv(f"Transcript:\n{text}")
             vhv("=" * 10)
             # for some reason using kwargs don't work
-            # cloze = alfred(
-            #     txt_audio=text,
-            #     txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
-            #     profile=shared.pv.profile_name,
-            #     max_token=shared.pv["sld_max_tkn"],
-            #     temperature=shared.pv["sld_temp"],
-            #     sld_buffer=shared.pv["sld_buffer"],
-            #     llm_choice=shared.pv["llm_choice"],
-            #     txt_keywords=shared.pv["txt_keywords"],
-            #     prompt_manag=shared.pv["prompt_management"],
-            #     cache_mode=False,
-            # )
             cloze = alfred(
                 text,
                 shared.pv["txt_chatgpt_context"],
@@ -224,7 +210,7 @@ class Cli:
                         shared.pv["llm_choice"],
                         shared.pv["txt_keywords"],
                         shared.pv["prompt_management"],
-                        False,
+                        False, # cache mode
                     )
                     assert cloze2 != cloze, "Force processing did not change the cloze"
                     cloze = cloze2
@@ -250,7 +236,7 @@ class Cli:
                     txt_tags=shared.pv["txt_tags"],
                     gallery=shared.pv["gallery"],
                     check_marked=False,
-                    txt_extra_source=None,
+                    txt_extra_source="",
                 )
                 if out is None:
                     out = "Success"
