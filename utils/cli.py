@@ -50,6 +50,10 @@ class Cli:
         assert txt_tags, "Missing txt_tags after splitting by a space"
         txt_tags += ["VoiceToAnki::cli_mode"]
 
+        if unsupervised:
+            vhv(f"Activating 'unsupervised' mode: {unsupervised}")
+            txt_tags += [f"VoiceToAnki::unsupervised::{unsupervised}"]
+
         if profile is MISSING:
             profile = "latest"
         # shared.pv.__class__._instance = None  # otherwise it forbids creating new instances
@@ -91,10 +95,6 @@ class Cli:
         if nb_audio_slots == "auto":
             nb_audio_slots = len(audio_todo)
             shared.audio_slot_nb = nb_audio_slots
-
-        if unsupervised:
-            vhv(f"Activating 'unsupervised' mode: {unsupervised}")
-            txt_tags += [f"VoiceToAnki::unsupervised::{unsupervised}"]
 
         if "gallery_pdf" in kwargs:
             # load just the pathnames but might maybe cause issue with ocr caching?:
@@ -219,7 +219,7 @@ class Cli:
                     txt_chatgpt_cloz=cloze,
                     txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
                     txt_deck=shared.pv["txt_deck"],
-                    txt_tags=shared.pv["txt_tags"] + txt_tags,
+                    txt_tags=txt_tags,
                     gallery=gallery,
                     check_marked=False,
                     txt_extra_source=None,
