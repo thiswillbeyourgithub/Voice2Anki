@@ -114,6 +114,8 @@ class Cli:
         else:
             gallery = None
 
+        shared.pv["gallery"] = gallery
+
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
         time.sleep(1)
@@ -220,7 +222,7 @@ class Cli:
                     txt_chatgpt_context=txt_chatgpt_context,
                     txt_deck=txt_deck,
                     txt_tags=txt_tags,
-                    gallery=gallery,
+                    gallery=shared.pv["gallery"],
                     check_marked=False,
                     txt_extra_source=None,
                 )
@@ -288,7 +290,7 @@ class Cli:
                             txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
                             txt_chatgpt_cloz=cloze,
                             txt_chatgpt_context=txt_chatgpt_context,
-                            gallery=gallery,
+                            gallery=shared.pv["gallery"],
                         )
                         vhv("Flagged audio")
                     except Exception as e:
