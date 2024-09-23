@@ -95,6 +95,9 @@ class Cli:
         if nb_audio_slots == "auto":
             nb_audio_slots = len(audio_todo)
             shared.audio_slot_nb = nb_audio_slots
+        shared.pv["txt_deck"] = txt_deck
+        shared.pv["txt_tags"] = txt_tags
+
 
         if "gallery_pdf" in kwargs:
             # load just the pathnames but might maybe cause issue with ocr caching?:
@@ -126,6 +129,8 @@ class Cli:
             vhv("Done dirloading")
 
         for audio in tqdm(audio_todo, unit="audio"):
+            shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
+
             row = shared.dirload_queue.loc[audio.__str__(), :]
             assert not row.empty, f"Empty row: {row}"
             temp_path = row["temp_path"]
@@ -220,8 +225,8 @@ class Cli:
                     txt_audio=text,
                     txt_chatgpt_cloz=cloze,
                     txt_chatgpt_context=txt_chatgpt_context,
-                    txt_deck=txt_deck,
-                    txt_tags=txt_tags,
+                    txt_deck=shared.pv["txt_deck"],
+                    txt_tags=shared.pv["txt_tags"],
                     gallery=shared.pv["gallery"],
                     check_marked=False,
                     txt_extra_source=None,
