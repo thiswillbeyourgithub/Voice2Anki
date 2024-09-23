@@ -218,7 +218,7 @@ class Cli:
                     txt_audio=text,
                     txt_chatgpt_cloz=cloze,
                     txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
-                    txt_deck=shared.pv["txt_deck"],
+                    txt_deck=txt_deck,
                     txt_tags=txt_tags,
                     gallery=gallery,
                     check_marked=False,
