@@ -101,6 +101,7 @@ class Cli:
         
         if txt_chatgpt_context == "auto":
             autocontext = True
+            txt_tags += ["VoiceToAnki::autocontext::REPLACE"]
         else:
             autocontext = False
             shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
@@ -137,17 +138,25 @@ class Cli:
 
         for audio in tqdm(audio_todo, unit="audio"):
             if autocontext:
-                new_c = "_".join(audio.name.split("_")[3:]).split("")
+                new_c = list("_".join(audio.name.split("_")[3:]))
                 context = ""
                 for char in new_c:
                     if char.isdigit():
                         break
                     context +- char
+                context_str = context
                 context = context.replace("_", " ").title()
                 context = "Cours sur: '" + context + "'"
                 if context != txt_chatgpt_context:
                     red(f"New context: '{context}'")
                     txt_chatgpt_context = context
+                    assert len([t for t in txt_tags if t.startswith("VoiceToAnki::autocontext")]) == 1, txt_tags
+                    for it, tag in enumerate(txt_tags):
+                        if tag.startswith("VoiceToAnki::autocontext::"):
+                            txt_tags[it] = f"VoiceToAnki::autocontext::{context_str}"
+                            break
+                else:
+                    assert f"VoiceToAnki::autocontext::{context_str}" in txt_tags, txt_tags
 
                 shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
 
