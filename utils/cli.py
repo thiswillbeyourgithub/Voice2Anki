@@ -95,6 +95,12 @@ class Cli:
         if nb_audio_slots == "auto":
             nb_audio_slots = len(audio_todo)
             shared.audio_slot_nb = nb_audio_slots
+        
+        if txt_chatgpt_context == "auto":
+            autocontext = True
+        else:
+            autocontext = False
+
         shared.pv["txt_deck"] = txt_deck
         shared.pv["txt_tags"] = txt_tags
 
@@ -129,6 +135,19 @@ class Cli:
             vhv("Done dirloading")
 
         for audio in tqdm(audio_todo, unit="audio"):
+            if autocontext:
+                new_c = "_".join(audio.name.split("_")[3:]).split("")
+                context = ""
+                for char in new_c:
+                    if char.isdigit():
+                        break
+                    context +- char
+                context = context.replace("_", " ").title()
+                context = "Cours sur: '" + context + "'"
+                if context != txt_chatgpt_context:
+                    red(f"New context: '{context}'")
+                    txt_chatgpt_context = context
+
             shared.pv["txt_chatgpt_context"] = txt_chatgpt_context
 
             row = shared.dirload_queue.loc[audio.__str__(), :]
@@ -154,7 +173,7 @@ class Cli:
             # )
             cloze = alfred(
                 text,
-                txt_chatgpt_context,
+                shared.pv["txt_chatgpt_context"],
                 shared.pv.profile_name,
                 shared.pv["sld_max_tkn"],
                 shared.pv["sld_temp"],
@@ -194,7 +213,7 @@ class Cli:
                     assert text2 != text, "Force processing did not change the text"
                     cloze2 = alfred(
                         text2,
-                        txt_chatgpt_context,
+                        shared.pv["txt_chatgpt_context"],
                         shared.pv.profile_name,
                         shared.pv["sld_max_tkn"],
                         shared.pv["sld_temp"],
@@ -218,13 +237,12 @@ class Cli:
                         breakpoint()
                     if ans:
                         vhv("Quitting")
-
             try:
                 out = to_anki(
                     audio_mp3_1=temp_path,
                     txt_audio=text,
                     txt_chatgpt_cloz=cloze,
-                    txt_chatgpt_context=txt_chatgpt_context,
+                    txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
                     txt_deck=shared.pv["txt_deck"],
                     txt_tags=shared.pv["txt_tags"],
                     gallery=shared.pv["gallery"],
@@ -294,7 +312,7 @@ class Cli:
                             txt_whisp_lang=shared.pv["txt_whisp_lang"],
                             txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
                             txt_chatgpt_cloz=cloze,
-                            txt_chatgpt_context=txt_chatgpt_context,
+                            txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
                             gallery=shared.pv["gallery"],
                         )
                         vhv("Flagged audio")
