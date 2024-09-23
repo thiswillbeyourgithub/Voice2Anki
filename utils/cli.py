@@ -144,8 +144,8 @@ class Cli:
                     if char.isdigit():
                         break
                     context += char
-                context_str = context
-                context = context.replace("_", " ").title()
+                context_str = context.strip()
+                context = context.replace("_", " ").title().strip()
                 context = "Cours sur: '" + context + "'"
                 if context != txt_chatgpt_context:
                     red(f"New context: '{context}'")
