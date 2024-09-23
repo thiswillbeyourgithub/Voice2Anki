@@ -143,7 +143,7 @@ class Cli:
                 for char in new_c:
                     if char.isdigit():
                         break
-                    context +- char
+                    context += char
                 context_str = context
                 context = context.replace("_", " ").title()
                 context = "Cours sur: '" + context + "'"
