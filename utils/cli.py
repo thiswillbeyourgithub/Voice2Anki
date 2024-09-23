@@ -147,7 +147,7 @@ class Cli:
             # )
             cloze = alfred(
                 text,
-                shared.pv["txt_chatgpt_context"],
+                txt_chatgpt_context,
                 shared.pv.profile_name,
                 shared.pv["sld_max_tkn"],
                 shared.pv["sld_temp"],
@@ -187,7 +187,7 @@ class Cli:
                     assert text2 != text, "Force processing did not change the text"
                     cloze2 = alfred(
                         text2,
-                        shared.pv["txt_chatgpt_context"],
+                        txt_chatgpt_context,
                         shared.pv.profile_name,
                         shared.pv["sld_max_tkn"],
                         shared.pv["sld_temp"],
@@ -217,7 +217,7 @@ class Cli:
                     audio_mp3_1=temp_path,
                     txt_audio=text,
                     txt_chatgpt_cloz=cloze,
-                    txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                    txt_chatgpt_context=txt_chatgpt_context,
                     txt_deck=txt_deck,
                     txt_tags=txt_tags,
                     gallery=gallery,
@@ -287,7 +287,7 @@ class Cli:
                             txt_whisp_lang=shared.pv["txt_whisp_lang"],
                             txt_whisp_prompt=shared.pv["txt_whisp_prompt"],
                             txt_chatgpt_cloz=cloze,
-                            txt_chatgpt_context=shared.pv["txt_chatgpt_context"],
+                            txt_chatgpt_context=txt_chatgpt_context,
                             gallery=gallery,
                         )
                         vhv("Flagged audio")
