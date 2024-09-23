@@ -145,6 +145,10 @@ class Cli:
                         break
                     context += char
                 context_str = context.strip()
+                while context_str.startswith("_"):
+                    context_str = context_str[1:]
+                while context_str.endswith("_"):
+                    context_str = context_str[:-1]
                 context = context.replace("_", " ").title().strip()
                 context = "Cours sur: '" + context + "'"
                 if context != txt_chatgpt_context:
