@@ -29,6 +29,7 @@ class Cli:
         txt_chatgpt_context: str,
         txt_deck: str,
         txt_tags: str,
+        sld_buffer: int,
         nb_audio_slots: Union[str, int],
 
         profile: Optional[str] = MISSING,
@@ -124,6 +125,8 @@ class Cli:
             gallery = None
 
         shared.pv["gallery"] = gallery
+
+        shared.pv["sld_buffer"] = sld_buffer
 
         audio_slots = dirload_splitted(True, [None] * nb_audio_slots)
 
