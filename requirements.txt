@@ -14,7 +14,7 @@ joblib>=1.4.2
 platformdirs >= 4.2.2
 iterator_cacher >= 1.0.0  # by me
 py_ankiconnect  # by me
-beartype >= 0.19.0rc0
+beartype >= 0.19.0
 
 # ocr mode
 ocr_with_format  # by me
