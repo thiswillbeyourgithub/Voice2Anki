@@ -77,8 +77,9 @@ class SharedModule:
             # ["highpass", "-1", "100"],
             # ["lowpass", "-1", "3000"],
             # # removes high frequency and very low ones
+            # note: voice frequency range are from 100hz to 17khz (male low to female high)
             ["highpass", "-2", "50"],
-            ["lowpass", "-2", "5000"],
+            ["lowpass", "-2", "18000"],
 
             # max silence should be 1s
             ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.5%"],
@@ -101,7 +102,7 @@ class SharedModule:
 
             # filter for voice
             ["highpass", "-2", "50"],
-            ["lowpass", "-2", "5000"],
+            ["lowpass", "-2", "18000"],
 
             # max silence should be 1s
             ["silence", "-l", "1", "0", "2%", "-1", "1.0", "2%"],
