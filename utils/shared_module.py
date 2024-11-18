@@ -74,10 +74,12 @@ class SharedModule:
 
             # isolate voice frequency
             # -2 is for a steeper filtering
-            # ["bandpass", "-1", "100", "3000"],
+            # ["highpass", "-1", "100"],
+            # ["lowpass", "-1", "3000"],
             # # removes high frequency and very low ones
             # note: voice frequency range are from 100hz to 17khz (male low to female high)
-            ["bandpass", "-2", "50", "18000"],
+            ["highpass", "-2", "50"],
+            ["lowpass", "-2", "18000"],
 
             # max silence should be 1s
             ["silence", "-l", "1", "0", "0.5%", "-1", "1.0", "0.5%"],
@@ -99,7 +101,8 @@ class SharedModule:
             ["norm"],
 
             # filter for voice
-            ["bandpass", "-2", "50", "18000"],
+            ["highpass", "-2", "50"],
+            ["lowpass", "-2", "18000"],
 
             # max silence should be 1s
             ["silence", "-l", "1", "0", "2%", "-1", "1.0", "2%"],
@@ -120,9 +123,11 @@ class SharedModule:
             ["norm"],  # normalize audio
 
             # isolate voice frequency
-            # ["bandpass", "-1", "100", "3000"],
+            # ["highpass", "-1", "100"],
+            # ["lowpass", "-1", "3000"],
             # -2 is for a steeper filtering: removes high frequency and very low ones
-            # ["bandpass", "-2", "50", "5000"],
+            # ["highpass", "-2", "50"],
+            # ["lowpass", "-2", "5000"],
             # ["norm"],  # normalize audio
 
             # max silence should be 3s
