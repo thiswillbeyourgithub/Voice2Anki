@@ -46,6 +46,8 @@
   * ![](./docs/anki_screenshot.png)
 
   # Roadmap
+<i>This TODO list is maintained automatically by [MdXLogseqTODOSync](https://github.com/thiswillbeyourgithub/MdXLogseqTODOSync)</i>
+
   <!-- BEGIN_TODO -->
 - ### Urgent
 - add a tab with the documentation inside
