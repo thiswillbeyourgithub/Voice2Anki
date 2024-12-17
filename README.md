@@ -44,3 +44,35 @@
 ## Gallery
 * Anki backend:
   * ![](./docs/anki_screenshot.png)
+
+  # Roadmap
+  <!-- BEGIN_TODO -->
+- ### Urgent
+- add a tab with the documentation inside
+    - starts from the problem
+- switch to gradio 5
+    - https://github.com/gradio-app/gradio/issues/9463
+- make easy to install via pypi / stop using requirements
+- ### Enhancements
+- by default create a Voice2Anki deck inside anki if needed
+- create a project icon
+- display the total price in the settings
+- API should be set as a textbox that works for all APIs instead of a dedicated field each time
+- use the litellm tokenizer as it's a bit better than relying only on openai
+- the system prompt should contain a string like {EXTRA_RULES} so that the user can add its own rules
+- add  a setting for a list of tags that you can add with a quick button to the previous card
+- use pandas to handle the embeddings instead of lists. This probably makes the score computation non scalable.
+- in the prompt make the LLM use a <thinking> xml tag
+- make it easier to change the endpoint url for whisper
+- checkbox to disable OCR + to set the OCR language
+- for each prompt used, keep a counter of how many times it is used, and a counter of how many times it is used on the same audio inputs
+    - as if it's used say 10 times on the same prompt, that means it was not sufficient and might be a bad example
+- replace most hardcoded strings by variables in a py file
+- store the thoughts in the memories maybe?
+- ### Overhaul
+- use faiss (possibly langchain) to handle the embeddings as it currently might not be scalable.
+- change the way audo components are used
+    - create like 1000 components
+- convert more of the code to use async
+- add a column to add buttons to easily add a text to the prompt or the audio. This way, modifications that the user frequently has to do are quicker to do.
+<!-- END_TODO -->
