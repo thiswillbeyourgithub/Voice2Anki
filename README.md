@@ -110,6 +110,11 @@ I have many other Anki projects, so don't hesitate to check them out!
 #### What is Few-Shot Learning?
       Few-Shot Learning is a machine learning approach where a model learns from a very small number of examples, unlike traditional machine learning that requires large datasets. In Voice2Anki, this technique is used to adapt the LLM's behavior based on just a few corrected examples you provide. When you correct a card and save it as an example, the system uses these few examples (or "shots") to understand your preferred style and formatting, making future cards more aligned with your preferences. You can learn more about Few-Shot Learning [here](https://www.geeksforgeeks.org/zero-shot-vs-one-shot-vs-few-shot-learning/#what-is-fewshot-learning).
 
+#### Do I have to use the Gradio GUI or can it run autonomously?
+      Initially, Voice2Anki was designed to be used only with the GUI interface. However, there is now an experimental CLI script located at `utils/cli.py` that can create flashcards autonomously. Please note that this CLI version is personal, barely tested, and should be used with caution.
+
+#### How can I help with the project?
+      We need help in several areas, including making the CLI version a first-class citizen of the project, improving documentation, and making the installation process easier through PyPI. If you're knowledgeable about Python packaging for Anki, we'd especially appreciate your expertise.
 
 
 
