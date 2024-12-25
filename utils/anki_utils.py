@@ -508,6 +508,8 @@ assert anki_media.exists(), "Media folder not found!"
 shared.anki_media = anki_media
 assert shared.anki_media.name == "collection.media"
 
+# Check if everything is running fine
+asyncio.run(sync_anki())
 
 if __name__ == "__main__":
     print(
