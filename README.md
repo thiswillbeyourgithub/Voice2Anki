@@ -46,8 +46,14 @@ I have many other Anki projects, so don't hesitate to check them out!
 
 
 ## Gallery
-* Anki backend:
-  * ![](./docs/anki_screenshot.png)
+* Interface screenshots:
+  * ![First](./docs/first.png)
+  * ![Second](./docs/second.png)
+  * ![Third](./docs/third.png)
+  * ![Fourth](./docs/fourth.png)
+  * ![Fifth](./docs/fifth.png)
+  * ![Sixth](./docs/sixth.png)
+  * ![Seventh](./docs/seventh.png)
 
   # Roadmap
 <i>This TODO list is maintained automatically by [MdXLogseqTODOSync](https://github.com/thiswillbeyourgithub/MdXLogseqTODOSync)</i>
