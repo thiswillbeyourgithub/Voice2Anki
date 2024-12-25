@@ -26,6 +26,7 @@ I have many other Anki projects, so don't hesitate to check them out!
 * Make sure you have python 3.11 (needed for asyncio.timeout)
 * Install the dependencies: `python -m pip install -r requirements.txt`
 * Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
+* To read the help page: `python Voice2Anki.py --help`
 * `python Voice2Anki.py`
     * `--open_browser` opens the browser on the interface.
     * `--authentication` enables the authentication panel. user/password have to be edited in `Voice2Anki.py`.
