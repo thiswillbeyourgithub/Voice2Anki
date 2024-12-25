@@ -90,6 +90,9 @@
 #### Why was this project created?
       Voice2Anki started as a tool to help me towards the end of medical school. I then released it hastily here and documented it quickly using [aider](https://aider.chat/). It worked well for me and I think it should be made much more accessible to people.
 
+#### How did you use it?
+      I first created very long audio files by telling out loud the anki flashcards I wanted and separated each flashcard by an audible STOP that, thanks to my other project https://github.com/thiswillbeyourgithub/whisper_audio_splitter I was able to split the long audio into flashcard size segment, then put then in a folder and loaded them all to Voice2Anki straight into anki.
+
 
 
 
