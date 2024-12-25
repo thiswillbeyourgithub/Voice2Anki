@@ -101,6 +101,9 @@ I have many other Anki projects, so don't hesitate to check them out!
 #### What are profiles and why should I use them?
       Profiles were made to separate example prompts. For example, if you have lots of list type anki cards about medical stuff then you might want a separate folder for physics related flashcards where your cards are phrased in another way.
 
+#### What does OCR have to do with Voice2Anki?
+      I made https://github.com/thiswillbeyourgithub/OCR_with_format to do OCR on the screenshots I was taking from my medical books so decided to include it in Voice2Anki so that you can use the native anki search browser and it will search among image content too.
+
 
 
 
