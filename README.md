@@ -5,18 +5,21 @@ I have many other Anki projects, so don't hesitate to check them out!
 ## What is Voice2Anki?
 * Voice2Anki is a tool that leverages the power of LLMs to correct the transcription of state of the art TTS (text to speech) models to create anki flashcards. It allows to create many very high quality flashcards at a fast speed, on any subjects, using any language, phrased in a the way that suits you the most (it learns through examples you give it)
 
-### Features
-* Works in any language
-* Works on any topic: LLM can correct Whisper efficiently
-* **Adapts to you** If a flashcard was not exactly like you wanted, correct it (manually or using your voice) then save it for the future and the LLM will use it for the next cards. You can save many examples like this as embeddings and keywords are used to find the most relevant example for your use case at each prompt.
-* Many settings: supports many LLMs, several TTS models etc
-* Advanced customization: you can add your own functions to modify some behaviors:
-    * want super specific formatting for your flashcards that LLM fail to imitate? Write a python function that transforms the text and put it in your profile. It will be automatically taken into account when sending the card to anki.
-    * also supports custom langchain file for very advanced formatting. For example I did one for quickly converting table data into flashcards.
-* You can specify anki tags, marks, deck etc.
-* If you supply one or several images, it will be OCR'ed then saved in the flashcard in a source field. A special algorithm is used to keep the formatting of the image in the OCR step.
-* Supports ChatGPT, GPT-4, replicate models, openrouter models thanks to [litellm](https://docs.litellm.ai/). Many more support can be added.
-* Supports multiple profile. Making it handy for various use.
+### Key Features
+* **Universal Language Support**: Works seamlessly in any language
+* **Topic Flexibility**: Handles any subject matter with efficient LLM-powered Whisper corrections
+* **Adaptive Learning**: 
+    * **Smart Adaptation**: The system learns from your corrections (voice or manual)
+    * **Memory System**: Uses embeddings and keywords to find relevant examples for future cards
+* **Powerful Customization**:
+    * **Multiple LLMs**: Supports ChatGPT, GPT-4, replicate models, and openrouter models via [litellm](https://docs.litellm.ai/)
+    * **TTS Options**: Multiple Text-to-Speech models available
+    * **Advanced Functions**: Add custom Python functions for specialized card formatting
+    * **LangChain Integration**: Supports custom formatting (e.g., table data conversion)
+* **Rich Anki Integration**:
+    * Specify tags, marks, and deck organization
+    * **Smart OCR**: Automatically processes images while preserving formatting
+* **Profile System**: Create and manage multiple profiles for different use cases
 
 ## Getting started
 * clone this repo
