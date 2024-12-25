@@ -59,6 +59,7 @@ I have many other Anki projects, so don't hesitate to check them out!
 - switch to gradio 5
     - https://github.com/gradio-app/gradio/issues/9463
 - make easy to install via pypi / stop using requirements
+- Make the `utils/cli.py` version a first class citizen
 - ### Enhancements
 - by default create a Voice2Anki deck inside anki if needed
 - create a project icon
