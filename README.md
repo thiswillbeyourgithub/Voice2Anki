@@ -61,14 +61,23 @@ python Voice2Anki.py --help
 2. Enter a profile name in the `profile` field (this loads default settings)
 3. Configure your API key in the settings
 
-## Notes
-* If using SSL, the certificates you will supply will probably be self signed, you'll likely have to tick a few checkbox on your browser to access the site.
-* It's apparently way less CPU intensive to use Chromium than to use firefox according to my limited testing with a heavily modified firefox.
-* tips: if you want to quickly have high quality card, add the end of the recording mention notes to alfred like "Note to Alfred: do 3 cards on that topic" or "Note to Alfred: a list card". Then simply let it create new cards and manually delete from the transcript that you hinted at Alfred and save the prompt as a good example of Alfred doing what you wanted.
-* The memories prompts are stored in your profile folder.
-* To update the app, you just have to do `git pull`
-* Reach out if you have any issue.
-* Feedbacks (of any nature) are much appreciated.
+## Important Notes
+
+### Security & Performance
+* **SSL Certificates**: Self-signed certificates require browser security exceptions
+* **Browser Compatibility**: Chromium-based browsers show better CPU performance than Firefox
+* **Updates**: Simply run `git pull` to get the latest version
+
+### Tips & Tricks
+* **Quick Quality Cards**: Add hints to Alfred at the end of recordings:
+  * Example: "Note to Alfred: do 3 cards on that topic"
+  * Example: "Note to Alfred: a list card"
+* **Memory Storage**: Prompt memories are saved in your profile folder
+* **Workflow**: After Alfred creates cards, remove the hint from the transcript and save it as a good example
+
+### Support
+* Feel free to reach out with any issues
+* All feedback is welcome and helps improve the project
 
 
 ## Gallery
