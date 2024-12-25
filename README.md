@@ -77,3 +77,21 @@
 - convert more of the code to use async
 - add a column to add buttons to easily add a text to the prompt or the audio. This way, modifications that the user frequently has to do are quicker to do.
 <!-- END_TODO -->
+
+
+## FAQ
+
+<details>
+  <summary>
+    Click to show
+  </summary>
+
+
+#### Why was this project created?
+      Voice2Anki started as a tool to help me towards the end of medical school. I then released it hastily here and documented it quickly using [aider](https://aider.chat/). It worked well for me and I think it should be made much more accessible to people.
+
+
+
+
+
+</details>
