@@ -1,3 +1,13 @@
+"""
+EXPERIMENTAL CODE - USE WITH CAUTION
+
+This CLI module is experimental and minimally tested. It was created to rapidly process
+multiple audio files into Anki flashcards without using the GUI interface. While it can
+efficiently handle audio splits created with Whisper Audio Splitter 
+(https://github.com/thiswillbeyourgithub/whisper_audio_splitter), all generated
+flashcards should be carefully reviewed afterwards for accuracy and quality.
+"""
+
 import gradio as gr
 import pyclip
 import time
