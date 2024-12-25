@@ -1,9 +1,7 @@
 # Voice2Anki
 
 ## What is Voice2Anki?
-* Voice2Anki is a tool that leverages the power of LLMs (think ChatGPT) to correct the transcription of TTS (text to speech, think openai's whisper) models to create [Anki](https://apps.ankiweb.net/) flashcards. It allows to create many very **high quality** flashcards at a **fast speed**, on **any subjects**, using **any language**, **using the same phrasing you would use** (thanks to Few Shot Learning it learns through the passed examples).
-
-I have many other Anki projects, so don't hesitate to check them out!
+* Voice2Anki is a tool that leverages the power of LLMs (think ChatGPT) to correct the transcription of TTS (text to speech, think openai's whisper) models to create [Anki](https://apps.ankiweb.net/) flashcards. It allows to create many very **high quality** flashcards at a **fast speed**, on **any subjects**, using **any language**, **using the same phrasing you would use** (thanks to Few Shot Learning it learns through the passed examples). I have many other Anki projects, so don't hesitate to check them out!
 
 ### Key Features
 * **Universal Language Support**: Works seamlessly in any language
