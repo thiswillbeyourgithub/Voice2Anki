@@ -16,6 +16,7 @@ iterator_cacher >= 1.0.0  # by me
 async_cache >= 1.1.1
 py_ankiconnect  # by me
 beartype >= 0.19.0
+python-magic >= 0.4.27
 
 # ocr mode
 ocr_with_format  # by me
