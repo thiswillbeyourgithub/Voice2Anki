@@ -19,6 +19,17 @@
     * **Smart OCR**: Automatically processes images while preserving formatting
 * **Profile System**: Create and manage multiple profiles for different use cases
 
+# Gallery
+* Interface screenshots:
+  * ![First](./docs/first.png)
+  * ![Second](./docs/second.png)
+  * ![Third](./docs/third.png)
+  * ![Fourth](./docs/fourth.png)
+  * ![Fifth](./docs/fifth.png)
+  * ![Sixth](./docs/sixth.png)
+  * ![Seventh](./docs/seventh.png)
+
+
 ## Getting Started
 
 ### Prerequisites
@@ -79,16 +90,6 @@ python Voice2Anki.py --help
 * Feel free to reach out with any issues
 * All feedback is welcome and helps improve the project
 
-
-## Gallery
-* Interface screenshots:
-  * ![First](./docs/first.png)
-  * ![Second](./docs/second.png)
-  * ![Third](./docs/third.png)
-  * ![Fourth](./docs/fourth.png)
-  * ![Fifth](./docs/fifth.png)
-  * ![Sixth](./docs/sixth.png)
-  * ![Seventh](./docs/seventh.png)
 
   # Roadmap
 <i>This TODO list is maintained automatically by [MdXLogseqTODOSync](https://github.com/thiswillbeyourgithub/MdXLogseqTODOSync)</i>
