@@ -8,7 +8,7 @@ I have many other Anki projects, so don't hesitate to check them out!
 ### Key Features
 * **Universal Language Support**: Works seamlessly in any language
 * **Topic Flexibility**: Handles any subject matter with efficient LLM-powered Whisper corrections
-* **Adaptive Learning**: 
+* **Adaptive Learning** (Few-Shot Learning): 
     * **Smart Adaptation**: The system learns from your corrections (voice or manual)
     * **Memory System**: Uses embeddings and keywords to find relevant examples for future cards
 * **Powerful Customization**:
@@ -106,6 +106,9 @@ I have many other Anki projects, so don't hesitate to check them out!
 
 #### What does OCR have to do with Voice2Anki?
       I made https://github.com/thiswillbeyourgithub/OCR_with_format to do OCR on the screenshots I was taking from my medical books so decided to include it in Voice2Anki so that you can use the native anki search browser and it will search among image content too.
+
+#### What is Few-Shot Learning?
+      Few-Shot Learning is a machine learning approach where a model learns from a very small number of examples, unlike traditional machine learning that requires large datasets. In Voice2Anki, this technique is used to adapt the LLM's behavior based on just a few corrected examples you provide. When you correct a card and save it as an example, the system uses these few examples (or "shots") to understand your preferred style and formatting, making future cards more aligned with your preferences. You can learn more about Few-Shot Learning [here](https://www.geeksforgeeks.org/zero-shot-vs-one-shot-vs-few-shot-learning/#what-is-fewshot-learning).
 
 
 
