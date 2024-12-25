@@ -93,6 +93,9 @@
 #### How did you use it?
       I first created very long audio files by telling out loud the anki flashcards I wanted and separated each flashcard by an audible STOP that, thanks to my other project https://github.com/thiswillbeyourgithub/whisper_audio_splitter I was able to split the long audio into flashcard size segment, then put then in a folder and loaded them all to Voice2Anki straight into anki.
 
+#### What is the status of this project?
+      I will now use it much less because I'm nearing the end of medical school but definitely want this project to grow. If people are knowledgeable about python packaging into anki don't hesitate to come forward because I won't have the time alone and if no one seems interested.
+
 
 
 
