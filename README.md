@@ -19,20 +19,47 @@
     * **Smart OCR**: Automatically processes images while preserving formatting
 * **Profile System**: Create and manage multiple profiles for different use cases
 
-## Getting started
-* clone this repo
-* Make sure you have python 3.11 (needed for asyncio.timeout)
-* Install the dependencies: `python -m pip install -r requirements.txt`
-* Anki must be open and with addon [AnkiConnect](https://ankiweb.net/shared/info/2055492159) enabled.
-* To read the help page: `python Voice2Anki.py --help`
-* `python Voice2Anki.py`
-    * `--open_browser` opens the browser on the interface.
-    * `--authentication` enables the authentication panel. user/password have to be edited in `Voice2Anki.py`.
-    * `--localnetwork` to make the interface accessible to your local network. Use `ifconfig` to figure out your local IP adress and connect to it using `https://[IP]:7860` (don't forget the http**s** ). You can use that to make it accessible from the global internet if you configure port forwarding from your router. Otherwise it's only accessible from the computer.
-    * `--debug` to increase verbosity.
-    * **CAREFUL** if you add `--share`, the interface will be forwarded to Hugging Face's website and accessible via a URL for 72 hours. Handy if you want to use Voice2Anki on mobile but can have privacy and security implications.
-* open your browser at the URL shown in the output of the previous command.
-* The first thing to do is to enter a profile name in the `profile` field. This will automatically fill the other fields with the latest value. Then also go enter the API key.
+## Getting Started
+
+### Prerequisites
+* Python 3.11 or later (required for asyncio.timeout)
+* Anki with [AnkiConnect](https://ankiweb.net/shared/info/2055492159) addon installed and enabled
+* An OpenAI API key or compatible LLM service
+
+### Quick Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/thiswillbeyourgithub/Voice2Anki.git
+   cd Voice2Anki
+   ```
+2. Install dependencies:
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
+### Running Voice2Anki
+1. Start Anki and ensure AnkiConnect is enabled
+2. Launch Voice2Anki:
+   ```bash
+   python Voice2Anki.py
+   ```
+   
+### Key Launch Options
+* `--open_browser`: Automatically opens your default browser
+* `--authentication`: Enables secure login (edit credentials in Voice2Anki.py)
+* `--localnetwork`: Makes interface available on your local network via `https://[LOCAL_IP]:7860`
+* `--debug`: Increases logging verbosity for troubleshooting
+* `--share`: Creates a temporary public URL (72h) via Hugging Face (**use with caution**)
+
+View all options with:
+```bash
+python Voice2Anki.py --help
+```
+
+### First-Time Setup
+1. Open your browser to the URL shown in the console output
+2. Enter a profile name in the `profile` field (this loads default settings)
+3. Configure your API key in the settings
 
 ## Notes
 * If using SSL, the certificates you will supply will probably be self signed, you'll likely have to tick a few checkbox on your browser to access the site.
