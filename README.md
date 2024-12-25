@@ -96,7 +96,7 @@ I have many other Anki projects, so don't hesitate to check them out!
       I first created very long audio files by telling out loud the anki flashcards I wanted and separated each flashcard by an audible STOP that, thanks to my other project https://github.com/thiswillbeyourgithub/whisper_audio_splitter I was able to split the long audio into flashcard size segment, then put then in a folder and loaded them all to Voice2Anki straight into anki.
 
 #### What is the status of this project?
-      I will now use it much less because I'm nearing the end of medical school but definitely want this project to grow. If people are knowledgeable about python packaging into anki don't hesitate to come forward because I won't have the time alone and if no one seems interested.
+      I will now use it much less because I'm nearing the end of medical school but definitely want this project to grow. If people are knowledgeable about python packaging into anki don't hesitate to come forward because I won't have the time alone and if no one seems interested. Last time I checked it was fully functional but I modified it to make it more accessible and documented etc and some bugs might have appeared because of the refactoring so please don't hesitate to open an issue as it's usually something dumb and quick to fix.
 
 #### What are profiles and why should I use them?
       Profiles were made to separate example prompts. For example, if you have lots of list type anki cards about medical stuff then you might want a separate folder for physics related flashcards where your cards are phrased in another way.
