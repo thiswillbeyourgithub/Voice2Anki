@@ -98,6 +98,9 @@ I have many other Anki projects, so don't hesitate to check them out!
 #### What is the status of this project?
       I will now use it much less because I'm nearing the end of medical school but definitely want this project to grow. If people are knowledgeable about python packaging into anki don't hesitate to come forward because I won't have the time alone and if no one seems interested.
 
+#### What are profiles and why should I use them?
+      Profiles were made to separate example prompts. For example, if you have lots of list type anki cards about medical stuff then you might want a separate folder for physics related flashcards where your cards are phrased in another way.
+
 
 
 
